@@ -1,9 +1,48 @@
-import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
+function parseCorsOrigins(value: string | undefined): string[] {
+  if (!value?.trim()) {
+    return [];
+  }
+
+  return value
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
 }
-bootstrap();
+
+function resolvePort(configService: ConfigService): number {
+  const raw =
+    configService.get<string>('BACKEND_PORT') ??
+    configService.get<string>('PORT') ??
+    '3000';
+  const port = Number(raw);
+  return Number.isFinite(port) && port > 0 ? port : 3000;
+}
+
+async function bootstrap(): Promise<void> {
+  const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+
+  const port = resolvePort(configService);
+  const corsOrigins = parseCorsOrigins(
+    configService.get<string>('CORS_ALLOWED_ORIGINS'),
+  );
+
+  if (corsOrigins.length > 0) {
+    app.enableCors({ origin: corsOrigins });
+  }
+
+  await app.listen(port);
+
+  console.log(`[backend] Server running on http://localhost:${port}`);
+  console.log(`[backend] GET http://localhost:${port}/health`);
+  console.log(`[backend] GET http://localhost:${port}/health/db`);
+}
+
+bootstrap().catch((error: unknown) => {
+  console.error('[backend] Failed to start:', error);
+  process.exit(1);
+});
