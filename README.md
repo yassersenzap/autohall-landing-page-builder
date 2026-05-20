@@ -50,6 +50,18 @@ Ces documents sont la **référence** avant et pendant le développement.
 
 ---
 
+## Structure technique initiale
+
+| Dossier | Rôle |
+|---------|------|
+| **`docs/context/`** | Document de contexte projet (vision, contraintes, vocabulaire Auto Hall). |
+| **`docs/mvp/`** | Documents de cadrage MVP (périmètre, données, API, export, sécurité, plan). |
+| **`backend/`** | API NestJS (scaffolding initial, logique métier à venir). |
+| **`frontend/`** | Interface React / Vite / TypeScript (page d’accueil minimale pour l’instant). |
+| **`docker/`** | Future configuration Docker (PostgreSQL, services, orchestration). |
+
+---
+
 ## Workflow MVP (résumé)
 
 1. Création d’une campagne et d’une landing associée.
@@ -69,6 +81,11 @@ Pour le détail fonctionnel et technique, se référer aux fichiers numérotés 
 
 ---
 
-## État du dépôt
+## État actuel du projet
 
-La racine est préparée pour Git (documentation, conventions, variables d’environnement d’exemple). Les dossiers **`backend/`**, **`frontend/`** et un **`docker-compose.yml`** ne sont pas encore créés à ce stade ; ils suivront après alignement sur la doc MVP.
+- Le **backend NestJS** démarre en local (scaffolding, sans logique métier).
+- Le **frontend React / Vite** démarre en local (page minimale de présentation).
+- **Docker**, **PostgreSQL** et **Prisma** ne sont pas encore configurés.
+- Aucune **logique métier** n’est encore développée.
+
+La racine reste préparée pour Git (documentation, conventions, variables d’environnement d’exemple dans `.env.example`).
