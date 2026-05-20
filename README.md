@@ -58,7 +58,7 @@ Ces documents sont la **référence** avant et pendant le développement.
 | **`docs/mvp/`** | Documents de cadrage MVP (périmètre, données, API, export, sécurité, plan). |
 | **`backend/`** | API NestJS (scaffolding initial, logique métier à venir). |
 | **`frontend/`** | Interface React / Vite / TypeScript (page d’accueil minimale pour l’instant). |
-| **`docker/`** | Future configuration Docker (PostgreSQL, services, orchestration). |
+| **`docker/`** | Documentation et ressources Docker (PostgreSQL local, pgAdmin optionnel). |
 
 ---
 
@@ -75,6 +75,17 @@ Pour le détail fonctionnel et technique, se référer aux fichiers numérotés 
 
 ---
 
+## Démarrage PostgreSQL local
+
+1. Copier les variables d’environnement : `cp .env.example .env` (ne pas versionner `.env`).
+2. Ajuster les mots de passe dans `.env` (`POSTGRES_PASSWORD`, `PGADMIN_DEFAULT_PASSWORD`, `DATABASE_URL`).
+3. Démarrer PostgreSQL : `docker compose up -d`
+4. *(Optionnel)* Démarrer pgAdmin : `docker compose --profile pgadmin up -d` → http://localhost:5050
+
+Commandes détaillées, connexion pgAdmin et dépannage : voir [`docker/README.md`](docker/README.md).
+
+---
+
 ## Règle de démarrage du développement
 
 **Ne pas commencer le code applicatif** (backend, frontend, schéma DB exécutable, etc.) sans avoir pris en compte et respecté les documents sous **`docs/mvp/`** (périmètre, données, API, export, sécurité, plan). En cas de divergence, mettre à jour la documentation en premier ou documenter une décision explicite.
@@ -85,7 +96,8 @@ Pour le détail fonctionnel et technique, se référer aux fichiers numérotés 
 
 - Le **backend NestJS** démarre en local (scaffolding, sans logique métier).
 - Le **frontend React / Vite** démarre en local (page minimale de présentation).
-- **Docker**, **PostgreSQL** et **Prisma** ne sont pas encore configurés.
+- **Docker** et **PostgreSQL** sont configurés via `docker-compose.yml` (pgAdmin optionnel en profil `pgadmin`).
+- **Prisma** n’est pas encore installé (pas de schéma ni de migrations).
 - Aucune **logique métier** n’est encore développée.
 
 La racine reste préparée pour Git (documentation, conventions, variables d’environnement d’exemple dans `.env.example`).
