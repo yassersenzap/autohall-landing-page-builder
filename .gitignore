@@ -1,0 +1,62 @@
+# Dependencies
+node_modules/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.nuxt/
+.vite/
+
+# NestJS
+*.tsbuildinfo
+
+# Prisma (local SQLite artifacts only if used in dev; migrations stay in Git)
+*.db
+*.db-journal
+
+# Testing / coverage
+coverage/
+.nyc_output/
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Windows
+$RECYCLE.BIN/
+*.stackdump
+
+# IDE / editors
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+*.swp
+*.swo
+*~
+
+# Cursor / local tooling
+.cursor/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+.cache/
