@@ -54,6 +54,11 @@ $RECYCLE.BIN/
 # Cursor / local tooling
 .cursor/
 
+# Local storage (exports, uploads, generated assets)
+storage/
+uploads/
+exports/
+
 # Temporary files
 tmp/
 temp/
