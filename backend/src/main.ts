@@ -1,3 +1,4 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
@@ -26,13 +27,25 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+
   const port = resolvePort(configService);
   const corsOrigins = parseCorsOrigins(
     configService.get<string>('CORS_ALLOWED_ORIGINS'),
   );
 
   if (corsOrigins.length > 0) {
-    app.enableCors({ origin: corsOrigins });
+    app.enableCors({
+      origin: corsOrigins,
+      credentials: true,
+      allowedHeaders: ['Content-Type', 'Authorization'],
+    });
   }
 
   await app.listen(port);
@@ -40,6 +53,8 @@ async function bootstrap(): Promise<void> {
   console.log(`[backend] Server running on http://localhost:${port}`);
   console.log(`[backend] GET http://localhost:${port}/health`);
   console.log(`[backend] GET http://localhost:${port}/health/db`);
+  console.log(`[backend] POST http://localhost:${port}/api/auth/login`);
+  console.log(`[backend] GET http://localhost:${port}/api/auth/me`);
 }
 
 bootstrap().catch((error: unknown) => {

@@ -45,20 +45,41 @@ Les variables d’environnement sont chargées via `@nestjs/config` (`ConfigModu
 | `BACKEND_PORT`         | Port HTTP du serveur NestJS (défaut : `3000`)    |
 | `DATABASE_URL`         | Connexion PostgreSQL (Prisma)                    |
 | `CORS_ALLOWED_ORIGINS` | Origines autorisées, séparées par des virgules   |
+| `JWT_SECRET`           | Secret de signature des tokens JWT (requis)      |
+| `JWT_EXPIRES_IN`       | Durée de vie du token (ex. `7d`)                 |
 
 ## Endpoints (infrastructure)
 
 | Méthode | Route        | Description                                      |
 |---------|--------------|--------------------------------------------------|
-| GET     | `/`          | Healthcheck applicatif minimal                   |
-| GET     | `/health`      | État du service (status, nom, timestamp)         |
-| GET     | `/health/db`   | Vérifie la connexion PostgreSQL via Prisma       |
+| GET     | `/`          | Healthcheck applicatif minimal (public)          |
+| GET     | `/health`      | État du service (public)                         |
+| GET     | `/health/db`   | Vérifie la connexion PostgreSQL via Prisma (public) |
+
+## Authentification (fondation)
+
+| Méthode | Route               | Accès    | Description                    |
+|---------|---------------------|----------|--------------------------------|
+| POST    | `/api/auth/login`   | Public   | Email + mot de passe → JWT     |
+| POST    | `/api/auth/logout`  | Public   | Déconnexion (JWT stateless)    |
+| GET     | `/api/auth/me`      | JWT      | Profil de l’utilisateur connecté |
+
+Rôles Prisma : `ADMIN`, `SI_DIGITAL`, `MARKETER`, `VIEWER` (le rôle marketing métier correspond à `MARKETER`).
+
+Utilisateur de développement (seed) : `admin@autohall.local` — mot de passe dans `prisma/seed.ts`.
 
 ### Exemples
 
 ```bash
 curl http://localhost:3000/health
 curl http://localhost:3000/health/db
+
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d "{\"email\":\"admin@autohall.local\",\"password\":\"Autohall_Dev_2026!\"}"
+
+curl http://localhost:3000/api/auth/me \
+  -H "Authorization: Bearer <accessToken>"
 ```
 
 ## Prisma

@@ -50,6 +50,137 @@ body {
   color: #475569;
 }
 
+.app__actions {
+  margin: 1.5rem 0 0;
+}
+
+.app__actions a,
+.auth-card__footer a,
+.dashboard a {
+  color: #003b73;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.app__actions a:hover,
+.auth-card__footer a:hover,
+.dashboard a:hover {
+  text-decoration: underline;
+}
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 24rem;
+  padding: 1.75rem;
+  border-radius: 0.75rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.auth-card__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+}
+
+.auth-card__subtitle {
+  margin: 0 0 1.25rem;
+  color: #64748b;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.auth-form__field input {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font: inherit;
+}
+
+.auth-form__error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.9rem;
+}
+
+.auth-form__submit,
+.dashboard__logout {
+  padding: 0.7rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: #003b73;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-form__submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.auth-card__footer {
+  margin: 1rem 0 0;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.dashboard {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.dashboard__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard__subtitle {
+  color: #64748b;
+}
+
+.dashboard__card {
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  margin-bottom: 1rem;
+}
+
+.dashboard__meta {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.dashboard__error {
+  color: #b91c1c;
+}
+
 @media (prefers-color-scheme: dark) {
   body {
     color: #e2e8f0;
@@ -62,5 +193,22 @@ body {
 
   .app__subtitle {
     color: #94a3b8;
+  }
+
+  .auth-card,
+  .dashboard__card {
+    background: #0f172a;
+    border-color: #1e293b;
+  }
+
+  .auth-card__subtitle,
+  .dashboard__subtitle {
+    color: #94a3b8;
+  }
+
+  .auth-form__field input {
+    background: #020617;
+    border-color: #334155;
+    color: #e2e8f0;
   }
 }
