@@ -78,8 +78,20 @@ Dans pgAdmin, ajouter un serveur avec :
 
 Les données PostgreSQL sont persistées dans le volume nommé `autohall_lp_postgres_data`.
 
-## Hors scope (étape actuelle)
+## Périmètre actuel et prochaines étapes
 
-- Dockerfile backend / frontend
-- Prisma, migrations, schéma de base
-- Services NestJS ou React dans Compose
+### Ce que Docker couvre aujourd’hui
+
+- **PostgreSQL** (service principal, volume persistant, healthcheck).
+- **pgAdmin** (optionnel, profil `pgadmin`) pour l’administration locale.
+
+### Ce que Docker ne couvre pas encore
+
+- **Backend NestJS** et **frontend React** : lancés sur la machine hôte (`npm run start:dev` / `npm run dev`), pas de Dockerfile ni de services dédiés dans Compose.
+- **Migrations Prisma métier** : Prisma 7 est configuré côté `backend/` (schéma minimal, `prisma.config.ts`, client généré via `npx prisma generate`). Les modèles, migrations et seed du MVP seront ajoutés dans une étape ultérieure, une fois le schéma aligné sur `docs/mvp/03-modele-donnees.md`.
+
+### Connexion backend ↔ PostgreSQL
+
+Le backend sur l’hôte se connecte à Postgres via `DATABASE_URL` avec l’hôte **`localhost`** (port exposé par Compose). Depuis pgAdmin dans Docker, utiliser l’hôte **`postgres`** (réseau interne Compose).
+
+Pour valider la chaîne complète : démarrer Postgres (`docker compose up -d`), puis le backend et appeler `GET /health/db` (voir [`../backend/README.md`](../backend/README.md)).
