@@ -63,8 +63,17 @@ curl http://localhost:3000/health/db
 
 ## Prisma
 
-- Schéma : `prisma/schema.prisma`
+- Schéma : `prisma/schema.prisma` (fondation MVP : utilisateurs, campagnes, pages, versions, blocs, formulaires, leads, exports, audit)
 - Config : `prisma.config.ts` (URL via `DATABASE_URL`)
-- Client généré : `@prisma/client` (regénérer avec `npx prisma generate` après clone)
+- Migrations : `prisma/migrations/`
+- Seed local : `prisma/seed.ts` (commande configurée dans `prisma.config.ts` → `migrations.seed`)
+- Données de démonstration : admin, campagne, landing, version, blocs, formulaire, lead — **dev uniquement**, idempotent (`upsert`)
 
-Aucun modèle métier ni migration n’est encore défini à ce stade.
+```bash
+npx prisma validate
+npx prisma generate
+npx prisma migrate dev --name init_database_foundation
+npm run db:seed
+```
+
+Le mot de passe de l’utilisateur admin créé par le seed est défini dans `prisma/seed.ts` (environnement local uniquement, jamais en production).
