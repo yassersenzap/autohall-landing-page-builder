@@ -99,7 +99,9 @@ export default function DashboardPage() {
         </section>
       ) : null}
 
-      <p>
+      <p className="dashboard__nav">
+        <Link to="/campaigns">Gérer les campagnes</Link>
+        {' · '}
         <Link to="/">Retour à l&apos;accueil public</Link>
       </p>
     </main>
