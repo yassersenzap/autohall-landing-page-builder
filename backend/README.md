@@ -68,6 +68,16 @@ Rôles Prisma : `ADMIN`, `SI_DIGITAL`, `MARKETER`, `VIEWER` (le rôle marketing 
 
 Utilisateur de développement (seed) : `admin@autohall.local` — mot de passe dans `prisma/seed.ts`.
 
+## Campagnes (fondation)
+
+| Méthode | Route | Rôles | Description |
+|---------|-------|-------|-------------|
+| GET | `/api/campaigns` | Tous (authentifiés) | Liste paginée (`page`, `limit`, `status`, `brand`, `search`) |
+| GET | `/api/campaigns/:id` | Tous | Détail d’une campagne |
+| POST | `/api/campaigns` | ADMIN, SI_DIGITAL, MARKETER | Création |
+| PATCH | `/api/campaigns/:id` | ADMIN, SI_DIGITAL, MARKETER | Mise à jour |
+| DELETE | `/api/campaigns/:id` | ADMIN, SI_DIGITAL | Archivage logique (`ARCHIVED`) |
+
 ### Exemples
 
 ```bash
@@ -79,6 +89,9 @@ curl -X POST http://localhost:3000/api/auth/login \
   -d "{\"email\":\"admin@autohall.local\",\"password\":\"Autohall_Dev_2026!\"}"
 
 curl http://localhost:3000/api/auth/me \
+  -H "Authorization: Bearer <accessToken>"
+
+curl http://localhost:3000/api/campaigns \
   -H "Authorization: Bearer <accessToken>"
 ```
 
