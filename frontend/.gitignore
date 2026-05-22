@@ -1,3 +1,8 @@
+# Environment (voir aussi /.gitignore)
+.env
+.env.*
+!.env.example
+
 # Logs
 logs
 *.log

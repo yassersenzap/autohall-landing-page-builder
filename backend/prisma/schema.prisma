@@ -1,0 +1,380 @@
+// AutoHall LP Builder — fondation base de données MVP
+// Référence : docs/mvp/03-modele-donnees.md
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum UserRole {
+  ADMIN
+  SI_DIGITAL
+  MARKETER
+  VIEWER
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum LandingPageStatus {
+  DRAFT
+  READY
+  EXPORTED
+  ARCHIVED
+}
+
+enum PageVersionStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ExportJobStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum LeadEventStatus {
+  RECEIVED
+  VALIDATED
+  SYNCED
+  FAILED
+  PENDING_RETRY
+  DUPLICATE
+}
+
+enum LeadRequestType {
+  TEST_DRIVE
+  CONTACT
+  OFFER_REQUEST
+  SERVICE_REQUEST
+  CALLBACK
+}
+
+enum FormFieldType {
+  FULL_NAME
+  PHONE
+  EMAIL
+  CITY
+  BRAND
+  MODEL
+  MESSAGE
+  TEXT
+  TEXTAREA
+  SELECT
+}
+
+// ---------------------------------------------------------------------------
+// Utilisateurs & gouvernance
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String    @id @default(uuid()) @db.Uuid
+  fullName     String    @map("full_name") @db.VarChar(150)
+  email        String    @unique @db.VarChar(180)
+  passwordHash String    @map("password_hash") @db.VarChar(255)
+  role         UserRole  @default(MARKETER)
+  isActive     Boolean   @default(true) @map("is_active")
+  lastLoginAt  DateTime? @map("last_login_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  campaignsCreated   Campaign[]     @relation("CampaignCreatedBy")
+  landingPagesCreated LandingPage[] @relation("LandingPageCreatedBy")
+  pageVersionsCreated PageVersion[]  @relation("PageVersionCreatedBy")
+  exportJobs         ExportJob[]
+  auditLogs          AuditLog[]
+
+  @@index([role])
+  @@index([isActive])
+  @@map("users")
+}
+
+// ---------------------------------------------------------------------------
+// Campagnes & pages
+// ---------------------------------------------------------------------------
+
+model Campaign {
+  id           String         @id @default(uuid()) @db.Uuid
+  name         String         @db.VarChar(180)
+  brand        String         @db.VarChar(100)
+  model        String?        @db.VarChar(100)
+  campaignType String         @map("campaign_type") @db.VarChar(80)
+  description  String?        @db.Text
+  startDate    DateTime?      @map("start_date") @db.Date
+  endDate      DateTime?      @map("end_date") @db.Date
+  status       CampaignStatus @default(DRAFT)
+  createdById  String         @map("created_by") @db.Uuid
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+
+  createdBy    User          @relation("CampaignCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  landingPages LandingPage[]
+  leadEvents   LeadEvent[]
+
+  @@index([status])
+  @@index([createdById])
+  @@index([createdAt])
+  @@map("campaigns")
+}
+
+model LandingPage {
+  id             String            @id @default(uuid()) @db.Uuid
+  campaignId     String            @map("campaign_id") @db.Uuid
+  title          String            @db.VarChar(180)
+  slug           String            @unique @db.VarChar(180)
+  status         LandingPageStatus @default(DRAFT)
+  publicBaseUrl  String?           @map("public_base_url") @db.VarChar(255)
+  lastExportedAt DateTime?         @map("last_exported_at")
+  createdById    String            @map("created_by") @db.Uuid
+  createdAt      DateTime          @default(now()) @map("created_at")
+  updatedAt      DateTime          @updatedAt @map("updated_at")
+
+  campaign   Campaign           @relation(fields: [campaignId], references: [id], onDelete: Restrict)
+  createdBy  User               @relation("LandingPageCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  versions   PageVersion[]
+  assets     LandingPageAsset[]
+  exportJobs ExportJob[]
+  leadEvents LeadEvent[]
+
+  @@index([campaignId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("landing_pages")
+}
+
+model PageVersion {
+  id            String            @id @default(uuid()) @db.Uuid
+  landingPageId String            @map("landing_page_id") @db.Uuid
+  versionNumber Int               @map("version_number")
+  label         String?           @db.VarChar(120)
+  status        PageVersionStatus @default(DRAFT)
+  /// Thème page (couleurs, langue, etc.) — structure contrôlée côté API
+  themeJson     Json?             @map("theme_json")
+  createdById   String            @map("created_by") @db.Uuid
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
+
+  landingPage LandingPage @relation(fields: [landingPageId], references: [id], onDelete: Cascade)
+  createdBy   User        @relation("PageVersionCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  blocks      PageBlock[]
+  form        Form?
+
+  @@unique([landingPageId, versionNumber])
+  @@index([landingPageId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("page_versions")
+}
+
+model PageBlock {
+  id            String   @id @default(uuid()) @db.Uuid
+  pageVersionId String   @map("page_version_id") @db.Uuid
+  blockKey      String   @map("block_key") @db.VarChar(80)
+  blockType     String   @map("block_type") @db.VarChar(50)
+  sortOrder     Int      @map("sort_order")
+  /// Props spécifiques au type de bloc (hero, gallery, cta, etc.)
+  propsJson     Json     @map("props_json")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  pageVersion PageVersion @relation(fields: [pageVersionId], references: [id], onDelete: Cascade)
+
+  @@unique([pageVersionId, blockKey])
+  @@index([pageVersionId])
+  @@index([pageVersionId, sortOrder])
+  @@map("page_blocks")
+}
+
+// ---------------------------------------------------------------------------
+// Formulaires (configuration relationnelle, distincte des blocs visuels)
+// ---------------------------------------------------------------------------
+
+model Form {
+  id            String          @id @default(uuid()) @db.Uuid
+  pageVersionId String          @unique @map("page_version_id") @db.Uuid
+  requestType   LeadRequestType @map("request_type")
+  title         String?         @db.VarChar(180)
+  subtitle      String?         @db.Text
+  isEnabled     Boolean         @default(true) @map("is_enabled")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  pageVersion PageVersion @relation(fields: [pageVersionId], references: [id], onDelete: Cascade)
+  fields      FormField[]
+
+  @@map("forms")
+}
+
+model FormField {
+  id          String        @id @default(uuid()) @db.Uuid
+  formId      String        @map("form_id") @db.Uuid
+  fieldKey    String        @map("field_key") @db.VarChar(80)
+  fieldType   FormFieldType @map("field_type")
+  label       String        @db.VarChar(120)
+  placeholder String?       @db.VarChar(180)
+  isRequired  Boolean       @default(false) @map("is_required")
+  sortOrder   Int           @map("sort_order")
+  /// Options pour champs SELECT ou règles de validation légères
+  optionsJson Json?         @map("options_json")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  form Form @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  @@unique([formId, fieldKey])
+  @@index([formId])
+  @@index([formId, sortOrder])
+  @@map("form_fields")
+}
+
+// ---------------------------------------------------------------------------
+// Assets & exports
+// ---------------------------------------------------------------------------
+
+model LandingPageAsset {
+  id            String   @id @default(uuid()) @db.Uuid
+  landingPageId String   @map("landing_page_id") @db.Uuid
+  originalName  String   @map("original_name") @db.VarChar(255)
+  storedName    String   @unique @map("stored_name") @db.VarChar(255)
+  mimeType      String   @map("mime_type") @db.VarChar(120)
+  fileSize      Int      @map("file_size")
+  storagePath   String   @map("storage_path") @db.VarChar(500)
+  publicPath    String?  @map("public_path") @db.VarChar(500)
+  altText       String?  @map("alt_text") @db.VarChar(255)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  landingPage LandingPage @relation(fields: [landingPageId], references: [id], onDelete: Cascade)
+
+  @@index([landingPageId])
+  @@map("landing_page_assets")
+}
+
+model ExportJob {
+  id            String          @id @default(uuid()) @db.Uuid
+  landingPageId String          @map("landing_page_id") @db.Uuid
+  generatedById String          @map("generated_by") @db.Uuid
+  zipFilename   String          @map("zip_filename") @db.VarChar(255)
+  zipPath       String          @map("zip_path") @db.VarChar(500)
+  checksum      String?         @db.VarChar(128)
+  status        ExportJobStatus @default(PENDING)
+  errorMessage  String?         @map("error_message") @db.Text
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  landingPage LandingPage @relation(fields: [landingPageId], references: [id], onDelete: Restrict)
+  generatedBy User        @relation(fields: [generatedById], references: [id], onDelete: Restrict)
+
+  @@index([landingPageId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("export_jobs")
+}
+
+// ---------------------------------------------------------------------------
+// Leads & intégration Auto Hall (simulation MVP)
+// ---------------------------------------------------------------------------
+
+model LeadEvent {
+  id              String          @id @default(uuid()) @db.Uuid
+  campaignId      String          @map("campaign_id") @db.Uuid
+  landingPageId   String          @map("landing_page_id") @db.Uuid
+  fullName        String          @map("full_name") @db.VarChar(180)
+  phone           String          @db.VarChar(40)
+  email           String?         @db.VarChar(180)
+  city            String?         @db.VarChar(100)
+  brand           String?         @db.VarChar(100)
+  model           String?         @db.VarChar(100)
+  requestType     LeadRequestType @map("request_type")
+  message         String?         @db.Text
+  sourceUrl       String          @map("source_url") @db.VarChar(500)
+  userAgent       String?         @map("user_agent") @db.Text
+  ipAddress       String?         @map("ip_address") @db.VarChar(80)
+  rawPayload      Json            @map("raw_payload")
+  status          LeadEventStatus @default(RECEIVED)
+  syncDestination String?         @map("sync_destination") @db.VarChar(80)
+  syncError       String?         @map("sync_error") @db.Text
+  syncedAt        DateTime?       @map("synced_at")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  campaign           Campaign            @relation(fields: [campaignId], references: [id], onDelete: Restrict)
+  landingPage        LandingPage         @relation(fields: [landingPageId], references: [id], onDelete: Restrict)
+  simulatedTestdrive SimulatedTestdrive?
+  simulatedContact   SimulatedContact?
+
+  @@index([campaignId])
+  @@index([landingPageId])
+  @@index([status])
+  @@index([email])
+  @@index([createdAt])
+  @@map("lead_events")
+}
+
+model SimulatedTestdrive {
+  id             String    @id @default(uuid()) @db.Uuid
+  leadEventId    String    @unique @map("lead_event_id") @db.Uuid
+  fullName       String    @map("full_name") @db.VarChar(180)
+  phone          String    @db.VarChar(40)
+  email          String?   @db.VarChar(180)
+  city           String?   @db.VarChar(100)
+  brand          String?   @db.VarChar(100)
+  model          String?   @db.VarChar(100)
+  preferredDate  DateTime? @map("preferred_date") @db.Date
+  sourceCampaign String?   @map("source_campaign") @db.VarChar(180)
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  leadEvent LeadEvent @relation(fields: [leadEventId], references: [id], onDelete: Cascade)
+
+  @@map("simulated_testdrive")
+}
+
+model SimulatedContact {
+  id             String   @id @default(uuid()) @db.Uuid
+  leadEventId    String   @unique @map("lead_event_id") @db.Uuid
+  fullName       String   @map("full_name") @db.VarChar(180)
+  phone          String   @db.VarChar(40)
+  email          String?  @db.VarChar(180)
+  city           String?  @db.VarChar(100)
+  subject        String?  @db.VarChar(180)
+  message        String?  @db.Text
+  sourceCampaign String?  @map("source_campaign") @db.VarChar(180)
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  leadEvent LeadEvent @relation(fields: [leadEventId], references: [id], onDelete: Cascade)
+
+  @@map("simulated_contacts")
+}
+
+// ---------------------------------------------------------------------------
+// Audit
+// ---------------------------------------------------------------------------
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String?  @map("user_id") @db.Uuid
+  action     String   @db.VarChar(120)
+  entityType String?  @map("entity_type") @db.VarChar(80)
+  entityId   String?  @map("entity_id") @db.Uuid
+  ipAddress  String?  @map("ip_address") @db.VarChar(80)
+  metadata   Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

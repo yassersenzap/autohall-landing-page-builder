@@ -1,0 +1,17 @@
+# ============================================================
+# Backend NestJS — règles spécifiques (voir aussi /.gitignore)
+# ============================================================
+
+# Secrets locaux (doublon volontaire pour sécurité)
+.env
+.env.local
+.env.*.local
+
+# Ancienne sortie Prisma custom (provider prisma-client → generated/prisma)
+# Avec prisma-client-js, le client vit dans node_modules/@prisma/client
+generated/
+
+# Ne pas ignorer (rappel) :
+# - .env.example
+# - prisma/schema.prisma
+# - prisma/migrations/
