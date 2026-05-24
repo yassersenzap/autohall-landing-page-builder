@@ -95,6 +95,34 @@ curl http://localhost:3000/api/campaigns \
   -H "Authorization: Bearer <accessToken>"
 ```
 
+## Landing pages (fondation)
+
+Routes nestées sous une campagne existante (`campaignId` UUID).
+
+| Méthode | Route | Rôles | Description |
+|---------|-------|-------|-------------|
+| GET | `/api/campaigns/:campaignId/landing-pages` | Tous (authentifiés) | Liste paginée (`page`, `limit`, `status`, `search`) |
+| GET | `/api/campaigns/:campaignId/landing-pages/:id` | Tous | Détail d’une landing page |
+| POST | `/api/campaigns/:campaignId/landing-pages` | ADMIN, SI_DIGITAL, MARKETER | Création (`title`, `slug`, `publicBaseUrl?`, `status?`) |
+| PATCH | `/api/campaigns/:campaignId/landing-pages/:id` | ADMIN, SI_DIGITAL, MARKETER | Mise à jour |
+| DELETE | `/api/campaigns/:campaignId/landing-pages/:id` | ADMIN, SI_DIGITAL | Archivage logique (`ARCHIVED`) |
+
+Le `slug` est unique globalement (minuscules, tirets). La suppression HTTP archive la page (`status: ARCHIVED`), sans suppression en base.
+
+### Exemple
+
+```bash
+CAMPAIGN_ID=00000000-0000-4000-8000-000000000001
+
+curl "http://localhost:3000/api/campaigns/${CAMPAIGN_ID}/landing-pages" \
+  -H "Authorization: Bearer <accessToken>"
+
+curl -X POST "http://localhost:3000/api/campaigns/${CAMPAIGN_ID}/landing-pages" \
+  -H "Authorization: Bearer <accessToken>" \
+  -H "Content-Type: application/json" \
+  -d "{\"title\":\"Landing test\",\"slug\":\"landing-test\"}"
+```
+
 ## Prisma
 
 - Schéma : `prisma/schema.prisma` (fondation MVP : utilisateurs, campagnes, pages, versions, blocs, formulaires, leads, exports, audit)
