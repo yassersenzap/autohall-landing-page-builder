@@ -247,6 +247,31 @@ body {
   color: #991b1b;
 }
 
+.status-ready {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-exported {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.campaigns-list__actions {
+  margin-top: 0.5rem;
+}
+
+.campaigns-list__actions a {
+  color: #003b73;
+  font-weight: 500;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.campaigns-list__actions a:hover {
+  text-decoration: underline;
+}
+
 @media (prefers-color-scheme: dark) {
   body {
     color: #e2e8f0;

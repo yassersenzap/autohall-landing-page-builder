@@ -166,6 +166,14 @@ export default function CampaignsPage() {
                 <div className="campaigns-list__meta">
                   Type : {campaign.campaignType}
                 </div>
+                <div className="campaigns-list__actions">
+                  <Link
+                    to={`/campaigns/${campaign.id}/landing-pages`}
+                    state={{ campaignName: campaign.name }}
+                  >
+                    Landing pages
+                  </Link>
+                </div>
               </li>
             ))}
           </ul>
