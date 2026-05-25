@@ -277,6 +277,31 @@ body {
   text-decoration: underline;
 }
 
+.auth-form__field select,
+.blocks-form__textarea {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font: inherit;
+}
+
+.blocks-form__textarea {
+  resize: vertical;
+  min-height: 8rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.85rem;
+}
+
+.blocks-list__props {
+  margin: 0.5rem 0 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.5rem;
+  background: #f1f5f9;
+  font-size: 0.8rem;
+  overflow-x: auto;
+  text-align: left;
+}
+
 @media (prefers-color-scheme: dark) {
   body {
     color: #e2e8f0;
@@ -302,9 +327,16 @@ body {
     color: #94a3b8;
   }
 
-  .auth-form__field input {
+  .auth-form__field input,
+  .auth-form__field select,
+  .blocks-form__textarea {
     background: #020617;
     border-color: #334155;
+    color: #e2e8f0;
+  }
+
+  .blocks-list__props {
+    background: #1e293b;
     color: #e2e8f0;
   }
 }

@@ -62,6 +62,9 @@ async function bootstrap(): Promise<void> {
   console.log(
     `[backend] GET http://localhost:${port}/api/landing-pages/:landingPageId/versions`,
   );
+  console.log(
+    `[backend] GET http://localhost:${port}/api/page-versions/:pageVersionId/blocks`,
+  );
 }
 
 bootstrap().catch((error: unknown) => {

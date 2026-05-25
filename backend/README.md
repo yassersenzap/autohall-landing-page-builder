@@ -150,6 +150,34 @@ curl -X POST "http://localhost:3000/api/landing-pages/${LANDING_PAGE_ID}/version
   -d "{\"label\":\"Version 2\"}"
 ```
 
+## Blocs de page (fondation)
+
+Routes nestées sous une version de page existante (`pageVersionId` UUID).
+
+| Méthode | Route | Rôles | Description |
+|---------|-------|-------|-------------|
+| GET | `/api/page-versions/:pageVersionId/blocks` | Tous (authentifiés) | Liste ordonnée par `sortOrder` |
+| GET | `/api/page-versions/:pageVersionId/blocks/:id` | Tous | Détail d’un bloc |
+| POST | `/api/page-versions/:pageVersionId/blocks` | ADMIN, SI_DIGITAL, MARKETER | Création (`blockType`, `propsJson`, `sortOrder?`, `blockKey?`) |
+| PATCH | `/api/page-versions/:pageVersionId/blocks/:id` | ADMIN, SI_DIGITAL, MARKETER | Mise à jour |
+| DELETE | `/api/page-versions/:pageVersionId/blocks/:id` | ADMIN, SI_DIGITAL, MARKETER | Suppression physique (pas de statut en schéma) |
+
+Types autorisés : `hero`, `text`, `image`, `button` (minuscules). Le `sortOrder` est auto-incrémenté si omis.
+
+### Exemple
+
+```bash
+PAGE_VERSION_ID=<uuid>
+
+curl "http://localhost:3000/api/page-versions/${PAGE_VERSION_ID}/blocks" \
+  -H "Authorization: Bearer <accessToken>"
+
+curl -X POST "http://localhost:3000/api/page-versions/${PAGE_VERSION_ID}/blocks" \
+  -H "Authorization: Bearer <accessToken>" \
+  -H "Content-Type: application/json" \
+  -d "{\"blockType\":\"text\",\"propsJson\":{\"content\":\"Bonjour Auto Hall\"}}"
+```
+
 ## Prisma
 
 - Schéma : `prisma/schema.prisma` (fondation MVP : utilisateurs, campagnes, pages, versions, blocs, formulaires, leads, exports, audit)
