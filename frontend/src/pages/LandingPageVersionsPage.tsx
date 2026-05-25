@@ -5,6 +5,7 @@ import {
   canManagePageVersions,
   createPageVersion,
   listPageVersions,
+  publishPageVersion,
   type PageVersionListItem,
 } from '../lib/page-versions';
 
@@ -27,6 +28,7 @@ export default function LandingPageVersionsPage() {
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [publishingId, setPublishingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [label, setLabel] = useState('');
 
@@ -92,6 +94,24 @@ export default function LandingPageVersionsPage() {
   }
 
   const canWrite = role ? canManagePageVersions(role) : false;
+
+  async function handlePublish(versionId: string) {
+    setPublishingId(versionId);
+    setError(null);
+
+    try {
+      await publishPageVersion(versionId);
+      await loadData();
+    } catch (err) {
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : 'Impossible de publier la version.',
+      );
+    } finally {
+      setPublishingId(null);
+    }
+  }
 
   const backLink =
     campaignId != null
@@ -167,20 +187,32 @@ export default function LandingPageVersionsPage() {
                 <div className="campaigns-list__title">
                   v{version.versionNumber}
                   {version.label ? ` — ${version.label}` : ''}
-                </div>
-                <div className="campaigns-list__meta">
                   <span
                     className={`campaigns-list__status status-${version.status.toLowerCase()}`}
                   >
                     {version.status}
                   </span>
-                  <span>
-                    {' '}
-                    — créée le{' '}
-                    {new Date(version.createdAt).toLocaleString('fr-FR')}
-                  </span>
+                </div>
+                <div className="campaigns-list__meta">
+                  Créée le{' '}
+                  {new Date(version.createdAt).toLocaleString('fr-FR')}
                 </div>
                 <div className="campaigns-list__actions">
+                  {canWrite && version.status === 'DRAFT' ? (
+                    <>
+                      <button
+                        type="button"
+                        className="versions-list__publish"
+                        disabled={publishingId === version.id}
+                        onClick={() => void handlePublish(version.id)}
+                      >
+                        {publishingId === version.id
+                          ? 'Publication…'
+                          : 'Publier'}
+                      </button>
+                      {' · '}
+                    </>
+                  ) : null}
                   <Link
                     to={`/page-versions/${version.id}/blocks`}
                     state={{

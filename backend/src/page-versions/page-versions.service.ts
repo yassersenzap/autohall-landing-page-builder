@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PageVersion, PageVersionStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePageVersionDto } from './dto/create-page-version.dto';
@@ -23,6 +27,21 @@ export type PageVersionDetail = PageVersionListItem & {
   themeJson: Prisma.JsonValue | null;
   updatedAt: string;
   createdBy: PageVersionCreator;
+};
+
+export type PublishedPageVersionResult = {
+  pageVersion: PageVersionListItem;
+  landingPage: {
+    id: string;
+    title: string;
+    slug: string;
+    status: string;
+  };
+  campaign: {
+    id: string;
+    name: string;
+    brand: string;
+  };
 };
 
 @Injectable()
@@ -112,6 +131,67 @@ export class PageVersionsService {
     });
 
     return this.toListItem(pageVersion);
+  }
+
+  async publish(pageVersionId: string): Promise<PublishedPageVersionResult> {
+    const existing = await this.prisma.pageVersion.findUnique({
+      where: { id: pageVersionId },
+      include: {
+        landingPage: {
+          include: { campaign: true },
+        },
+      },
+    });
+
+    if (!existing) {
+      throw new NotFoundException({
+        success: false,
+        message: 'Page version not found',
+        code: 'PAGE_VERSION_NOT_FOUND',
+      });
+    }
+
+    if (existing.status === PageVersionStatus.ARCHIVED) {
+      throw new BadRequestException({
+        success: false,
+        message: 'Archived page versions cannot be published',
+        code: 'PAGE_VERSION_ARCHIVED',
+      });
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.pageVersion.updateMany({
+        where: {
+          landingPageId: existing.landingPageId,
+          id: { not: pageVersionId },
+          status: { not: PageVersionStatus.ARCHIVED },
+        },
+        data: { status: PageVersionStatus.DRAFT },
+      }),
+      this.prisma.pageVersion.update({
+        where: { id: pageVersionId },
+        data: { status: PageVersionStatus.PUBLISHED },
+      }),
+    ]);
+
+    const pageVersion = await this.prisma.pageVersion.findUniqueOrThrow({
+      where: { id: pageVersionId },
+    });
+
+    return {
+      pageVersion: this.toListItem(pageVersion),
+      landingPage: {
+        id: existing.landingPage.id,
+        title: existing.landingPage.title,
+        slug: existing.landingPage.slug,
+        status: existing.landingPage.status,
+      },
+      campaign: {
+        id: existing.landingPage.campaign.id,
+        name: existing.landingPage.campaign.name,
+        brand: existing.landingPage.campaign.brand,
+      },
+    };
   }
 
   /** Archivage logique (pas de suppression physique — blocs et formulaires liés). */

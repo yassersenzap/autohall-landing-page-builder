@@ -50,6 +50,28 @@ export async function createPageVersion(
   });
 }
 
+export type PublishPageVersionResult = {
+  pageVersion: PageVersionListItem;
+  landingPage: {
+    id: string;
+    title: string;
+    slug: string;
+    status: string;
+  };
+  campaign: {
+    id: string;
+    name: string;
+    brand: string;
+  };
+};
+
+export async function publishPageVersion(pageVersionId: string) {
+  return apiRequest<PublishPageVersionResult>(
+    `/api/page-versions/${pageVersionId}/publish`,
+    { method: 'POST' },
+  );
+}
+
 export function canManagePageVersions(role: string): boolean {
   return role === 'ADMIN' || role === 'SI_DIGITAL' || role === 'MARKETER';
 }
