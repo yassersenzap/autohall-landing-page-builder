@@ -180,6 +180,22 @@ export default function LandingPageVersionsPage() {
                     {new Date(version.createdAt).toLocaleString('fr-FR')}
                   </span>
                 </div>
+                <div className="campaigns-list__actions">
+                  <Link
+                    to={`/page-versions/${version.id}/blocks`}
+                    state={{
+                      versionNumber: version.versionNumber,
+                      versionLabel: version.label,
+                      versionStatus: version.status,
+                      landingPageId,
+                      landingPageTitle,
+                      campaignId,
+                      campaignName,
+                    }}
+                  >
+                    Blocs
+                  </Link>
+                </div>
               </li>
             ))}
           </ul>
