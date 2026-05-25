@@ -178,6 +178,23 @@ curl -X POST "http://localhost:3000/api/page-versions/${PAGE_VERSION_ID}/blocks"
   -d "{\"blockType\":\"text\",\"propsJson\":{\"content\":\"Bonjour Auto Hall\"}}"
 ```
 
+## Publication d’une version
+
+| Méthode | Route | Rôles | Description |
+|---------|-------|-------|-------------|
+| POST | `/api/page-versions/:pageVersionId/publish` | ADMIN, SI_DIGITAL, MARKETER | Publie la version ciblée |
+
+Règles métier :
+
+- Une seule version **PUBLISHED** par landing page (garantie applicative).
+- Lors de la publication, toutes les autres versions **non archivées** de la même landing passent en **DRAFT**.
+- Une version **ARCHIVED** ne peut pas être publiée (erreur 400).
+
+```bash
+curl -X POST "http://localhost:3000/api/page-versions/${PAGE_VERSION_ID}/publish" \
+  -H "Authorization: Bearer <accessToken>"
+```
+
 ## Aperçu privé (preview)
 
 | Méthode | Route | Rôles | Description |
