@@ -243,6 +243,62 @@ Invoke-WebRequest -Uri "http://localhost:3000/api/page-versions/$pageVersionId/e
   -OutFile "landing-export.zip"
 ```
 
+## Collecte publique des leads (staging)
+
+Phase 1 — simulation : les soumissions sont stockées dans `lead_events` uniquement. Pas d’écriture vers les tables Auto Hall réelles (`simulated_testdrive` / `simulated_contacts` seront branchées plus tard).
+
+| Méthode | Route | Accès | Description |
+|---------|-------|-------|-------------|
+| POST | `/api/public/leads` | Public (sans JWT) | Enregistre un lead depuis une landing exportée |
+| GET | `/api/lead-events` | JWT — tous rôles authentifiés | Liste paginée des leads reçus (lecture interne) |
+
+### Payload `POST /api/public/leads`
+
+Champs obligatoires : `fullName`, `phone`, et (`landingPageId` **ou** `landingSlug`).
+
+```json
+{
+  "campaignId": "uuid",
+  "landingPageId": "uuid",
+  "landingSlug": "demo-offre-printemps",
+  "pageVersionId": "uuid",
+  "fullName": "Client Exemple",
+  "phone": "0600000000",
+  "email": "client@example.com",
+  "vehicleModel": "Ranger",
+  "sourceUrl": "https://offre.example.ma",
+  "rawPayload": { "fullName": "...", "phone": "..." },
+  "metadata": { "utmSource": "facebook" }
+}
+```
+
+Réponse **201** :
+
+```json
+{
+  "success": true,
+  "data": { "leadId": "uuid", "status": "RECEIVED" },
+  "message": "Lead received successfully"
+}
+```
+
+L’export ZIP embarque `js/landing-config.js` (`window.LANDING_CONFIG.leadEndpoint`) et envoie le formulaire `lead_form` vers cette API.
+
+Variable optionnelle : `PUBLIC_API_BASE_URL` (ex. `http://localhost:3000`) pour l’URL injectée dans le ZIP — sinon `http://localhost:{BACKEND_PORT}/api/public/leads`.
+
+### Test manuel
+
+1. Publier une version avec un bloc `lead_form`.
+2. Exporter le ZIP, servir le dossier : `npx serve .` (éviter `file://` pour CORS).
+3. Soumettre le formulaire → message de succès.
+4. Vérifier en base ou via `GET /api/lead-events` (token admin).
+
+```powershell
+curl -X POST "http://localhost:3000/api/public/leads" `
+  -H "Content-Type: application/json" `
+  -d "{\"landingSlug\":\"demo-offre-printemps\",\"fullName\":\"Test Client\",\"phone\":\"0601020304\",\"email\":\"test@example.com\",\"vehicleModel\":\"Ranger\",\"sourceUrl\":\"http://localhost:8080\"}"
+```
+
 ## Aperçu privé (preview)
 
 | Méthode | Route | Rôles | Description |

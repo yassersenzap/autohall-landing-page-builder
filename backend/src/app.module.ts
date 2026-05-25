@@ -6,6 +6,7 @@ import { getEnvFilePaths } from './config/env-paths';
 import { AuthModule } from './auth/auth.module';
 import { CampaignsModule } from './campaigns/campaigns.module';
 import { HealthModule } from './health/health.module';
+import { LeadEventsModule } from './lead-events/lead-events.module';
 import { LandingPagesModule } from './landing-pages/landing-pages.module';
 import { PageBlocksModule } from './page-blocks/page-blocks.module';
 import { PageExportModule } from './page-export/page-export.module';
@@ -27,6 +28,7 @@ import { PrismaModule } from './prisma/prisma.module';
     PageBlocksModule,
     PagePreviewModule,
     PageExportModule,
+    LeadEventsModule,
     HealthModule,
   ],
   controllers: [AppController],
