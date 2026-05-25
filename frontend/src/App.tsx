@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import CampaignLandingPagesPage from './pages/CampaignLandingPagesPage';
+import LandingPageVersionsPage from './pages/LandingPageVersionsPage';
 import CampaignsPage from './pages/CampaignsPage';
 import DashboardPage from './pages/DashboardPage';
 import HomePage from './pages/HomePage';
@@ -18,6 +19,10 @@ export default function App() {
           <Route
             path="/campaigns/:campaignId/landing-pages"
             element={<CampaignLandingPagesPage />}
+          />
+          <Route
+            path="/landing-pages/:landingPageId/versions"
+            element={<LandingPageVersionsPage />}
           />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

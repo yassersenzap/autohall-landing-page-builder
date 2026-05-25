@@ -123,6 +123,33 @@ curl -X POST "http://localhost:3000/api/campaigns/${CAMPAIGN_ID}/landing-pages" 
   -d "{\"title\":\"Landing test\",\"slug\":\"landing-test\"}"
 ```
 
+## Versions de page (fondation)
+
+Routes nestées sous une landing page existante (`landingPageId` UUID).
+
+| Méthode | Route | Rôles | Description |
+|---------|-------|-------|-------------|
+| GET | `/api/landing-pages/:landingPageId/versions` | Tous (authentifiés) | Liste paginée (`page`, `limit`, `status`, `search`) |
+| GET | `/api/landing-pages/:landingPageId/versions/:id` | Tous | Détail d’une version |
+| POST | `/api/landing-pages/:landingPageId/versions` | ADMIN, SI_DIGITAL, MARKETER | Création (`label?`, `status?`, `themeJson?`) — `versionNumber` auto-incrémenté |
+| PATCH | `/api/landing-pages/:landingPageId/versions/:id` | ADMIN, SI_DIGITAL, MARKETER | Mise à jour |
+| DELETE | `/api/landing-pages/:landingPageId/versions/:id` | ADMIN, SI_DIGITAL | Archivage logique (`ARCHIVED`) |
+
+### Exemple
+
+```bash
+# Récupérer l'id de la landing démo (slug demo-offre-printemps) via la liste campagne, puis :
+LANDING_PAGE_ID=<uuid>
+
+curl "http://localhost:3000/api/landing-pages/${LANDING_PAGE_ID}/versions" \
+  -H "Authorization: Bearer <accessToken>"
+
+curl -X POST "http://localhost:3000/api/landing-pages/${LANDING_PAGE_ID}/versions" \
+  -H "Authorization: Bearer <accessToken>" \
+  -H "Content-Type: application/json" \
+  -d "{\"label\":\"Version 2\"}"
+```
+
 ## Prisma
 
 - Schéma : `prisma/schema.prisma` (fondation MVP : utilisateurs, campagnes, pages, versions, blocs, formulaires, leads, exports, audit)
