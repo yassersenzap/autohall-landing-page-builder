@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ApiError, logoutClient, meRequest } from '../lib/api';
+import { downloadPageVersionExport } from '../lib/page-export';
 import {
   canManagePageVersions,
   createPageVersion,
@@ -29,6 +30,7 @@ export default function LandingPageVersionsPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [publishingId, setPublishingId] = useState<string | null>(null);
+  const [exportingId, setExportingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [label, setLabel] = useState('');
 
@@ -94,6 +96,26 @@ export default function LandingPageVersionsPage() {
   }
 
   const canWrite = role ? canManagePageVersions(role) : false;
+
+  async function handleExport(version: PageVersionListItem) {
+    setExportingId(version.id);
+    setError(null);
+
+    try {
+      await downloadPageVersionExport(
+        version.id,
+        `landing-v${version.versionNumber}.zip`,
+      );
+    } catch (err) {
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : 'Impossible d’exporter la version.',
+      );
+    } finally {
+      setExportingId(null);
+    }
+  }
 
   async function handlePublish(versionId: string) {
     setPublishingId(versionId);
@@ -241,6 +263,21 @@ export default function LandingPageVersionsPage() {
                   >
                     Preview
                   </Link>
+                  {canWrite && version.status === 'PUBLISHED' ? (
+                    <>
+                      {' · '}
+                      <button
+                        type="button"
+                        className="versions-list__publish"
+                        disabled={exportingId === version.id}
+                        onClick={() => void handleExport(version)}
+                      >
+                        {exportingId === version.id
+                          ? 'Export…'
+                          : 'Exporter ZIP'}
+                      </button>
+                    </>
+                  ) : null}
                 </div>
               </li>
             ))}

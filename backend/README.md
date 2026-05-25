@@ -195,6 +195,39 @@ curl -X POST "http://localhost:3000/api/page-versions/${PAGE_VERSION_ID}/publish
   -H "Authorization: Bearer <accessToken>"
 ```
 
+## Export ZIP statique (fondation)
+
+| Méthode | Route | Rôles | Description |
+|---------|-------|-------|-------------|
+| GET | `/api/page-versions/:pageVersionId/export` | ADMIN, SI_DIGITAL, MARKETER | Télécharge un ZIP statique cPanel-ready |
+
+Règles :
+
+- Seules les versions **PUBLISHED** peuvent être exportées (sinon 400 `PAGE_VERSION_NOT_PUBLISHED`).
+- Le ZIP contient : `index.html`, `assets/style.css`, `js/main.js`.
+- Nom de fichier : `landing-{slug}-v{versionNumber}.zip` (ex. `landing-demo-offre-printemps-v1.zip`).
+
+### Exemple curl
+
+```bash
+curl -o export.zip "http://localhost:3000/api/page-versions/${PAGE_VERSION_ID}/export" \
+  -H "Authorization: Bearer <accessToken>"
+```
+
+### Exemple PowerShell
+
+```powershell
+$login = Invoke-RestMethod -Uri "http://localhost:3000/api/auth/login" -Method POST `
+  -ContentType "application/json" `
+  -Body '{"email":"admin@autohall.local","password":"Autohall_Dev_2026!"}'
+$token = $login.data.accessToken
+$pageVersionId = "<uuid-version-publiee>"
+
+Invoke-WebRequest -Uri "http://localhost:3000/api/page-versions/$pageVersionId/export" `
+  -Headers @{ Authorization = "Bearer $token" } `
+  -OutFile "landing-export.zip"
+```
+
 ## Aperçu privé (preview)
 
 | Méthode | Route | Rôles | Description |

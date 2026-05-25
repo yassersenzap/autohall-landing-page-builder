@@ -71,6 +71,9 @@ async function bootstrap(): Promise<void> {
   console.log(
     `[backend] POST http://localhost:${port}/api/page-versions/:pageVersionId/publish`,
   );
+  console.log(
+    `[backend] GET http://localhost:${port}/api/page-versions/:pageVersionId/export`,
+  );
 }
 
 bootstrap().catch((error: unknown) => {
