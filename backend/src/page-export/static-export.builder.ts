@@ -41,6 +41,60 @@ function escapeHtml(value: string): string {
     .replace(/'/g, '&#39;');
 }
 
+type LeadFormField = {
+  name: string;
+  label: string;
+  type: string;
+  required: boolean;
+};
+
+function parseLeadFormFields(props: Record<string, unknown>): LeadFormField[] {
+  if (!Array.isArray(props.fields)) {
+    return [];
+  }
+
+  return props.fields
+    .filter(
+      (item): item is Record<string, unknown> =>
+        item !== null && typeof item === 'object' && !Array.isArray(item),
+    )
+    .map((field) => ({
+      name: typeof field.name === 'string' ? field.name : 'field',
+      label: typeof field.label === 'string' ? field.label : 'Champ',
+      type: typeof field.type === 'string' ? field.type : 'text',
+      required: Boolean(field.required),
+    }));
+}
+
+function renderLeadFormHtml(props: Record<string, unknown>): string {
+  const title = propString(props, 'title');
+  const subtitle = propString(props, 'subtitle');
+  const submitText = propString(props, 'submitText') ?? 'Envoyer ma demande';
+  const fields = parseLeadFormFields(props);
+
+  const fieldsHtml = fields
+    .map((field) => {
+      const requiredAttr = field.required ? ' required' : '';
+      const inputType = escapeHtml(field.type || 'text');
+      return `
+      <label class="lead-form__field">
+        <span class="lead-form__label">${escapeHtml(field.label)}${field.required ? ' *' : ''}</span>
+        <input type="${inputType}" name="${escapeHtml(field.name)}"${requiredAttr} />
+      </label>`;
+    })
+    .join('');
+
+  return `
+    <section class="block block-lead-form" id="lead-form">
+      ${title ? `<h2 class="block-lead-form__title">${escapeHtml(title)}</h2>` : ''}
+      ${subtitle ? `<p class="block-lead-form__subtitle">${escapeHtml(subtitle)}</p>` : ''}
+      <form class="lead-form" action="#" method="post" novalidate>
+        ${fieldsHtml}
+        <button type="submit" class="lead-form__submit">${escapeHtml(submitText)}</button>
+      </form>
+    </section>`;
+}
+
 function renderBlockHtml(block: ExportBlock): string {
   const props = propsAsRecord(block.propsJson);
   const type = block.blockType.toLowerCase();
@@ -96,6 +150,10 @@ function renderBlockHtml(block: ExportBlock): string {
     <section class="block block-button">
       <a class="block-button__link" href="${escapeHtml(target)}">${escapeHtml(label)}</a>
     </section>`;
+  }
+
+  if (type === 'lead_form') {
+    return renderLeadFormHtml(props);
   }
 
   return `
@@ -251,10 +309,80 @@ body {
   font-weight: 600;
   text-decoration: none;
 }
+
+.block-lead-form {
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+.block-lead-form__title {
+  margin: 0 0 0.35rem;
+  font-size: 1.5rem;
+  color: #003b73;
+}
+
+.block-lead-form__subtitle {
+  margin: 0 0 1rem;
+  color: #475569;
+}
+
+.lead-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  max-width: 32rem;
+}
+
+.lead-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.lead-form__label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.lead-form__field input {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font: inherit;
+}
+
+.lead-form__submit {
+  align-self: flex-start;
+  padding: 0.65rem 1.25rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: #003b73;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lead-form__submit:hover {
+  background: #005a9e;
+}
 `;
 
 export const STATIC_MAIN_JS = `document.addEventListener('DOMContentLoaded', function () {
   console.log('[AutoHall] Landing page statique chargée');
+
+  var leadForms = document.querySelectorAll('form.lead-form');
+  var placeholderMessage =
+    "Votre demande a été enregistrée localement. L'intégration API sera ajoutée dans l'étape suivante.";
+
+  leadForms.forEach(function (form) {
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      alert(placeholderMessage);
+    });
+  });
 });
 `;
 
