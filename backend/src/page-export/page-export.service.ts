@@ -4,12 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PageVersionStatus } from '@prisma/client';
+import { ConfigService } from '@nestjs/config';
 import archiver from 'archiver';
 import { PassThrough } from 'stream';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   buildExportFilename,
   buildIndexHtml,
+  buildLandingConfigJs,
   STATIC_MAIN_JS,
   STATIC_STYLE_CSS,
 } from './static-export.builder';
@@ -22,7 +24,10 @@ export type PageExportResult = {
 
 @Injectable()
 export class PageExportService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async exportZip(pageVersionId: string): Promise<PageExportResult> {
     const pageVersion = await this.prisma.pageVersion.findUnique({
@@ -55,6 +60,8 @@ export class PageExportService {
 
     const { landingPage, blocks } = pageVersion;
 
+    const leadEndpoint = this.resolvePublicLeadEndpoint();
+
     const indexHtml = buildIndexHtml(
       {
         title: landingPage.title,
@@ -64,9 +71,18 @@ export class PageExportService {
       blocks,
     );
 
+    const landingConfigJs = buildLandingConfigJs({
+      leadEndpoint,
+      campaignId: landingPage.campaignId,
+      landingPageId: landingPage.id,
+      pageVersionId: pageVersion.id,
+      landingSlug: landingPage.slug,
+    });
+
     const buffer = await this.createZipBuffer({
       'index.html': indexHtml,
       'assets/style.css': STATIC_STYLE_CSS,
+      'js/landing-config.js': landingConfigJs,
       'js/main.js': STATIC_MAIN_JS,
     });
 
@@ -80,6 +96,21 @@ export class PageExportService {
       filename,
       mimeType: 'application/zip',
     };
+  }
+
+  private resolvePublicLeadEndpoint(): string {
+    const configured = this.configService.get<string>('PUBLIC_API_BASE_URL');
+    if (configured?.trim()) {
+      const base = configured.trim().replace(/\/$/, '');
+      return base.endsWith('/api/public/leads')
+        ? base
+        : `${base}/api/public/leads`;
+    }
+
+    const port = Number(
+      this.configService.get<string>('BACKEND_PORT') ?? '3000',
+    );
+    return `http://localhost:${port}/api/public/leads`;
   }
 
   private createZipBuffer(files: Record<string, string>): Promise<Buffer> {

@@ -90,6 +90,7 @@ function renderLeadFormHtml(props: Record<string, unknown>): string {
       ${subtitle ? `<p class="block-lead-form__subtitle">${escapeHtml(subtitle)}</p>` : ''}
       <form class="lead-form" action="#" method="post" novalidate>
         ${fieldsHtml}
+        <p class="lead-form__feedback" role="status" aria-live="polite"></p>
         <button type="submit" class="lead-form__submit">${escapeHtml(submitText)}</button>
       </form>
     </section>`;
@@ -162,6 +163,18 @@ function renderBlockHtml(block: ExportBlock): string {
     </section>`;
 }
 
+export type ExportLandingConfig = {
+  leadEndpoint: string;
+  campaignId: string;
+  landingPageId: string;
+  pageVersionId: string;
+  landingSlug: string;
+};
+
+export function buildLandingConfigJs(config: ExportLandingConfig): string {
+  return `window.LANDING_CONFIG = ${JSON.stringify(config)};\n`;
+}
+
 export function buildIndexHtml(
   context: ExportPageContext,
   blocks: ExportBlock[],
@@ -187,6 +200,7 @@ ${body}
   <footer class="site-footer">
     <p>&copy; ${new Date().getFullYear()} Auto Hall</p>
   </footer>
+  <script src="js/landing-config.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
@@ -368,19 +382,131 @@ body {
 .lead-form__submit:hover {
   background: #005a9e;
 }
+
+.lead-form__submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.lead-form__feedback {
+  margin: 0;
+  min-height: 1.25rem;
+  font-size: 0.9rem;
+}
+
+.lead-form__feedback.is-success {
+  color: #166534;
+}
+
+.lead-form__feedback.is-error {
+  color: #b91c1c;
+}
 `;
 
 export const STATIC_MAIN_JS = `document.addEventListener('DOMContentLoaded', function () {
   console.log('[AutoHall] Landing page statique chargée');
 
+  var config = window.LANDING_CONFIG || {};
   var leadForms = document.querySelectorAll('form.lead-form');
-  var placeholderMessage =
-    "Votre demande a été enregistrée localement. L'intégration API sera ajoutée dans l'étape suivante.";
+
+  function showFeedback(form, message, type) {
+    var node = form.querySelector('.lead-form__feedback');
+    if (!node) {
+      alert(message);
+      return;
+    }
+    node.textContent = message;
+    node.className = 'lead-form__feedback is-' + type;
+  }
+
+  function collectFormFields(form) {
+    var fields = {};
+    var elements = form.querySelectorAll('input, textarea, select');
+    elements.forEach(function (el) {
+      if (!el.name) return;
+      fields[el.name] = el.value;
+    });
+    return fields;
+  }
 
   leadForms.forEach(function (form) {
     form.addEventListener('submit', function (event) {
       event.preventDefault();
-      alert(placeholderMessage);
+
+      if (!config.leadEndpoint) {
+        showFeedback(
+          form,
+          "Configuration manquante : endpoint de collecte des leads.",
+          'error',
+        );
+        return;
+      }
+
+      var fields = collectFormFields(form);
+      var fullName = fields.fullName || fields.name || '';
+      var phone = fields.phone || '';
+
+      if (!fullName.trim() || !phone.trim()) {
+        showFeedback(form, 'Nom et téléphone sont obligatoires.', 'error');
+        return;
+      }
+
+      var submitButton = form.querySelector('.lead-form__submit');
+      if (submitButton) submitButton.disabled = true;
+      showFeedback(form, 'Envoi en cours…', 'success');
+
+      var body = {
+        campaignId: config.campaignId,
+        landingPageId: config.landingPageId,
+        pageVersionId: config.pageVersionId,
+        landingSlug: config.landingSlug,
+        fullName: fullName.trim(),
+        phone: phone.trim(),
+        email: fields.email || undefined,
+        vehicleModel: fields.vehicleModel || undefined,
+        sourceUrl: window.location.href,
+        rawPayload: fields,
+        metadata: {
+          userAgent: navigator.userAgent,
+          submittedFrom: 'static-export',
+        },
+      };
+
+      fetch(config.leadEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+        .then(function (response) {
+          return response.json().then(function (payload) {
+            return { ok: response.ok, payload: payload };
+          });
+        })
+        .then(function (result) {
+          if (!result.ok) {
+            var errMsg =
+              (result.payload && result.payload.message) ||
+              'Impossible d’envoyer votre demande.';
+            throw new Error(errMsg);
+          }
+          showFeedback(
+            form,
+            (result.payload && result.payload.message) ||
+              'Votre demande a bien été enregistrée. Un conseiller Auto Hall vous contactera.',
+            'success',
+          );
+          form.reset();
+        })
+        .catch(function (err) {
+          showFeedback(
+            form,
+            err.message || 'Erreur réseau lors de l’envoi du formulaire.',
+            'error',
+          );
+        })
+        .finally(function () {
+          if (submitButton) submitButton.disabled = false;
+        });
     });
   });
 });

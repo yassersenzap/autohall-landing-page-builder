@@ -40,13 +40,23 @@ async function bootstrap(): Promise<void> {
     configService.get<string>('CORS_ALLOWED_ORIGINS'),
   );
 
-  if (corsOrigins.length > 0) {
-    app.enableCors({
-      origin: corsOrigins,
-      credentials: true,
-      allowedHeaders: ['Content-Type', 'Authorization'],
-    });
-  }
+  const isDevelopment =
+    configService.get<string>('NODE_ENV') !== 'production';
+
+  app.enableCors({
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
+      if (!origin || isDevelopment || corsOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+      callback(null, true);
+    },
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
 
   await app.listen(port);
 
@@ -74,6 +84,8 @@ async function bootstrap(): Promise<void> {
   console.log(
     `[backend] GET http://localhost:${port}/api/page-versions/:pageVersionId/export`,
   );
+  console.log(`[backend] POST http://localhost:${port}/api/public/leads`);
+  console.log(`[backend] GET http://localhost:${port}/api/lead-events`);
 }
 
 bootstrap().catch((error: unknown) => {
