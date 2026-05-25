@@ -178,6 +178,17 @@ curl -X POST "http://localhost:3000/api/page-versions/${PAGE_VERSION_ID}/blocks"
   -d "{\"blockType\":\"text\",\"propsJson\":{\"content\":\"Bonjour Auto Hall\"}}"
 ```
 
+## Aperçu privé (preview)
+
+| Méthode | Route | Rôles | Description |
+|---------|-------|-------|-------------|
+| GET | `/api/page-versions/:pageVersionId/preview` | Tous (authentifiés) | Version, landing page, campagne et blocs ordonnés |
+
+```bash
+curl "http://localhost:3000/api/page-versions/${PAGE_VERSION_ID}/preview" \
+  -H "Authorization: Bearer <accessToken>"
+```
+
 ## Prisma
 
 - Schéma : `prisma/schema.prisma` (fondation MVP : utilisateurs, campagnes, pages, versions, blocs, formulaires, leads, exports, audit)

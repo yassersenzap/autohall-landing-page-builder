@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import CampaignLandingPagesPage from './pages/CampaignLandingPagesPage';
 import LandingPageVersionsPage from './pages/LandingPageVersionsPage';
+import PagePreviewPage from './pages/PagePreviewPage';
 import PageVersionBlocksPage from './pages/PageVersionBlocksPage';
 import CampaignsPage from './pages/CampaignsPage';
 import DashboardPage from './pages/DashboardPage';
@@ -28,6 +29,10 @@ export default function App() {
           <Route
             path="/page-versions/:pageVersionId/blocks"
             element={<PageVersionBlocksPage />}
+          />
+          <Route
+            path="/page-versions/:pageVersionId/preview"
+            element={<PagePreviewPage />}
           />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

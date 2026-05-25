@@ -195,6 +195,20 @@ export default function LandingPageVersionsPage() {
                   >
                     Blocs
                   </Link>
+                  {' · '}
+                  <Link
+                    to={`/page-versions/${version.id}/preview`}
+                    state={{
+                      versionNumber: version.versionNumber,
+                      versionLabel: version.label,
+                      landingPageId,
+                      landingPageTitle,
+                      campaignId,
+                      campaignName,
+                    }}
+                  >
+                    Preview
+                  </Link>
                 </div>
               </li>
             ))}
