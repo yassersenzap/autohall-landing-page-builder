@@ -189,6 +189,18 @@ export default function CampaignLandingPagesPage() {
                     {new Date(page.lastExportedAt).toLocaleString('fr-FR')}
                   </div>
                 ) : null}
+                <div className="campaigns-list__actions">
+                  <Link
+                    to={`/landing-pages/${page.id}/versions`}
+                    state={{
+                      landingPageTitle: page.title,
+                      campaignId,
+                      campaignName,
+                    }}
+                  >
+                    Versions
+                  </Link>
+                </div>
               </li>
             ))}
           </ul>

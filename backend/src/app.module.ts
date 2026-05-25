@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { CampaignsModule } from './campaigns/campaigns.module';
 import { HealthModule } from './health/health.module';
 import { LandingPagesModule } from './landing-pages/landing-pages.module';
+import { PageVersionsModule } from './page-versions/page-versions.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
@@ -19,6 +20,7 @@ import { PrismaModule } from './prisma/prisma.module';
     AuthModule,
     CampaignsModule,
     LandingPagesModule,
+    PageVersionsModule,
     HealthModule,
   ],
   controllers: [AppController],
