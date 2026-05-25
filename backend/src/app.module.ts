@@ -8,6 +8,7 @@ import { CampaignsModule } from './campaigns/campaigns.module';
 import { HealthModule } from './health/health.module';
 import { LandingPagesModule } from './landing-pages/landing-pages.module';
 import { PageBlocksModule } from './page-blocks/page-blocks.module';
+import { PagePreviewModule } from './page-preview/page-preview.module';
 import { PageVersionsModule } from './page-versions/page-versions.module';
 import { PrismaModule } from './prisma/prisma.module';
 
@@ -23,6 +24,7 @@ import { PrismaModule } from './prisma/prisma.module';
     LandingPagesModule,
     PageVersionsModule,
     PageBlocksModule,
+    PagePreviewModule,
     HealthModule,
   ],
   controllers: [AppController],
