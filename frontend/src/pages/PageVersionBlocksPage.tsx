@@ -196,7 +196,7 @@ export default function PageVersionBlocksPage() {
               >
                 {BLOCK_TYPES.map((type) => (
                   <option key={type} value={type}>
-                    {type.toUpperCase()}
+                    {type.replace(/_/g, ' ').toUpperCase()}
                   </option>
                 ))}
               </select>

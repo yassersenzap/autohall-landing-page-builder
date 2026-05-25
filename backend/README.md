@@ -162,7 +162,9 @@ Routes nestées sous une version de page existante (`pageVersionId` UUID).
 | PATCH | `/api/page-versions/:pageVersionId/blocks/:id` | ADMIN, SI_DIGITAL, MARKETER | Mise à jour |
 | DELETE | `/api/page-versions/:pageVersionId/blocks/:id` | ADMIN, SI_DIGITAL, MARKETER | Suppression physique (pas de statut en schéma) |
 
-Types autorisés : `hero`, `text`, `image`, `button` (minuscules). Le `sortOrder` est auto-incrémenté si omis.
+Types autorisés : `hero`, `text`, `image`, `button`, `lead_form` (minuscules). Le `sortOrder` est auto-incrémenté si omis.
+
+Le bloc `lead_form` utilise un `propsJson` avec `title`, `subtitle`, `submitText` et un tableau `fields` (`name`, `label`, `type`, `required`). Il est rendu dans l’aperçu privé et dans l’export ZIP (formulaire HTML statique, soumission locale en placeholder — pas d’API leads pour l’instant).
 
 ### Exemple
 
@@ -176,7 +178,20 @@ curl -X POST "http://localhost:3000/api/page-versions/${PAGE_VERSION_ID}/blocks"
   -H "Authorization: Bearer <accessToken>" \
   -H "Content-Type: application/json" \
   -d "{\"blockType\":\"text\",\"propsJson\":{\"content\":\"Bonjour Auto Hall\"}}"
+
+curl -X POST "http://localhost:3000/api/page-versions/${PAGE_VERSION_ID}/blocks" \
+  -H "Authorization: Bearer <accessToken>" \
+  -H "Content-Type: application/json" \
+  -d "{\"blockType\":\"lead_form\",\"propsJson\":{\"title\":\"Demander un essai\",\"subtitle\":\"Remplissez le formulaire.\",\"submitText\":\"Envoyer ma demande\",\"fields\":[{\"name\":\"fullName\",\"label\":\"Nom complet\",\"type\":\"text\",\"required\":true},{\"name\":\"phone\",\"label\":\"Téléphone\",\"type\":\"tel\",\"required\":true}]}}"
 ```
+
+### Test manuel `lead_form`
+
+1. Connexion admin → Campagnes → Landing pages → Versions → **Blocs**.
+2. Créer un bloc **lead_form** (template JSON prérempli).
+3. **Preview** : formulaire visible avec champs.
+4. Publier la version → **Exporter ZIP** → ouvrir `index.html`.
+5. Soumettre le formulaire : alerte placeholder (pas d’appel API).
 
 ## Publication d’une version
 

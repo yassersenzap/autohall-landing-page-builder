@@ -1,6 +1,7 @@
 import { apiRequest } from './api';
+import { DEFAULT_LEAD_FORM_PROPS } from './lead-form-block';
 
-export const BLOCK_TYPES = ['hero', 'text', 'image', 'button'] as const;
+export const BLOCK_TYPES = ['hero', 'text', 'image', 'button', 'lead_form'] as const;
 export type BlockType = (typeof BLOCK_TYPES)[number];
 
 export type PageBlockItem = {
@@ -39,6 +40,7 @@ export const DEFAULT_BLOCK_PROPS: Record<BlockType, Record<string, unknown>> = {
     text: 'Cliquez ici',
     href: '#lead-form',
   },
+  lead_form: DEFAULT_LEAD_FORM_PROPS,
 };
 
 function pageBlocksBase(pageVersionId: string): string {

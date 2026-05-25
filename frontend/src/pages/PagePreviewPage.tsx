@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ApiError, logoutClient, meRequest } from '../lib/api';
+import { LeadFormPreview } from '../lib/lead-form-block';
 import {
   fetchPagePreview,
   propString,
@@ -74,6 +75,12 @@ function PreviewBlockView({ block }: { block: PreviewBlock }) {
           <span className="preview-block__meta">→ {target}</span>
         ) : null}
       </section>
+    );
+  }
+
+  if (type === 'lead_form') {
+    return (
+      <LeadFormPreview propsJson={block.propsJson} formId="lead-form" />
     );
   }
 
