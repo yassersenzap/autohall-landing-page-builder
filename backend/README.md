@@ -250,7 +250,9 @@ Phase 1 — simulation : les soumissions sont stockées dans `lead_events` uniqu
 | Méthode | Route | Accès | Description |
 |---------|-------|-------|-------------|
 | POST | `/api/public/leads` | Public (sans JWT) | Enregistre un lead depuis une landing exportée |
-| GET | `/api/lead-events` | JWT — tous rôles authentifiés | Liste paginée des leads reçus (lecture interne) |
+| GET | `/api/lead-events` | JWT — ADMIN, SI_DIGITAL, MARKETER | Liste paginée des leads (filtres + recherche) |
+
+Query `GET /api/lead-events` : `page`, `limit`, `search` (nom, email, téléphone), `status`, `campaignId`, `landingPageId`. Tri par date décroissante.
 
 ### Payload `POST /api/public/leads`
 

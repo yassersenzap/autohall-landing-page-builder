@@ -1,5 +1,14 @@
+import { LeadEventStatus } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, Max, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class ListLeadEventsQueryDto {
   @IsOptional()
@@ -14,4 +23,20 @@ export class ListLeadEventsQueryDto {
   @Min(1)
   @Max(100)
   limit?: number = 20;
+
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @IsOptional()
+  @IsEnum(LeadEventStatus)
+  status?: LeadEventStatus;
+
+  @IsOptional()
+  @IsUUID()
+  campaignId?: string;
+
+  @IsOptional()
+  @IsUUID()
+  landingPageId?: string;
 }

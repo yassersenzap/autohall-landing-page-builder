@@ -31,11 +31,15 @@ export type LeadEventListItem = {
   fullName: string;
   phone: string;
   email: string | null;
+  brand: string | null;
   model: string | null;
   requestType: LeadRequestType;
   status: LeadEventStatus;
   sourceUrl: string;
   createdAt: string;
+  campaignName: string;
+  landingPageTitle: string;
+  landingPageSlug: string;
 };
 
 @Injectable()
@@ -106,39 +110,88 @@ export class LeadEventsService {
     const limit = query.limit ?? 20;
     const skip = (page - 1) * limit;
 
+    const where: Prisma.LeadEventWhereInput = {};
+
+    if (query.status) {
+      where.status = query.status;
+    }
+
+    if (query.campaignId) {
+      where.campaignId = query.campaignId;
+    }
+
+    if (query.landingPageId) {
+      where.landingPageId = query.landingPageId;
+    }
+
+    if (query.search?.trim()) {
+      const term = query.search.trim();
+      where.OR = [
+        { fullName: { contains: term, mode: 'insensitive' } },
+        { email: { contains: term, mode: 'insensitive' } },
+        { phone: { contains: term, mode: 'insensitive' } },
+      ];
+    }
+
     const [items, total] = await Promise.all([
       this.prisma.leadEvent.findMany({
+        where,
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit,
-        select: {
-          id: true,
-          campaignId: true,
-          landingPageId: true,
-          fullName: true,
-          phone: true,
-          email: true,
-          model: true,
-          requestType: true,
-          status: true,
-          sourceUrl: true,
-          createdAt: true,
+        include: {
+          campaign: { select: { name: true } },
+          landingPage: { select: { title: true, slug: true } },
         },
       }),
-      this.prisma.leadEvent.count(),
+      this.prisma.leadEvent.count({ where }),
     ]);
 
     return {
-      data: items.map((item) => ({
-        ...item,
-        createdAt: item.createdAt.toISOString(),
-      })),
+      data: items.map((item) => this.toListItem(item)),
       pagination: {
         page,
         limit,
         total,
         totalPages: Math.max(1, Math.ceil(total / limit)),
       },
+    };
+  }
+
+  private toListItem(
+    item: {
+      id: string;
+      campaignId: string;
+      landingPageId: string;
+      fullName: string;
+      phone: string;
+      email: string | null;
+      brand: string | null;
+      model: string | null;
+      requestType: LeadRequestType;
+      status: LeadEventStatus;
+      sourceUrl: string;
+      createdAt: Date;
+      campaign: { name: string };
+      landingPage: { title: string; slug: string };
+    },
+  ): LeadEventListItem {
+    return {
+      id: item.id,
+      campaignId: item.campaignId,
+      landingPageId: item.landingPageId,
+      fullName: item.fullName,
+      phone: item.phone,
+      email: item.email,
+      brand: item.brand,
+      model: item.model,
+      requestType: item.requestType,
+      status: item.status,
+      sourceUrl: item.sourceUrl,
+      createdAt: item.createdAt.toISOString(),
+      campaignName: item.campaign.name,
+      landingPageTitle: item.landingPage.title,
+      landingPageSlug: item.landingPage.slug,
     };
   }
 
