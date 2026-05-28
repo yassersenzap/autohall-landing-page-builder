@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ApiError, logoutClient, logoutRequest, meRequest, type AuthUser } from '../lib/api';
+import { canViewLeads } from '../lib/leads';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -102,6 +103,12 @@ export default function DashboardPage() {
       <p className="dashboard__nav">
         <Link to="/campaigns">Gérer les campagnes</Link>
         {' · '}
+        {user && canViewLeads(user.role) ? (
+          <>
+            <Link to="/leads">Consulter les leads</Link>
+            {' · '}
+          </>
+        ) : null}
         <Link to="/">Retour à l&apos;accueil public</Link>
       </p>
     </main>
