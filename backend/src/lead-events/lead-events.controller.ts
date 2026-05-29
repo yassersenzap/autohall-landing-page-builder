@@ -12,6 +12,7 @@ import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { ListLeadEventsQueryDto } from './dto/list-lead-events-query.dto';
+import { UpdateLeadFollowUpDto } from './dto/update-lead-follow-up.dto';
 import { UpdateLeadStatusDto } from './dto/update-lead-status.dto';
 import { LeadEventsService } from './lead-events.service';
 
@@ -39,6 +40,18 @@ export class LeadEventsController {
   }
 
   @Roles(...INTERNAL_READ_ROLES)
+  @Get('assignable-users')
+  async findAssignableUsers() {
+    const data = await this.leadEventsService.findAssignableUsers();
+
+    return {
+      success: true,
+      data,
+      message: 'Assignable users retrieved successfully',
+    };
+  }
+
+  @Roles(...INTERNAL_READ_ROLES)
   @Get(':id/history')
   async findHistory(@Param('id', ParseUUIDPipe) id: string) {
     const data = await this.leadEventsService.findStatusHistory(id);
@@ -59,6 +72,26 @@ export class LeadEventsController {
       success: true,
       data,
       message: 'Lead event retrieved successfully',
+    };
+  }
+
+  @Roles(...INTERNAL_READ_ROLES)
+  @Patch(':id/follow-up')
+  async updateFollowUp(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateLeadFollowUpDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    const data = await this.leadEventsService.updateFollowUp(
+      id,
+      dto,
+      user.id,
+    );
+
+    return {
+      success: true,
+      data,
+      message: 'Lead follow-up updated successfully',
     };
   }
 

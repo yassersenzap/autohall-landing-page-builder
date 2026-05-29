@@ -714,6 +714,62 @@ body {
   border-color: #475569;
 }
 
+.priority-low {
+  background: #f1f5f9;
+  color: #475569;
+  border-color: #cbd5e1;
+}
+
+.priority-normal {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #93c5fd;
+}
+
+.priority-high {
+  background: #fff7ed;
+  color: #c2410c;
+  border-color: #fdba74;
+}
+
+.priority-urgent {
+  background: #7f1d1d;
+  color: #fecaca;
+  border-color: #991b1b;
+}
+
+.leads-table__overdue {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.leads-table__overdue-badge {
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.leads-filters__checkbox {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.leads-filters__checkbox input {
+  width: auto;
+}
+
+.lead-history__follow-up-label {
+  font-weight: 600;
+  color: #334155;
+}
+
 .leads-pagination {
   display: flex;
   align-items: center;
@@ -745,5 +801,33 @@ body {
   .lead-history__date,
   .lead-history__meta {
     color: #94a3b8;
+  }
+
+  .lead-history__follow-up-label {
+    color: #cbd5e1;
+  }
+
+  .priority-low {
+    background: #1e293b;
+    color: #cbd5e1;
+    border-color: #334155;
+  }
+
+  .priority-normal {
+    background: #1e3a8a;
+    color: #dbeafe;
+    border-color: #1d4ed8;
+  }
+
+  .priority-high {
+    background: #7c2d12;
+    color: #ffedd5;
+    border-color: #c2410c;
+  }
+
+  .leads-table__overdue-badge {
+    background: #450a0a;
+    color: #fecaca;
+    border-color: #991b1b;
   }
 }

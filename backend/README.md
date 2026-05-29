@@ -254,8 +254,10 @@ Phase 1 — simulation : les soumissions sont stockées dans `lead_events` uniqu
 | GET | `/api/lead-events/:id` | JWT — ADMIN, SI_DIGITAL, MARKETER | Détail complet d’un lead |
 | PATCH | `/api/lead-events/:id/status` | JWT — ADMIN, SI_DIGITAL, MARKETER | Mise à jour du statut (+ commentaire interne optionnel) |
 | GET | `/api/lead-events/:id/history` | JWT — ADMIN, SI_DIGITAL, MARKETER | Historique des changements de statut |
+| PATCH | `/api/lead-events/:id/follow-up` | JWT — ADMIN, SI_DIGITAL, MARKETER | Priorité, assignation, prochaine relance |
+| GET | `/api/lead-events/assignable-users` | JWT — ADMIN, SI_DIGITAL, MARKETER | Utilisateurs éligibles à l’assignation |
 
-Query `GET /api/lead-events` : `page`, `limit`, `search` (nom, email, téléphone), `status`, `campaignId`, `landingPageId`. Tri par date décroissante.
+Query `GET /api/lead-events` : `page`, `limit`, `search` (nom, email, téléphone), `status`, `campaignId`, `landingPageId`, `priority`, `assignedToUserId`, `overdueOnly`. Tri par date décroissante.
 
 Statuts métier : `RECEIVED`, `CONTACTED`, `QUALIFIED`, `REJECTED`, `ARCHIVED`.
 

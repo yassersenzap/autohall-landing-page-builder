@@ -7,14 +7,24 @@ import {
   Campaign,
   LandingPage,
   LeadEventStatus,
+  LeadHistoryEventType,
+  LeadPriority,
   LeadRequestType,
   Prisma,
+  UserRole,
 } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePublicLeadDto } from './dto/create-public-lead.dto';
 import { ListLeadEventsQueryDto } from './dto/list-lead-events-query.dto';
+import { UpdateLeadFollowUpDto } from './dto/update-lead-follow-up.dto';
 import { UpdateLeadStatusDto } from './dto/update-lead-status.dto';
 import {
+  buildFollowUpActivityNote,
+  formatFollowUpDate,
+  formatPriorityLabel,
+} from './lead-follow-up.helper';
+import {
+  isFollowUpOverdue,
   leadEventDetailInclude,
   toLeadEventDetail,
   type LeadEventDetail,
@@ -46,11 +56,23 @@ export type LeadEventListItem = {
   model: string | null;
   requestType: LeadRequestType;
   status: LeadEventStatus;
+  priority: LeadPriority;
+  assignedToUserId: string | null;
+  assignedToName: string | null;
+  nextFollowUpAt: string | null;
+  isFollowUpOverdue: boolean;
   sourceUrl: string;
   createdAt: string;
   campaignName: string;
   landingPageTitle: string;
   landingPageSlug: string;
+};
+
+export type AssignableUserItem = {
+  id: string;
+  fullName: string;
+  email: string;
+  role: UserRole;
 };
 
 @Injectable()
@@ -144,6 +166,21 @@ export class LeadEventsService {
       ];
     }
 
+    if (query.priority) {
+      where.priority = query.priority;
+    }
+
+    if (query.assignedToUserId) {
+      where.assignedToUserId = query.assignedToUserId;
+    }
+
+    if (query.overdueOnly) {
+      where.nextFollowUpAt = { lt: new Date() };
+      where.status = {
+        notIn: [LeadEventStatus.ARCHIVED, LeadEventStatus.REJECTED],
+      };
+    }
+
     const [items, total] = await Promise.all([
       this.prisma.leadEvent.findMany({
         where,
@@ -153,6 +190,7 @@ export class LeadEventsService {
         include: {
           campaign: { select: { name: true } },
           landingPage: { select: { title: true, slug: true } },
+          assignedTo: { select: { id: true, fullName: true } },
         },
       }),
       this.prisma.leadEvent.count({ where }),
@@ -244,10 +282,166 @@ export class LeadEventsService {
         where: { id },
         data: {
           status: dto.status,
+          ...(dto.status === LeadEventStatus.CONTACTED
+            ? { lastContactAt: new Date() }
+            : {}),
           ...(dto.internalComment !== undefined
             ? { internalComment: nextInternalComment }
             : {}),
         },
+        include: leadEventDetailInclude,
+      });
+    });
+
+    return toLeadEventDetail(lead);
+  }
+
+  async findAssignableUsers(): Promise<AssignableUserItem[]> {
+    const users = await this.prisma.user.findMany({
+      where: {
+        isActive: true,
+        role: {
+          in: [UserRole.ADMIN, UserRole.SI_DIGITAL, UserRole.MARKETER],
+        },
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        role: true,
+      },
+      orderBy: { fullName: 'asc' },
+    });
+
+    return users;
+  }
+
+  async updateFollowUp(
+    id: string,
+    dto: UpdateLeadFollowUpDto,
+    changedByUserId?: string,
+  ): Promise<LeadEventDetail> {
+    const hasUpdate =
+      dto.assignedToUserId !== undefined ||
+      dto.priority !== undefined ||
+      dto.nextFollowUpAt !== undefined;
+
+    if (!hasUpdate) {
+      throw new BadRequestException({
+        success: false,
+        message: 'At least one follow-up field must be provided',
+        code: 'VALIDATION_ERROR',
+      });
+    }
+
+    const existing = await this.prisma.leadEvent.findUnique({
+      where: { id },
+      include: {
+        assignedTo: { select: { id: true, fullName: true, email: true } },
+      },
+    });
+
+    if (!existing) {
+      throw new NotFoundException({
+        success: false,
+        message: 'Lead event not found',
+        code: 'LEAD_EVENT_NOT_FOUND',
+      });
+    }
+
+    const changes: string[] = [];
+    const updateData: Prisma.LeadEventUpdateInput = {};
+
+    if (dto.assignedToUserId !== undefined) {
+      if (dto.assignedToUserId === null) {
+        updateData.assignedTo = { disconnect: true };
+        if (existing.assignedTo) {
+          changes.push(
+            `Assignation : ${existing.assignedTo.fullName} → Non assigné`,
+          );
+        }
+      } else {
+        const assignee = await this.prisma.user.findFirst({
+          where: {
+            id: dto.assignedToUserId,
+            isActive: true,
+            role: {
+              in: [UserRole.ADMIN, UserRole.SI_DIGITAL, UserRole.MARKETER],
+            },
+          },
+          select: { id: true, fullName: true },
+        });
+
+        if (!assignee) {
+          throw new BadRequestException({
+            success: false,
+            message: 'Assigned user not found or not eligible',
+            code: 'ASSIGNEE_NOT_FOUND',
+          });
+        }
+
+        if (existing.assignedToUserId !== assignee.id) {
+          const previousName = existing.assignedTo?.fullName ?? 'Non assigné';
+          changes.push(`Assignation : ${previousName} → ${assignee.fullName}`);
+        }
+
+        updateData.assignedTo = { connect: { id: assignee.id } };
+      }
+    }
+
+    if (dto.priority !== undefined && dto.priority !== existing.priority) {
+      changes.push(
+        `Priorité : ${formatPriorityLabel(existing.priority)} → ${formatPriorityLabel(dto.priority)}`,
+      );
+      updateData.priority = dto.priority;
+    }
+
+    if (dto.nextFollowUpAt !== undefined) {
+      const nextDate = dto.nextFollowUpAt
+        ? new Date(dto.nextFollowUpAt)
+        : null;
+
+      if (nextDate && Number.isNaN(nextDate.getTime())) {
+        throw new BadRequestException({
+          success: false,
+          message: 'Invalid nextFollowUpAt date',
+          code: 'VALIDATION_ERROR',
+        });
+      }
+
+      const previousLabel = formatFollowUpDate(existing.nextFollowUpAt);
+      const nextLabel = formatFollowUpDate(nextDate);
+
+      if (
+        existing.nextFollowUpAt?.toISOString() !== nextDate?.toISOString()
+      ) {
+        changes.push(`Prochaine relance : ${previousLabel} → ${nextLabel}`);
+      }
+
+      updateData.nextFollowUpAt = nextDate;
+    }
+
+    if (changes.length === 0) {
+      return this.findOneById(id);
+    }
+
+    const activityNote = buildFollowUpActivityNote(changes);
+
+    const lead = await this.prisma.$transaction(async (tx) => {
+      await tx.leadStatusHistory.create({
+        data: {
+          leadEventId: id,
+          eventType: LeadHistoryEventType.FOLLOW_UP_UPDATE,
+          previousStatus: existing.status,
+          newStatus: existing.status,
+          activityNote,
+          changedByUserId: changedByUserId ?? null,
+        },
+      });
+
+      return tx.leadEvent.update({
+        where: { id },
+        data: updateData,
         include: leadEventDetailInclude,
       });
     });
@@ -282,10 +476,14 @@ export class LeadEventsService {
       model: string | null;
       requestType: LeadRequestType;
       status: LeadEventStatus;
+      priority: LeadPriority;
+      assignedToUserId: string | null;
+      nextFollowUpAt: Date | null;
       sourceUrl: string;
       createdAt: Date;
       campaign: { name: string };
       landingPage: { title: string; slug: string };
+      assignedTo: { id: string; fullName: string } | null;
     },
   ): LeadEventListItem {
     return {
@@ -299,6 +497,11 @@ export class LeadEventsService {
       model: item.model,
       requestType: item.requestType,
       status: item.status,
+      priority: item.priority,
+      assignedToUserId: item.assignedToUserId,
+      assignedToName: item.assignedTo?.fullName ?? null,
+      nextFollowUpAt: item.nextFollowUpAt?.toISOString() ?? null,
+      isFollowUpOverdue: isFollowUpOverdue(item.nextFollowUpAt, item.status),
       sourceUrl: item.sourceUrl,
       createdAt: item.createdAt.toISOString(),
       campaignName: item.campaign.name,

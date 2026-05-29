@@ -53,6 +53,18 @@ enum LeadEventStatus {
   ARCHIVED
 }
 
+enum LeadPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum LeadHistoryEventType {
+  STATUS_CHANGE
+  FOLLOW_UP_UPDATE
+}
+
 enum LeadRequestType {
   TEST_DRIVE
   CONTACT
@@ -95,6 +107,7 @@ model User {
   exportJobs         ExportJob[]
   auditLogs          AuditLog[]
   leadStatusChanges  LeadStatusHistory[]
+  assignedLeads      LeadEvent[]         @relation("LeadAssignedTo")
 
   @@index([role])
   @@index([isActive])
@@ -303,7 +316,11 @@ model LeadEvent {
   userAgent       String?         @map("user_agent") @db.Text
   ipAddress       String?         @map("ip_address") @db.VarChar(80)
   rawPayload      Json            @map("raw_payload")
-  status          LeadEventStatus @default(RECEIVED)
+  status            LeadEventStatus @default(RECEIVED)
+  assignedToUserId  String?         @map("assigned_to_user_id") @db.Uuid
+  priority          LeadPriority    @default(NORMAL)
+  nextFollowUpAt    DateTime?       @map("next_follow_up_at")
+  lastContactAt     DateTime?       @map("last_contact_at")
   syncDestination String?         @map("sync_destination") @db.VarChar(80)
   syncError       String?         @map("sync_error") @db.Text
   syncedAt        DateTime?       @map("synced_at")
@@ -312,6 +329,7 @@ model LeadEvent {
 
   campaign           Campaign            @relation(fields: [campaignId], references: [id], onDelete: Restrict)
   landingPage        LandingPage         @relation(fields: [landingPageId], references: [id], onDelete: Restrict)
+  assignedTo         User?               @relation("LeadAssignedTo", fields: [assignedToUserId], references: [id], onDelete: SetNull)
   simulatedTestdrive SimulatedTestdrive?
   simulatedContact   SimulatedContact?
   statusHistory      LeadStatusHistory[]
@@ -321,17 +339,22 @@ model LeadEvent {
   @@index([status])
   @@index([email])
   @@index([createdAt])
+  @@index([assignedToUserId])
+  @@index([priority])
+  @@index([nextFollowUpAt])
   @@map("lead_events")
 }
 
 model LeadStatusHistory {
-  id              String          @id @default(uuid()) @db.Uuid
-  leadEventId     String          @map("lead_event_id") @db.Uuid
-  previousStatus  LeadEventStatus @map("previous_status")
-  newStatus       LeadEventStatus @map("new_status")
-  internalComment String?         @map("internal_comment") @db.Text
-  changedAt       DateTime        @default(now()) @map("changed_at")
-  changedByUserId String?         @map("changed_by_user_id") @db.Uuid
+  id              String               @id @default(uuid()) @db.Uuid
+  leadEventId     String               @map("lead_event_id") @db.Uuid
+  eventType       LeadHistoryEventType @default(STATUS_CHANGE) @map("event_type")
+  previousStatus  LeadEventStatus      @map("previous_status")
+  newStatus       LeadEventStatus      @map("new_status")
+  internalComment String?              @map("internal_comment") @db.Text
+  activityNote    String?              @map("activity_note") @db.Text
+  changedAt       DateTime             @default(now()) @map("changed_at")
+  changedByUserId String?              @map("changed_by_user_id") @db.Uuid
 
   leadEvent LeadEvent @relation(fields: [leadEventId], references: [id], onDelete: Cascade)
   changedBy User?     @relation(fields: [changedByUserId], references: [id], onDelete: SetNull)

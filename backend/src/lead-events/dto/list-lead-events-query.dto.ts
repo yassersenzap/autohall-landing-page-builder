@@ -1,6 +1,7 @@
-import { LeadEventStatus } from '@prisma/client';
-import { Type } from 'class-transformer';
+import { LeadEventStatus, LeadPriority } from '@prisma/client';
+import { Transform, Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsEnum,
   IsInt,
   IsOptional,
@@ -9,6 +10,19 @@ import {
   Max,
   Min,
 } from 'class-validator';
+
+function toBoolean(value: unknown): boolean | undefined {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+  if (value === true || value === 'true' || value === '1') {
+    return true;
+  }
+  if (value === false || value === 'false' || value === '0') {
+    return false;
+  }
+  return undefined;
+}
 
 export class ListLeadEventsQueryDto {
   @IsOptional()
@@ -39,4 +53,17 @@ export class ListLeadEventsQueryDto {
   @IsOptional()
   @IsUUID()
   landingPageId?: string;
+
+  @IsOptional()
+  @IsEnum(LeadPriority)
+  priority?: LeadPriority;
+
+  @IsOptional()
+  @IsUUID()
+  assignedToUserId?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => toBoolean(value))
+  @IsBoolean()
+  overdueOnly?: boolean;
 }
