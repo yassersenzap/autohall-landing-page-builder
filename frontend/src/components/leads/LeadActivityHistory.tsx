@@ -24,7 +24,9 @@ export default function LeadActivityHistory({
   }
 
   if (items.length === 0) {
-    return <p className="lead-detail__text">Aucun changement de statut enregistré.</p>;
+    return (
+      <p className="lead-detail__text">Aucune activité enregistrée pour ce lead.</p>
+    );
   }
 
   return (
@@ -32,19 +34,23 @@ export default function LeadActivityHistory({
       {items.map((entry) => (
         <li key={entry.id} className="lead-history__item">
           <div className="lead-history__header">
-            <span className="lead-history__transition">
-              <span
-                className={`campaigns-list__status status-${entry.previousStatus.toLowerCase()}`}
-              >
-                {entry.previousStatus}
+            {entry.eventType === 'FOLLOW_UP_UPDATE' ? (
+              <span className="lead-history__follow-up-label">Suivi interne</span>
+            ) : (
+              <span className="lead-history__transition">
+                <span
+                  className={`campaigns-list__status status-${entry.previousStatus.toLowerCase()}`}
+                >
+                  {entry.previousStatus}
+                </span>
+                <span className="lead-history__arrow">→</span>
+                <span
+                  className={`campaigns-list__status status-${entry.newStatus.toLowerCase()}`}
+                >
+                  {entry.newStatus}
+                </span>
               </span>
-              <span className="lead-history__arrow">→</span>
-              <span
-                className={`campaigns-list__status status-${entry.newStatus.toLowerCase()}`}
-              >
-                {entry.newStatus}
-              </span>
-            </span>
+            )}
             <time className="lead-history__date" dateTime={entry.changedAt}>
               {formatDate(entry.changedAt)}
             </time>
@@ -52,6 +58,9 @@ export default function LeadActivityHistory({
           <p className="lead-history__meta">
             Par : {entry.changedByName ?? 'Utilisateur inconnu'}
           </p>
+          {entry.activityNote?.trim() ? (
+            <p className="lead-history__comment">{entry.activityNote}</p>
+          ) : null}
           {entry.internalComment?.trim() ? (
             <p className="lead-history__comment">{entry.internalComment}</p>
           ) : null}

@@ -11,6 +11,11 @@ export type LeadEventListItem = {
   model: string | null;
   requestType: string;
   status: string;
+  priority: string;
+  assignedToUserId: string | null;
+  assignedToName: string | null;
+  nextFollowUpAt: string | null;
+  isFollowUpOverdue: boolean;
   sourceUrl: string;
   createdAt: string;
   campaignName: string;
@@ -32,6 +37,9 @@ export type LeadsListParams = {
   status?: string;
   campaignId?: string;
   landingPageId?: string;
+  priority?: string;
+  assignedToUserId?: string;
+  overdueOnly?: boolean;
 };
 
 export type LeadsListResponse = {
@@ -49,6 +57,21 @@ export const LEAD_STATUSES = [
   'ARCHIVED',
 ] as const;
 
+export const LEAD_PRIORITIES = ['LOW', 'NORMAL', 'HIGH', 'URGENT'] as const;
+
+export const PRIORITY_LABELS: Record<string, string> = {
+  LOW: 'Basse',
+  NORMAL: 'Normale',
+  HIGH: 'Haute',
+  URGENT: 'Urgente',
+};
+
+export type LeadAssignee = {
+  id: string;
+  fullName: string;
+  email: string;
+} | null;
+
 export type LeadEventDetail = {
   id: string;
   campaignId: string;
@@ -63,6 +86,12 @@ export type LeadEventDetail = {
   message: string | null;
   internalComment: string | null;
   status: string;
+  priority: string;
+  assignedToUserId: string | null;
+  assignedTo: LeadAssignee;
+  nextFollowUpAt: string | null;
+  lastContactAt: string | null;
+  isFollowUpOverdue: boolean;
   sourceUrl: string;
   userAgent: string | null;
   ipAddress: string | null;
@@ -84,12 +113,27 @@ export type UpdateLeadStatusPayload = {
   internalComment?: string;
 };
 
+export type UpdateLeadFollowUpPayload = {
+  assignedToUserId?: string | null;
+  priority?: string;
+  nextFollowUpAt?: string | null;
+};
+
+export type AssignableUser = {
+  id: string;
+  fullName: string;
+  email: string;
+  role: string;
+};
+
 export type LeadStatusHistoryItem = {
   id: string;
   leadEventId: string;
+  eventType: string;
   previousStatus: string;
   newStatus: string;
   internalComment: string | null;
+  activityNote: string | null;
   changedAt: string;
   changedByUserId: string | null;
   changedByName: string | null;
@@ -98,6 +142,12 @@ export type LeadStatusHistoryItem = {
 export type LeadStatusHistoryResponse = {
   success: true;
   data: LeadStatusHistoryItem[];
+  message: string;
+};
+
+export type AssignableUsersResponse = {
+  success: true;
+  data: AssignableUser[];
   message: string;
 };
 
@@ -122,9 +172,35 @@ function buildQueryString(params: LeadsListParams): string {
   if (params.landingPageId) {
     searchParams.set('landingPageId', params.landingPageId);
   }
+  if (params.priority) {
+    searchParams.set('priority', params.priority);
+  }
+  if (params.assignedToUserId) {
+    searchParams.set('assignedToUserId', params.assignedToUserId);
+  }
+  if (params.overdueOnly) {
+    searchParams.set('overdueOnly', 'true');
+  }
 
   const query = searchParams.toString();
   return query ? `?${query}` : '';
+}
+
+export function formatLeadDate(value: string | null): string {
+  if (!value) {
+    return '—';
+  }
+  return new Date(value).toLocaleString('fr-FR');
+}
+
+export function toDateTimeLocalValue(value: string | null): string {
+  if (!value) {
+    return '';
+  }
+  const date = new Date(value);
+  const offset = date.getTimezoneOffset();
+  const local = new Date(date.getTime() - offset * 60_000);
+  return local.toISOString().slice(0, 16);
 }
 
 export async function listLeadEvents(
@@ -140,6 +216,13 @@ export function canViewLeads(role: string): boolean {
   return role === 'ADMIN' || role === 'SI_DIGITAL' || role === 'MARKETER';
 }
 
+export async function getAssignableUsers(): Promise<AssignableUsersResponse> {
+  const response = await apiRequest<AssignableUser[]>(
+    '/api/lead-events/assignable-users',
+  );
+  return response as AssignableUsersResponse;
+}
+
 export async function getLeadEvent(id: string): Promise<LeadDetailResponse> {
   const response = await apiRequest<LeadEventDetail>(`/api/lead-events/${id}`);
   return response as LeadDetailResponse;
@@ -151,6 +234,20 @@ export async function updateLeadEventStatus(
 ): Promise<LeadDetailResponse> {
   const response = await apiRequest<LeadEventDetail>(
     `/api/lead-events/${id}/status`,
+    {
+      method: 'PATCH',
+      body: payload,
+    },
+  );
+  return response as LeadDetailResponse;
+}
+
+export async function updateLeadFollowUp(
+  id: string,
+  payload: UpdateLeadFollowUpPayload,
+): Promise<LeadDetailResponse> {
+  const response = await apiRequest<LeadEventDetail>(
+    `/api/lead-events/${id}/follow-up`,
     {
       method: 'PATCH',
       body: payload,

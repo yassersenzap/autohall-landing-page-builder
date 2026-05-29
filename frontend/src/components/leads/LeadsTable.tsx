@@ -1,5 +1,10 @@
 import { Link } from 'react-router-dom';
-import type { LeadEventListItem, LeadsPagination } from '../../lib/leads';
+import {
+  formatLeadDate,
+  PRIORITY_LABELS,
+  type LeadEventListItem,
+  type LeadsPagination,
+} from '../../lib/leads';
 
 type LeadsTableProps = {
   leads: LeadEventListItem[];
@@ -47,6 +52,9 @@ export default function LeadsTable({
               <th>Modèle</th>
               <th>Campagne</th>
               <th>Landing</th>
+              <th>Priorité</th>
+              <th>Assigné à</th>
+              <th>Relance</th>
               <th>Statut</th>
               <th>Source</th>
               <th />
@@ -69,6 +77,24 @@ export default function LeadsTable({
                   <span className="leads-table__landing-slug">
                     /{lead.landingPageSlug}
                   </span>
+                </td>
+                <td>
+                  <span
+                    className={`campaigns-list__status priority-${lead.priority.toLowerCase()}`}
+                  >
+                    {PRIORITY_LABELS[lead.priority] ?? lead.priority}
+                  </span>
+                </td>
+                <td>{lead.assignedToName ?? '—'}</td>
+                <td
+                  className={
+                    lead.isFollowUpOverdue ? 'leads-table__overdue' : undefined
+                  }
+                >
+                  {formatLeadDate(lead.nextFollowUpAt)}
+                  {lead.isFollowUpOverdue ? (
+                    <span className="leads-table__overdue-badge">En retard</span>
+                  ) : null}
                 </td>
                 <td>
                   <span

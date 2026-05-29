@@ -9,7 +9,9 @@ import { listCampaigns, type CampaignListItem } from '../lib/campaigns';
 import { listLandingPages, type LandingPageListItem } from '../lib/landing-pages';
 import {
   canViewLeads,
+  getAssignableUsers,
   listLeadEvents,
+  type AssignableUser,
   type LeadEventListItem,
   type LeadsPagination,
 } from '../lib/leads';
@@ -19,6 +21,9 @@ const EMPTY_FILTERS: LeadsFilterValues = {
   status: '',
   campaignId: '',
   landingPageId: '',
+  priority: '',
+  assignedToUserId: '',
+  overdueOnly: false,
 };
 
 export default function LeadsPage() {
@@ -33,6 +38,7 @@ export default function LeadsPage() {
   });
   const [campaigns, setCampaigns] = useState<CampaignListItem[]>([]);
   const [landingPages, setLandingPages] = useState<LandingPageListItem[]>([]);
+  const [assignableUsers, setAssignableUsers] = useState<AssignableUser[]>([]);
   const [filters, setFilters] = useState<LeadsFilterValues>(EMPTY_FILTERS);
   const [appliedFilters, setAppliedFilters] =
     useState<LeadsFilterValues>(EMPTY_FILTERS);
@@ -61,6 +67,9 @@ export default function LeadsPage() {
           status: nextFilters.status || undefined,
           campaignId: nextFilters.campaignId || undefined,
           landingPageId: nextFilters.landingPageId || undefined,
+          priority: nextFilters.priority || undefined,
+          assignedToUserId: nextFilters.assignedToUserId || undefined,
+          overdueOnly: nextFilters.overdueOnly || undefined,
         });
         setLeads(response.data);
         setPagination(response.pagination);
@@ -105,9 +114,13 @@ export default function LeadsPage() {
           return;
         }
 
-        const campaignsResponse = await listCampaigns();
+        const [campaignsResponse, usersResponse] = await Promise.all([
+          listCampaigns(),
+          getAssignableUsers(),
+        ]);
         if (!cancelled) {
           setCampaigns(campaignsResponse.data);
+          setAssignableUsers(usersResponse.data);
         }
 
         await loadLeads(1, EMPTY_FILTERS, profile.data.role);
@@ -204,6 +217,7 @@ export default function LeadsPage() {
         values={filters}
         campaigns={campaigns}
         landingPages={landingPages}
+        assignableUsers={assignableUsers}
         onChange={setFilters}
         onApply={handleApplyFilters}
         onRefresh={handleRefresh}
