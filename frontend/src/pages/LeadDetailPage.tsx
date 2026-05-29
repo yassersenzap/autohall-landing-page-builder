@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import LeadActivityHistory from '../components/leads/LeadActivityHistory';
 import LeadStatusForm from '../components/leads/LeadStatusForm';
 import { ApiError, logoutClient, meRequest } from '../lib/api';
 import {
   canViewLeads,
   getLeadEvent,
+  getLeadEventHistory,
   updateLeadEventStatus,
   type LeadEventDetail,
+  type LeadStatusHistoryItem,
 } from '../lib/leads';
 
 function formatDate(value: string): string {
@@ -22,6 +25,28 @@ export default function LeadDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [history, setHistory] = useState<LeadStatusHistoryItem[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState<string | null>(null);
+
+  const loadHistory = useCallback(async (leadId: string) => {
+    setHistoryError(null);
+    setHistoryLoading(true);
+
+    try {
+      const response = await getLeadEventHistory(leadId);
+      setHistory(response.data);
+    } catch (err) {
+      setHistory([]);
+      setHistoryError(
+        err instanceof ApiError
+          ? err.message
+          : 'Impossible de charger l’historique.',
+      );
+    } finally {
+      setHistoryLoading(false);
+    }
+  }, []);
 
   const loadLead = useCallback(async () => {
     if (!id) {
@@ -42,6 +67,7 @@ export default function LeadDetailPage() {
 
       const response = await getLeadEvent(id);
       setLead(response.data);
+      await loadHistory(id);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         logoutClient();
@@ -65,7 +91,7 @@ export default function LeadDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [id, navigate]);
+  }, [id, loadHistory, navigate]);
 
   useEffect(() => {
     void loadLead();
@@ -87,6 +113,7 @@ export default function LeadDetailPage() {
       });
       setLead(response.data);
       setSuccess('Lead mis à jour avec succès.');
+      await loadHistory(id);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         logoutClient();
@@ -232,6 +259,15 @@ export default function LeadDetailPage() {
           currentInternalComment={lead.internalComment}
           submitting={submitting}
           onSubmit={handleStatusUpdate}
+        />
+      </section>
+
+      <section className="dashboard__card">
+        <h2>Historique d&apos;activité</h2>
+        <LeadActivityHistory
+          items={history}
+          loading={historyLoading}
+          error={historyError}
         />
       </section>
     </main>

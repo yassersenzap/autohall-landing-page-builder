@@ -8,6 +8,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
+import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { ListLeadEventsQueryDto } from './dto/list-lead-events-query.dto';
 import { UpdateLeadStatusDto } from './dto/update-lead-status.dto';
@@ -37,6 +39,18 @@ export class LeadEventsController {
   }
 
   @Roles(...INTERNAL_READ_ROLES)
+  @Get(':id/history')
+  async findHistory(@Param('id', ParseUUIDPipe) id: string) {
+    const data = await this.leadEventsService.findStatusHistory(id);
+
+    return {
+      success: true,
+      data,
+      message: 'Lead status history retrieved successfully',
+    };
+  }
+
+  @Roles(...INTERNAL_READ_ROLES)
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     const data = await this.leadEventsService.findOneById(id);
@@ -53,8 +67,13 @@ export class LeadEventsController {
   async updateStatus(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateLeadStatusDto,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
-    const data = await this.leadEventsService.updateStatus(id, dto);
+    const data = await this.leadEventsService.updateStatus(
+      id,
+      dto,
+      user.id,
+    );
 
     return {
       success: true,

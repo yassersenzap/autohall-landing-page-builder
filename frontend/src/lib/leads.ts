@@ -84,6 +84,23 @@ export type UpdateLeadStatusPayload = {
   internalComment?: string;
 };
 
+export type LeadStatusHistoryItem = {
+  id: string;
+  leadEventId: string;
+  previousStatus: string;
+  newStatus: string;
+  internalComment: string | null;
+  changedAt: string;
+  changedByUserId: string | null;
+  changedByName: string | null;
+};
+
+export type LeadStatusHistoryResponse = {
+  success: true;
+  data: LeadStatusHistoryItem[];
+  message: string;
+};
+
 function buildQueryString(params: LeadsListParams): string {
   const searchParams = new URLSearchParams();
 
@@ -140,4 +157,13 @@ export async function updateLeadEventStatus(
     },
   );
   return response as LeadDetailResponse;
+}
+
+export async function getLeadEventHistory(
+  id: string,
+): Promise<LeadStatusHistoryResponse> {
+  const response = await apiRequest<LeadStatusHistoryItem[]>(
+    `/api/lead-events/${id}/history`,
+  );
+  return response as LeadStatusHistoryResponse;
 }
