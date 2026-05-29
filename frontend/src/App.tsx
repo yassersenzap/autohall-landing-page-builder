@@ -5,6 +5,7 @@ import LandingPageVersionsPage from './pages/LandingPageVersionsPage';
 import PagePreviewPage from './pages/PagePreviewPage';
 import PageVersionBlocksPage from './pages/PageVersionBlocksPage';
 import CampaignsPage from './pages/CampaignsPage';
+import LeadDetailPage from './pages/LeadDetailPage';
 import LeadsPage from './pages/LeadsPage';
 import DashboardPage from './pages/DashboardPage';
 import HomePage from './pages/HomePage';
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/campaigns" element={<CampaignsPage />} />
           <Route path="/leads" element={<LeadsPage />} />
+          <Route path="/leads/:id" element={<LeadDetailPage />} />
           <Route
             path="/campaigns/:campaignId/landing-pages"
             element={<CampaignLandingPagesPage />}

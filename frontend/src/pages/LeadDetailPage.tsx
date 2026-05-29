@@ -1,0 +1,239 @@
+import { useCallback, useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import LeadStatusForm from '../components/leads/LeadStatusForm';
+import { ApiError, logoutClient, meRequest } from '../lib/api';
+import {
+  canViewLeads,
+  getLeadEvent,
+  updateLeadEventStatus,
+  type LeadEventDetail,
+} from '../lib/leads';
+
+function formatDate(value: string): string {
+  return new Date(value).toLocaleString('fr-FR');
+}
+
+export default function LeadDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [role, setRole] = useState<string | null>(null);
+  const [lead, setLead] = useState<LeadEventDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const loadLead = useCallback(async () => {
+    if (!id) {
+      return;
+    }
+
+    setError(null);
+    setSuccess(null);
+    setLoading(true);
+
+    try {
+      const profile = await meRequest();
+      setRole(profile.data.role);
+
+      if (!canViewLeads(profile.data.role)) {
+        return;
+      }
+
+      const response = await getLeadEvent(id);
+      setLead(response.data);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        logoutClient();
+        navigate('/login', { replace: true });
+        return;
+      }
+      if (err instanceof ApiError && err.status === 403) {
+        setError('Vous n’avez pas accès à ce lead.');
+        return;
+      }
+      if (err instanceof ApiError && err.status === 404) {
+        setLead(null);
+        setError('Lead introuvable.');
+        return;
+      }
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : 'Impossible de charger le détail du lead.',
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [id, navigate]);
+
+  useEffect(() => {
+    void loadLead();
+  }, [loadLead]);
+
+  async function handleStatusUpdate(status: string, internalComment: string) {
+    if (!id) {
+      return;
+    }
+
+    setSubmitting(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const response = await updateLeadEventStatus(id, {
+        status,
+        internalComment: internalComment.trim() || undefined,
+      });
+      setLead(response.data);
+      setSuccess('Lead mis à jour avec succès.');
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        logoutClient();
+        navigate('/login', { replace: true });
+        return;
+      }
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : 'Impossible de mettre à jour le lead.',
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (!id) {
+    return (
+      <main className="dashboard">
+        <p className="dashboard__error">Identifiant de lead manquant.</p>
+        <Link to="/leads">Retour à la liste</Link>
+      </main>
+    );
+  }
+
+  if (loading) {
+    return (
+      <main className="dashboard">
+        <p>Chargement du lead…</p>
+      </main>
+    );
+  }
+
+  if (role && !canViewLeads(role)) {
+    return (
+      <main className="dashboard">
+        <p className="dashboard__error">
+          Accès refusé : votre rôle ne permet pas de gérer les leads.
+        </p>
+        <Link to="/dashboard">Retour au tableau de bord</Link>
+      </main>
+    );
+  }
+
+  if (!lead) {
+    return (
+      <main className="dashboard">
+        <header className="dashboard__header">
+          <h1>Détail du lead</h1>
+          <Link to="/leads" className="dashboard__link">
+            Retour à la liste
+          </Link>
+        </header>
+        {error ? <p className="dashboard__error">{error}</p> : null}
+        {!error ? <p>Lead introuvable.</p> : null}
+      </main>
+    );
+  }
+
+  return (
+    <main className="dashboard lead-detail-page">
+      <header className="dashboard__header">
+        <div>
+          <h1>{lead.fullName}</h1>
+          <p className="dashboard__subtitle">
+            Lead reçu le {formatDate(lead.createdAt)}
+          </p>
+        </div>
+        <Link to="/leads" className="dashboard__link">
+          Retour à la liste
+        </Link>
+      </header>
+
+      {error ? <p className="dashboard__error">{error}</p> : null}
+      {success ? <p className="lead-detail__success">{success}</p> : null}
+
+      <section className="dashboard__card">
+        <h2>Informations</h2>
+        <ul className="dashboard__meta lead-detail__meta">
+          <li>
+            <strong>Téléphone :</strong> {lead.phone}
+          </li>
+          <li>
+            <strong>Email :</strong> {lead.email ?? '—'}
+          </li>
+          <li>
+            <strong>Marque :</strong> {lead.brand ?? '—'}
+          </li>
+          <li>
+            <strong>Modèle :</strong> {lead.model ?? '—'}
+          </li>
+          <li>
+            <strong>Campagne :</strong> {lead.campaignName}
+          </li>
+          <li>
+            <strong>Landing page :</strong> {lead.landingPageTitle} (
+            /{lead.landingPageSlug})
+          </li>
+          <li>
+            <strong>Source URL :</strong>{' '}
+            <a href={lead.sourceUrl} target="_blank" rel="noreferrer">
+              {lead.sourceUrl}
+            </a>
+          </li>
+          <li>
+            <strong>Statut :</strong>{' '}
+            <span
+              className={`campaigns-list__status status-${lead.status.toLowerCase()}`}
+            >
+              {lead.status}
+            </span>
+          </li>
+          <li>
+            <strong>Type de demande :</strong> {lead.requestType}
+          </li>
+          <li>
+            <strong>Dernière mise à jour :</strong>{' '}
+            {formatDate(lead.updatedAt)}
+          </li>
+        </ul>
+      </section>
+
+      <section className="dashboard__card">
+        <h2>Message client</h2>
+        <p className="lead-detail__text">
+          {lead.message?.trim() ? lead.message : 'Aucun message laissé.'}
+        </p>
+      </section>
+
+      <section className="dashboard__card">
+        <h2>Commentaire interne</h2>
+        <p className="lead-detail__text">
+          {lead.internalComment?.trim()
+            ? lead.internalComment
+            : 'Aucun commentaire interne.'}
+        </p>
+      </section>
+
+      <section className="dashboard__card">
+        <LeadStatusForm
+          key={`${lead.id}-${lead.status}-${lead.internalComment ?? ''}`}
+          currentStatus={lead.status}
+          currentInternalComment={lead.internalComment}
+          submitting={submitting}
+          onSubmit={handleStatusUpdate}
+        />
+      </section>
+    </main>
+  );
+}

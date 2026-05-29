@@ -613,6 +613,53 @@ body {
   white-space: nowrap;
 }
 
+.lead-detail__meta {
+  margin: 0;
+}
+
+.lead-detail__text {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.lead-detail__success {
+  color: #15803d;
+  margin: 0 0 1rem;
+}
+
+.lead-status-form textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  font: inherit;
+  resize: vertical;
+}
+
+.status-contacted {
+  background: #1e3a8a;
+  color: #dbeafe;
+  border-color: #1d4ed8;
+}
+
+.status-qualified {
+  background: #14532d;
+  color: #bbf7d0;
+  border-color: #166534;
+}
+
+.status-rejected {
+  background: #7f1d1d;
+  color: #fecaca;
+  border-color: #991b1b;
+}
+
+.status-archived {
+  background: #334155;
+  color: #e2e8f0;
+  border-color: #475569;
+}
+
 .leads-pagination {
   display: flex;
   align-items: center;
