@@ -94,6 +94,7 @@ model User {
   pageVersionsCreated PageVersion[]  @relation("PageVersionCreatedBy")
   exportJobs         ExportJob[]
   auditLogs          AuditLog[]
+  leadStatusChanges  LeadStatusHistory[]
 
   @@index([role])
   @@index([isActive])
@@ -313,6 +314,7 @@ model LeadEvent {
   landingPage        LandingPage         @relation(fields: [landingPageId], references: [id], onDelete: Restrict)
   simulatedTestdrive SimulatedTestdrive?
   simulatedContact   SimulatedContact?
+  statusHistory      LeadStatusHistory[]
 
   @@index([campaignId])
   @@index([landingPageId])
@@ -320,6 +322,23 @@ model LeadEvent {
   @@index([email])
   @@index([createdAt])
   @@map("lead_events")
+}
+
+model LeadStatusHistory {
+  id              String          @id @default(uuid()) @db.Uuid
+  leadEventId     String          @map("lead_event_id") @db.Uuid
+  previousStatus  LeadEventStatus @map("previous_status")
+  newStatus       LeadEventStatus @map("new_status")
+  internalComment String?         @map("internal_comment") @db.Text
+  changedAt       DateTime        @default(now()) @map("changed_at")
+  changedByUserId String?         @map("changed_by_user_id") @db.Uuid
+
+  leadEvent LeadEvent @relation(fields: [leadEventId], references: [id], onDelete: Cascade)
+  changedBy User?     @relation(fields: [changedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([leadEventId])
+  @@index([changedAt])
+  @@map("lead_status_history")
 }
 
 model SimulatedTestdrive {

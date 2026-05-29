@@ -90,6 +90,9 @@ async function bootstrap(): Promise<void> {
   console.log(
     `[backend] PATCH http://localhost:${port}/api/lead-events/:id/status`,
   );
+  console.log(
+    `[backend] GET http://localhost:${port}/api/lead-events/:id/history`,
+  );
 }
 
 bootstrap().catch((error: unknown) => {

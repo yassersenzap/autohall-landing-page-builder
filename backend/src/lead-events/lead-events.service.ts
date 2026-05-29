@@ -19,6 +19,11 @@ import {
   toLeadEventDetail,
   type LeadEventDetail,
 } from './lead-event.mapper';
+import {
+  leadStatusHistoryInclude,
+  toLeadStatusHistoryItem,
+  type LeadStatusHistoryItem,
+} from './lead-status-history.mapper';
 
 type ResolvedLeadContext = {
   campaign: Campaign;
@@ -181,24 +186,70 @@ export class LeadEventsService {
     return toLeadEventDetail(lead);
   }
 
+  async findStatusHistory(leadEventId: string): Promise<LeadStatusHistoryItem[]> {
+    await this.ensureLeadExists(leadEventId);
+
+    const rows = await this.prisma.leadStatusHistory.findMany({
+      where: { leadEventId },
+      orderBy: { changedAt: 'desc' },
+      include: leadStatusHistoryInclude,
+    });
+
+    return rows.map((row) => toLeadStatusHistoryItem(row));
+  }
+
   async updateStatus(
     id: string,
     dto: UpdateLeadStatusDto,
+    changedByUserId?: string,
   ): Promise<LeadEventDetail> {
-    await this.ensureLeadExists(id);
+    const existing = await this.prisma.leadEvent.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        status: true,
+        internalComment: true,
+      },
+    });
 
-    const data: Prisma.LeadEventUpdateInput = {
-      status: dto.status,
-    };
-
-    if (dto.internalComment !== undefined) {
-      data.internalComment = dto.internalComment.trim() || null;
+    if (!existing) {
+      throw new NotFoundException({
+        success: false,
+        message: 'Lead event not found',
+        code: 'LEAD_EVENT_NOT_FOUND',
+      });
     }
 
-    const lead = await this.prisma.leadEvent.update({
-      where: { id },
-      data,
-      include: leadEventDetailInclude,
+    const nextInternalComment =
+      dto.internalComment !== undefined
+        ? dto.internalComment.trim() || null
+        : existing.internalComment;
+
+    const statusChanged = existing.status !== dto.status;
+
+    const lead = await this.prisma.$transaction(async (tx) => {
+      if (statusChanged) {
+        await tx.leadStatusHistory.create({
+          data: {
+            leadEventId: id,
+            previousStatus: existing.status,
+            newStatus: dto.status,
+            internalComment: nextInternalComment,
+            changedByUserId: changedByUserId ?? null,
+          },
+        });
+      }
+
+      return tx.leadEvent.update({
+        where: { id },
+        data: {
+          status: dto.status,
+          ...(dto.internalComment !== undefined
+            ? { internalComment: nextInternalComment }
+            : {}),
+        },
+        include: leadEventDetailInclude,
+      });
     });
 
     return toLeadEventDetail(lead);
