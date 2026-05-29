@@ -43,12 +43,46 @@ export type LeadsListResponse = {
 
 export const LEAD_STATUSES = [
   'RECEIVED',
-  'VALIDATED',
-  'SYNCED',
-  'FAILED',
-  'PENDING_RETRY',
-  'DUPLICATE',
+  'CONTACTED',
+  'QUALIFIED',
+  'REJECTED',
+  'ARCHIVED',
 ] as const;
+
+export type LeadEventDetail = {
+  id: string;
+  campaignId: string;
+  landingPageId: string;
+  fullName: string;
+  phone: string;
+  email: string | null;
+  city: string | null;
+  brand: string | null;
+  model: string | null;
+  requestType: string;
+  message: string | null;
+  internalComment: string | null;
+  status: string;
+  sourceUrl: string;
+  userAgent: string | null;
+  ipAddress: string | null;
+  createdAt: string;
+  updatedAt: string;
+  campaignName: string;
+  landingPageTitle: string;
+  landingPageSlug: string;
+};
+
+export type LeadDetailResponse = {
+  success: true;
+  data: LeadEventDetail;
+  message: string;
+};
+
+export type UpdateLeadStatusPayload = {
+  status: string;
+  internalComment?: string;
+};
 
 function buildQueryString(params: LeadsListParams): string {
   const searchParams = new URLSearchParams();
@@ -87,4 +121,23 @@ export async function listLeadEvents(
 
 export function canViewLeads(role: string): boolean {
   return role === 'ADMIN' || role === 'SI_DIGITAL' || role === 'MARKETER';
+}
+
+export async function getLeadEvent(id: string): Promise<LeadDetailResponse> {
+  const response = await apiRequest<LeadEventDetail>(`/api/lead-events/${id}`);
+  return response as LeadDetailResponse;
+}
+
+export async function updateLeadEventStatus(
+  id: string,
+  payload: UpdateLeadStatusPayload,
+): Promise<LeadDetailResponse> {
+  const response = await apiRequest<LeadEventDetail>(
+    `/api/lead-events/${id}/status`,
+    {
+      method: 'PATCH',
+      body: payload,
+    },
+  );
+  return response as LeadDetailResponse;
 }

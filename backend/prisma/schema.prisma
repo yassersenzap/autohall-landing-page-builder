@@ -47,11 +47,10 @@ enum ExportJobStatus {
 
 enum LeadEventStatus {
   RECEIVED
-  VALIDATED
-  SYNCED
-  FAILED
-  PENDING_RETRY
-  DUPLICATE
+  CONTACTED
+  QUALIFIED
+  REJECTED
+  ARCHIVED
 }
 
 enum LeadRequestType {
@@ -298,6 +297,7 @@ model LeadEvent {
   model           String?         @db.VarChar(100)
   requestType     LeadRequestType @map("request_type")
   message         String?         @db.Text
+  internalComment String?         @map("internal_comment") @db.Text
   sourceUrl       String          @map("source_url") @db.VarChar(500)
   userAgent       String?         @map("user_agent") @db.Text
   ipAddress       String?         @map("ip_address") @db.VarChar(80)

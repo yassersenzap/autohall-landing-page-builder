@@ -13,6 +13,12 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePublicLeadDto } from './dto/create-public-lead.dto';
 import { ListLeadEventsQueryDto } from './dto/list-lead-events-query.dto';
+import { UpdateLeadStatusDto } from './dto/update-lead-status.dto';
+import {
+  leadEventDetailInclude,
+  toLeadEventDetail,
+  type LeadEventDetail,
+} from './lead-event.mapper';
 
 type ResolvedLeadContext = {
   campaign: Campaign;
@@ -156,6 +162,61 @@ export class LeadEventsService {
         totalPages: Math.max(1, Math.ceil(total / limit)),
       },
     };
+  }
+
+  async findOneById(id: string): Promise<LeadEventDetail> {
+    const lead = await this.prisma.leadEvent.findUnique({
+      where: { id },
+      include: leadEventDetailInclude,
+    });
+
+    if (!lead) {
+      throw new NotFoundException({
+        success: false,
+        message: 'Lead event not found',
+        code: 'LEAD_EVENT_NOT_FOUND',
+      });
+    }
+
+    return toLeadEventDetail(lead);
+  }
+
+  async updateStatus(
+    id: string,
+    dto: UpdateLeadStatusDto,
+  ): Promise<LeadEventDetail> {
+    await this.ensureLeadExists(id);
+
+    const data: Prisma.LeadEventUpdateInput = {
+      status: dto.status,
+    };
+
+    if (dto.internalComment !== undefined) {
+      data.internalComment = dto.internalComment.trim() || null;
+    }
+
+    const lead = await this.prisma.leadEvent.update({
+      where: { id },
+      data,
+      include: leadEventDetailInclude,
+    });
+
+    return toLeadEventDetail(lead);
+  }
+
+  private async ensureLeadExists(id: string): Promise<void> {
+    const exists = await this.prisma.leadEvent.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+
+    if (!exists) {
+      throw new NotFoundException({
+        success: false,
+        message: 'Lead event not found',
+        code: 'LEAD_EVENT_NOT_FOUND',
+      });
+    }
   }
 
   private toListItem(

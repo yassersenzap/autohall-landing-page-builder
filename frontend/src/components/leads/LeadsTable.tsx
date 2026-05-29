@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import type { LeadEventListItem, LeadsPagination } from '../../lib/leads';
 
 type LeadsTableProps = {
@@ -48,6 +49,7 @@ export default function LeadsTable({
               <th>Landing</th>
               <th>Statut</th>
               <th>Source</th>
+              <th />
             </tr>
           </thead>
           <tbody>
@@ -77,6 +79,11 @@ export default function LeadsTable({
                 </td>
                 <td className="leads-table__source" title={lead.sourceUrl}>
                   {lead.sourceUrl}
+                </td>
+                <td>
+                  <Link to={`/leads/${lead.id}`} className="dashboard__link">
+                    Voir
+                  </Link>
                 </td>
               </tr>
             ))}

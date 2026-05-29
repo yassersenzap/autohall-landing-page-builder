@@ -1,7 +1,16 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Query,
+} from '@nestjs/common';
 import { UserRole } from '@prisma/client';
 import { Roles } from '../common/decorators/roles.decorator';
 import { ListLeadEventsQueryDto } from './dto/list-lead-events-query.dto';
+import { UpdateLeadStatusDto } from './dto/update-lead-status.dto';
 import { LeadEventsService } from './lead-events.service';
 
 const INTERNAL_READ_ROLES = [
@@ -24,6 +33,33 @@ export class LeadEventsController {
       data: result.data,
       pagination: result.pagination,
       message: 'Lead events retrieved successfully',
+    };
+  }
+
+  @Roles(...INTERNAL_READ_ROLES)
+  @Get(':id')
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    const data = await this.leadEventsService.findOneById(id);
+
+    return {
+      success: true,
+      data,
+      message: 'Lead event retrieved successfully',
+    };
+  }
+
+  @Roles(...INTERNAL_READ_ROLES)
+  @Patch(':id/status')
+  async updateStatus(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateLeadStatusDto,
+  ) {
+    const data = await this.leadEventsService.updateStatus(id, dto);
+
+    return {
+      success: true,
+      data,
+      message: 'Lead status updated successfully',
     };
   }
 }
