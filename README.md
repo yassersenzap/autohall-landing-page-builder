@@ -94,6 +94,8 @@ Depuis `backend/` (PostgreSQL doit être démarré via Docker et `DATABASE_URL` 
 cd backend
 npm install
 npx prisma generate
+npx prisma migrate deploy
+npm run db:seed
 npm run start:dev
 ```
 
@@ -108,26 +110,44 @@ Détails (variables, Prisma CLI, build) : voir [`backend/README.md`](backend/REA
 
 ---
 
+## Démarrage frontend (local)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Interface builder : **http://localhost:5173** (API : `VITE_API_BASE_URL`, défaut `http://localhost:3000`).
+
+---
+
+## Recette et validation MVP
+
+- **Recette opérationnelle (scénarios, routes, limites)** : [`docs/mvp/11-recette-mvp-stabilisation.md`](docs/mvp/11-recette-mvp-stabilisation.md)
+- **Checklist avant démo** : [`docs/mvp/CHECKLIST-DEMO.md`](docs/mvp/CHECKLIST-DEMO.md)
+
+---
+
 ## Règle de démarrage du développement
 
 **Ne pas commencer le code applicatif** (backend, frontend, schéma DB exécutable, etc.) sans avoir pris en compte et respecté les documents sous **`docs/mvp/`** (périmètre, données, API, export, sécurité, plan). En cas de divergence, mettre à jour la documentation en premier ou documenter une décision explicite.
 
 ---
 
-## État actuel du projet
+## État actuel du projet (MVP stabilisé)
 
-### En place
+### Fonctionnel
 
-- **Docker** : PostgreSQL 16 via `docker-compose.yml` (pgAdmin optionnel, profil `pgadmin`).
-- **Backend NestJS** : démarre en local ; **Prisma 7** installé et intégré (`PrismaService`, adapter PostgreSQL, `prisma.config.ts`, schéma minimal dans `backend/prisma/schema.prisma`).
-- **Health checks** : `GET /health` (état du service) et `GET /health/db` (connexion PostgreSQL via Prisma).
-- **Frontend React / Vite** : page minimale de présentation, lancée en local (non conteneurisée).
-- **Configuration** : `.env.example` à la racine et dans `backend/` ; chargement des variables depuis le `.env` racine (voir `backend/src/config/env-paths.ts`).
+- **Docker** : PostgreSQL 16 (+ pgAdmin optionnel).
+- **Backend NestJS + Prisma 7** : auth JWT/RBAC, campagnes, landings, versions, blocs, preview, publish, export ZIP, leads publics et internes (liste, détail, statut, suivi, historique, KPI dashboard).
+- **Frontend React / Vite** : parcours builder + espace leads + tableau de bord KPI.
+- **Seed** : admin, campagne/landing démo, lead exemple (`backend/prisma/seed.ts`).
 
-### Pas encore fait
+### Limites connues (hors prochaine phase)
 
-- **Modèles Prisma métier**, **migrations** et **seed** (référence : `docs/mvp/03-modele-donnees.md`, phase 3 du plan MVP).
-- **Logique métier** (auth, campagnes, landing pages, export ZIP, leads, etc.).
-- **Conteneurisation** du backend et du frontend dans Docker Compose.
+- Éditeur de blocs en **JSON** (pas de canvas / drag-and-drop).
+- Tables `simulated_*`, `export_jobs`, `audit_logs`, assets — schéma présent, **non branchées**.
+- Seed : version démo en `DRAFT` sans bloc `lead_form` — publier et ajouter le formulaire pour la démo export.
 
-La documentation MVP sous `docs/mvp/` reste la référence avant d’étendre le code applicatif.
+Voir la recette : [`docs/mvp/11-recette-mvp-stabilisation.md`](docs/mvp/11-recette-mvp-stabilisation.md).
