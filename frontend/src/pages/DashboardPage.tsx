@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import LeadDashboardSection from '../components/dashboard/LeadDashboardSection';
 import { ApiError, logoutClient, logoutRequest, meRequest, type AuthUser } from '../lib/api';
+import { getLeadDashboardKpis, type LeadDashboardKpis } from '../lib/lead-dashboard';
 import { canViewLeads } from '../lib/leads';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [kpis, setKpis] = useState<LeadDashboardKpis | null>(null);
+  const [kpisError, setKpisError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -15,8 +19,27 @@ export default function DashboardPage() {
     async function loadProfile() {
       try {
         const response = await meRequest();
-        if (!cancelled) {
-          setUser(response.data);
+        if (cancelled) {
+          return;
+        }
+
+        setUser(response.data);
+
+        if (canViewLeads(response.data.role)) {
+          try {
+            const dashboard = await getLeadDashboardKpis();
+            if (!cancelled) {
+              setKpis(dashboard.data);
+            }
+          } catch (err) {
+            if (!cancelled) {
+              setKpisError(
+                err instanceof ApiError
+                  ? err.message
+                  : 'Impossible de charger les indicateurs leads.',
+              );
+            }
+          }
         }
       } catch (err) {
         if (!cancelled) {
@@ -74,8 +97,7 @@ export default function DashboardPage() {
         <div>
           <h1>Tableau de bord</h1>
           <p className="dashboard__subtitle">
-            Espace interne — modules métier à venir (campagnes, landing pages,
-            export).
+            Espace interne AutoHall — campagnes, landing pages et suivi des leads.
           </p>
         </div>
         <button type="button" className="dashboard__logout" onClick={handleLogout}>
@@ -98,6 +120,13 @@ export default function DashboardPage() {
             </li>
           </ul>
         </section>
+      ) : null}
+
+      {user && canViewLeads(user.role) ? (
+        <>
+          {kpisError ? <p className="dashboard__error">{kpisError}</p> : null}
+          {kpis ? <LeadDashboardSection kpis={kpis} /> : null}
+        </>
       ) : null}
 
       <p className="dashboard__nav">

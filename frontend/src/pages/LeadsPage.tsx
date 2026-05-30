@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import LeadsFilters, {
   type LeadsFilterValues,
 } from '../components/leads/LeadsFilters';
@@ -16,18 +16,25 @@ import {
   type LeadsPagination,
 } from '../lib/leads';
 
-const EMPTY_FILTERS: LeadsFilterValues = {
-  search: '',
-  status: '',
-  campaignId: '',
-  landingPageId: '',
-  priority: '',
-  assignedToUserId: '',
-  overdueOnly: false,
-};
+function initialFilters(searchParams: URLSearchParams): LeadsFilterValues {
+  return {
+    search: '',
+    status: '',
+    campaignId: '',
+    landingPageId: '',
+    priority: '',
+    assignedToUserId: '',
+    overdueOnly: searchParams.get('overdueOnly') === 'true',
+  };
+}
 
 export default function LeadsPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const startingFilters = useMemo(
+    () => initialFilters(searchParams),
+    [searchParams],
+  );
   const [role, setRole] = useState<string | null>(null);
   const [leads, setLeads] = useState<LeadEventListItem[]>([]);
   const [pagination, setPagination] = useState<LeadsPagination>({
@@ -39,9 +46,9 @@ export default function LeadsPage() {
   const [campaigns, setCampaigns] = useState<CampaignListItem[]>([]);
   const [landingPages, setLandingPages] = useState<LandingPageListItem[]>([]);
   const [assignableUsers, setAssignableUsers] = useState<AssignableUser[]>([]);
-  const [filters, setFilters] = useState<LeadsFilterValues>(EMPTY_FILTERS);
+  const [filters, setFilters] = useState<LeadsFilterValues>(startingFilters);
   const [appliedFilters, setAppliedFilters] =
-    useState<LeadsFilterValues>(EMPTY_FILTERS);
+    useState<LeadsFilterValues>(startingFilters);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -123,7 +130,7 @@ export default function LeadsPage() {
           setAssignableUsers(usersResponse.data);
         }
 
-        await loadLeads(1, EMPTY_FILTERS, profile.data.role);
+        await loadLeads(1, startingFilters, profile.data.role);
       } catch (err) {
         if (!cancelled) {
           if (err instanceof ApiError && err.status === 401) {

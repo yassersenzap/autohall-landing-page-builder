@@ -30,6 +30,13 @@ import {
   type LeadEventDetail,
 } from './lead-event.mapper';
 import {
+  CONTACTED_STATUSES,
+  getStartOfToday,
+  getStartOfWeek,
+  overdueFollowUpWhere,
+} from './lead-dashboard.helper';
+import type { LeadDashboardKpis } from './lead-dashboard.types';
+import {
   leadStatusHistoryInclude,
   toLeadStatusHistoryItem,
   type LeadStatusHistoryItem,
@@ -552,6 +559,133 @@ export class LeadEventsService {
     return {
       campaign: landingPage.campaign,
       landingPage,
+    };
+  }
+
+  async getDashboardKpis(): Promise<LeadDashboardKpis> {
+    const startOfToday = getStartOfToday();
+    const startOfWeek = getStartOfWeek();
+    const overdueWhere = overdueFollowUpWhere();
+
+    const [
+      totalLeads,
+      receivedToday,
+      receivedThisWeek,
+      overdueFollowUps,
+      contactedCount,
+      statusGroups,
+      priorityGroups,
+      campaignGroups,
+      landingGroups,
+      overdueLeadsRaw,
+    ] = await Promise.all([
+      this.prisma.leadEvent.count(),
+      this.prisma.leadEvent.count({
+        where: { createdAt: { gte: startOfToday } },
+      }),
+      this.prisma.leadEvent.count({
+        where: { createdAt: { gte: startOfWeek } },
+      }),
+      this.prisma.leadEvent.count({ where: overdueWhere }),
+      this.prisma.leadEvent.count({
+        where: { status: { in: CONTACTED_STATUSES } },
+      }),
+      this.prisma.leadEvent.groupBy({
+        by: ['status'],
+        _count: { _all: true },
+        orderBy: { _count: { status: 'desc' } },
+      }),
+      this.prisma.leadEvent.groupBy({
+        by: ['priority'],
+        _count: { _all: true },
+        orderBy: { _count: { priority: 'desc' } },
+      }),
+      this.prisma.leadEvent.groupBy({
+        by: ['campaignId'],
+        _count: { _all: true },
+        orderBy: { _count: { campaignId: 'desc' } },
+        take: 10,
+      }),
+      this.prisma.leadEvent.groupBy({
+        by: ['landingPageId'],
+        _count: { _all: true },
+        orderBy: { _count: { landingPageId: 'desc' } },
+        take: 10,
+      }),
+      this.prisma.leadEvent.findMany({
+        where: overdueWhere,
+        orderBy: { nextFollowUpAt: 'asc' },
+        take: 10,
+        include: {
+          campaign: { select: { name: true } },
+          landingPage: { select: { title: true } },
+        },
+      }),
+    ]);
+
+    const campaignIds = campaignGroups.map((g) => g.campaignId);
+    const landingIds = landingGroups.map((g) => g.landingPageId);
+
+    const [campaigns, landingPages] = await Promise.all([
+      campaignIds.length
+        ? this.prisma.campaign.findMany({
+            where: { id: { in: campaignIds } },
+            select: { id: true, name: true },
+          })
+        : Promise.resolve([]),
+      landingIds.length
+        ? this.prisma.landingPage.findMany({
+            where: { id: { in: landingIds } },
+            select: { id: true, title: true, slug: true },
+          })
+        : Promise.resolve([]),
+    ]);
+
+    const campaignNameById = new Map(campaigns.map((c) => [c.id, c.name]));
+    const landingById = new Map(landingPages.map((l) => [l.id, l]));
+
+    const contactedRatePercent =
+      totalLeads > 0
+        ? Math.round((contactedCount / totalLeads) * 1000) / 10
+        : 0;
+
+    return {
+      totalLeads,
+      receivedToday,
+      receivedThisWeek,
+      overdueFollowUps,
+      contactedRatePercent,
+      byStatus: statusGroups.map((g) => ({
+        status: g.status,
+        count: g._count._all,
+      })),
+      byPriority: priorityGroups.map((g) => ({
+        priority: g.priority,
+        count: g._count._all,
+      })),
+      byCampaign: campaignGroups.map((g) => ({
+        campaignId: g.campaignId,
+        campaignName: campaignNameById.get(g.campaignId) ?? 'Campagne inconnue',
+        count: g._count._all,
+      })),
+      byLandingPage: landingGroups.map((g) => {
+        const landing = landingById.get(g.landingPageId);
+        return {
+          landingPageId: g.landingPageId,
+          title: landing?.title ?? 'Landing inconnue',
+          slug: landing?.slug ?? '—',
+          count: g._count._all,
+        };
+      }),
+      overdueLeads: overdueLeadsRaw.map((lead) => ({
+        id: lead.id,
+        fullName: lead.fullName,
+        status: lead.status,
+        priority: lead.priority,
+        nextFollowUpAt: lead.nextFollowUpAt!.toISOString(),
+        campaignName: lead.campaign.name,
+        landingPageTitle: lead.landingPage.title,
+      })),
     };
   }
 }
