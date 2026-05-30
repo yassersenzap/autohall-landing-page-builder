@@ -164,7 +164,7 @@ Routes nestées sous une version de page existante (`pageVersionId` UUID).
 
 Types autorisés : `hero`, `text`, `image`, `button`, `lead_form` (minuscules). Le `sortOrder` est auto-incrémenté si omis.
 
-Le bloc `lead_form` utilise un `propsJson` avec `title`, `subtitle`, `submitText` et un tableau `fields` (`name`, `label`, `type`, `required`). Il est rendu dans l’aperçu privé et dans l’export ZIP (formulaire HTML statique, soumission locale en placeholder — pas d’API leads pour l’instant).
+Le bloc `lead_form` utilise un `propsJson` avec `title`, `subtitle`, `submitText` et un tableau `fields` (`name`, `label`, `type`, `required`). Il est rendu dans l’aperçu privé et dans l’export ZIP ; la soumission appelle `POST /api/public/leads` via `js/landing-config.js` et `js/main.js`.
 
 ### Exemple
 
@@ -188,10 +188,12 @@ curl -X POST "http://localhost:3000/api/page-versions/${PAGE_VERSION_ID}/blocks"
 ### Test manuel `lead_form`
 
 1. Connexion admin → Campagnes → Landing pages → Versions → **Blocs**.
-2. Créer un bloc **lead_form** (template JSON prérempli).
+2. Créer un bloc **lead_form** (template JSON prérempli dans l’UI).
 3. **Preview** : formulaire visible avec champs.
-4. Publier la version → **Exporter ZIP** → ouvrir `index.html`.
-5. Soumettre le formulaire : alerte placeholder (pas d’appel API).
+4. **Publier** la version → **Exporter ZIP** → servir le dossier (`npx serve .`).
+5. Soumettre le formulaire → lead enregistré dans `lead_events` (vérifier via `/leads` ou API).
+
+Recette complète : [`../docs/mvp/11-recette-mvp-stabilisation.md`](../docs/mvp/11-recette-mvp-stabilisation.md).
 
 ## Publication d’une version
 

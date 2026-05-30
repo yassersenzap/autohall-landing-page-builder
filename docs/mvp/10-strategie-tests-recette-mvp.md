@@ -2,9 +2,11 @@
 ## Plateforme interne de génération de landing pages — Auto Hall
 
 **Version :** 1.0  
-**Statut :** Document de préparation avant code  
+**Statut :** Document de préparation avant code (partiellement obsolète sur la sync Auto Hall)  
 **Projet :** Builder interne de landing pages Auto Hall  
 **Stack cible :** React, NestJS, PostgreSQL, Docker, Export ZIP compatible cPanel
+
+> **Recette opérationnelle alignée sur le code actuel :** voir [`11-recette-mvp-stabilisation.md`](./11-recette-mvp-stabilisation.md) et [`CHECKLIST-DEMO.md`](./CHECKLIST-DEMO.md).
 
 ---
 
