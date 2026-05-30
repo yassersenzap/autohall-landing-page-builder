@@ -251,6 +251,7 @@ Phase 1 — simulation : les soumissions sont stockées dans `lead_events` uniqu
 |---------|-------|-------|-------------|
 | POST | `/api/public/leads` | Public (sans JWT) | Enregistre un lead depuis une landing exportée |
 | GET | `/api/lead-events` | JWT — ADMIN, SI_DIGITAL, MARKETER | Liste paginée des leads (filtres + recherche) |
+| GET | `/api/lead-events/dashboard` | JWT — ADMIN, SI_DIGITAL, MARKETER | KPIs opérationnels leads (volume, statuts, relances) |
 | GET | `/api/lead-events/:id` | JWT — ADMIN, SI_DIGITAL, MARKETER | Détail complet d’un lead |
 | PATCH | `/api/lead-events/:id/status` | JWT — ADMIN, SI_DIGITAL, MARKETER | Mise à jour du statut (+ commentaire interne optionnel) |
 | GET | `/api/lead-events/:id/history` | JWT — ADMIN, SI_DIGITAL, MARKETER | Historique des changements de statut |

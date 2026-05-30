@@ -40,6 +40,18 @@ export class LeadEventsController {
   }
 
   @Roles(...INTERNAL_READ_ROLES)
+  @Get('dashboard')
+  async getDashboard() {
+    const data = await this.leadEventsService.getDashboardKpis();
+
+    return {
+      success: true,
+      data,
+      message: 'Lead dashboard KPIs retrieved successfully',
+    };
+  }
+
+  @Roles(...INTERNAL_READ_ROLES)
   @Get('assignable-users')
   async findAssignableUsers() {
     const data = await this.leadEventsService.findAssignableUsers();
