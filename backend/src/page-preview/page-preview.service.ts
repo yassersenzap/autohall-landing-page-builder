@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { buildLandingPreviewFragment } from '../landing-render/landing-document.builder';
 import { PrismaService } from '../prisma/prisma.service';
 
 export type PreviewCampaign = {
@@ -39,11 +40,26 @@ export type PreviewBlock = {
   propsJson: Prisma.JsonValue;
 };
 
+export type PreviewRenderBlock = {
+  id: string;
+  html: string;
+};
+
+export type PagePreviewRender = {
+  themeMode: 'light' | 'dark';
+  themeStyle: string;
+  headerHtml: string;
+  blocksHtml: PreviewRenderBlock[];
+  footerHtml: string;
+  mainHtml: string;
+};
+
 export type PagePreviewData = {
   pageVersion: PreviewPageVersion;
   landingPage: PreviewLandingPage;
   campaign: PreviewCampaign;
   blocks: PreviewBlock[];
+  render: PagePreviewRender;
 };
 
 @Injectable()
@@ -74,6 +90,21 @@ export class PagePreviewService {
     }
 
     const { landingPage, blocks, ...version } = pageVersion;
+
+    const render = buildLandingPreviewFragment({
+      shell: {
+        title: landingPage.title,
+        campaignName: landingPage.campaign.name,
+        brand: landingPage.campaign.brand,
+      },
+      blocks: blocks.map((block) => ({
+        id: block.id,
+        blockType: block.blockType,
+        sortOrder: block.sortOrder,
+        propsJson: block.propsJson,
+      })),
+      themeJson: version.themeJson,
+    });
 
     return {
       pageVersion: {
@@ -109,6 +140,7 @@ export class PagePreviewService {
         sortOrder: block.sortOrder,
         propsJson: block.propsJson,
       })),
+      render,
     };
   }
 }

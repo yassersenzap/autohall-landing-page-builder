@@ -33,6 +33,46 @@ npx prisma validate
 npx prisma generate
 ```
 
+## Dépannage local (Windows)
+
+### `EADDRINUSE :::3000` au démarrage du backend
+
+Ce n’est **pas** un bug applicatif : Nest appelle `app.listen(port)` une seule fois (`src/main.ts`). L’erreur signifie qu’**un autre processus** écoute déjà sur le port (souvent une ancienne instance `npm run start:dev` laissée ouverte dans un autre terminal).
+
+1. Fermer le terminal où le backend tourne déjà, **ou**
+2. Libérer le port puis relancer :
+
+```powershell
+# Port utilisé → PID
+Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue |
+  Select-Object -ExpandProperty OwningProcess -Unique
+
+# Arrêter le processus (remplacer 12345 par le PID affiché)
+Stop-Process -Id 12345 -Force
+```
+
+### Ports courants du MVP
+
+| Port | Usage |
+|------|--------|
+| **3000** | API NestJS (`BACKEND_PORT`) |
+| **5173** | Frontend Vite (`npm run dev` dans `frontend/`) |
+| **8080** | Landing exportée statique (`npx serve . -l 8080` dans le dossier ZIP extrait) |
+
+```powershell
+# Vérifier plusieurs ports d’un coup
+3000, 5173, 8080 | ForEach-Object {
+  $p = $_
+  $pid = Get-NetTCPConnection -LocalPort $p -ErrorAction SilentlyContinue |
+    Select-Object -ExpandProperty OwningProcess -Unique
+  if ($pid) { "Port $p → PID $pid" } else { "Port $p → libre" }
+}
+```
+
+Ne lancer qu’**une** instance de `npm run start:dev` à la fois. Pour le frontend et `serve`, même principe : un processus par port.
+
+Rendu landing (preview + export) : [`docs/mvp/12-landing-render.md`](../docs/mvp/12-landing-render.md).
+
 ## Configuration
 
 Les variables d’environnement sont chargées via `@nestjs/config` (`ConfigModule` global), dans cet ordre :

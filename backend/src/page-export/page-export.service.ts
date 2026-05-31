@@ -69,6 +69,7 @@ export class PageExportService {
         brand: landingPage.campaign.brand,
       },
       blocks,
+      pageVersion.themeJson,
     );
 
     const landingConfigJs = buildLandingConfigJs({

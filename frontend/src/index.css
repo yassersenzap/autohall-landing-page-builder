@@ -414,8 +414,13 @@ body {
 .preview-canvas {
   border-radius: 0.75rem;
   border: 1px solid #e2e8f0;
-  background: #ffffff;
+  background: #f4f6f9;
   overflow: hidden;
+}
+
+.preview-canvas__landing {
+  width: 100%;
+  min-height: 12rem;
 }
 
 .preview-canvas__empty {
