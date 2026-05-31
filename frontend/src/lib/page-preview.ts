@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { apiRequest } from './api';
 
 export type PreviewCampaign = {
@@ -37,12 +38,42 @@ export type PreviewBlock = {
   propsJson: Record<string, unknown>;
 };
 
+export type PreviewRenderBlock = {
+  id: string;
+  html: string;
+};
+
+export type PagePreviewRender = {
+  themeMode: 'light' | 'dark';
+  themeStyle: string;
+  headerHtml: string;
+  blocksHtml: PreviewRenderBlock[];
+  footerHtml: string;
+  mainHtml: string;
+};
+
 export type PagePreviewData = {
   pageVersion: PreviewPageVersion;
   landingPage: PreviewLandingPage;
   campaign: PreviewCampaign;
   blocks: PreviewBlock[];
+  render: PagePreviewRender;
 };
+
+/** Converts inline CSS variables from the API into a React style object. */
+export function landingThemeStyleToReact(cssVariables: string): CSSProperties {
+  const style: Record<string, string> = {};
+  for (const chunk of cssVariables.split(';')) {
+    const trimmed = chunk.trim();
+    if (!trimmed) continue;
+    const idx = trimmed.indexOf(':');
+    if (idx < 0) continue;
+    const key = trimmed.slice(0, idx).trim();
+    const value = trimmed.slice(idx + 1).trim();
+    if (key) style[key] = value;
+  }
+  return style;
+}
 
 export async function fetchPagePreview(pageVersionId: string) {
   return apiRequest<PagePreviewData>(

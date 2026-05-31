@@ -1,14 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ApiError, logoutClient, meRequest } from '../lib/api';
-import { LeadFormPreview } from '../lib/lead-form-block';
 import {
   fetchPagePreview,
-  propString,
-  propsAsRecord,
+  landingThemeStyleToReact,
   type PagePreviewData,
-  type PreviewBlock,
 } from '../lib/page-preview';
+import '@landing-styles';
 
 type LocationState = {
   versionNumber?: number;
@@ -19,77 +17,8 @@ type LocationState = {
   campaignName?: string;
 };
 
-function PreviewBlockView({ block }: { block: PreviewBlock }) {
-  const props = propsAsRecord(block.propsJson);
-  const type = block.blockType.toLowerCase();
-
-  if (type === 'hero') {
-    const title = propString(props, 'title');
-    const subtitle = propString(props, 'subtitle');
-    const buttonText = propString(props, 'buttonText');
-
-    return (
-      <section className="preview-block preview-block--hero">
-        {title ? <h2 className="preview-block__title">{title}</h2> : null}
-        {subtitle ? <p className="preview-block__subtitle">{subtitle}</p> : null}
-        {buttonText ? (
-          <span className="preview-block__button">{buttonText}</span>
-        ) : null}
-      </section>
-    );
-  }
-
-  if (type === 'text') {
-    const content = propString(props, 'content', 'text', 'body');
-
-    return (
-      <section className="preview-block preview-block--text">
-        <p>{content ?? '—'}</p>
-      </section>
-    );
-  }
-
-  if (type === 'image') {
-    const imageUrl = propString(props, 'imageUrl', 'src', 'url');
-    const alt = propString(props, 'alt') ?? 'Image';
-
-    return (
-      <section className="preview-block preview-block--image">
-        {imageUrl ? (
-          <img src={imageUrl} alt={alt} className="preview-block__image" />
-        ) : (
-          <div className="preview-block__placeholder">Image non définie</div>
-        )}
-      </section>
-    );
-  }
-
-  if (type === 'button') {
-    const label = propString(props, 'label', 'text', 'buttonText');
-    const target = propString(props, 'target', 'href', 'buttonTarget');
-
-    return (
-      <section className="preview-block preview-block--button">
-        <span className="preview-block__button">{label ?? 'Bouton'}</span>
-        {target ? (
-          <span className="preview-block__meta">→ {target}</span>
-        ) : null}
-      </section>
-    );
-  }
-
-  if (type === 'lead_form') {
-    return (
-      <LeadFormPreview propsJson={block.propsJson} formId="lead-form" />
-    );
-  }
-
-  return (
-    <section className="preview-block preview-block--unknown">
-      <p>Type de bloc inconnu : {block.blockType}</p>
-      <pre className="blocks-list__props">{JSON.stringify(props, null, 2)}</pre>
-    </section>
-  );
+function HtmlFragment({ html }: { html: string }) {
+  return <div dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
 export default function PagePreviewPage() {
@@ -201,16 +130,27 @@ export default function PagePreviewPage() {
             </p>
             <p className="preview-meta__line">
               <strong>Version :</strong> {preview.pageVersion.status}
+              {preview.render.themeMode === 'dark' ? ' · thème sombre' : ''}
             </p>
           </section>
 
           <div className="preview-canvas">
-            {preview.blocks.length === 0 ? (
+            {preview.render.blocksHtml.length === 0 ? (
               <p className="preview-canvas__empty">Aucun bloc à afficher.</p>
             ) : (
-              preview.blocks.map((block) => (
-                <PreviewBlockView key={block.id} block={block} />
-              ))
+              <article
+                className="lp-document preview-canvas__landing"
+                data-theme={preview.render.themeMode}
+                style={landingThemeStyleToReact(preview.render.themeStyle)}
+              >
+                <HtmlFragment html={preview.render.headerHtml} />
+                <main className="lp-page">
+                  {preview.render.blocksHtml.map((block) => (
+                    <HtmlFragment key={block.id} html={block.html} />
+                  ))}
+                </main>
+                <HtmlFragment html={preview.render.footerHtml} />
+              </article>
             )}
           </div>
         </>
