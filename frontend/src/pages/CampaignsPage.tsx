@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
+import { EmptyState } from '../components/ui/EmptyState';
+import { Input } from '../components/ui/Input';
+import { PageHeader } from '../components/ui/PageHeader';
+import { StatusBadge } from '../components/ui/StatusBadge';
 import { ApiError, logoutClient, meRequest } from '../lib/api';
 import {
   canManageCampaigns,
@@ -81,104 +87,86 @@ export default function CampaignsPage() {
   const canWrite = role ? canManageCampaigns(role) : false;
 
   return (
-    <main className="dashboard campaigns-page">
-      <header className="dashboard__header">
-        <div>
-          <h1>Campagnes</h1>
-          <p className="dashboard__subtitle">
-            Liste des campagnes marketing Auto Hall.
-          </p>
-        </div>
-        <Link to="/dashboard" className="dashboard__link">
-          Tableau de bord
-        </Link>
-      </header>
+    <div className="studio-stack">
+      <PageHeader
+        title="Campagnes"
+        subtitle="Gérez les campagnes marketing et leurs landing pages associées."
+        backTo="/dashboard"
+        backLabel="Tableau de bord"
+      />
 
-      {loading ? <p>Chargement des campagnes…</p> : null}
-      {error ? <p className="dashboard__error">{error}</p> : null}
+      {loading ? <p className="ui-page-header__subtitle">Chargement…</p> : null}
+      {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
 
       {canWrite ? (
-        <section className="dashboard__card campaigns-form">
-          <h2>Nouvelle campagne</h2>
-          <form className="auth-form" onSubmit={handleCreate}>
-            <label className="auth-form__field">
-              <span>Nom</span>
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                maxLength={180}
-              />
-            </label>
-            <label className="auth-form__field">
-              <span>Marque</span>
-              <input
-                value={brand}
-                onChange={(e) => setBrand(e.target.value)}
-                required
-                maxLength={100}
-              />
-            </label>
-            <label className="auth-form__field">
-              <span>Modèle (optionnel)</span>
-              <input
-                value={model}
-                onChange={(e) => setModel(e.target.value)}
-                maxLength={100}
-              />
-            </label>
-            <label className="auth-form__field">
-              <span>Type de campagne</span>
-              <input
-                value={campaignType}
-                onChange={(e) => setCampaignType(e.target.value)}
-                required
-                maxLength={80}
-              />
-            </label>
-            <button
-              type="submit"
-              className="auth-form__submit"
-              disabled={submitting}
-            >
+        <Card title="Nouvelle campagne">
+          <form className="ui-form-stack" onSubmit={handleCreate}>
+            <Input
+              label="Nom"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              maxLength={180}
+            />
+            <Input
+              label="Marque"
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
+              required
+              maxLength={100}
+            />
+            <Input
+              label="Modèle (optionnel)"
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              maxLength={100}
+            />
+            <Input
+              label="Type de campagne"
+              value={campaignType}
+              onChange={(e) => setCampaignType(e.target.value)}
+              required
+              maxLength={80}
+            />
+            <Button type="submit" disabled={submitting}>
               {submitting ? 'Création…' : 'Créer la campagne'}
-            </button>
+            </Button>
           </form>
-        </section>
+        </Card>
       ) : null}
 
-      <section className="dashboard__card">
-        <h2>Campagnes ({campaigns.length})</h2>
+      <Card title={`Campagnes (${campaigns.length})`}>
         {campaigns.length === 0 && !loading ? (
-          <p>Aucune campagne pour le moment.</p>
+          <EmptyState
+            title="Aucune campagne"
+            description="Créez une première campagne pour démarrer."
+          />
         ) : (
           <ul className="campaigns-list">
             {campaigns.map((campaign) => (
               <li key={campaign.id} className="campaigns-list__item">
-                <div className="campaigns-list__title">{campaign.name}</div>
-                <div className="campaigns-list__meta">
-                  <span>{campaign.brand}</span>
-                  {campaign.model ? <span> — {campaign.model}</span> : null}
-                  <span className={`campaigns-list__status status-${campaign.status.toLowerCase()}`}>
-                    {campaign.status}
-                  </span>
+                <div className="campaigns-list__title">
+                  {campaign.name}
+                  <StatusBadge status={campaign.status} />
                 </div>
                 <div className="campaigns-list__meta">
-                  Type : {campaign.campaignType}
+                  {campaign.brand}
+                  {campaign.model ? ` — ${campaign.model}` : ''} · Type :{' '}
+                  {campaign.campaignType}
                 </div>
                 <div className="campaigns-list__actions">
                   <Link
                     to={`/campaigns/${campaign.id}/landing-pages`}
                     state={{ campaignName: campaign.name }}
                   >
-                    Landing pages
+                    Landing pages →
                   </Link>
                 </div>
               </li>
             ))}
           </ul>
         )}
-      </section>
-    </main>
+      </Card>
+    </div>
   );
 }

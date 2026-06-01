@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import LeadDashboardSection from '../components/dashboard/LeadDashboardSection';
-import { ApiError, logoutClient, logoutRequest, meRequest, type AuthUser } from '../lib/api';
+import { Card } from '../components/ui/Card';
+import { PageHeader } from '../components/ui/PageHeader';
+import { ApiError, meRequest, type AuthUser } from '../lib/api';
 import { getLeadDashboardKpis, type LeadDashboardKpis } from '../lib/lead-dashboard';
 import { canViewLeads } from '../lib/leads';
 
 export default function DashboardPage() {
-  const navigate = useNavigate();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [kpis, setKpis] = useState<LeadDashboardKpis | null>(null);
   const [kpisError, setKpisError] = useState<string | null>(null);
@@ -19,18 +20,14 @@ export default function DashboardPage() {
     async function loadProfile() {
       try {
         const response = await meRequest();
-        if (cancelled) {
-          return;
-        }
+        if (cancelled) return;
 
         setUser(response.data);
 
         if (canViewLeads(response.data.role)) {
           try {
             const dashboard = await getLeadDashboardKpis();
-            if (!cancelled) {
-              setKpis(dashboard.data);
-            }
+            if (!cancelled) setKpis(dashboard.data);
           } catch (err) {
             if (!cancelled) {
               setKpisError(
@@ -41,73 +38,36 @@ export default function DashboardPage() {
             }
           }
         }
-      } catch (err) {
-        if (!cancelled) {
-          logoutClient();
-          if (err instanceof ApiError && err.status === 401) {
-            navigate('/login', { replace: true });
-            return;
-          }
-          setError('Impossible de charger le profil utilisateur.');
-        }
+      } catch {
+        if (!cancelled) setError('Impossible de charger le profil utilisateur.');
       } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+        if (!cancelled) setLoading(false);
       }
     }
 
     void loadProfile();
-
     return () => {
       cancelled = true;
     };
-  }, [navigate]);
-
-  async function handleLogout() {
-    try {
-      await logoutRequest();
-    } catch {
-      // JWT stateless : la déconnexion côté client reste valide.
-    } finally {
-      logoutClient();
-      navigate('/login', { replace: true });
-    }
-  }
+  }, []);
 
   if (loading) {
-    return (
-      <main className="dashboard">
-        <p>Chargement du tableau de bord…</p>
-      </main>
-    );
+    return <p className="ui-page-header__subtitle">Chargement du tableau de bord…</p>;
   }
 
   if (error) {
-    return (
-      <main className="dashboard">
-        <p className="dashboard__error">{error}</p>
-      </main>
-    );
+    return <p className="ui-alert ui-alert--error">{error}</p>;
   }
 
   return (
-    <main className="dashboard">
-      <header className="dashboard__header">
-        <div>
-          <h1>Tableau de bord</h1>
-          <p className="dashboard__subtitle">
-            Espace interne AutoHall — campagnes, landing pages et suivi des leads.
-          </p>
-        </div>
-        <button type="button" className="dashboard__logout" onClick={handleLogout}>
-          Se déconnecter
-        </button>
-      </header>
+    <div className="studio-stack">
+      <PageHeader
+        title="Tableau de bord"
+        subtitle="Vue d’ensemble — campagnes, landing pages et performance des leads."
+      />
 
       {user ? (
-        <section className="dashboard__card">
-          <h2>Session active</h2>
+        <Card title="Session active">
           <ul className="dashboard__meta">
             <li>
               <strong>Nom :</strong> {user.fullName}
@@ -119,27 +79,25 @@ export default function DashboardPage() {
               <strong>Rôle :</strong> {user.role}
             </li>
           </ul>
-        </section>
+        </Card>
       ) : null}
 
       {user && canViewLeads(user.role) ? (
         <>
-          {kpisError ? <p className="dashboard__error">{kpisError}</p> : null}
+          {kpisError ? <p className="ui-alert ui-alert--error">{kpisError}</p> : null}
           {kpis ? <LeadDashboardSection kpis={kpis} /> : null}
         </>
       ) : null}
 
-      <p className="dashboard__nav">
+      <nav className="dashboard__nav" aria-label="Raccourcis">
         <Link to="/campaigns">Gérer les campagnes</Link>
-        {' · '}
         {user && canViewLeads(user.role) ? (
           <>
-            <Link to="/leads">Consulter les leads</Link>
             {' · '}
+            <Link to="/leads">Consulter les leads</Link>
           </>
         ) : null}
-        <Link to="/">Retour à l&apos;accueil public</Link>
-      </p>
-    </main>
+      </nav>
+    </div>
   );
 }
