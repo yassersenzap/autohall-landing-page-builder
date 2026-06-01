@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ApiError, logoutClient, meRequest } from '../lib/api';
+import { Button } from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
+import { EmptyState } from '../components/ui/EmptyState';
+import { Input } from '../components/ui/Input';
+import { PageHeader } from '../components/ui/PageHeader';
+import { StatusBadge } from '../components/ui/StatusBadge';
 import { downloadPageVersionExport } from '../lib/page-export';
 import {
   canManagePageVersions,
@@ -156,52 +162,42 @@ export default function LandingPageVersionsPage() {
   }
 
   return (
-    <main className="dashboard campaigns-page">
-      <header className="dashboard__header">
-        <div>
-          <h1>Versions de page</h1>
-          <p className="dashboard__subtitle">
-            {landingPageTitle
-              ? `Landing : ${landingPageTitle}`
-              : `Landing ${landingPageId}`}
-          </p>
-        </div>
-        <Link to={backLink.to} state={backLink.state} className="dashboard__link">
-          {backLink.label}
-        </Link>
-      </header>
+    <div className="studio-stack">
+      <PageHeader
+        title="Versions de page"
+        subtitle={
+          landingPageTitle
+            ? `Landing : ${landingPageTitle}`
+            : `Landing ${landingPageId}`
+        }
+        backTo={backLink.to}
+        backState={backLink.state}
+        backLabel={backLink.label}
+      />
 
-      {loading ? <p>Chargement des versions…</p> : null}
-      {error ? <p className="dashboard__error">{error}</p> : null}
+      {loading ? <p className="ui-page-header__subtitle">Chargement…</p> : null}
+      {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
 
       {canWrite ? (
-        <section className="dashboard__card campaigns-form">
-          <h2>Nouvelle version</h2>
-          <form className="auth-form" onSubmit={handleCreate}>
-            <label className="auth-form__field">
-              <span>Libellé (optionnel)</span>
-              <input
-                value={label}
-                onChange={(e) => setLabel(e.target.value)}
-                maxLength={120}
-                placeholder="Ex. Version 2 — promo été"
-              />
-            </label>
-            <button
-              type="submit"
-              className="auth-form__submit"
-              disabled={submitting}
-            >
+        <Card title="Nouvelle version">
+          <form className="ui-form-stack" onSubmit={handleCreate}>
+            <Input
+              label="Libellé (optionnel)"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              maxLength={120}
+              placeholder="Ex. Version 2 — promo été"
+            />
+            <Button type="submit" disabled={submitting}>
               {submitting ? 'Création…' : 'Créer la version'}
-            </button>
+            </Button>
           </form>
-        </section>
+        </Card>
       ) : null}
 
-      <section className="dashboard__card">
-        <h2>Versions ({versions.length})</h2>
+      <Card title={`Versions (${versions.length})`}>
         {versions.length === 0 && !loading ? (
-          <p>Aucune version pour cette landing page.</p>
+          <EmptyState title="Aucune version pour cette landing page." />
         ) : (
           <ul className="campaigns-list">
             {versions.map((version) => (
@@ -209,11 +205,7 @@ export default function LandingPageVersionsPage() {
                 <div className="campaigns-list__title">
                   v{version.versionNumber}
                   {version.label ? ` — ${version.label}` : ''}
-                  <span
-                    className={`campaigns-list__status status-${version.status.toLowerCase()}`}
-                  >
-                    {version.status}
-                  </span>
+                  <StatusBadge status={version.status} />
                 </div>
                 <div className="campaigns-list__meta">
                   Créée le{' '}
@@ -283,7 +275,7 @@ export default function LandingPageVersionsPage() {
             ))}
           </ul>
         )}
-      </section>
-    </main>
+      </Card>
+    </div>
   );
 }

@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ApiError, logoutClient, meRequest } from '../lib/api';
+import { Button } from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
+import { EmptyState } from '../components/ui/EmptyState';
+import { Input } from '../components/ui/Input';
+import { PageHeader } from '../components/ui/PageHeader';
+import { StatusBadge } from '../components/ui/StatusBadge';
 import {
   canManageLandingPages,
   createLandingPage,
@@ -110,78 +116,63 @@ export default function CampaignLandingPagesPage() {
   }
 
   return (
-    <main className="dashboard campaigns-page">
-      <header className="dashboard__header">
-        <div>
-          <h1>Landing pages</h1>
-          <p className="dashboard__subtitle">
-            {campaignName
-              ? `Campagne : ${campaignName}`
-              : `Campagne ${campaignId}`}
-          </p>
-        </div>
-        <Link to="/campaigns" className="dashboard__link">
-          Retour aux campagnes
-        </Link>
-      </header>
+    <div className="studio-stack">
+      <PageHeader
+        title="Landing pages"
+        subtitle={
+          campaignName
+            ? `Campagne : ${campaignName}`
+            : `Campagne ${campaignId}`
+        }
+        backTo="/campaigns"
+        backLabel="Campagnes"
+      />
 
-      {loading ? <p>Chargement des landing pages…</p> : null}
-      {error ? <p className="dashboard__error">{error}</p> : null}
+      {loading ? <p className="ui-page-header__subtitle">Chargement…</p> : null}
+      {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
 
       {canWrite ? (
-        <section className="dashboard__card campaigns-form">
-          <h2>Nouvelle landing page</h2>
-          <form className="auth-form" onSubmit={handleCreate}>
-            <label className="auth-form__field">
-              <span>Titre</span>
-              <input
-                value={title}
-                onChange={(e) => handleTitleChange(e.target.value)}
-                required
-                maxLength={180}
-              />
-            </label>
-            <label className="auth-form__field">
-              <span>Slug (URL)</span>
-              <input
-                value={slug}
-                onChange={(e) => {
-                  setSlugTouched(true);
-                  setSlug(e.target.value);
-                }}
-                required
-                maxLength={180}
-                pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
-                title="Minuscules, chiffres et tirets uniquement"
-              />
-            </label>
-            <button
-              type="submit"
-              className="auth-form__submit"
-              disabled={submitting}
-            >
+        <Card title="Nouvelle landing page">
+          <form className="ui-form-stack" onSubmit={handleCreate}>
+            <Input
+              label="Titre"
+              value={title}
+              onChange={(e) => handleTitleChange(e.target.value)}
+              required
+              maxLength={180}
+            />
+            <Input
+              label="Slug (URL)"
+              value={slug}
+              onChange={(e) => {
+                setSlugTouched(true);
+                setSlug(e.target.value);
+              }}
+              required
+              maxLength={180}
+              pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
+              title="Minuscules, chiffres et tirets uniquement"
+            />
+            <Button type="submit" disabled={submitting}>
               {submitting ? 'Création…' : 'Créer la landing page'}
-            </button>
+            </Button>
           </form>
-        </section>
+        </Card>
       ) : null}
 
-      <section className="dashboard__card">
-        <h2>Landing pages ({landingPages.length})</h2>
+      <Card title={`Landing pages (${landingPages.length})`}>
         {landingPages.length === 0 && !loading ? (
-          <p>Aucune landing page pour cette campagne.</p>
+          <EmptyState title="Aucune landing page pour cette campagne." />
         ) : (
           <ul className="campaigns-list">
             {landingPages.map((page) => (
               <li key={page.id} className="campaigns-list__item">
-                <div className="campaigns-list__title">{page.title}</div>
+                <div className="campaigns-list__title">
+                  {page.title}
+                  <StatusBadge status={page.status} />
+                </div>
                 <div className="campaigns-list__meta">
                   <span>/{page.slug}</span>
-                  <span
-                    className={`campaigns-list__status status-${page.status.toLowerCase()}`}
-                  >
-                    {page.status}
-                  </span>
                 </div>
                 {page.lastExportedAt ? (
                   <div className="campaigns-list__meta">
@@ -205,7 +196,7 @@ export default function CampaignLandingPagesPage() {
             ))}
           </ul>
         )}
-      </section>
-    </main>
+      </Card>
+    </div>
   );
 }

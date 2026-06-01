@@ -4,6 +4,8 @@ import LeadsFilters, {
   type LeadsFilterValues,
 } from '../components/leads/LeadsFilters';
 import LeadsTable from '../components/leads/LeadsTable';
+import { Card } from '../components/ui/Card';
+import { PageHeader } from '../components/ui/PageHeader';
 import { ApiError, logoutClient, meRequest } from '../lib/api';
 import { listCampaigns, type CampaignListItem } from '../lib/campaigns';
 import { listLandingPages, type LandingPageListItem } from '../lib/landing-pages';
@@ -194,33 +196,30 @@ export default function LeadsPage() {
 
   if (role && !canViewLeads(role)) {
     return (
-      <main className="dashboard">
-        <p className="dashboard__error">
+      <div className="studio-stack">
+        <p className="ui-alert ui-alert--error">
           Accès refusé : votre rôle ne permet pas de consulter les leads.
         </p>
-        <Link to="/dashboard">Retour au tableau de bord</Link>
-      </main>
+        <Link to="/dashboard" className="ui-link">
+          Retour au tableau de bord
+        </Link>
+      </div>
     );
   }
 
   return (
-    <main className="dashboard leads-page">
-      <header className="dashboard__header">
-        <div>
-          <h1>Leads reçus</h1>
-          <p className="dashboard__subtitle">
-            Consultation des soumissions issues des landing pages exportées
-            (staging).
-          </p>
-        </div>
-        <Link to="/dashboard" className="dashboard__link">
-          Tableau de bord
-        </Link>
-      </header>
+    <div className="studio-stack leads-page">
+      <PageHeader
+        title="Leads reçus"
+        subtitle="Soumissions issues des landing pages exportées et du formulaire public."
+        backTo="/dashboard"
+        backLabel="Tableau de bord"
+      />
 
-      {error ? <p className="dashboard__error">{error}</p> : null}
+      {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
 
-      <LeadsFilters
+      <Card padding="none">
+        <LeadsFilters
         values={filters}
         campaigns={campaigns}
         landingPages={landingPages}
@@ -229,14 +228,17 @@ export default function LeadsPage() {
         onApply={handleApplyFilters}
         onRefresh={handleRefresh}
         loading={loading}
-      />
+        />
+      </Card>
 
-      <LeadsTable
-        leads={leads}
-        pagination={pagination}
-        loading={loading}
-        onPageChange={handlePageChange}
-      />
-    </main>
+      <Card padding="none">
+        <LeadsTable
+          leads={leads}
+          pagination={pagination}
+          loading={loading}
+          onPageChange={handlePageChange}
+        />
+      </Card>
+    </div>
   );
 }

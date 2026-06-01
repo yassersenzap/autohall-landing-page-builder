@@ -1,5 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { ThemeToggle } from '../components/studio/ThemeToggle';
+import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
 import { ApiError, loginRequest } from '../lib/api';
 import { isAuthenticated, setAccessToken } from '../lib/auth-storage';
 
@@ -40,47 +43,45 @@ export default function LoginPage() {
 
   return (
     <main className="auth-page">
+      <div style={{ position: 'fixed', top: '1rem', right: '1rem' }}>
+        <ThemeToggle />
+      </div>
       <section className="auth-card">
         <h1 className="auth-card__title">Connexion</h1>
         <p className="auth-card__subtitle">
           Accès réservé aux utilisateurs Auto Hall.
         </p>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <label className="auth-form__field">
-            <span>Email</span>
-            <input
-              type="email"
-              name="email"
-              autoComplete="username"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              required
-            />
-          </label>
-
-          <label className="auth-form__field">
-            <span>Mot de passe</span>
-            <input
-              type="password"
-              name="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              required
-              minLength={8}
-            />
-          </label>
-
-          {error ? <p className="auth-form__error">{error}</p> : null}
-
-          <button className="auth-form__submit" type="submit" disabled={loading}>
+        <form className="ui-form-stack" onSubmit={handleSubmit}>
+          <Input
+            label="Email"
+            type="email"
+            name="email"
+            autoComplete="username"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+          />
+          <Input
+            label="Mot de passe"
+            type="password"
+            name="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            required
+            minLength={8}
+          />
+          {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
+          <Button type="submit" disabled={loading}>
             {loading ? 'Connexion…' : 'Se connecter'}
-          </button>
+          </Button>
         </form>
 
         <p className="auth-card__footer">
-          <Link to="/">Retour à l&apos;accueil</Link>
+          <Link to="/" className="ui-link">
+            Retour à l&apos;accueil
+          </Link>
         </p>
       </section>
     </main>

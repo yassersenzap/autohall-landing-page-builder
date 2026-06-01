@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Badge } from '../components/ui/Badge';
+import { Button } from '../components/ui/Button';
+import { StatusBadge } from '../components/ui/StatusBadge';
+import { Tabs } from '../components/ui/Tabs';
 import { ApiError, logoutClient, meRequest } from '../lib/api';
 import {
   fetchPagePreview,
@@ -17,6 +21,8 @@ type LocationState = {
   campaignName?: string;
 };
 
+type ViewportMode = 'desktop' | 'mobile';
+
 function HtmlFragment({ html }: { html: string }) {
   return <div dangerouslySetInnerHTML={{ __html: html }} />;
 }
@@ -30,11 +36,10 @@ export default function PagePreviewPage() {
   const [preview, setPreview] = useState<PagePreviewData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewport, setViewport] = useState<ViewportMode>('desktop');
 
   const loadPreview = useCallback(async () => {
-    if (!pageVersionId) {
-      return;
-    }
+    if (!pageVersionId) return;
 
     setError(null);
     setLoading(true);
@@ -73,16 +78,18 @@ export default function PagePreviewPage() {
             campaignId: state.campaignId,
             campaignName: state.campaignName,
           },
-          label: 'Retour aux versions',
+          label: 'Versions',
         }
-      : { to: '/campaigns', state: undefined, label: 'Retour aux campagnes' };
+      : { to: '/campaigns', state: undefined, label: 'Campagnes' };
 
   if (!pageVersionId) {
     return (
-      <main className="dashboard">
-        <p className="dashboard__error">Identifiant de version invalide.</p>
-        <Link to="/campaigns">Retour aux campagnes</Link>
-      </main>
+      <p className="ui-alert ui-alert--error">
+        Identifiant de version invalide.{' '}
+        <Link to="/campaigns" className="ui-link">
+          Retour
+        </Link>
+      </p>
     );
   }
 
@@ -97,64 +104,93 @@ export default function PagePreviewPage() {
           }`
         : null;
 
-  return (
-    <main className="dashboard preview-page">
-      <header className="dashboard__header">
-        <div>
-          <h1>Aperçu</h1>
-          <p className="dashboard__subtitle">
-            {preview?.landingPage.title ?? state.landingPageTitle ?? 'Landing page'}
-            {versionLabel ? ` · ${versionLabel}` : ''}
-          </p>
-        </div>
-        <Link
-          to={versionsBackLink.to}
-          state={versionsBackLink.state}
-          className="dashboard__link"
-        >
-          {versionsBackLink.label}
-        </Link>
-      </header>
+  const landingTitle =
+    preview?.landingPage.title ?? state.landingPageTitle ?? 'Landing page';
 
-      {loading ? <p>Chargement de l’aperçu…</p> : null}
-      {error ? <p className="dashboard__error">{error}</p> : null}
+  return (
+    <div className="preview-studio">
+      <div className="preview-toolbar">
+        <div className="preview-toolbar__meta">
+          <div>
+            <p className="preview-toolbar__title">{landingTitle}</p>
+            {versionLabel ? (
+              <p className="ui-page-header__subtitle" style={{ margin: 0 }}>
+                {versionLabel}
+              </p>
+            ) : null}
+          </div>
+          {preview ? (
+            <div className="preview-toolbar__chips">
+              <StatusBadge status={preview.pageVersion.status} />
+              <Badge variant="default">/{preview.landingPage.slug}</Badge>
+              {preview.render.themeMode === 'dark' ? (
+                <Badge variant="primary">Landing sombre</Badge>
+              ) : (
+                <Badge variant="default">Landing claire</Badge>
+              )}
+            </div>
+          ) : null}
+        </div>
+        <div className="preview-toolbar__actions">
+          <Tabs
+            ariaLabel="Mode d’affichage"
+            items={[
+              { id: 'desktop', label: 'Desktop' },
+              { id: 'mobile', label: 'Mobile' },
+            ]}
+            activeId={viewport}
+            onChange={(id) => setViewport(id as ViewportMode)}
+          />
+          <Link to={versionsBackLink.to} state={versionsBackLink.state}>
+            <Button variant="secondary" size="sm">
+              ← {versionsBackLink.label}
+            </Button>
+          </Link>
+          {preview ? (
+            <Button variant="ghost" size="sm" onClick={() => void loadPreview()}>
+              Actualiser
+            </Button>
+          ) : null}
+        </div>
+      </div>
+
+      {loading ? <p className="ui-page-header__subtitle">Chargement de l’aperçu…</p> : null}
+      {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
 
       {preview && !loading ? (
-        <>
-          <section className="dashboard__card preview-meta">
-            <p className="preview-meta__line">
-              <strong>Campagne :</strong> {preview.campaign.name} ({preview.campaign.brand})
-            </p>
-            <p className="preview-meta__line">
-              <strong>Landing :</strong> /{preview.landingPage.slug} — {preview.landingPage.status}
-            </p>
-            <p className="preview-meta__line">
-              <strong>Version :</strong> {preview.pageVersion.status}
-              {preview.render.themeMode === 'dark' ? ' · thème sombre' : ''}
-            </p>
-          </section>
-
-          <div className="preview-canvas">
-            {preview.render.blocksHtml.length === 0 ? (
-              <p className="preview-canvas__empty">Aucun bloc à afficher.</p>
-            ) : (
-              <article
-                className="lp-document preview-canvas__landing"
-                data-theme={preview.render.themeMode}
-                style={landingThemeStyleToReact(preview.render.themeStyle)}
-              >
-                <HtmlFragment html={preview.render.headerHtml} />
-                <main className="lp-page">
-                  {preview.render.blocksHtml.map((block) => (
-                    <HtmlFragment key={block.id} html={block.html} />
-                  ))}
-                </main>
-                <HtmlFragment html={preview.render.footerHtml} />
-              </article>
-            )}
+        <div className="preview-viewport-wrap">
+          <div
+            className={[
+              'preview-viewport',
+              viewport === 'mobile' ? 'preview-viewport--mobile' : 'preview-viewport--desktop',
+            ].join(' ')}
+          >
+            <div className={viewport === 'mobile' ? 'preview-device-frame' : ''}>
+              <div className={viewport === 'mobile' ? 'preview-device-frame__screen' : ''}>
+                {preview.render.blocksHtml.length === 0 ? (
+                  <p className="ui-empty__desc" style={{ padding: '2rem' }}>
+                    Aucun bloc à afficher.
+                  </p>
+                ) : (
+                  <article
+                    className="lp-document preview-canvas__landing"
+                    data-theme={preview.render.themeMode}
+                    style={landingThemeStyleToReact(preview.render.themeStyle)}
+                  >
+                    <HtmlFragment html={preview.render.headerHtml} />
+                    <main className="lp-page">
+                      {preview.render.blocksHtml.map((block) => (
+                        <HtmlFragment key={block.id} html={block.html} />
+                      ))}
+                    </main>
+                    <HtmlFragment html={preview.render.footerHtml} />
+                  </article>
+                )}
+              </div>
+            </div>
           </div>
-        </>
+        </div>
       ) : null}
-    </main>
+    </div>
   );
 }

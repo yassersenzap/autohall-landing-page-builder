@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { StudioThemeProvider } from './context/StudioThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import CampaignLandingPagesPage from './pages/CampaignLandingPagesPage';
 import LandingPageVersionsPage from './pages/LandingPageVersionsPage';
@@ -13,34 +14,36 @@ import LoginPage from './pages/LoginPage';
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/campaigns" element={<CampaignsPage />} />
-          <Route path="/leads" element={<LeadsPage />} />
-          <Route path="/leads/:id" element={<LeadDetailPage />} />
-          <Route
-            path="/campaigns/:campaignId/landing-pages"
-            element={<CampaignLandingPagesPage />}
-          />
-          <Route
-            path="/landing-pages/:landingPageId/versions"
-            element={<LandingPageVersionsPage />}
-          />
-          <Route
-            path="/page-versions/:pageVersionId/blocks"
-            element={<PageVersionBlocksPage />}
-          />
-          <Route
-            path="/page-versions/:pageVersionId/preview"
-            element={<PagePreviewPage />}
-          />
-        </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <StudioThemeProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/campaigns" element={<CampaignsPage />} />
+            <Route path="/leads" element={<LeadsPage />} />
+            <Route path="/leads/:id" element={<LeadDetailPage />} />
+            <Route
+              path="/campaigns/:campaignId/landing-pages"
+              element={<CampaignLandingPagesPage />}
+            />
+            <Route
+              path="/landing-pages/:landingPageId/versions"
+              element={<LandingPageVersionsPage />}
+            />
+            <Route
+              path="/page-versions/:pageVersionId/blocks"
+              element={<PageVersionBlocksPage />}
+            />
+            <Route
+              path="/page-versions/:pageVersionId/preview"
+              element={<PagePreviewPage />}
+            />
+          </Route>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </StudioThemeProvider>
   );
 }

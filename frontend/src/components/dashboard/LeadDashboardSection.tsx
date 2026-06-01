@@ -1,35 +1,12 @@
 import { Link } from 'react-router-dom';
+import { Card } from '../ui/Card';
+import { StatCard } from '../ui/StatCard';
 import { STATUS_LABELS, type LeadDashboardKpis } from '../../lib/lead-dashboard';
 import { formatLeadDate, PRIORITY_LABELS } from '../../lib/leads';
 
 type LeadDashboardSectionProps = {
   kpis: LeadDashboardKpis;
 };
-
-function KpiCard({
-  label,
-  value,
-  highlight,
-}: {
-  label: string;
-  value: string | number;
-  highlight?: 'warning' | 'accent';
-}) {
-  const className = [
-    'kpi-card',
-    highlight === 'warning' ? 'kpi-card--warning' : '',
-    highlight === 'accent' ? 'kpi-card--accent' : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
-
-  return (
-    <article className={className}>
-      <p className="kpi-card__label">{label}</p>
-      <p className="kpi-card__value">{value}</p>
-    </article>
-  );
-}
 
 function BreakdownTable({
   title,
@@ -42,16 +19,14 @@ function BreakdownTable({
 }) {
   if (rows.length === 0) {
     return (
-      <section className="dashboard__card kpi-breakdown">
-        <h3>{title}</h3>
+      <Card title={title}>
         <p className="lead-detail__text">Aucune donnée.</p>
-      </section>
+      </Card>
     );
   }
 
   return (
-    <section className="dashboard__card kpi-breakdown">
-      <h3>{title}</h3>
+    <Card title={title} className="kpi-breakdown">
       <table className="kpi-table">
         <thead>
           <tr>
@@ -68,7 +43,7 @@ function BreakdownTable({
           ))}
         </tbody>
       </table>
-    </section>
+    </Card>
   );
 }
 
@@ -94,40 +69,34 @@ export default function LeadDashboardSection({ kpis }: LeadDashboardSectionProps
   }));
 
   return (
-    <div className="lead-dashboard">
-      <h2 className="lead-dashboard__title">Indicateurs leads</h2>
-      <p className="dashboard__subtitle lead-dashboard__intro">
-        Vue opérationnelle du volume, du suivi et de la performance des campagnes.
-      </p>
+    <div className="lead-dashboard studio-stack">
+      <div>
+        <h2 className="lead-dashboard__title">Indicateurs leads</h2>
+        <p className="lead-dashboard__intro">
+          Vue opérationnelle du volume, du suivi et de la performance des campagnes.
+        </p>
+      </div>
 
       <div className="kpi-cards">
-        <KpiCard label="Total leads" value={kpis.totalLeads} />
-        <KpiCard label="Reçus aujourd&apos;hui" value={kpis.receivedToday} highlight="accent" />
-        <KpiCard label="Reçus cette semaine" value={kpis.receivedThisWeek} />
-        <KpiCard
+        <StatCard label="Total leads" value={kpis.totalLeads} />
+        <StatCard label="Reçus aujourd'hui" value={kpis.receivedToday} highlight="accent" />
+        <StatCard label="Reçus cette semaine" value={kpis.receivedThisWeek} />
+        <StatCard
           label="Relances en retard"
           value={kpis.overdueFollowUps}
           highlight={kpis.overdueFollowUps > 0 ? 'warning' : undefined}
         />
-        <KpiCard
-          label="Taux contactés"
-          value={`${kpis.contactedRatePercent} %`}
-        />
+        <StatCard label="Taux contactés" value={`${kpis.contactedRatePercent} %`} />
       </div>
 
       <div className="kpi-breakdown-grid">
         <BreakdownTable title="Par statut" rows={byStatus} labelKey="Statut" />
         <BreakdownTable title="Par priorité" rows={byPriority} labelKey="Priorité" />
         <BreakdownTable title="Par campagne (top 10)" rows={byCampaign} labelKey="Campagne" />
-        <BreakdownTable
-          title="Par landing page (top 10)"
-          rows={byLanding}
-          labelKey="Landing"
-        />
+        <BreakdownTable title="Par landing page (top 10)" rows={byLanding} labelKey="Landing" />
       </div>
 
-      <section className="dashboard__card kpi-breakdown">
-        <h3>Relances en retard</h3>
+      <Card title="Relances en retard">
         {kpis.overdueLeads.length === 0 ? (
           <p className="lead-detail__text">Aucune relance en retard.</p>
         ) : (
@@ -152,7 +121,7 @@ export default function LeadDashboardSection({ kpis }: LeadDashboardSectionProps
                       {formatLeadDate(lead.nextFollowUpAt)}
                     </td>
                     <td>
-                      <Link to={`/leads/${lead.id}`} className="dashboard__link">
+                      <Link to={`/leads/${lead.id}`} className="ui-link">
                         Voir
                       </Link>
                     </td>
@@ -167,7 +136,7 @@ export default function LeadDashboardSection({ kpis }: LeadDashboardSectionProps
             <Link to="/leads?overdueOnly=true">Voir tous les leads en retard</Link>
           </p>
         ) : null}
-      </section>
+      </Card>
     </div>
   );
 }
