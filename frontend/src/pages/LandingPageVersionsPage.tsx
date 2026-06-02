@@ -211,21 +211,16 @@ export default function LandingPageVersionsPage() {
                   Créée le{' '}
                   {new Date(version.createdAt).toLocaleString('fr-FR')}
                 </div>
-                <div className="campaigns-list__actions">
+                <div className="version-actions">
                   {canWrite && version.status === 'DRAFT' ? (
-                    <>
-                      <button
-                        type="button"
-                        className="versions-list__publish"
-                        disabled={publishingId === version.id}
-                        onClick={() => void handlePublish(version.id)}
-                      >
-                        {publishingId === version.id
-                          ? 'Publication…'
-                          : 'Publier'}
-                      </button>
-                      {' · '}
-                    </>
+                    <Button
+                      type="button"
+                      size="sm"
+                      disabled={publishingId === version.id}
+                      onClick={() => void handlePublish(version.id)}
+                    >
+                      {publishingId === version.id ? 'Publication…' : 'Publier'}
+                    </Button>
                   ) : null}
                   <Link
                     to={`/page-versions/${version.id}/blocks`}
@@ -238,10 +233,10 @@ export default function LandingPageVersionsPage() {
                       campaignId,
                       campaignName,
                     }}
+                    className="ui-btn ui-btn--secondary ui-btn--sm"
                   >
-                    Blocs
+                    Éditeur
                   </Link>
-                  {' · '}
                   <Link
                     to={`/page-versions/${version.id}/preview`}
                     state={{
@@ -252,23 +247,20 @@ export default function LandingPageVersionsPage() {
                       campaignId,
                       campaignName,
                     }}
+                    className="ui-btn ui-btn--ghost ui-btn--sm"
                   >
                     Preview
                   </Link>
                   {canWrite && version.status === 'PUBLISHED' ? (
-                    <>
-                      {' · '}
-                      <button
-                        type="button"
-                        className="versions-list__publish"
-                        disabled={exportingId === version.id}
-                        onClick={() => void handleExport(version)}
-                      >
-                        {exportingId === version.id
-                          ? 'Export…'
-                          : 'Exporter ZIP'}
-                      </button>
-                    </>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      disabled={exportingId === version.id}
+                      onClick={() => void handleExport(version)}
+                    >
+                      {exportingId === version.id ? 'Export…' : 'ZIP'}
+                    </Button>
                   ) : null}
                 </div>
               </li>

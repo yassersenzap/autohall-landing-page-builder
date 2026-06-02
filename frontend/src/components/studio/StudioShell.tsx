@@ -47,7 +47,8 @@ export default function StudioShell({ children }: StudioShellProps) {
           <p className="studio-sidebar__logo">Auto Hall</p>
           <p className="studio-sidebar__title">LP Builder Studio</p>
         </div>
-        <nav className="studio-sidebar__nav">
+        <nav className="studio-sidebar__nav" aria-label="Menu studio">
+          <p className="studio-sidebar__nav-label">Menu</p>
           {NAV_ITEMS.map((item) => (
             <NavLink
               key={item.to}

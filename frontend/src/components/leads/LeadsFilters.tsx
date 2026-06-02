@@ -3,9 +3,13 @@ import {
   LEAD_STATUSES,
   PRIORITY_LABELS,
 } from '../../lib/leads';
+import { STATUS_LABELS } from '../../lib/lead-dashboard';
 import type { CampaignListItem } from '../../lib/campaigns';
 import type { LandingPageListItem } from '../../lib/landing-pages';
 import type { AssignableUser } from '../../lib/leads';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
+import { Select } from '../ui/Select';
 
 export type LeadsFilterValues = {
   search: string;
@@ -50,116 +54,97 @@ export default function LeadsFilters({
   }
 
   return (
-    <section className="dashboard__card leads-filters">
-      <h2>Filtres</h2>
-      <div className="leads-filters__grid">
-        <label className="auth-form__field">
-          <span>Recherche</span>
-          <input
+    <div className="ui-filter-panel leads-filters">
+      <div className="ui-filter-panel__grid">
+        <div className="ui-field--span-2">
+          <Input
+            label="Recherche"
             type="search"
             placeholder="Nom, email ou téléphone"
             value={values.search}
             onChange={(e) => updateField('search', e.target.value)}
           />
-        </label>
-        <label className="auth-form__field">
-          <span>Statut</span>
-          <select
-            value={values.status}
-            onChange={(e) => updateField('status', e.target.value)}
-          >
-            <option value="">Tous</option>
-            {LEAD_STATUSES.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="auth-form__field">
-          <span>Campagne</span>
-          <select
-            value={values.campaignId}
-            onChange={(e) => updateField('campaignId', e.target.value)}
-          >
-            <option value="">Toutes</option>
-            {campaigns.map((campaign) => (
-              <option key={campaign.id} value={campaign.id}>
-                {campaign.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="auth-form__field">
-          <span>Landing page</span>
-          <select
-            value={values.landingPageId}
-            onChange={(e) => updateField('landingPageId', e.target.value)}
-            disabled={!values.campaignId}
-          >
-            <option value="">Toutes</option>
-            {landingPages.map((page) => (
-              <option key={page.id} value={page.id}>
-                {page.title}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="auth-form__field">
-          <span>Priorité</span>
-          <select
-            value={values.priority}
-            onChange={(e) => updateField('priority', e.target.value)}
-          >
-            <option value="">Toutes</option>
-            {LEAD_PRIORITIES.map((priority) => (
-              <option key={priority} value={priority}>
-                {PRIORITY_LABELS[priority]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="auth-form__field">
-          <span>Assigné à</span>
-          <select
-            value={values.assignedToUserId}
-            onChange={(e) => updateField('assignedToUserId', e.target.value)}
-          >
-            <option value="">Tous</option>
-            {assignableUsers.map((user) => (
-              <option key={user.id} value={user.id}>
-                {user.fullName}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="auth-form__field leads-filters__checkbox">
-          <span>Relances en retard</span>
+        </div>
+        <Select
+          label="Statut"
+          value={values.status}
+          onChange={(e) => updateField('status', e.target.value)}
+        >
+          <option value="">Tous les statuts</option>
+          {LEAD_STATUSES.map((status) => (
+            <option key={status} value={status}>
+              {STATUS_LABELS[status] ?? status}
+            </option>
+          ))}
+        </Select>
+        <Select
+          label="Campagne"
+          value={values.campaignId}
+          onChange={(e) => updateField('campaignId', e.target.value)}
+        >
+          <option value="">Toutes les campagnes</option>
+          {campaigns.map((campaign) => (
+            <option key={campaign.id} value={campaign.id}>
+              {campaign.name}
+            </option>
+          ))}
+        </Select>
+        <Select
+          label="Landing page"
+          value={values.landingPageId}
+          onChange={(e) => updateField('landingPageId', e.target.value)}
+          disabled={!values.campaignId}
+          hint={!values.campaignId ? 'Sélectionnez d’abord une campagne' : undefined}
+        >
+          <option value="">Toutes les landing pages</option>
+          {landingPages.map((page) => (
+            <option key={page.id} value={page.id}>
+              {page.title}
+            </option>
+          ))}
+        </Select>
+        <Select
+          label="Priorité"
+          value={values.priority}
+          onChange={(e) => updateField('priority', e.target.value)}
+        >
+          <option value="">Toutes les priorités</option>
+          {LEAD_PRIORITIES.map((priority) => (
+            <option key={priority} value={priority}>
+              {PRIORITY_LABELS[priority]}
+            </option>
+          ))}
+        </Select>
+        <Select
+          label="Assigné à"
+          value={values.assignedToUserId}
+          onChange={(e) => updateField('assignedToUserId', e.target.value)}
+        >
+          <option value="">Tous les assignés</option>
+          {assignableUsers.map((user) => (
+            <option key={user.id} value={user.id}>
+              {user.fullName}
+            </option>
+          ))}
+        </Select>
+        <label className="ui-checkbox-field">
           <input
             type="checkbox"
+            className="ui-checkbox-field__input"
             checked={values.overdueOnly}
             onChange={(e) => updateField('overdueOnly', e.target.checked)}
           />
+          <span className="ui-checkbox-field__label">Relances en retard uniquement</span>
         </label>
       </div>
-      <div className="leads-filters__actions">
-        <button
-          type="button"
-          className="auth-form__submit"
-          onClick={onApply}
-          disabled={loading}
-        >
-          Appliquer
-        </button>
-        <button
-          type="button"
-          className="dashboard__logout leads-filters__refresh"
-          onClick={onRefresh}
-          disabled={loading}
-        >
+      <div className="ui-filter-panel__footer">
+        <Button type="button" onClick={onApply} disabled={loading}>
+          Appliquer les filtres
+        </Button>
+        <Button type="button" variant="secondary" onClick={onRefresh} disabled={loading}>
           Rafraîchir
-        </button>
+        </Button>
       </div>
-    </section>
+    </div>
   );
 }

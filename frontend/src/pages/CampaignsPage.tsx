@@ -100,7 +100,7 @@ export default function CampaignsPage() {
 
       {canWrite ? (
         <Card title="Nouvelle campagne">
-          <form className="ui-form-stack" onSubmit={handleCreate}>
+          <form className="campaign-form-grid" onSubmit={handleCreate}>
             <Input
               label="Nom"
               value={name}
@@ -128,9 +128,11 @@ export default function CampaignsPage() {
               required
               maxLength={80}
             />
-            <Button type="submit" disabled={submitting}>
-              {submitting ? 'Création…' : 'Créer la campagne'}
-            </Button>
+            <div className="campaign-form-grid__actions">
+              <Button type="submit" disabled={submitting}>
+                {submitting ? 'Création…' : 'Créer la campagne'}
+              </Button>
+            </div>
           </form>
         </Card>
       ) : null}
@@ -158,8 +160,9 @@ export default function CampaignsPage() {
                   <Link
                     to={`/campaigns/${campaign.id}/landing-pages`}
                     state={{ campaignName: campaign.name }}
+                    className="ui-btn ui-btn--secondary ui-btn--sm"
                   >
-                    Landing pages →
+                    Landing pages
                   </Link>
                 </div>
               </li>

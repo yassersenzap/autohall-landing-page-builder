@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
+import { Button } from '../ui/Button';
+import { PriorityBadge } from '../ui/PriorityBadge';
+import { StatusBadge } from '../ui/StatusBadge';
 import {
   formatLeadDate,
-  PRIORITY_LABELS,
   type LeadEventListItem,
   type LeadsPagination,
 } from '../../lib/leads';
@@ -14,7 +16,13 @@ type LeadsTableProps = {
 };
 
 function formatDate(value: string): string {
-  return new Date(value).toLocaleString('fr-FR');
+  return new Date(value).toLocaleString('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 export default function LeadsTable({
@@ -24,52 +32,61 @@ export default function LeadsTable({
   onPageChange,
 }: LeadsTableProps) {
   if (loading) {
-    return <p>Chargement des leads…</p>;
+    return <p className="ui-table-panel__loading">Chargement des leads…</p>;
   }
 
   if (leads.length === 0) {
     return (
-      <section className="dashboard__card">
-        <p>Aucun lead trouvé pour ces critères.</p>
-      </section>
+      <p className="ui-table-panel__empty">
+        Aucun lead trouvé pour ces critères de filtrage.
+      </p>
     );
   }
 
   return (
-    <section className="dashboard__card leads-table-wrap">
-      <h2>
-        Leads ({pagination.total})
-      </h2>
+    <>
+      <div className="ui-table-panel__head">
+        <h2 className="ui-table-panel__title">Résultats</h2>
+        <span className="ui-table-panel__meta">
+          {pagination.total} lead{pagination.total > 1 ? 's' : ''} · page{' '}
+          {pagination.page} / {pagination.totalPages}
+        </span>
+      </div>
       <div className="leads-table-scroll">
         <table className="leads-table">
           <thead>
             <tr>
               <th>Date</th>
-              <th>Nom</th>
-              <th>Téléphone</th>
-              <th>Email</th>
-              <th>Marque</th>
-              <th>Modèle</th>
+              <th>Contact</th>
               <th>Campagne</th>
               <th>Landing</th>
               <th>Priorité</th>
-              <th>Assigné à</th>
+              <th>Assigné</th>
               <th>Relance</th>
               <th>Statut</th>
               <th>Source</th>
-              <th />
+              <th aria-label="Actions" />
             </tr>
           </thead>
           <tbody>
             {leads.map((lead) => (
               <tr key={lead.id}>
-                <td>{formatDate(lead.createdAt)}</td>
-                <td>{lead.fullName}</td>
-                <td>{lead.phone}</td>
-                <td>{lead.email ?? '—'}</td>
-                <td>{lead.brand ?? '—'}</td>
-                <td>{lead.model ?? '—'}</td>
-                <td>{lead.campaignName}</td>
+                <td className="leads-table__date">{formatDate(lead.createdAt)}</td>
+                <td>
+                  <span className="leads-table__name">{lead.fullName}</span>
+                  <span className="leads-table__contact-line">{lead.phone}</span>
+                  {lead.email ? (
+                    <span className="leads-table__contact-line">{lead.email}</span>
+                  ) : null}
+                </td>
+                <td>
+                  <span className="leads-table__cell-primary">{lead.campaignName}</span>
+                  {(lead.brand ?? lead.model) ? (
+                    <span className="leads-table__contact-line">
+                      {[lead.brand, lead.model].filter(Boolean).join(' · ')}
+                    </span>
+                  ) : null}
+                </td>
                 <td>
                   <span className="leads-table__landing-title">
                     {lead.landingPageTitle}
@@ -79,11 +96,7 @@ export default function LeadsTable({
                   </span>
                 </td>
                 <td>
-                  <span
-                    className={`campaigns-list__status priority-${lead.priority.toLowerCase()}`}
-                  >
-                    {PRIORITY_LABELS[lead.priority] ?? lead.priority}
-                  </span>
+                  <PriorityBadge priority={lead.priority} />
                 </td>
                 <td>{lead.assignedToName ?? '—'}</td>
                 <td
@@ -97,17 +110,16 @@ export default function LeadsTable({
                   ) : null}
                 </td>
                 <td>
-                  <span
-                    className={`campaigns-list__status status-${lead.status.toLowerCase()}`}
-                  >
-                    {lead.status}
-                  </span>
+                  <StatusBadge status={lead.status} />
                 </td>
                 <td className="leads-table__source" title={lead.sourceUrl}>
                   {lead.sourceUrl}
                 </td>
-                <td>
-                  <Link to={`/leads/${lead.id}`} className="dashboard__link">
+                <td className="leads-table__actions">
+                  <Link
+                    to={`/leads/${lead.id}`}
+                    className="ui-btn ui-btn--ghost ui-btn--sm"
+                  >
                     Voir
                   </Link>
                 </td>
@@ -118,27 +130,29 @@ export default function LeadsTable({
       </div>
       {pagination.totalPages > 1 ? (
         <div className="leads-pagination">
-          <button
+          <Button
             type="button"
-            className="dashboard__logout"
+            variant="secondary"
+            size="sm"
             disabled={pagination.page <= 1}
             onClick={() => onPageChange(pagination.page - 1)}
           >
             Page précédente
-          </button>
-          <span>
-            Page {pagination.page} / {pagination.totalPages}
+          </Button>
+          <span className="leads-pagination__meta">
+            Page {pagination.page} sur {pagination.totalPages}
           </span>
-          <button
+          <Button
             type="button"
-            className="dashboard__logout"
+            variant="secondary"
+            size="sm"
             disabled={pagination.page >= pagination.totalPages}
             onClick={() => onPageChange(pagination.page + 1)}
           >
             Page suivante
-          </button>
+          </Button>
         </div>
       ) : null}
-    </section>
+    </>
   );
 }

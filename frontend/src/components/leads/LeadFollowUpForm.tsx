@@ -6,6 +6,9 @@ import {
   type AssignableUser,
   type LeadEventDetail,
 } from '../../lib/leads';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
+import { Select } from '../ui/Select';
 
 type LeadFollowUpFormProps = {
   lead: LeadEventDetail;
@@ -44,53 +47,48 @@ export default function LeadFollowUpForm({
   }
 
   return (
-    <form className="auth-form lead-status-form" onSubmit={handleSubmit}>
-      <label className="auth-form__field">
-        <span>Priorité</span>
-        <select
-          value={priority}
-          onChange={(e) => setPriority(e.target.value)}
-          disabled={submitting}
-        >
-          {LEAD_PRIORITIES.map((value) => (
-            <option key={value} value={value}>
-              {PRIORITY_LABELS[value]}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="auth-form__field">
-        <span>Assigné à</span>
-        <select
-          value={assignedToUserId}
-          onChange={(e) => setAssignedToUserId(e.target.value)}
-          disabled={submitting}
-        >
-          <option value="">Non assigné</option>
-          {assignableUsers.map((user) => (
-            <option key={user.id} value={user.id}>
-              {user.fullName}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="auth-form__field">
-        <span>Prochaine relance</span>
-        <input
-          type="datetime-local"
-          value={nextFollowUpAt}
-          onChange={(e) => setNextFollowUpAt(e.target.value)}
-          disabled={submitting}
-        />
-      </label>
+    <form className="ui-form-stack" onSubmit={handleSubmit}>
+      <Select
+        label="Priorité"
+        value={priority}
+        onChange={(e) => setPriority(e.target.value)}
+        disabled={submitting}
+      >
+        {LEAD_PRIORITIES.map((value) => (
+          <option key={value} value={value}>
+            {PRIORITY_LABELS[value]}
+          </option>
+        ))}
+      </Select>
+      <Select
+        label="Assigné à"
+        value={assignedToUserId}
+        onChange={(e) => setAssignedToUserId(e.target.value)}
+        disabled={submitting}
+      >
+        <option value="">Non assigné</option>
+        {assignableUsers.map((user) => (
+          <option key={user.id} value={user.id}>
+            {user.fullName}
+          </option>
+        ))}
+      </Select>
+      <Input
+        label="Prochaine relance"
+        type="datetime-local"
+        value={nextFollowUpAt}
+        onChange={(e) => setNextFollowUpAt(e.target.value)}
+        disabled={submitting}
+      />
       {lead.lastContactAt ? (
         <p className="lead-detail__text">
-          Dernier contact : {new Date(lead.lastContactAt).toLocaleString('fr-FR')}
+          Dernier contact :{' '}
+          {new Date(lead.lastContactAt).toLocaleString('fr-FR')}
         </p>
       ) : null}
-      <button type="submit" className="auth-form__submit" disabled={submitting}>
+      <Button type="submit" disabled={submitting}>
         {submitting ? 'Enregistrement…' : 'Enregistrer le suivi'}
-      </button>
+      </Button>
     </form>
   );
 }

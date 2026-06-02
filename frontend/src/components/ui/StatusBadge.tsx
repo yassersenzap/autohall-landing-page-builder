@@ -1,3 +1,4 @@
+import { STATUS_LABELS } from '../../lib/lead-dashboard';
 import { Badge } from './Badge';
 
 const STATUS_VARIANT: Record<
@@ -23,6 +24,8 @@ type StatusBadgeProps = {
 export function StatusBadge({ status, label }: StatusBadgeProps) {
   const key = status.toLowerCase().replace(/_/g, '-');
   const variant = STATUS_VARIANT[key] ?? 'default';
+  const display =
+    label ?? STATUS_LABELS[status] ?? STATUS_LABELS[status.toUpperCase()] ?? status;
 
-  return <Badge variant={variant}>{label ?? status}</Badge>;
+  return <Badge variant={variant}>{display}</Badge>;
 }

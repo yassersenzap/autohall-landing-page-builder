@@ -6,6 +6,12 @@ html[data-studio-theme='dark'] {
   --studio-font: 'Inter Variable', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --studio-font-mono: ui-monospace, 'Cascadia Code', 'Segoe UI Mono', monospace;
 
+  --studio-text-xs: 0.75rem;
+  --studio-text-sm: 0.8125rem;
+  --studio-text-base: 0.9375rem;
+  --studio-text-lg: 1.125rem;
+  --studio-text-xl: 1.5rem;
+
   --studio-radius-sm: 0.5rem;
   --studio-radius-md: 0.625rem;
   --studio-radius-lg: 0.75rem;
@@ -22,7 +28,7 @@ html[data-studio-theme='dark'] {
   --studio-space-12: 3rem;
   --studio-space-16: 4rem;
 
-  --studio-content-max: 72rem;
+  --studio-content-max: 68rem;
   --studio-sidebar-width: 16rem;
   --studio-topbar-height: 3.5rem;
   --studio-btn-height-sm: 2.25rem;
@@ -34,6 +40,7 @@ html[data-studio-theme='light'] {
   --studio-bg-subtle: #efeff1;
   --studio-surface: #ffffff;
   --studio-surface-raised: #ffffff;
+  --studio-surface-elevated: #fafafa;
   --studio-surface-hover: #f4f4f5;
   --studio-border: #e5e7eb;
   --studio-border-strong: #d4d4d8;
@@ -42,25 +49,27 @@ html[data-studio-theme='light'] {
   --studio-text-muted: #64748b;
   --studio-primary: #b91c1c;
   --studio-primary-hover: #991b1b;
-  --studio-primary-soft: rgba(185, 28, 28, 0.1);
+  --studio-primary-soft: rgba(185, 28, 28, 0.09);
   --studio-primary-foreground: #ffffff;
   --studio-accent: #991b1b;
   --studio-success: #15803d;
-  --studio-success-soft: #dcfce7;
+  --studio-success-soft: #ecfdf3;
   --studio-warning: #b45309;
-  --studio-warning-soft: #fef3c7;
+  --studio-warning-soft: #fffbeb;
   --studio-danger: #b91c1c;
-  --studio-danger-soft: #fee2e2;
+  --studio-danger-soft: #fef2f2;
   --studio-sidebar-bg: #fafafa;
   --studio-sidebar-text: #0a0a0a;
   --studio-sidebar-muted: #71717a;
-  --studio-sidebar-active: rgba(10, 10, 10, 0.06);
+  --studio-sidebar-active: rgba(10, 10, 10, 0.05);
+  --studio-sidebar-active-border: rgba(185, 28, 28, 0.35);
   --studio-sidebar-border: #e5e7eb;
   --studio-preview-chrome: #18181b;
+  --studio-table-head: #f4f4f5;
   --studio-shadow-sm: 0 1px 2px rgba(10, 10, 10, 0.04);
-  --studio-shadow-md: 0 8px 24px rgba(10, 10, 10, 0.08);
-  --studio-shadow-lg: 0 20px 48px rgba(10, 10, 10, 0.1);
-  --studio-focus-ring: rgba(185, 28, 28, 0.35);
+  --studio-shadow-md: 0 4px 16px rgba(10, 10, 10, 0.06);
+  --studio-shadow-lg: 0 16px 40px rgba(10, 10, 10, 0.08);
+  --studio-focus-ring: rgba(185, 28, 28, 0.28);
 }
 
 html[data-studio-theme='dark'] {
@@ -68,6 +77,7 @@ html[data-studio-theme='dark'] {
   --studio-bg-subtle: #080808;
   --studio-surface: #111111;
   --studio-surface-raised: #141414;
+  --studio-surface-elevated: #171717;
   --studio-surface-hover: #1a1a1a;
   --studio-border: #262626;
   --studio-border-strong: #2a2a2a;
@@ -76,25 +86,27 @@ html[data-studio-theme='dark'] {
   --studio-text-muted: #a3a3a3;
   --studio-primary: #ef4444;
   --studio-primary-hover: #f87171;
-  --studio-primary-soft: rgba(239, 68, 68, 0.14);
+  --studio-primary-soft: rgba(239, 68, 68, 0.12);
   --studio-primary-foreground: #fafafa;
   --studio-accent: #f87171;
   --studio-success: #4ade80;
-  --studio-success-soft: rgba(74, 222, 128, 0.14);
+  --studio-success-soft: rgba(74, 222, 128, 0.12);
   --studio-warning: #fbbf24;
-  --studio-warning-soft: rgba(251, 191, 36, 0.14);
+  --studio-warning-soft: rgba(251, 191, 36, 0.12);
   --studio-danger: #f87171;
-  --studio-danger-soft: rgba(248, 113, 113, 0.14);
+  --studio-danger-soft: rgba(248, 113, 113, 0.12);
   --studio-sidebar-bg: #0a0a0a;
   --studio-sidebar-text: #fafafa;
   --studio-sidebar-muted: #737373;
-  --studio-sidebar-active: rgba(250, 250, 250, 0.08);
+  --studio-sidebar-active: rgba(250, 250, 250, 0.06);
+  --studio-sidebar-active-border: rgba(239, 68, 68, 0.45);
   --studio-sidebar-border: #262626;
   --studio-preview-chrome: #050505;
-  --studio-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --studio-shadow-md: 0 12px 32px rgba(0, 0, 0, 0.55);
-  --studio-shadow-lg: 0 24px 56px rgba(0, 0, 0, 0.65);
-  --studio-focus-ring: rgba(239, 68, 68, 0.4);
+  --studio-table-head: #171717;
+  --studio-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --studio-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --studio-shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.6);
+  --studio-focus-ring: rgba(239, 68, 68, 0.32);
 }
 
 html[data-studio-theme='light'],

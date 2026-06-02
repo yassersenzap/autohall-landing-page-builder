@@ -208,7 +208,7 @@ export default function LeadsPage() {
   }
 
   return (
-    <div className="studio-stack leads-page">
+    <div className="studio-stack leads-page" data-page="leads">
       <PageHeader
         title="Leads reçus"
         subtitle="Soumissions issues des landing pages exportées et du formulaire public."
@@ -218,7 +218,7 @@ export default function LeadsPage() {
 
       {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
 
-      <Card padding="none">
+      <Card title="Filtres" padding="none">
         <LeadsFilters
         values={filters}
         campaigns={campaigns}

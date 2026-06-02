@@ -1,5 +1,8 @@
 import { useState, type FormEvent } from 'react';
+import { STATUS_LABELS } from '../../lib/lead-dashboard';
 import { LEAD_STATUSES } from '../../lib/leads';
+import { Button } from '../ui/Button';
+import { Select } from '../ui/Select';
 
 type LeadStatusFormProps = {
   currentStatus: string;
@@ -25,25 +28,23 @@ export default function LeadStatusForm({
   }
 
   return (
-    <form className="auth-form lead-status-form" onSubmit={handleSubmit}>
-      <h2>Gestion du statut</h2>
-      <label className="auth-form__field">
-        <span>Statut</span>
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          disabled={submitting}
-        >
-          {LEAD_STATUSES.map((value) => (
-            <option key={value} value={value}>
-              {value}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="auth-form__field">
-        <span>Commentaire interne</span>
+    <form className="ui-form-stack lead-status-form" onSubmit={handleSubmit}>
+      <Select
+        label="Statut"
+        value={status}
+        onChange={(e) => setStatus(e.target.value)}
+        disabled={submitting}
+      >
+        {LEAD_STATUSES.map((value) => (
+          <option key={value} value={value}>
+            {STATUS_LABELS[value] ?? value}
+          </option>
+        ))}
+      </Select>
+      <label className="ui-field">
+        <span className="ui-field__label">Commentaire interne</span>
         <textarea
+          className="ui-textarea"
           rows={4}
           placeholder="Notes visibles uniquement en interne"
           value={internalComment}
@@ -51,9 +52,9 @@ export default function LeadStatusForm({
           disabled={submitting}
         />
       </label>
-      <button type="submit" className="auth-form__submit" disabled={submitting}>
-        {submitting ? 'Enregistrement…' : 'Enregistrer'}
-      </button>
+      <Button type="submit" disabled={submitting}>
+        {submitting ? 'Enregistrement…' : 'Enregistrer le statut'}
+      </Button>
     </form>
   );
 }
