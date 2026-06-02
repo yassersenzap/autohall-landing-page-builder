@@ -27,22 +27,24 @@ function BreakdownTable({
 
   return (
     <Card title={title} className="kpi-breakdown">
-      <table className="kpi-table">
-        <thead>
-          <tr>
-            <th>{labelKey ?? 'Libellé'}</th>
-            <th>Leads</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.label}>
-              <td>{row.label}</td>
-              <td>{row.count}</td>
+      <div className="kpi-table-wrap">
+        <table className="kpi-table">
+          <thead>
+            <tr>
+              <th>{labelKey ?? 'Libellé'}</th>
+              <th>Leads</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.label}>
+                <td>{row.label}</td>
+                <td>{row.count}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </Card>
   );
 }
@@ -69,9 +71,11 @@ export default function LeadDashboardSection({ kpis }: LeadDashboardSectionProps
   }));
 
   return (
-    <div className="lead-dashboard studio-stack">
-      <div>
-        <h2 className="lead-dashboard__title">Indicateurs leads</h2>
+    <section className="lead-dashboard studio-stack" aria-labelledby="lead-dashboard-heading">
+      <div className="lead-dashboard__header">
+        <h2 id="lead-dashboard-heading" className="lead-dashboard__title">
+          Indicateurs leads
+        </h2>
         <p className="lead-dashboard__intro">
           Vue opérationnelle du volume, du suivi et de la performance des campagnes.
         </p>
@@ -121,7 +125,10 @@ export default function LeadDashboardSection({ kpis }: LeadDashboardSectionProps
                       {formatLeadDate(lead.nextFollowUpAt)}
                     </td>
                     <td>
-                      <Link to={`/leads/${lead.id}`} className="ui-link">
+                      <Link
+                        to={`/leads/${lead.id}`}
+                        className="ui-btn ui-btn--ghost ui-btn--sm"
+                      >
                         Voir
                       </Link>
                     </td>
@@ -133,10 +140,12 @@ export default function LeadDashboardSection({ kpis }: LeadDashboardSectionProps
         )}
         {kpis.overdueFollowUps > kpis.overdueLeads.length ? (
           <p className="dashboard__nav">
-            <Link to="/leads?overdueOnly=true">Voir tous les leads en retard</Link>
+            <Link to="/leads?overdueOnly=true" className="ui-btn ui-btn--secondary ui-btn--sm">
+              Voir tous les leads en retard
+            </Link>
           </p>
         ) : null}
       </Card>
-    </div>
+    </section>
   );
 }

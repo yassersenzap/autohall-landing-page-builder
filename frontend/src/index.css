@@ -1,3 +1,4 @@
+@import '@fontsource-variable/inter';
 @import './styles/studio-tokens.css';
 @import './styles/studio-components.css';
 @import './styles/studio-layout.css';
@@ -12,15 +13,24 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: var(--studio-font, system-ui, sans-serif);
-  font-size: 1rem;
-  line-height: 1.5;
-  color: var(--studio-text, #0f172a);
-  background-color: var(--studio-bg, #f0f2f6);
+  font-family: var(--studio-font);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  font-weight: 400;
+  color: var(--studio-text);
+  background-color: var(--studio-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
   min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--studio-text);
 }

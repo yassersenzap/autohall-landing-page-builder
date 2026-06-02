@@ -64,7 +64,7 @@ export default function StudioShell({ children }: StudioShellProps) {
           ))}
         </nav>
         <div className="studio-sidebar__footer">
-          <Link to="/" className="ui-link">
+          <Link to="/" className="studio-sidebar__public-link">
             Accueil public
           </Link>
         </div>
@@ -73,10 +73,12 @@ export default function StudioShell({ children }: StudioShellProps) {
       <div className="studio-main">
         <header className="studio-topbar">
           <div className="studio-topbar__spacer" />
-          <ThemeToggle />
-          <Button variant="ghost" size="sm" onClick={() => void handleLogout()}>
-            Déconnexion
-          </Button>
+          <div className="studio-topbar__actions">
+            <ThemeToggle />
+            <Button variant="secondary" size="sm" onClick={() => void handleLogout()}>
+              Déconnexion
+            </Button>
+          </div>
         </header>
         <div className={contentClass}>{children}</div>
       </div>
