@@ -1,5 +1,6 @@
 export const ALLOWED_BLOCK_TYPES = [
   'hero',
+  'trust_bar',
   'text',
   'image',
   'button',

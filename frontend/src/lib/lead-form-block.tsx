@@ -10,8 +10,14 @@ export type LeadFormField = {
 export const DEFAULT_LEAD_FORM_PROPS: Record<string, unknown> = {
   title: 'Demander un essai',
   subtitle:
-    'Remplissez le formulaire, un conseiller Auto Hall vous contactera.',
+    'Remplissez le formulaire, un conseiller Auto Hall vous contactera sous 48h.',
   submitText: 'Envoyer ma demande',
+  privacyNote: 'Vos données sont utilisées uniquement pour traiter votre demande.',
+  reassurance: [
+    'Sans engagement',
+    'Réponse sous 48h ouvrées',
+    'Conseiller dédié en concession',
+  ],
   fields: [
     { name: 'fullName', label: 'Nom complet', type: 'text', required: true },
     { name: 'phone', label: 'Téléphone', type: 'tel', required: true },

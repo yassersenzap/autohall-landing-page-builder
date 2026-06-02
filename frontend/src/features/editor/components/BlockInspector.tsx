@@ -71,9 +71,17 @@ export function BlockInspector({ block, disabled, onChangeProps }: BlockInspecto
           <Input label="Titre" value={asString(props.title)} disabled={disabled} onChange={(e) => handleField('title', e.target.value)} />
           <Input label="Sous-titre" value={asString(props.subtitle)} disabled={disabled} onChange={(e) => handleField('subtitle', e.target.value)} />
           <Input label="URL image véhicule" value={asString(props.imageUrl)} disabled={disabled} onChange={(e) => handleField('imageUrl', e.target.value)} />
-          <Input label="Texte bouton" value={asString(props.buttonText)} disabled={disabled} onChange={(e) => handleField('buttonText', e.target.value)} />
-          <Input label="Lien bouton" value={asString(props.buttonTarget)} disabled={disabled} onChange={(e) => handleField('buttonTarget', e.target.value)} />
+          <Input label="Texte bouton principal" value={asString(props.buttonText)} disabled={disabled} onChange={(e) => handleField('buttonText', e.target.value)} />
+          <Input label="Lien bouton principal" value={asString(props.buttonTarget)} disabled={disabled} onChange={(e) => handleField('buttonTarget', e.target.value)} />
+          <Input label="Texte bouton secondaire" value={asString(props.secondaryButtonText)} disabled={disabled} onChange={(e) => handleField('secondaryButtonText', e.target.value)} />
+          <Input label="Lien bouton secondaire" value={asString(props.secondaryButtonTarget)} disabled={disabled} onChange={(e) => handleField('secondaryButtonTarget', e.target.value)} />
         </>
+      ) : null}
+
+      {type === 'trust_bar' ? (
+        <p className="ui-field__hint">
+          Modifiez les indicateurs (value, label) en mode avancé JSON via la clé <code>metrics</code>.
+        </p>
       ) : null}
 
       {type === 'text' ? (
@@ -114,6 +122,13 @@ export function BlockInspector({ block, disabled, onChangeProps }: BlockInspecto
         <>
           <Input label="Titre de section" value={asString(props.heading)} disabled={disabled} onChange={(e) => handleField('heading', e.target.value)} />
           <Input label="Sous-titre" value={asString(props.subtitle)} disabled={disabled} onChange={(e) => handleField('subtitle', e.target.value)} />
+          {type === 'features' ? (
+            <>
+              <Input label="Nom du modèle" value={asString(props.modelName)} disabled={disabled} onChange={(e) => handleField('modelName', e.target.value)} />
+              <Input label="Accroche modèle" value={asString(props.modelTagline)} disabled={disabled} onChange={(e) => handleField('modelTagline', e.target.value)} />
+              <Input label="URL visuel modèle" value={asString(props.imageUrl)} disabled={disabled} onChange={(e) => handleField('imageUrl', e.target.value)} />
+            </>
+          ) : null}
           <p className="ui-field__hint">
             Les éléments de liste se modifient en mode avancé JSON (items, highlights, quotes…).
           </p>
@@ -124,6 +139,7 @@ export function BlockInspector({ block, disabled, onChangeProps }: BlockInspecto
         <>
           <Input label="Titre" value={asString(props.heading)} disabled={disabled} onChange={(e) => handleField('heading', e.target.value)} />
           <Input label="Sous-titre" value={asString(props.subtitle)} disabled={disabled} onChange={(e) => handleField('subtitle', e.target.value)} />
+          <Input label="Exemple mensualité" value={asString(props.paymentExample)} disabled={disabled} onChange={(e) => handleField('paymentExample', e.target.value)} />
           <Input label="Texte bouton" value={asString(props.ctaLabel)} disabled={disabled} onChange={(e) => handleField('ctaLabel', e.target.value)} />
           <Input label="Lien bouton" value={asString(props.ctaTarget)} disabled={disabled} onChange={(e) => handleField('ctaTarget', e.target.value)} />
         </>
@@ -157,6 +173,7 @@ export function BlockInspector({ block, disabled, onChangeProps }: BlockInspecto
           <Input label="Titre formulaire" value={asString(props.title)} disabled={disabled} onChange={(e) => handleField('title', e.target.value)} />
           <Input label="Sous-titre formulaire" value={asString(props.subtitle)} disabled={disabled} onChange={(e) => handleField('subtitle', e.target.value)} />
           <Input label="Texte bouton submit" value={asString(props.submitText)} disabled={disabled} onChange={(e) => handleField('submitText', e.target.value)} />
+          <Input label="Note confidentialité" value={asString(props.privacyNote)} disabled={disabled} onChange={(e) => handleField('privacyNote', e.target.value)} />
           <Select
             label="Type champ principal"
             value={asString(

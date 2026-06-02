@@ -52,6 +52,16 @@ type ListItem = { title: string; description: string };
 type QuoteItem = { text: string; author: string; role: string };
 type FaqItem = { question: string; answer: string };
 type LinkItem = { label: string; href: string };
+type MetricItem = { value: string; label: string };
+
+function renderBtn(
+  href: string,
+  label: string,
+  variant: 'primary' | 'secondary' | 'ghost' = 'primary',
+  size: 'lg' | 'md' = 'lg',
+): string {
+  return `<a class="lp-btn lp-btn--${variant} lp-btn--${size}" href="${escapeHtml(href)}">${escapeHtml(label)}</a>`;
+}
 
 function parseObjectList(
   props: Record<string, unknown>,
@@ -112,6 +122,15 @@ function parseLinks(props: Record<string, unknown>): LinkItem[] {
     .filter((item) => item.label);
 }
 
+function parseMetrics(props: Record<string, unknown>): MetricItem[] {
+  return parseObjectList(props, 'metrics')
+    .map((item) => ({
+      value: propString(item, 'value') ?? '',
+      label: propString(item, 'label') ?? '',
+    }))
+    .filter((item) => item.value && item.label);
+}
+
 function parseStringList(props: Record<string, unknown>, key: string): string[] {
   if (!Array.isArray(props[key])) {
     return [];
@@ -162,31 +181,50 @@ function renderLeadFormHtml(props: Record<string, unknown>): string {
   const title = propString(props, 'title');
   const subtitle = propString(props, 'subtitle');
   const submitText = propString(props, 'submitText') ?? 'Envoyer ma demande';
+  const privacyNote = propString(props, 'privacyNote', 'legalNote');
+  const reassurance = parseStringList(props, 'reassurance');
   const fields = parseLeadFormFields(props);
 
   const fieldsHtml = fields
     .map((field) => {
       const requiredAttr = field.required ? ' required' : '';
       const inputType = escapeHtml(field.type || 'text');
+      const isFullWidth =
+        field.name === 'fullName' || field.name === 'message' || fields.length <= 2;
       return `
-        <label class="lp-lead-form__field">
+        <label class="lp-lead-form__field${isFullWidth ? ' lp-lead-form__field--full' : ''}">
           <span class="lp-lead-form__label">${escapeHtml(field.label)}${field.required ? ' <span aria-hidden="true">*</span>' : ''}</span>
           <input class="lp-lead-form__input" type="${inputType}" name="${escapeHtml(field.name)}"${requiredAttr} autocomplete="on" />
         </label>`;
     })
     .join('');
 
+  const reassuranceHtml = reassurance.length
+    ? `<ul class="lp-lead-form__reassurance">${reassurance
+        .map(
+          (item) =>
+            `<li class="lp-lead-form__reassurance-item"><span class="lp-lead-form__check" aria-hidden="true"></span>${escapeHtml(item)}</li>`,
+        )
+        .join('')}</ul>`
+    : '';
+
   return `
     <section class="lp-block lp-lead-form" id="lead-form">
-      <div class="lp-section lp-section--narrow">
-        <div class="lp-lead-form__card">
-          ${title ? `<h2 class="lp-lead-form__title">${escapeHtml(title)}</h2>` : ''}
-          ${subtitle ? `<p class="lp-lead-form__subtitle">${escapeHtml(subtitle)}</p>` : ''}
-          <form class="lp-lead-form" action="#" method="post" novalidate>
-            <div class="lp-lead-form__grid">${fieldsHtml}</div>
-            <p class="lp-lead-form__feedback" role="status" aria-live="polite"></p>
-            <button type="submit" class="lp-btn lp-btn--primary lp-btn--lg">${escapeHtml(submitText)}</button>
-          </form>
+      <div class="lp-section">
+        <div class="lp-lead-form__layout">
+          <aside class="lp-lead-form__aside">
+            ${title ? `<h2 class="lp-lead-form__title">${escapeHtml(title)}</h2>` : ''}
+            ${subtitle ? `<p class="lp-lead-form__subtitle">${escapeHtml(subtitle)}</p>` : ''}
+            ${reassuranceHtml}
+          </aside>
+          <div class="lp-lead-form__card">
+            <form class="lp-lead-form__form" action="#" method="post" novalidate>
+              <div class="lp-lead-form__grid">${fieldsHtml}</div>
+              <p class="lp-lead-form__feedback" role="status" aria-live="polite"></p>
+              <button type="submit" class="lp-btn lp-btn--primary lp-btn--lg lp-lead-form__submit">${escapeHtml(submitText)}</button>
+              ${privacyNote ? `<p class="lp-lead-form__privacy">${escapeHtml(privacyNote)}</p>` : ''}
+            </form>
+          </div>
         </div>
       </div>
     </section>`;
@@ -198,8 +236,19 @@ function renderHeroHtml(props: Record<string, unknown>): string {
   const eyebrow = propString(props, 'eyebrow', 'kicker', 'badge');
   const buttonText = propString(props, 'buttonText');
   const buttonTarget = propString(props, 'buttonTarget', 'href') ?? '#lead-form';
+  const secondaryText = propString(props, 'secondaryButtonText', 'secondaryCtaText');
+  const secondaryTarget =
+    propString(props, 'secondaryButtonTarget', 'secondaryCtaTarget') ?? '#offer';
   const imageUrl = propString(props, 'imageUrl', 'src', 'url');
   const imageAlt = propString(props, 'alt', 'imageAlt') ?? 'Véhicule Auto Hall';
+
+  const actions: string[] = [];
+  if (buttonText) {
+    actions.push(renderBtn(buttonTarget, buttonText, 'primary', 'lg'));
+  }
+  if (secondaryText) {
+    actions.push(renderBtn(secondaryTarget, secondaryText, 'secondary', 'lg'));
+  }
 
   const mediaHtml = imageUrl
     ? `<div class="lp-hero__media"><img class="lp-hero__img" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(imageAlt)}" loading="eager" decoding="async" /></div>`
@@ -207,18 +256,39 @@ function renderHeroHtml(props: Record<string, unknown>): string {
 
   return `
     <section class="lp-block lp-hero">
+      <div class="lp-hero__glow" aria-hidden="true"></div>
       <div class="lp-hero__inner lp-section">
         <div class="lp-hero__content">
           ${eyebrow ? `<p class="lp-hero__eyebrow">${escapeHtml(eyebrow)}</p>` : ''}
           ${title ? `<h1 class="lp-hero__title">${escapeHtml(title)}</h1>` : ''}
           ${subtitle ? `<p class="lp-hero__subtitle">${escapeHtml(subtitle)}</p>` : ''}
-          ${
-            buttonText
-              ? `<div class="lp-hero__actions"><a class="lp-btn lp-btn--primary lp-btn--lg" href="${escapeHtml(buttonTarget)}">${escapeHtml(buttonText)}</a></div>`
-              : ''
-          }
+          ${actions.length ? `<div class="lp-hero__actions">${actions.join('')}</div>` : ''}
         </div>
         ${mediaHtml}
+      </div>
+    </section>`;
+}
+
+function renderTrustBarHtml(props: Record<string, unknown>): string {
+  const metrics = parseMetrics(props);
+  if (metrics.length === 0) {
+    return '';
+  }
+
+  const items = metrics
+    .map(
+      (metric) => `
+      <div class="lp-trust-bar__item">
+        <p class="lp-trust-bar__value">${escapeHtml(metric.value)}</p>
+        <p class="lp-trust-bar__label">${escapeHtml(metric.label)}</p>
+      </div>`,
+    )
+    .join('');
+
+  return `
+    <section class="lp-block lp-trust-bar" aria-label="Réassurance">
+      <div class="lp-section">
+        <div class="lp-trust-bar__grid">${items}</div>
       </div>
     </section>`;
 }
@@ -264,7 +334,7 @@ function renderOfferHighlightsHtml(props: Record<string, unknown>): string {
     .join('');
 
   return `
-    <section class="lp-block lp-offer-highlights">
+    <section class="lp-block lp-offer-highlights" id="offer">
       <div class="lp-section">
         <div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>
         <div class="lp-offer-highlights__grid">${cards}</div>
@@ -272,15 +342,61 @@ function renderOfferHighlightsHtml(props: Record<string, unknown>): string {
     </section>`;
 }
 
+function renderFeaturesShowcaseHtml(props: Record<string, unknown>): string {
+  const heading = propString(props, 'heading', 'title');
+  const subtitle = propString(props, 'subtitle');
+  const modelName = propString(props, 'modelName', 'model');
+  const modelTagline = propString(props, 'modelTagline', 'tagline');
+  const imageUrl = propString(props, 'imageUrl', 'src');
+  const imageAlt = propString(props, 'alt', 'imageAlt') ?? 'Véhicule';
+  const items = parseListItems(props, 'items');
+
+  const specs = items
+    .map(
+      (item) => `
+      <li class="lp-showcase__spec">
+        <strong class="lp-showcase__spec-title">${escapeHtml(item.title)}</strong>
+        <span class="lp-showcase__spec-text">${escapeHtml(item.description)}</span>
+      </li>`,
+    )
+    .join('');
+
+  const mediaHtml = imageUrl
+    ? `<div class="lp-showcase__media"><img class="lp-showcase__img" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(imageAlt)}" loading="lazy" decoding="async" /></div>`
+    : `<div class="lp-showcase__media lp-showcase__media--placeholder" aria-hidden="true"><span>Visuel modèle</span></div>`;
+
+  return `
+    <section class="lp-block lp-features lp-features--showcase" id="model">
+      <div class="lp-section">
+        <div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>
+        <div class="lp-showcase">
+          ${mediaHtml}
+          <div class="lp-showcase__copy">
+            ${modelName ? `<p class="lp-showcase__model">${escapeHtml(modelName)}</p>` : ''}
+            ${modelTagline ? `<p class="lp-showcase__tagline">${escapeHtml(modelTagline)}</p>` : ''}
+            ${specs ? `<ul class="lp-showcase__specs">${specs}</ul>` : ''}
+          </div>
+        </div>
+      </div>
+    </section>`;
+}
+
 function renderFeaturesHtml(props: Record<string, unknown>): string {
+  const layout = propString(props, 'layout');
+  const imageUrl = propString(props, 'imageUrl', 'src');
+  if (layout === 'showcase' || imageUrl) {
+    return renderFeaturesShowcaseHtml(props);
+  }
+
   const heading = propString(props, 'heading', 'title');
   const subtitle = propString(props, 'subtitle');
   const items = parseListItems(props, 'items');
 
   const cards = items
     .map(
-      (item) => `
+      (item, index) => `
       <article class="lp-feature-card">
+        <span class="lp-feature-card__index" aria-hidden="true">${String(index + 1).padStart(2, '0')}</span>
         <h3 class="lp-feature-card__title">${escapeHtml(item.title)}</h3>
         <p class="lp-feature-card__text">${escapeHtml(item.description)}</p>
       </article>`,
@@ -301,11 +417,16 @@ function renderFinancingHtml(props: Record<string, unknown>): string {
   const subtitle = propString(props, 'subtitle');
   const ctaLabel = propString(props, 'ctaLabel', 'buttonText') ?? 'Simuler mon financement';
   const ctaTarget = propString(props, 'ctaTarget', 'buttonTarget') ?? '#lead-form';
+  const paymentExample = propString(props, 'paymentExample', 'monthlyFrom');
   const bullets = parseStringList(props, 'bullets');
 
   const listHtml = bullets
     .map((bullet) => `<li class="lp-financing__bullet">${escapeHtml(bullet)}</li>`)
     .join('');
+
+  const paymentHtml = paymentExample
+    ? `<p class="lp-financing__payment"><span class="lp-financing__payment-label">À partir de</span> <strong>${escapeHtml(paymentExample)}</strong></p>`
+    : '';
 
   return `
     <section class="lp-block lp-financing">
@@ -313,10 +434,11 @@ function renderFinancingHtml(props: Record<string, unknown>): string {
         <div class="lp-financing__panel">
           <div class="lp-financing__copy">
             ${renderSectionHeading(heading, subtitle)}
+            ${paymentHtml}
             ${listHtml ? `<ul class="lp-financing__list">${listHtml}</ul>` : ''}
           </div>
           <div class="lp-financing__cta">
-            <a class="lp-btn lp-btn--primary lp-btn--lg" href="${escapeHtml(ctaTarget)}">${escapeHtml(ctaLabel)}</a>
+            ${renderBtn(ctaTarget, ctaLabel, 'primary', 'lg')}
           </div>
         </div>
       </div>
@@ -446,6 +568,10 @@ export function renderBlockHtml(block: RenderBlockInput): string {
     return renderHeroHtml(props);
   }
 
+  if (type === 'trust_bar') {
+    return renderTrustBarHtml(props);
+  }
+
   if (type === 'text') {
     const content = propString(props, 'content', 'text', 'body') ?? '';
     const heading = propString(props, 'heading', 'title');
@@ -550,8 +676,11 @@ export function renderPageShellHeader(shell: RenderPageShell): string {
   return `
   <header class="lp-site-header">
     <div class="lp-site-header__inner lp-section">
-      <p class="lp-site-header__brand">${escapeHtml(shell.brand)}</p>
-      <p class="lp-site-header__campaign">${escapeHtml(shell.campaignName)}</p>
+      <div class="lp-site-header__brand-group">
+        <p class="lp-site-header__brand">${escapeHtml(shell.brand)}</p>
+        <p class="lp-site-header__campaign">${escapeHtml(shell.campaignName)}</p>
+      </div>
+      <a class="lp-btn lp-btn--primary lp-btn--md lp-site-header__cta" href="#lead-form">Demander un essai</a>
     </div>
   </header>`;
 }
