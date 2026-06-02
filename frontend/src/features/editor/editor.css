@@ -135,8 +135,94 @@
   line-height: 1.4;
 }
 
-.editor-library__class {
-  display: none;
+.editor-library__intro {
+  margin: 0 0 var(--studio-space-3);
+  font-size: var(--studio-text-sm);
+  color: var(--studio-text-muted);
+  line-height: 1.45;
+}
+
+.editor-library__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--studio-space-2);
+}
+
+.editor-library__category {
+  margin: var(--studio-space-2) 0 0;
+  font-size: var(--studio-text-xs);
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--studio-text-muted);
+}
+
+.editor-library__group:first-child .editor-library__category {
+  margin-top: 0;
+}
+
+.editor-library__body {
+  min-width: 0;
+}
+
+.editor-canvas__type {
+  font-weight: 650;
+  color: var(--studio-text);
+}
+
+.editor-canvas__preview-hint {
+  margin: 0;
+  font-size: var(--studio-text-sm);
+  color: var(--studio-text-secondary);
+  line-height: 1.45;
+}
+
+.template-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: var(--studio-space-3);
+  margin-top: var(--studio-space-4);
+}
+
+.template-picker__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--studio-space-2);
+  padding: var(--studio-space-4);
+  border: 1px solid var(--studio-border);
+  border-radius: var(--studio-radius-lg);
+  background: var(--studio-surface-elevated);
+}
+
+.template-picker__card--selected {
+  border-color: color-mix(in srgb, var(--studio-primary) 50%, var(--studio-border));
+  box-shadow: inset 3px 0 0 var(--studio-primary);
+}
+
+.template-picker__title {
+  margin: 0;
+  font-size: var(--studio-text-base);
+  font-weight: 650;
+}
+
+.template-picker__desc,
+.template-picker__meta,
+.template-picker__count {
+  margin: 0;
+  font-size: var(--studio-text-sm);
+  color: var(--studio-text-secondary);
+  line-height: 1.45;
+}
+
+.template-picker__meta {
+  font-size: var(--studio-text-xs);
+  color: var(--studio-text-muted);
+}
+
+.template-picker__count {
+  margin-top: auto;
+  font-size: var(--studio-text-xs);
+  color: var(--studio-text-muted);
 }
 
 .editor-navigator {

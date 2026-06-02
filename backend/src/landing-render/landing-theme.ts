@@ -7,9 +7,9 @@ export type LandingTheme = {
   cssVariables: string;
 };
 
-const DEFAULT_PRIMARY = '#0c4a6e';
+const DEFAULT_PRIMARY = '#b91c1c';
 const DEFAULT_FONT =
-  "'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif";
+  "'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
 
 function readThemeObject(themeJson: Prisma.JsonValue | null): Record<string, unknown> {
   if (!themeJson || typeof themeJson !== 'object' || Array.isArray(themeJson)) {
@@ -65,12 +65,9 @@ export function resolveLandingTheme(
     theme.mode === 'dark' || theme.appearance === 'dark' ? 'dark' : 'light';
 
   const primaryHover = shadeHex(primaryColor, mode === 'dark' ? 24 : -18);
-  const primarySoft = `${primaryColor}1a`;
+  const primarySoft = `${primaryColor}1f`;
 
-  const cssVariables =
-    mode === 'dark'
-      ? `--lp-primary: ${primaryColor}; --lp-primary-hover: ${primaryHover}; --lp-primary-soft: ${primarySoft}; --lp-font: ${fontFamily}, system-ui, sans-serif;`
-      : `--lp-primary: ${primaryColor}; --lp-primary-hover: ${primaryHover}; --lp-primary-soft: ${primarySoft}; --lp-font: ${fontFamily}, system-ui, sans-serif;`;
+  const cssVariables = `--lp-primary: ${primaryColor}; --lp-primary-hover: ${primaryHover}; --lp-primary-soft: ${primarySoft}; --lp-font: ${fontFamily}, system-ui, sans-serif; --lp-display-font: ${fontFamily}, system-ui, sans-serif;`;
 
   return {
     mode,

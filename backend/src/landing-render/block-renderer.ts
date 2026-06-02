@@ -48,6 +48,82 @@ type LeadFormField = {
   required: boolean;
 };
 
+type ListItem = { title: string; description: string };
+type QuoteItem = { text: string; author: string; role: string };
+type FaqItem = { question: string; answer: string };
+type LinkItem = { label: string; href: string };
+
+function parseObjectList(
+  props: Record<string, unknown>,
+  key: string,
+): Record<string, unknown>[] {
+  if (!Array.isArray(props[key])) {
+    return [];
+  }
+  return props[key].filter(
+    (item): item is Record<string, unknown> =>
+      item !== null && typeof item === 'object' && !Array.isArray(item),
+  );
+}
+
+function parseListItems(
+  props: Record<string, unknown>,
+  ...keys: string[]
+): ListItem[] {
+  for (const key of keys) {
+    const items = parseObjectList(props, key)
+      .map((item) => ({
+        title: propString(item, 'title') ?? '',
+        description: propString(item, 'description', 'text') ?? '',
+      }))
+      .filter((item) => item.title || item.description);
+    if (items.length > 0) {
+      return items;
+    }
+  }
+  return [];
+}
+
+function parseQuotes(props: Record<string, unknown>): QuoteItem[] {
+  return parseObjectList(props, 'quotes')
+    .map((item) => ({
+      text: propString(item, 'text', 'quote') ?? '',
+      author: propString(item, 'author', 'name') ?? '',
+      role: propString(item, 'role', 'subtitle') ?? '',
+    }))
+    .filter((item) => item.text);
+}
+
+function parseFaqItems(props: Record<string, unknown>): FaqItem[] {
+  return parseObjectList(props, 'items')
+    .map((item) => ({
+      question: propString(item, 'question') ?? '',
+      answer: propString(item, 'answer') ?? '',
+    }))
+    .filter((item) => item.question && item.answer);
+}
+
+function parseLinks(props: Record<string, unknown>): LinkItem[] {
+  return parseObjectList(props, 'links')
+    .map((item) => ({
+      label: propString(item, 'label') ?? '',
+      href: propString(item, 'href', 'url') ?? '#',
+    }))
+    .filter((item) => item.label);
+}
+
+function parseStringList(props: Record<string, unknown>, key: string): string[] {
+  if (!Array.isArray(props[key])) {
+    return [];
+  }
+  return props[key]
+    .filter(
+      (value): value is string =>
+        typeof value === 'string' && value.trim().length > 0,
+    )
+    .map((value) => value.trim());
+}
+
 function parseLeadFormFields(props: Record<string, unknown>): LeadFormField[] {
   if (!Array.isArray(props.fields)) {
     return [];
@@ -74,6 +150,12 @@ function renderTextParagraphs(content: string): string {
   return parts
     .map((part) => `<p class="lp-text__p">${escapeHtml(part)}</p>`)
     .join('');
+}
+
+function renderSectionHeading(heading: string | null, subtitle: string | null): string {
+  return `
+    ${heading ? `<h2 class="lp-section-title">${escapeHtml(heading)}</h2>` : ''}
+    ${subtitle ? `<p class="lp-section-subtitle">${escapeHtml(subtitle)}</p>` : ''}`;
 }
 
 function renderLeadFormHtml(props: Record<string, unknown>): string {
@@ -110,30 +192,258 @@ function renderLeadFormHtml(props: Record<string, unknown>): string {
     </section>`;
 }
 
+function renderHeroHtml(props: Record<string, unknown>): string {
+  const title = propString(props, 'title');
+  const subtitle = propString(props, 'subtitle');
+  const eyebrow = propString(props, 'eyebrow', 'kicker', 'badge');
+  const buttonText = propString(props, 'buttonText');
+  const buttonTarget = propString(props, 'buttonTarget', 'href') ?? '#lead-form';
+  const imageUrl = propString(props, 'imageUrl', 'src', 'url');
+  const imageAlt = propString(props, 'alt', 'imageAlt') ?? 'Véhicule Auto Hall';
+
+  const mediaHtml = imageUrl
+    ? `<div class="lp-hero__media"><img class="lp-hero__img" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(imageAlt)}" loading="eager" decoding="async" /></div>`
+    : `<div class="lp-hero__media lp-hero__media--placeholder" aria-hidden="true"><span>Visuel véhicule / offre</span></div>`;
+
+  return `
+    <section class="lp-block lp-hero">
+      <div class="lp-hero__inner lp-section">
+        <div class="lp-hero__content">
+          ${eyebrow ? `<p class="lp-hero__eyebrow">${escapeHtml(eyebrow)}</p>` : ''}
+          ${title ? `<h1 class="lp-hero__title">${escapeHtml(title)}</h1>` : ''}
+          ${subtitle ? `<p class="lp-hero__subtitle">${escapeHtml(subtitle)}</p>` : ''}
+          ${
+            buttonText
+              ? `<div class="lp-hero__actions"><a class="lp-btn lp-btn--primary lp-btn--lg" href="${escapeHtml(buttonTarget)}">${escapeHtml(buttonText)}</a></div>`
+              : ''
+          }
+        </div>
+        ${mediaHtml}
+      </div>
+    </section>`;
+}
+
+function renderBenefitsHtml(props: Record<string, unknown>): string {
+  const heading = propString(props, 'heading', 'title');
+  const subtitle = propString(props, 'subtitle');
+  const items = parseListItems(props, 'items');
+
+  const cards = items
+    .map(
+      (item) => `
+      <article class="lp-card lp-benefits__card">
+        <h3 class="lp-card__title">${escapeHtml(item.title)}</h3>
+        <p class="lp-card__text">${escapeHtml(item.description)}</p>
+      </article>`,
+    )
+    .join('');
+
+  return `
+    <section class="lp-block lp-benefits">
+      <div class="lp-section">
+        <div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>
+        <div class="lp-benefits__grid">${cards}</div>
+      </div>
+    </section>`;
+}
+
+function renderOfferHighlightsHtml(props: Record<string, unknown>): string {
+  const heading = propString(props, 'heading', 'title');
+  const subtitle = propString(props, 'subtitle');
+  const items = parseListItems(props, 'highlights', 'items');
+
+  const cards = items
+    .map(
+      (item, index) => `
+      <article class="lp-offer-card">
+        <span class="lp-offer-card__index">${String(index + 1).padStart(2, '0')}</span>
+        <h3 class="lp-offer-card__title">${escapeHtml(item.title)}</h3>
+        <p class="lp-offer-card__text">${escapeHtml(item.description)}</p>
+      </article>`,
+    )
+    .join('');
+
+  return `
+    <section class="lp-block lp-offer-highlights">
+      <div class="lp-section">
+        <div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>
+        <div class="lp-offer-highlights__grid">${cards}</div>
+      </div>
+    </section>`;
+}
+
+function renderFeaturesHtml(props: Record<string, unknown>): string {
+  const heading = propString(props, 'heading', 'title');
+  const subtitle = propString(props, 'subtitle');
+  const items = parseListItems(props, 'items');
+
+  const cards = items
+    .map(
+      (item) => `
+      <article class="lp-feature-card">
+        <h3 class="lp-feature-card__title">${escapeHtml(item.title)}</h3>
+        <p class="lp-feature-card__text">${escapeHtml(item.description)}</p>
+      </article>`,
+    )
+    .join('');
+
+  return `
+    <section class="lp-block lp-features">
+      <div class="lp-section">
+        <div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>
+        <div class="lp-features__grid">${cards}</div>
+      </div>
+    </section>`;
+}
+
+function renderFinancingHtml(props: Record<string, unknown>): string {
+  const heading = propString(props, 'heading', 'title');
+  const subtitle = propString(props, 'subtitle');
+  const ctaLabel = propString(props, 'ctaLabel', 'buttonText') ?? 'Simuler mon financement';
+  const ctaTarget = propString(props, 'ctaTarget', 'buttonTarget') ?? '#lead-form';
+  const bullets = parseStringList(props, 'bullets');
+
+  const listHtml = bullets
+    .map((bullet) => `<li class="lp-financing__bullet">${escapeHtml(bullet)}</li>`)
+    .join('');
+
+  return `
+    <section class="lp-block lp-financing">
+      <div class="lp-section">
+        <div class="lp-financing__panel">
+          <div class="lp-financing__copy">
+            ${renderSectionHeading(heading, subtitle)}
+            ${listHtml ? `<ul class="lp-financing__list">${listHtml}</ul>` : ''}
+          </div>
+          <div class="lp-financing__cta">
+            <a class="lp-btn lp-btn--primary lp-btn--lg" href="${escapeHtml(ctaTarget)}">${escapeHtml(ctaLabel)}</a>
+          </div>
+        </div>
+      </div>
+    </section>`;
+}
+
+function renderAfterSalesHtml(props: Record<string, unknown>): string {
+  const heading = propString(props, 'heading', 'title');
+  const subtitle = propString(props, 'subtitle', 'description');
+  const items = parseListItems(props, 'items');
+
+  const listHtml = items
+    .map(
+      (item) => `
+      <li class="lp-after-sales__item">
+        <strong>${escapeHtml(item.title)}</strong>
+        <span>${escapeHtml(item.description)}</span>
+      </li>`,
+    )
+    .join('');
+
+  return `
+    <section class="lp-block lp-after-sales">
+      <div class="lp-section lp-section--narrow">
+        <div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>
+        ${listHtml ? `<ul class="lp-after-sales__list">${listHtml}</ul>` : ''}
+      </div>
+    </section>`;
+}
+
+function renderTestimonialsHtml(props: Record<string, unknown>): string {
+  const heading = propString(props, 'heading', 'title');
+  const subtitle = propString(props, 'subtitle');
+  const quotes = parseQuotes(props);
+
+  const cards = quotes
+    .map(
+      (quote) => `
+      <blockquote class="lp-testimonial-card">
+        <p class="lp-testimonial-card__text">“${escapeHtml(quote.text)}”</p>
+        <footer class="lp-testimonial-card__author">
+          <strong>${escapeHtml(quote.author)}</strong>
+          ${quote.role ? `<span>${escapeHtml(quote.role)}</span>` : ''}
+        </footer>
+      </blockquote>`,
+    )
+    .join('');
+
+  return `
+    <section class="lp-block lp-testimonials">
+      <div class="lp-section">
+        <div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>
+        <div class="lp-testimonials__grid">${cards}</div>
+      </div>
+    </section>`;
+}
+
+function renderFaqHtml(props: Record<string, unknown>): string {
+  const heading = propString(props, 'heading', 'title');
+  const subtitle = propString(props, 'subtitle');
+  const items = parseFaqItems(props);
+
+  const rows = items
+    .map(
+      (item) => `
+      <details class="lp-faq__item">
+        <summary class="lp-faq__question">${escapeHtml(item.question)}</summary>
+        <p class="lp-faq__answer">${escapeHtml(item.answer)}</p>
+      </details>`,
+    )
+    .join('');
+
+  return `
+    <section class="lp-block lp-faq">
+      <div class="lp-section lp-section--narrow">
+        <div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>
+        <div class="lp-faq__list">${rows}</div>
+      </div>
+    </section>`;
+}
+
+function renderFinalCtaHtml(props: Record<string, unknown>): string {
+  const title = propString(props, 'title', 'heading');
+  const subtitle = propString(props, 'subtitle', 'description');
+  const buttonText = propString(props, 'buttonText', 'label') ?? 'Je passe à l’action';
+  const buttonTarget = propString(props, 'buttonTarget', 'target') ?? '#lead-form';
+
+  return `
+    <section class="lp-block lp-final-cta">
+      <div class="lp-section">
+        <div class="lp-final-cta__panel">
+          ${title ? `<h2 class="lp-final-cta__title">${escapeHtml(title)}</h2>` : ''}
+          ${subtitle ? `<p class="lp-final-cta__subtitle">${escapeHtml(subtitle)}</p>` : ''}
+          <a class="lp-btn lp-btn--primary lp-btn--lg" href="${escapeHtml(buttonTarget)}">${escapeHtml(buttonText)}</a>
+        </div>
+      </div>
+    </section>`;
+}
+
+function renderFooterLegalHtml(props: Record<string, unknown>): string {
+  const legalText =
+    propString(props, 'legalText', 'text') ??
+    'Mentions légales — Auto Hall. Offre soumise à conditions.';
+  const links = parseLinks(props);
+
+  const linksHtml = links
+    .map(
+      (link) =>
+        `<a class="lp-footer-legal__link" href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a>`,
+    )
+    .join('');
+
+  return `
+    <section class="lp-block lp-footer-legal">
+      <div class="lp-section">
+        <p class="lp-footer-legal__text">${escapeHtml(legalText)}</p>
+        ${linksHtml ? `<div class="lp-footer-legal__links">${linksHtml}</div>` : ''}
+      </div>
+    </section>`;
+}
+
 export function renderBlockHtml(block: RenderBlockInput): string {
   const props = propsAsRecord(block.propsJson);
   const type = block.blockType.toLowerCase();
 
   if (type === 'hero') {
-    const title = propString(props, 'title');
-    const subtitle = propString(props, 'subtitle');
-    const eyebrow = propString(props, 'eyebrow', 'kicker', 'badge');
-    const buttonText = propString(props, 'buttonText');
-    const buttonTarget = propString(props, 'buttonTarget', 'href') ?? '#lead-form';
-
-    return `
-    <section class="lp-block lp-hero">
-      <div class="lp-hero__inner lp-section">
-        ${eyebrow ? `<p class="lp-hero__eyebrow">${escapeHtml(eyebrow)}</p>` : ''}
-        ${title ? `<h1 class="lp-hero__title">${escapeHtml(title)}</h1>` : ''}
-        ${subtitle ? `<p class="lp-hero__subtitle">${escapeHtml(subtitle)}</p>` : ''}
-        ${
-          buttonText
-            ? `<div class="lp-hero__actions"><a class="lp-btn lp-btn--primary lp-btn--lg" href="${escapeHtml(buttonTarget)}">${escapeHtml(buttonText)}</a></div>`
-            : ''
-        }
-      </div>
-    </section>`;
+    return renderHeroHtml(props);
   }
 
   if (type === 'text') {
@@ -190,6 +500,42 @@ export function renderBlockHtml(block: RenderBlockInput): string {
 
   if (type === 'lead_form') {
     return renderLeadFormHtml(props);
+  }
+
+  if (type === 'benefits') {
+    return renderBenefitsHtml(props);
+  }
+
+  if (type === 'offer_highlights') {
+    return renderOfferHighlightsHtml(props);
+  }
+
+  if (type === 'features') {
+    return renderFeaturesHtml(props);
+  }
+
+  if (type === 'financing') {
+    return renderFinancingHtml(props);
+  }
+
+  if (type === 'after_sales') {
+    return renderAfterSalesHtml(props);
+  }
+
+  if (type === 'testimonials') {
+    return renderTestimonialsHtml(props);
+  }
+
+  if (type === 'faq') {
+    return renderFaqHtml(props);
+  }
+
+  if (type === 'final_cta') {
+    return renderFinalCtaHtml(props);
+  }
+
+  if (type === 'footer_legal') {
+    return renderFooterLegalHtml(props);
   }
 
   return `
