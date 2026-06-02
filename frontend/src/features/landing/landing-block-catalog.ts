@@ -2,6 +2,7 @@ import { DEFAULT_LEAD_FORM_PROPS } from '../../lib/lead-form-block';
 
 export const EDITOR_BLOCK_TYPES = [
   'hero',
+  'trust_bar',
   'text',
   'image',
   'button',
@@ -79,6 +80,14 @@ export const EDITOR_BLOCK_LIBRARY: EditorBlockDefinition[] = [
     description: 'Titre, visuel véhicule et appel à l’action.',
     icon: 'H',
     landingClassName: 'lp-hero',
+  },
+  {
+    type: 'trust_bar',
+    category: 'trust',
+    label: 'Bandeau de réassurance',
+    description: 'Chiffres clés et preuves de confiance.',
+    icon: '+',
+    landingClassName: 'lp-trust-bar',
   },
   {
     type: 'lead_form',
@@ -197,8 +206,18 @@ export const DEFAULT_EDITOR_BLOCK_PROPS: Record<
       'Essai, financement et accompagnement personnalisé par nos conseillers.',
     buttonText: 'Réserver un essai',
     buttonTarget: '#lead-form',
+    secondaryButtonText: 'Découvrir l’offre',
+    secondaryButtonTarget: '#offer',
     imageUrl: VEHICLE_IMAGE,
     alt: 'Véhicule Auto Hall',
+  },
+  trust_bar: {
+    metrics: [
+      { value: '4.8/5', label: 'Satisfaction clients' },
+      { value: '48h', label: 'Réponse conseiller' },
+      { value: '15+', label: 'Années d’expertise' },
+      { value: '100%', label: 'Véhicules contrôlés' },
+    ],
   },
   text: {
     heading: 'Une expérience premium en concession',
@@ -235,6 +254,10 @@ export const DEFAULT_EDITOR_BLOCK_PROPS: Record<
     ],
   },
   features: {
+    layout: 'showcase',
+    modelName: 'Modèle phare',
+    modelTagline: 'Design, technologie et efficience pour votre quotidien.',
+    imageUrl: VEHICLE_IMAGE,
     heading: 'Équipements & services inclus',
     subtitle: 'Tout ce qui fait la différence au quotidien.',
     items: [
@@ -246,6 +269,7 @@ export const DEFAULT_EDITOR_BLOCK_PROPS: Record<
   financing: {
     heading: 'Financez votre véhicule sereinement',
     subtitle: 'Simulation personnalisée avec nos partenaires.',
+    paymentExample: '299 € / mois',
     bullets: [
       'Apport à partir de 0 €',
       'Durée flexible jusqu’à 84 mois',
