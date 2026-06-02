@@ -102,6 +102,10 @@ export default function LandingPageVersionsPage() {
   }
 
   const canWrite = role ? canManagePageVersions(role) : false;
+  const latestVersion =
+    versions.length > 0
+      ? [...versions].sort((a, b) => b.versionNumber - a.versionNumber)[0]
+      : null;
 
   async function handleExport(version: PageVersionListItem) {
     setExportingId(version.id);
@@ -178,6 +182,74 @@ export default function LandingPageVersionsPage() {
       {loading ? <p className="ui-page-header__subtitle">Chargement…</p> : null}
       {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
 
+      <Card title="Centre de contrôle">
+        {latestVersion ? (
+          <div className="versions-control">
+            <p className="versions-control__meta">
+              Dernière version : <strong>v{latestVersion.versionNumber}</strong>
+              {latestVersion.label ? ` — ${latestVersion.label}` : ''}
+            </p>
+            <div className="version-actions">
+              <StatusBadge status={latestVersion.status} />
+              <Link
+                to={`/page-versions/${latestVersion.id}/blocks`}
+                state={{
+                  versionNumber: latestVersion.versionNumber,
+                  versionLabel: latestVersion.label,
+                  versionStatus: latestVersion.status,
+                  landingPageId,
+                  landingPageTitle,
+                  campaignId,
+                  campaignName,
+                }}
+                className="ui-btn ui-btn--primary ui-btn--sm"
+              >
+                Éditer
+              </Link>
+              <Link
+                to={`/page-versions/${latestVersion.id}/preview`}
+                state={{
+                  versionNumber: latestVersion.versionNumber,
+                  versionLabel: latestVersion.label,
+                  landingPageId,
+                  landingPageTitle,
+                  campaignId,
+                  campaignName,
+                }}
+                className="ui-btn ui-btn--secondary ui-btn--sm"
+              >
+                Preview
+              </Link>
+              {canWrite && latestVersion.status === 'DRAFT' ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  disabled={publishingId === latestVersion.id}
+                  onClick={() => void handlePublish(latestVersion.id)}
+                >
+                  {publishingId === latestVersion.id ? 'Publication…' : 'Publier'}
+                </Button>
+              ) : null}
+              {canWrite && latestVersion.status === 'PUBLISHED' ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  disabled={exportingId === latestVersion.id}
+                  onClick={() => void handleExport(latestVersion)}
+                >
+                  {exportingId === latestVersion.id ? 'Export…' : 'Exporter ZIP'}
+                </Button>
+              ) : null}
+            </div>
+          </div>
+        ) : (
+          <p className="ui-page-header__subtitle">
+            Créez une première version pour ouvrir l’éditeur visuel et démarrer la production.
+          </p>
+        )}
+      </Card>
+
       {canWrite ? (
         <Card title="Nouvelle version">
           <form className="ui-form-stack" onSubmit={handleCreate}>
@@ -197,7 +269,10 @@ export default function LandingPageVersionsPage() {
 
       <Card title={`Versions (${versions.length})`}>
         {versions.length === 0 && !loading ? (
-          <EmptyState title="Aucune version pour cette landing page." />
+          <EmptyState
+            title="Aucune version pour cette landing page"
+            description="Créez une version pour commencer l’édition, lancer la preview puis publier."
+          />
         ) : (
           <ul className="campaigns-list">
             {versions.map((version) => (

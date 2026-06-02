@@ -55,6 +55,34 @@
   gap: var(--studio-space-6);
 }
 
+.studio-workflow {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--studio-space-2);
+}
+
+.studio-workflow__item {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0.2rem 0.65rem;
+  border: 1px solid var(--studio-border);
+  border-radius: 999px;
+  font-size: var(--studio-text-sm);
+  color: var(--studio-text-muted);
+  background: var(--studio-surface-elevated);
+}
+
+.studio-workflow__item--active {
+  color: var(--studio-primary);
+  border-color: color-mix(in srgb, var(--studio-primary) 40%, var(--studio-border));
+  background: var(--studio-primary-soft);
+  font-weight: 600;
+}
+
 .dashboard-session__list {
   margin: 0;
   padding: 0;
@@ -170,6 +198,10 @@
   padding-top: var(--studio-space-2);
 }
 
+.dashboard-quick-actions--stack {
+  padding-top: 0;
+}
+
 .dashboard-quick-actions .ui-btn {
   min-width: 10rem;
 }
@@ -226,6 +258,7 @@
 .campaigns-list__meta {
   font-size: 0.875rem;
   color: var(--studio-text-muted);
+  line-height: 1.5;
 }
 
 .campaigns-list__actions {
@@ -495,6 +528,18 @@
   gap: var(--studio-space-2);
 }
 
+.versions-control {
+  display: flex;
+  flex-direction: column;
+  gap: var(--studio-space-3);
+}
+
+.versions-control__meta {
+  margin: 0;
+  font-size: var(--studio-text-sm);
+  color: var(--studio-text-secondary);
+}
+
 .lead-detail-page .dashboard-session__list {
   list-style: none;
   padding: 0;
@@ -533,6 +578,13 @@
 .lead-detail-meta__value {
   font-size: var(--studio-text-sm);
   color: var(--studio-text);
+}
+
+@media (max-width: 700px) {
+  .studio-workflow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .leads-table__overdue {

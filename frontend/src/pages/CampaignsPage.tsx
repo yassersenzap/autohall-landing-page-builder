@@ -86,6 +86,14 @@ export default function CampaignsPage() {
 
   const canWrite = role ? canManageCampaigns(role) : false;
 
+  function getOptionalCount(
+    source: CampaignListItem,
+    key: 'landingPagesCount' | 'versionsCount',
+  ): number | null {
+    const value = (source as Record<string, unknown>)[key];
+    return typeof value === 'number' ? value : null;
+  }
+
   return (
     <div className="studio-stack">
       <PageHeader
@@ -97,6 +105,15 @@ export default function CampaignsPage() {
 
       {loading ? <p className="ui-page-header__subtitle">Chargement…</p> : null}
       {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
+
+      <Card title="Workflow recommandé">
+        <ol className="studio-workflow">
+          <li className="studio-workflow__item studio-workflow__item--active">1. Créer ou choisir une campagne</li>
+          <li className="studio-workflow__item">2. Ajouter une landing page</li>
+          <li className="studio-workflow__item">3. Créer une version et éditer le contenu</li>
+          <li className="studio-workflow__item">4. Prévisualiser, publier et exporter ZIP</li>
+        </ol>
+      </Card>
 
       {canWrite ? (
         <Card title="Nouvelle campagne">
@@ -140,8 +157,8 @@ export default function CampaignsPage() {
       <Card title={`Campagnes (${campaigns.length})`}>
         {campaigns.length === 0 && !loading ? (
           <EmptyState
-            title="Aucune campagne"
-            description="Créez une première campagne pour démarrer."
+            title="Aucune campagne disponible"
+            description="Une campagne regroupe vos landing pages et leurs versions. Créez votre première campagne pour démarrer le flow studio."
           />
         ) : (
           <ul className="campaigns-list">
@@ -156,13 +173,24 @@ export default function CampaignsPage() {
                   {campaign.model ? ` — ${campaign.model}` : ''} · Type :{' '}
                   {campaign.campaignType}
                 </div>
+                <div className="campaigns-list__meta">
+                  Landing pages : {getOptionalCount(campaign, 'landingPagesCount') ?? '—'} · Versions :{' '}
+                  {getOptionalCount(campaign, 'versionsCount') ?? '—'}
+                </div>
                 <div className="campaigns-list__actions">
+                  <Link
+                    to={`/campaigns/${campaign.id}/landing-pages`}
+                    state={{ campaignName: campaign.name }}
+                    className="ui-btn ui-btn--primary ui-btn--sm"
+                  >
+                    Ouvrir
+                  </Link>
                   <Link
                     to={`/campaigns/${campaign.id}/landing-pages`}
                     state={{ campaignName: campaign.name }}
                     className="ui-btn ui-btn--secondary ui-btn--sm"
                   >
-                    Landing pages
+                    Nouvelle landing page
                   </Link>
                 </div>
               </li>

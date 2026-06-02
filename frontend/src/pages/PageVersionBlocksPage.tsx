@@ -1,6 +1,7 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
 import { BlockLibrary } from '../features/editor/components/BlockLibrary';
 import { BlockNavigator } from '../features/editor/components/BlockNavigator';
 import { EditorCanvas } from '../features/editor/components/EditorCanvas';
@@ -17,6 +18,8 @@ import {
 import { downloadPageVersionExport } from '../lib/page-export';
 import { publishPageVersion } from '../lib/page-versions';
 import '../features/editor/editor.css';
+
+const LAST_DRAFT_STORAGE_KEY = 'autohall-studio-last-draft';
 
 type LocationState = {
   versionNumber?: number;
@@ -86,6 +89,20 @@ export default function PageVersionBlocksPage() {
       ? `v${state.versionNumber}${state.versionLabel ? ` — ${state.versionLabel}` : ''}`
       : `Version ${pageVersionId}`;
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        LAST_DRAFT_STORAGE_KEY,
+        JSON.stringify({
+          pageVersionId,
+          label: versionTitle,
+        }),
+      );
+    } catch {
+      // Ignore storage errors
+    }
+  }, [pageVersionId, versionTitle]);
+
   async function handleAddBlock(blockType: EditorBlockType) {
     await createBlock({
       blockType,
@@ -118,6 +135,15 @@ export default function PageVersionBlocksPage() {
 
   return (
     <div className="studio-stack">
+      <Card title="Étape en cours">
+        <ol className="studio-workflow">
+          <li className="studio-workflow__item">Campagnes</li>
+          <li className="studio-workflow__item">Landing pages & versions</li>
+          <li className="studio-workflow__item studio-workflow__item--active">Visual editor</li>
+          <li className="studio-workflow__item">Preview</li>
+          <li className="studio-workflow__item">Publish & Export ZIP</li>
+        </ol>
+      </Card>
       <EditorShell
         toolbar={
           <EditorToolbar
@@ -203,13 +229,29 @@ export default function PageVersionBlocksPage() {
           Ouvrir la preview
         </Link>
       </p>
-      {versionStatus !== 'PUBLISHED' ? (
-        <div>
+      <div className="editor-actions-panel">
+        <Link
+          to={`/page-versions/${pageVersionId}/preview`}
+          className="ui-btn ui-btn--secondary ui-btn--sm"
+        >
+          Ouvrir la preview
+        </Link>
+        {versionStatus !== 'PUBLISHED' ? (
           <Button size="sm" onClick={() => void handlePublish()} disabled={publishing || !status.canWrite}>
             {publishing ? 'Publication…' : 'Publier cette version'}
           </Button>
-        </div>
-      ) : null}
+        ) : null}
+        {versionStatus === 'PUBLISHED' ? (
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => void handleExport()}
+            disabled={exporting || !status.canWrite}
+          >
+            {exporting ? 'Export…' : 'Exporter ZIP'}
+          </Button>
+        ) : null}
+      </div>
     </div>
   );
 }

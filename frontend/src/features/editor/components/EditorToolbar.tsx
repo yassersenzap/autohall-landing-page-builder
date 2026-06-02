@@ -44,6 +44,14 @@ export function EditorToolbar({
 }: EditorToolbarProps) {
   return (
     <div className="editor-toolbar">
+      <div className="editor-toolbar__helper" role="note" aria-label="Guide rapide">
+        <p className="editor-toolbar__helper-title">Guide rapide</p>
+        <div className="editor-toolbar__helper-steps">
+          <span>1. Ajouter un bloc</span>
+          <span>2. Modifier le contenu</span>
+          <span>3. Prévisualiser puis publier</span>
+        </div>
+      </div>
       <PageHeader
         title={title}
         subtitle={subtitle}
@@ -57,8 +65,8 @@ export function EditorToolbar({
             <Button variant="ghost" size="sm" onClick={onRefresh}>
               Recharger
             </Button>
-            <Link to={previewTo} state={previewState}>
-              <span className="ui-btn ui-btn--secondary ui-btn--sm">Preview</span>
+            <Link to={previewTo} state={previewState} className="ui-btn ui-btn--secondary ui-btn--sm">
+              Preview
             </Link>
             {canWrite ? (
               <Button size="sm" disabled={publishing} onClick={onPublish}>
