@@ -2,17 +2,20 @@ import { useStudioTheme } from '../../context/StudioThemeContext';
 
 export function ThemeToggle() {
   const { mode, toggleMode } = useStudioTheme();
+  const isLight = mode === 'light';
 
   return (
     <button
       type="button"
       className="studio-theme-toggle"
       onClick={toggleMode}
-      aria-label={mode === 'light' ? 'Activer le mode sombre' : 'Activer le mode clair'}
-      title={mode === 'light' ? 'Mode sombre' : 'Mode clair'}
+      aria-label={isLight ? 'Activer le mode sombre' : 'Activer le mode clair'}
+      title={isLight ? 'Mode sombre' : 'Mode clair'}
     >
-      <span aria-hidden="true">{mode === 'light' ? '◐' : '◑'}</span>
-      <span>{mode === 'light' ? 'Sombre' : 'Clair'}</span>
+      <span className="studio-theme-toggle__icon" aria-hidden="true">
+        {isLight ? '☾' : '☀'}
+      </span>
+      <span>{isLight ? 'Sombre' : 'Clair'}</span>
     </button>
   );
 }

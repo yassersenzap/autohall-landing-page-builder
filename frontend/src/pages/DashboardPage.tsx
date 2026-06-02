@@ -68,15 +68,18 @@ export default function DashboardPage() {
 
       {user ? (
         <Card title="Session active">
-          <ul className="dashboard__meta">
-            <li>
-              <strong>Nom :</strong> {user.fullName}
+          <ul className="dashboard-session__list">
+            <li className="dashboard-session__item">
+              <strong>Nom</strong>
+              <span>{user.fullName}</span>
             </li>
-            <li>
-              <strong>Email :</strong> {user.email}
+            <li className="dashboard-session__item">
+              <strong>Email</strong>
+              <span>{user.email}</span>
             </li>
-            <li>
-              <strong>Rôle :</strong> {user.role}
+            <li className="dashboard-session__item">
+              <strong>Rôle</strong>
+              <span>{user.role}</span>
             </li>
           </ul>
         </Card>
@@ -89,13 +92,14 @@ export default function DashboardPage() {
         </>
       ) : null}
 
-      <nav className="dashboard__nav" aria-label="Raccourcis">
-        <Link to="/campaigns">Gérer les campagnes</Link>
+      <nav className="dashboard-quick-actions" aria-label="Raccourcis">
+        <Link to="/campaigns" className="ui-btn ui-btn--secondary ui-btn--md">
+          Gérer les campagnes
+        </Link>
         {user && canViewLeads(user.role) ? (
-          <>
-            {' · '}
-            <Link to="/leads">Consulter les leads</Link>
-          </>
+          <Link to="/leads" className="ui-btn ui-btn--secondary ui-btn--md">
+            Consulter les leads
+          </Link>
         ) : null}
       </nav>
     </div>

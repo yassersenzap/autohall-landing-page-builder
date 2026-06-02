@@ -9,6 +9,8 @@
 
 Le switch clair/sombre du studio **ne modifie pas** le rendu landing : celui-ci suit `themeJson` de la version (API `render.themeMode`).
 
+Le thème sombre du studio suit une palette **graphite neutre** (#050505–#141414, bordures #262626) : mêmes grilles/paddings qu’en clair, seules les couleurs changent. Typographie : **Inter Variable** via `@fontsource-variable/inter` (pas de CDN). Accent Auto Hall : rouge sobre, sans dominante bleue navy.
+
 ## Structure frontend
 
 ```
