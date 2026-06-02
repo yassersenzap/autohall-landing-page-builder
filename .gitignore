@@ -36,9 +36,6 @@ coverage/
 .nyc_output/
 
 # Prisma
-# — Versionner : prisma/schema.prisma, prisma/migrations/
-# — Client généré (prisma-client-js) : node_modules/@prisma/client (après prisma generate)
-# — Ignorer les sorties custom / legacy (ancien provider prisma-client)
 *.db
 *.db-journal
 **/generated/prisma/
@@ -73,3 +70,5 @@ temp/
 *.tmp
 *.temp
 .cache/
+.playwright-cli/
+docs-private/

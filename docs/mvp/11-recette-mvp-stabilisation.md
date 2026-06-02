@@ -2,7 +2,8 @@
 
 **Version :** alignée sur le code au 2026-05  
 **Statut :** document opérationnel pour démo et validation manuelle  
-**Hors périmètre de cette recette :** drag-and-drop, canvas visuel, médias avancés, intégration Auto Hall réelle (`simulated_*`)
+**Hors périmètre de cette recette :** médias avancés, intégration Auto Hall réelle (`simulated_*`)  
+**Note de référence :** pour la recette orientée éditeur visuel V1 (canvas, drag-and-drop, inspector), se référer à `docs/mvp/14-visual-editor-v1.md`.
 
 ---
 
@@ -27,7 +28,7 @@
 | **Seed de démo** | Version 1 en `DRAFT`, bloc `hero` uniquement — **pas** de `lead_form` ni de version publiée par défaut. Publier + ajouter `lead_form` manuellement pour tester l’export formulaire. |
 | **Tables schéma non branchées** | `export_jobs`, `audit_logs`, `landing_page_assets`, `simulated_testdrive`, `simulated_contacts` — présentes en base, sans API métier. |
 | **Formulaires relationnels** | `forms` / `form_fields` seedés mais **sans UI/API** dédiée ; le formulaire exporté vient du bloc `lead_form` (`propsJson`). |
-| **Éditeur de blocs** | Saisie **JSON** manuelle, pas d’éditeur visuel. |
+| **Éditeur de blocs** | Ce document décrit l’ancien flux MVP. Le flux éditeur visuel V1 est documenté dans `docs/mvp/14-visual-editor-v1.md`. |
 | **JWT** | Stateless — logout ne révoque pas le token côté serveur. |
 | **CORS** | En développement, origines non listées peuvent être acceptées si `NODE_ENV !== production`. |
 | **KPI dashboard** | « Aujourd’hui » / « semaine » = fuseau **serveur** ; semaine = lundi → aujourd’hui (locale serveur). |
