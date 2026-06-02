@@ -218,6 +218,15 @@ export default function LeadsPage() {
 
       {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
 
+      <Card title="Workflow suivi commercial">
+        <ol className="studio-workflow">
+          <li className="studio-workflow__item">Landing publiée</li>
+          <li className="studio-workflow__item">Leads collectés</li>
+          <li className="studio-workflow__item studio-workflow__item--active">Qualification et relances</li>
+          <li className="studio-workflow__item">Pilotage des performances</li>
+        </ol>
+      </Card>
+
       <Card title="Filtres" padding="none">
         <LeadsFilters
         values={filters}

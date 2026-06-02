@@ -131,6 +131,15 @@ export default function CampaignLandingPagesPage() {
       {loading ? <p className="ui-page-header__subtitle">Chargement…</p> : null}
       {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
 
+      <Card title="Étape en cours">
+        <ol className="studio-workflow">
+          <li className="studio-workflow__item">Campagnes</li>
+          <li className="studio-workflow__item studio-workflow__item--active">Landing pages</li>
+          <li className="studio-workflow__item">Versions</li>
+          <li className="studio-workflow__item">Editor / Preview / Publish / Export</li>
+        </ol>
+      </Card>
+
       {canWrite ? (
         <Card title="Nouvelle landing page">
           <form className="ui-form-stack" onSubmit={handleCreate}>
@@ -162,7 +171,10 @@ export default function CampaignLandingPagesPage() {
 
       <Card title={`Landing pages (${landingPages.length})`}>
         {landingPages.length === 0 && !loading ? (
-          <EmptyState title="Aucune landing page pour cette campagne." />
+          <EmptyState
+            title="Aucune landing page pour cette campagne"
+            description="Créez une landing page puis une version pour passer à l’éditeur visuel."
+          />
         ) : (
           <ul className="campaigns-list">
             {landingPages.map((page) => (
