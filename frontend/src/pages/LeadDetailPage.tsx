@@ -3,6 +3,10 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import LeadActivityHistory from '../components/leads/LeadActivityHistory';
 import LeadFollowUpForm from '../components/leads/LeadFollowUpForm';
 import LeadStatusForm from '../components/leads/LeadStatusForm';
+import { Card } from '../components/ui/Card';
+import { PageHeader } from '../components/ui/PageHeader';
+import { PriorityBadge } from '../components/ui/PriorityBadge';
+import { StatusBadge } from '../components/ui/StatusBadge';
 import { ApiError, logoutClient, meRequest } from '../lib/api';
 import {
   canViewLeads,
@@ -10,7 +14,6 @@ import {
   getAssignableUsers,
   getLeadEvent,
   getLeadEventHistory,
-  PRIORITY_LABELS,
   updateLeadFollowUp,
   updateLeadEventStatus,
   type AssignableUser,
@@ -179,154 +182,143 @@ export default function LeadDetailPage() {
 
   if (!id) {
     return (
-      <main className="dashboard">
-        <p className="dashboard__error">Identifiant de lead manquant.</p>
-        <Link to="/leads">Retour à la liste</Link>
-      </main>
+      <div className="studio-stack">
+        <p className="ui-alert ui-alert--error">Identifiant de lead manquant.</p>
+        <Link to="/leads" className="ui-link">
+          Retour à la liste
+        </Link>
+      </div>
     );
   }
 
   if (loading) {
-    return (
-      <main className="dashboard">
-        <p>Chargement du lead…</p>
-      </main>
-    );
+    return <p className="ui-page-header__subtitle">Chargement du lead…</p>;
   }
 
   if (role && !canViewLeads(role)) {
     return (
-      <main className="dashboard">
-        <p className="dashboard__error">
+      <div className="studio-stack">
+        <p className="ui-alert ui-alert--error">
           Accès refusé : votre rôle ne permet pas de gérer les leads.
         </p>
-        <Link to="/dashboard">Retour au tableau de bord</Link>
-      </main>
+        <Link to="/dashboard" className="ui-link">
+          Retour au tableau de bord
+        </Link>
+      </div>
     );
   }
 
   if (!lead) {
     return (
-      <main className="dashboard">
-        <header className="dashboard__header">
-          <h1>Détail du lead</h1>
-          <Link to="/leads" className="dashboard__link">
-            Retour à la liste
-          </Link>
-        </header>
-        {error ? <p className="dashboard__error">{error}</p> : null}
-        {!error ? <p>Lead introuvable.</p> : null}
-      </main>
+      <div className="studio-stack">
+        <PageHeader title="Détail du lead" backTo="/leads" backLabel="Retour à la liste" />
+        {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
+        {!error ? <p className="ui-page-header__subtitle">Lead introuvable.</p> : null}
+      </div>
     );
   }
 
   return (
-    <main className="dashboard lead-detail-page">
-      <header className="dashboard__header">
-        <div>
-          <h1>{lead.fullName}</h1>
-          <p className="dashboard__subtitle">
-            Lead reçu le {formatDate(lead.createdAt)}
-          </p>
-        </div>
-        <Link to="/leads" className="dashboard__link">
-          Retour à la liste
-        </Link>
-      </header>
+    <div className="studio-stack lead-detail-page">
+      <PageHeader
+        title={lead.fullName}
+        subtitle={`Lead reçu le ${formatDate(lead.createdAt)}`}
+        backTo="/leads"
+        backLabel="Retour à la liste"
+        actions={
+          <>
+            <StatusBadge status={lead.status} />
+            <PriorityBadge priority={lead.priority} />
+          </>
+        }
+      />
 
-      {error ? <p className="dashboard__error">{error}</p> : null}
-      {success ? <p className="lead-detail__success">{success}</p> : null}
+      {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
+      {success ? <p className="ui-alert ui-alert--success">{success}</p> : null}
       {followUpSuccess ? (
-        <p className="lead-detail__success">{followUpSuccess}</p>
+        <p className="ui-alert ui-alert--success">{followUpSuccess}</p>
       ) : null}
 
-      <section className="dashboard__card">
-        <h2>Informations</h2>
-        <ul className="dashboard__meta lead-detail__meta">
-          <li>
-            <strong>Téléphone :</strong> {lead.phone}
-          </li>
-          <li>
-            <strong>Email :</strong> {lead.email ?? '—'}
-          </li>
-          <li>
-            <strong>Marque :</strong> {lead.brand ?? '—'}
-          </li>
-          <li>
-            <strong>Modèle :</strong> {lead.model ?? '—'}
-          </li>
-          <li>
-            <strong>Campagne :</strong> {lead.campaignName}
-          </li>
-          <li>
-            <strong>Landing page :</strong> {lead.landingPageTitle} (
-            /{lead.landingPageSlug})
-          </li>
-          <li>
-            <strong>Source URL :</strong>{' '}
-            <a href={lead.sourceUrl} target="_blank" rel="noreferrer">
-              {lead.sourceUrl}
-            </a>
-          </li>
-          <li>
-            <strong>Priorité :</strong>{' '}
-            <span
-              className={`campaigns-list__status priority-${lead.priority.toLowerCase()}`}
-            >
-              {PRIORITY_LABELS[lead.priority] ?? lead.priority}
-            </span>
-          </li>
-          <li>
-            <strong>Assigné à :</strong>{' '}
-            {lead.assignedTo?.fullName ?? 'Non assigné'}
-          </li>
-          <li>
-            <strong>Prochaine relance :</strong>{' '}
-            <span
-              className={
-                lead.isFollowUpOverdue ? 'leads-table__overdue' : undefined
-              }
+      <Card title="Informations">
+        <dl className="lead-detail-meta">
+          <div className="lead-detail-meta__item">
+            <dt className="lead-detail-meta__label">Téléphone</dt>
+            <dd className="lead-detail-meta__value">{lead.phone}</dd>
+          </div>
+          <div className="lead-detail-meta__item">
+            <dt className="lead-detail-meta__label">Email</dt>
+            <dd className="lead-detail-meta__value">{lead.email ?? '—'}</dd>
+          </div>
+          <div className="lead-detail-meta__item">
+            <dt className="lead-detail-meta__label">Campagne</dt>
+            <dd className="lead-detail-meta__value">{lead.campaignName}</dd>
+          </div>
+          <div className="lead-detail-meta__item">
+            <dt className="lead-detail-meta__label">Landing page</dt>
+            <dd className="lead-detail-meta__value">
+              {lead.landingPageTitle} (/{lead.landingPageSlug})
+            </dd>
+          </div>
+          <div className="lead-detail-meta__item">
+            <dt className="lead-detail-meta__label">Marque / modèle</dt>
+            <dd className="lead-detail-meta__value">
+              {[lead.brand, lead.model].filter(Boolean).join(' · ') || '—'}
+            </dd>
+          </div>
+          <div className="lead-detail-meta__item">
+            <dt className="lead-detail-meta__label">Assigné à</dt>
+            <dd className="lead-detail-meta__value">
+              {lead.assignedTo?.fullName ?? 'Non assigné'}
+            </dd>
+          </div>
+          <div className="lead-detail-meta__item">
+            <dt className="lead-detail-meta__label">Prochaine relance</dt>
+            <dd
+              className={[
+                'lead-detail-meta__value',
+                lead.isFollowUpOverdue ? 'leads-table__overdue' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
             >
               {formatLeadDate(lead.nextFollowUpAt)}
-              {lead.isFollowUpOverdue ? ' (en retard)' : ''}
-            </span>
-          </li>
-          <li>
-            <strong>Statut :</strong>{' '}
-            <span
-              className={`campaigns-list__status status-${lead.status.toLowerCase()}`}
-            >
-              {lead.status}
-            </span>
-          </li>
-          <li>
-            <strong>Type de demande :</strong> {lead.requestType}
-          </li>
-          <li>
-            <strong>Dernière mise à jour :</strong>{' '}
-            {formatDate(lead.updatedAt)}
-          </li>
-        </ul>
-      </section>
+              {lead.isFollowUpOverdue ? ' · En retard' : ''}
+            </dd>
+          </div>
+          <div className="lead-detail-meta__item">
+            <dt className="lead-detail-meta__label">Type de demande</dt>
+            <dd className="lead-detail-meta__value">{lead.requestType}</dd>
+          </div>
+          <div className="lead-detail-meta__item">
+            <dt className="lead-detail-meta__label">Source</dt>
+            <dd className="lead-detail-meta__value">
+              <a href={lead.sourceUrl} target="_blank" rel="noreferrer" className="ui-link">
+                {lead.sourceUrl}
+              </a>
+            </dd>
+          </div>
+          <div className="lead-detail-meta__item">
+            <dt className="lead-detail-meta__label">Dernière mise à jour</dt>
+            <dd className="lead-detail-meta__value">{formatDate(lead.updatedAt)}</dd>
+          </div>
+        </dl>
+      </Card>
 
-      <section className="dashboard__card">
-        <h2>Message client</h2>
+      <Card title="Message client">
         <p className="lead-detail__text">
           {lead.message?.trim() ? lead.message : 'Aucun message laissé.'}
         </p>
-      </section>
+      </Card>
 
-      <section className="dashboard__card">
-        <h2>Commentaire interne</h2>
+      <Card title="Commentaire interne">
         <p className="lead-detail__text">
           {lead.internalComment?.trim()
             ? lead.internalComment
             : 'Aucun commentaire interne.'}
         </p>
-      </section>
+      </Card>
 
-      <section className="dashboard__card">
-        <h2>Suivi interne</h2>
+      <Card title="Suivi interne">
         <LeadFollowUpForm
           key={`${lead.id}-${lead.priority}-${lead.assignedToUserId ?? ''}-${lead.nextFollowUpAt ?? ''}`}
           lead={lead}
@@ -334,10 +326,9 @@ export default function LeadDetailPage() {
           submitting={followUpSubmitting}
           onSubmit={handleFollowUpUpdate}
         />
-      </section>
+      </Card>
 
-      <section className="dashboard__card">
-        <h2>Statut et commentaire</h2>
+      <Card title="Statut et commentaire">
         <LeadStatusForm
           key={`${lead.id}-${lead.status}-${lead.internalComment ?? ''}`}
           currentStatus={lead.status}
@@ -345,16 +336,15 @@ export default function LeadDetailPage() {
           submitting={submitting}
           onSubmit={handleStatusUpdate}
         />
-      </section>
+      </Card>
 
-      <section className="dashboard__card">
-        <h2>Historique d&apos;activité</h2>
+      <Card title="Historique d'activité">
         <LeadActivityHistory
           items={history}
           loading={historyLoading}
           error={historyError}
         />
-      </section>
-    </main>
+      </Card>
+    </div>
   );
 }
