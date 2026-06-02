@@ -42,6 +42,8 @@ html[data-studio-theme='light'] {
   --studio-space-6: 1.5rem;
   --studio-space-8: 2rem;
   --studio-space-10: 2.5rem;
+  --studio-space-12: 3rem;
+  --studio-space-16: 4rem;
   --studio-content-max: 72rem;
   --studio-sidebar-width: 15.5rem;
   --studio-topbar-height: 3.25rem;

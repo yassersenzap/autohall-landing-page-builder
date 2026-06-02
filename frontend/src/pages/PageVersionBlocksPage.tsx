@@ -1,15 +1,22 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { ApiError, logoutClient, meRequest } from '../lib/api';
+import { Button } from '../components/ui/Button';
+import { BlockLibrary } from '../features/editor/components/BlockLibrary';
+import { BlockNavigator } from '../features/editor/components/BlockNavigator';
+import { EditorCanvas } from '../features/editor/components/EditorCanvas';
+import { EditorShell } from '../features/editor/components/EditorShell';
+import { EditorToolbar } from '../features/editor/components/EditorToolbar';
+import { PropertiesPanel } from '../features/editor/components/PropertiesPanel';
+import { usePageEditor } from '../features/editor/hooks/usePageEditor';
 import {
-  BLOCK_TYPES,
-  canManagePageBlocks,
-  createPageBlock,
-  DEFAULT_BLOCK_PROPS,
-  listPageBlocks,
-  type BlockType,
-  type PageBlockItem,
-} from '../lib/page-blocks';
+  DEFAULT_EDITOR_BLOCK_PROPS,
+  EDITOR_BLOCK_LIBRARY,
+  type EditorBlockType,
+  type EditorDeviceMode,
+} from '../features/editor/types/editor.types';
+import { downloadPageVersionExport } from '../lib/page-export';
+import { publishPageVersion } from '../lib/page-versions';
+import '../features/editor/editor.css';
 
 type LocationState = {
   versionNumber?: number;
@@ -26,94 +33,12 @@ export default function PageVersionBlocksPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const state = (location.state as LocationState | null) ?? {};
-
-  const [blocks, setBlocks] = useState<PageBlockItem[]>([]);
-  const [role, setRole] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const [blockType, setBlockType] = useState<BlockType>('hero');
-  const [propsText, setPropsText] = useState(() =>
-    JSON.stringify(DEFAULT_BLOCK_PROPS.hero, null, 2),
+  const [publishing, setPublishing] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [deviceMode, setDeviceMode] = useState<EditorDeviceMode>('desktop');
+  const [versionStatus, setVersionStatus] = useState<string | undefined>(
+    state.versionStatus,
   );
-
-  const loadData = useCallback(async () => {
-    if (!pageVersionId) {
-      return;
-    }
-
-    setError(null);
-    setLoading(true);
-
-    try {
-      const [profile, blocksResponse] = await Promise.all([
-        meRequest(),
-        listPageBlocks(pageVersionId),
-      ]);
-      setRole(profile.data.role);
-      setBlocks(blocksResponse.data);
-    } catch (err) {
-      if (err instanceof ApiError && err.status === 401) {
-        logoutClient();
-        navigate('/login', { replace: true });
-        return;
-      }
-      setError(
-        err instanceof ApiError
-          ? err.message
-          : 'Impossible de charger les blocs.',
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [pageVersionId, navigate]);
-
-  useEffect(() => {
-    void loadData();
-  }, [loadData]);
-
-  function handleBlockTypeChange(nextType: BlockType) {
-    setBlockType(nextType);
-    setPropsText(JSON.stringify(DEFAULT_BLOCK_PROPS[nextType], null, 2));
-  }
-
-  async function handleCreate(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!pageVersionId) {
-      return;
-    }
-
-    let propsJson: Record<string, unknown>;
-    try {
-      propsJson = JSON.parse(propsText) as Record<string, unknown>;
-      if (typeof propsJson !== 'object' || propsJson === null || Array.isArray(propsJson)) {
-        throw new Error('invalid');
-      }
-    } catch {
-      setError('Le contenu JSON du bloc est invalide.');
-      return;
-    }
-
-    setSubmitting(true);
-    setError(null);
-
-    try {
-      await createPageBlock(pageVersionId, { blockType, propsJson });
-      setPropsText(JSON.stringify(DEFAULT_BLOCK_PROPS[blockType], null, 2));
-      await loadData();
-    } catch (err) {
-      setError(
-        err instanceof ApiError
-          ? err.message
-          : 'Impossible de créer le bloc.',
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  const canWrite = role ? canManagePageBlocks(role) : false;
 
   const versionsBackLink =
     state.landingPageId != null
@@ -130,118 +55,161 @@ export default function PageVersionBlocksPage() {
 
   if (!pageVersionId) {
     return (
-      <main className="dashboard">
-        <p className="dashboard__error">Identifiant de version invalide.</p>
-        <Link to="/campaigns">Retour aux campagnes</Link>
-      </main>
+      <p className="ui-alert ui-alert--error">Identifiant de version invalide.</p>
     );
   }
+  const pageVersionIdValue = pageVersionId;
+
+  const navigateToLogin = useCallback(
+    () => navigate('/login', { replace: true }),
+    [navigate],
+  );
+
+  const {
+    blocks,
+    selectedBlockId,
+    selectedBlock,
+    selectBlock,
+    status,
+    load,
+    createBlock,
+    updateBlock,
+    deleteBlock,
+    moveBlock,
+  } = usePageEditor({
+    pageVersionId: pageVersionIdValue,
+    navigateToLogin,
+  });
 
   const versionTitle =
     state.versionNumber != null
       ? `v${state.versionNumber}${state.versionLabel ? ` — ${state.versionLabel}` : ''}`
       : `Version ${pageVersionId}`;
 
+  async function handleAddBlock(blockType: EditorBlockType) {
+    await createBlock({
+      blockType,
+      propsJson: DEFAULT_EDITOR_BLOCK_PROPS[blockType],
+    });
+  }
+
+  async function handlePublish() {
+    setPublishing(true);
+    try {
+      await publishPageVersion(pageVersionIdValue);
+      setVersionStatus('PUBLISHED');
+      await load();
+    } finally {
+      setPublishing(false);
+    }
+  }
+
+  async function handleExport() {
+    setExporting(true);
+    try {
+      await downloadPageVersionExport(
+        pageVersionIdValue,
+        state.versionNumber ? `landing-v${state.versionNumber}.zip` : undefined,
+      );
+    } finally {
+      setExporting(false);
+    }
+  }
+
   return (
-    <main className="dashboard campaigns-page">
-      <header className="dashboard__header">
-        <div>
-          <h1>Blocs de page</h1>
-          <p className="dashboard__subtitle">
-            {versionTitle}
-            {state.versionStatus ? ` (${state.versionStatus})` : ''}
-            {state.landingPageTitle ? ` — ${state.landingPageTitle}` : ''}
-          </p>
-        </div>
-        <Link
-          to={versionsBackLink.to}
-          state={versionsBackLink.state}
-          className="dashboard__link"
-        >
-          {versionsBackLink.label}
+    <div className="studio-stack">
+      <EditorShell
+        toolbar={
+          <EditorToolbar
+            title="Visual Builder Editor"
+            subtitle={
+              `${versionTitle}${state.versionStatus ? ` (${state.versionStatus})` : ''}${
+                state.landingPageTitle ? ` — ${state.landingPageTitle}` : ''
+              }`
+            }
+            status={versionStatus}
+            canWrite={status.canWrite}
+            publishing={publishing}
+            exporting={exporting}
+            previewTo={`/page-versions/${pageVersionId}/preview`}
+            previewState={{
+              versionNumber: state.versionNumber,
+              versionLabel: state.versionLabel,
+              landingPageId: state.landingPageId,
+              landingPageTitle: state.landingPageTitle,
+              campaignId: state.campaignId,
+              campaignName: state.campaignName,
+            }}
+            onPublish={() => void handlePublish()}
+            onExport={() => void handleExport()}
+            onRefresh={() => void load()}
+            backTo={versionsBackLink.to}
+            backLabel={versionsBackLink.label}
+            backState={versionsBackLink.state}
+            deviceMode={deviceMode}
+            onChangeDeviceMode={setDeviceMode}
+          />
+        }
+        left={
+          <>
+            <BlockLibrary
+              blocks={EDITOR_BLOCK_LIBRARY}
+              canWrite={status.canWrite}
+              onAddBlock={(type) => void handleAddBlock(type)}
+            />
+            <BlockNavigator
+              blocks={blocks}
+              selectedBlockId={selectedBlockId}
+              onSelectBlock={selectBlock}
+            />
+          </>
+        }
+        center={
+          <>
+            {status.loading ? <p className="ui-page-header__subtitle">Chargement des blocs…</p> : null}
+            {status.error ? <p className="ui-alert ui-alert--error">{status.error}</p> : null}
+            <EditorCanvas
+              blocks={blocks}
+              selectedBlockId={selectedBlockId}
+              canWrite={status.canWrite && !status.mutationBusy}
+              onSelectBlock={selectBlock}
+              onMoveUp={(blockId) => {
+                const index = blocks.findIndex((b) => b.id === blockId);
+                if (index > 0) void moveBlock(blockId, index - 1);
+              }}
+              onMoveDown={(blockId) => {
+                const index = blocks.findIndex((b) => b.id === blockId);
+                if (index >= 0 && index < blocks.length - 1) void moveBlock(blockId, index + 1);
+              }}
+              onReorder={(blockId, newIndex) => void moveBlock(blockId, newIndex)}
+              onDeleteBlock={(blockId) => void deleteBlock(blockId)}
+              onQuickAddHero={() => void handleAddBlock('hero')}
+              deviceMode={deviceMode}
+            />
+          </>
+        }
+        right={
+          <PropertiesPanel
+            selectedBlock={selectedBlock}
+            canWrite={status.canWrite && !status.mutationBusy}
+            onChangeProps={(blockId, nextProps) => void updateBlock(blockId, { propsJson: nextProps })}
+          />
+        }
+      />
+      <p className="ui-page-header__subtitle">
+        Rendu landing : backend `landing-render` (source unique preview/export).
+        {' '}
+        <Link to={`/page-versions/${pageVersionId}/preview`} className="ui-link">
+          Ouvrir la preview
         </Link>
-      </header>
-
-      <section className="dashboard__card">
-        <h2>Version</h2>
-        <ul className="dashboard__meta">
-          <li>
-            <strong>ID :</strong> {pageVersionId}
-          </li>
-          {state.versionNumber != null ? (
-            <li>
-              <strong>Numéro :</strong> {state.versionNumber}
-            </li>
-          ) : null}
-          {state.versionLabel ? (
-            <li>
-              <strong>Libellé :</strong> {state.versionLabel}
-            </li>
-          ) : null}
-        </ul>
-      </section>
-
-      {loading ? <p>Chargement des blocs…</p> : null}
-      {error ? <p className="dashboard__error">{error}</p> : null}
-
-      {canWrite ? (
-        <section className="dashboard__card campaigns-form">
-          <h2>Nouveau bloc</h2>
-          <form className="auth-form" onSubmit={handleCreate}>
-            <label className="auth-form__field">
-              <span>Type de bloc</span>
-              <select
-                value={blockType}
-                onChange={(e) => handleBlockTypeChange(e.target.value as BlockType)}
-              >
-                {BLOCK_TYPES.map((type) => (
-                  <option key={type} value={type}>
-                    {type.replace(/_/g, ' ').toUpperCase()}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="auth-form__field">
-              <span>Contenu (JSON)</span>
-              <textarea
-                className="blocks-form__textarea"
-                value={propsText}
-                onChange={(e) => setPropsText(e.target.value)}
-                rows={8}
-                spellCheck={false}
-              />
-            </label>
-            <button
-              type="submit"
-              className="auth-form__submit"
-              disabled={submitting}
-            >
-              {submitting ? 'Création…' : 'Ajouter le bloc'}
-            </button>
-          </form>
-        </section>
+      </p>
+      {versionStatus !== 'PUBLISHED' ? (
+        <div>
+          <Button size="sm" onClick={() => void handlePublish()} disabled={publishing || !status.canWrite}>
+            {publishing ? 'Publication…' : 'Publier cette version'}
+          </Button>
+        </div>
       ) : null}
-
-      <section className="dashboard__card">
-        <h2>Blocs ({blocks.length})</h2>
-        {blocks.length === 0 && !loading ? (
-          <p>Aucun bloc pour cette version.</p>
-        ) : (
-          <ul className="campaigns-list">
-            {blocks.map((block) => (
-              <li key={block.id} className="campaigns-list__item">
-                <div className="campaigns-list__title">
-                  #{block.sortOrder} — {block.blockType.toUpperCase()}
-                  <span className="campaigns-list__meta"> ({block.blockKey})</span>
-                </div>
-                <pre className="blocks-list__props">
-                  {JSON.stringify(block.propsJson, null, 2)}
-                </pre>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    </main>
+    </div>
   );
 }

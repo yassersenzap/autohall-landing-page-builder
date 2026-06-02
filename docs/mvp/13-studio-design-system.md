@@ -40,3 +40,7 @@ frontend/src/
 ## Extension
 
 Pour un nouveau composant UI interne : ajouter dans `components/ui/` + styles dans `studio-components.css` en utilisant uniquement les tokens `--studio-*`.
+
+## Référence complémentaire
+
+La structure et les flux de l’éditeur visuel V1 (library/canvas/properties, hooks, API dédiée) sont détaillés dans `docs/mvp/14-visual-editor-v1.md`.
