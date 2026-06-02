@@ -16,6 +16,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
 import { EmptyEditorState } from './EmptyEditorState';
+import { getBlockLabel } from '../../landing/landing-block-catalog';
 import type { EditorDeviceMode, EditorPageBlock } from '../types/editor.types';
 
 type EditorCanvasProps = {
@@ -75,12 +76,15 @@ function BlockCard({
         <button type="button" className="editor-canvas__main" onClick={onSelect}>
           <div className="editor-canvas__meta">
             <Badge variant="default">#{block.sortOrder}</Badge>
-            <span>{block.blockType}</span>
-            <span className="editor-canvas__key">{block.blockKey}</span>
+            <span className="editor-canvas__type">{getBlockLabel(block.blockType)}</span>
           </div>
-          <pre className="editor-canvas__json">
-            {JSON.stringify(block.propsJson, null, 2)}
-          </pre>
+          <p className="editor-canvas__preview-hint">
+            {typeof block.propsJson.title === 'string'
+              ? block.propsJson.title
+              : typeof block.propsJson.heading === 'string'
+                ? block.propsJson.heading
+                : 'Contenu personnalisable dans le panneau de droite'}
+          </p>
         </button>
         <div className="editor-canvas__actions">
           <Button size="sm" variant="ghost" disabled={!canWrite || index === 0} onClick={onMoveUp}>

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
@@ -8,7 +8,10 @@ import { EditorCanvas } from '../features/editor/components/EditorCanvas';
 import { EditorShell } from '../features/editor/components/EditorShell';
 import { EditorToolbar } from '../features/editor/components/EditorToolbar';
 import { PropertiesPanel } from '../features/editor/components/PropertiesPanel';
+import { TemplatePicker } from '../features/editor/components/TemplatePicker';
 import { usePageEditor } from '../features/editor/hooks/usePageEditor';
+import { useApplyLandingTemplate } from '../features/landing/useApplyLandingTemplate';
+import type { LandingTemplateId } from '../features/landing/landing-templates';
 import {
   DEFAULT_EDITOR_BLOCK_PROPS,
   EDITOR_BLOCK_LIBRARY,
@@ -29,6 +32,7 @@ type LocationState = {
   landingPageTitle?: string;
   campaignId?: string;
   campaignName?: string;
+  applyTemplate?: LandingTemplateId;
 };
 
 export default function PageVersionBlocksPage() {
@@ -42,6 +46,10 @@ export default function PageVersionBlocksPage() {
   const [versionStatus, setVersionStatus] = useState<string | undefined>(
     state.versionStatus,
   );
+  const [selectedTemplateId, setSelectedTemplateId] = useState<LandingTemplateId | null>(
+    state.applyTemplate ?? null,
+  );
+  const templateAutoAppliedRef = useRef(false);
 
   const versionsBackLink =
     state.landingPageId != null
@@ -84,6 +92,12 @@ export default function PageVersionBlocksPage() {
     navigateToLogin,
   });
 
+  const {
+    applying: applyingTemplate,
+    error: templateError,
+    applyTemplate,
+  } = useApplyLandingTemplate(pageVersionIdValue, status.canWrite);
+
   const versionTitle =
     state.versionNumber != null
       ? `v${state.versionNumber}${state.versionLabel ? ` — ${state.versionLabel}` : ''}`
@@ -102,6 +116,42 @@ export default function PageVersionBlocksPage() {
       // Ignore storage errors
     }
   }, [pageVersionId, versionTitle]);
+
+  useEffect(() => {
+    if (
+      status.loading ||
+      blocks.length > 0 ||
+      !state.applyTemplate ||
+      !status.canWrite ||
+      templateAutoAppliedRef.current
+    ) {
+      return;
+    }
+
+    templateAutoAppliedRef.current = true;
+    setSelectedTemplateId(state.applyTemplate);
+
+    void applyTemplate(state.applyTemplate).then((created) => {
+      if (created?.length) {
+        void load();
+      }
+    });
+  }, [
+    applyTemplate,
+    blocks.length,
+    load,
+    state.applyTemplate,
+    status.canWrite,
+    status.loading,
+  ]);
+
+  async function handleApplyTemplate(templateId: LandingTemplateId) {
+    setSelectedTemplateId(templateId);
+    const created = await applyTemplate(templateId);
+    if (created?.length) {
+      await load();
+    }
+  }
 
   async function handleAddBlock(blockType: EditorBlockType) {
     await createBlock({
@@ -139,7 +189,7 @@ export default function PageVersionBlocksPage() {
         <ol className="studio-workflow">
           <li className="studio-workflow__item">Campagnes</li>
           <li className="studio-workflow__item">Landing pages & versions</li>
-          <li className="studio-workflow__item studio-workflow__item--active">Visual editor</li>
+          <li className="studio-workflow__item studio-workflow__item--active">Modèle & éditeur</li>
           <li className="studio-workflow__item">Preview</li>
           <li className="studio-workflow__item">Publish & Export ZIP</li>
         </ol>
@@ -194,6 +244,19 @@ export default function PageVersionBlocksPage() {
           <>
             {status.loading ? <p className="ui-page-header__subtitle">Chargement des blocs…</p> : null}
             {status.error ? <p className="ui-alert ui-alert--error">{status.error}</p> : null}
+            {!status.loading && blocks.length === 0 ? (
+              <>
+                <TemplatePicker
+                  disabled={!status.canWrite || status.mutationBusy || applyingTemplate}
+                  applying={applyingTemplate}
+                  selectedId={selectedTemplateId}
+                  onSelect={(templateId) => void handleApplyTemplate(templateId)}
+                />
+                {templateError ? (
+                  <p className="ui-alert ui-alert--error">{templateError}</p>
+                ) : null}
+              </>
+            ) : null}
             <EditorCanvas
               blocks={blocks}
               selectedBlockId={selectedBlockId}

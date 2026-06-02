@@ -182,6 +182,20 @@ export default function LandingPageVersionsPage() {
       {loading ? <p className="ui-page-header__subtitle">Chargement…</p> : null}
       {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
 
+      <Card title="Parcours de production">
+        <ol className="studio-workflow">
+          <li className="studio-workflow__item">Campagne</li>
+          <li className="studio-workflow__item studio-workflow__item--active">Versions</li>
+          <li className="studio-workflow__item">Modèle de landing</li>
+          <li className="studio-workflow__item">Édition des sections</li>
+          <li className="studio-workflow__item">Preview & export ZIP</li>
+        </ol>
+        <p className="ui-page-header__subtitle" style={{ marginBottom: 0 }}>
+          Créez une version, ouvrez l’éditeur puis choisissez un modèle (essai routier, offre
+          saisonnière, SAV, lancement véhicule) sur une version vide.
+        </p>
+      </Card>
+
       <Card title="Centre de contrôle">
         {latestVersion ? (
           <div className="versions-control">

@@ -1,5 +1,6 @@
 import { Card } from '../../../components/ui/Card';
 import { StatusBadge } from '../../../components/ui/StatusBadge';
+import { getBlockLabel } from '../../landing/landing-block-catalog';
 import type { EditorPageBlock } from '../types/editor.types';
 
 type BlockNavigatorProps = {
@@ -32,9 +33,9 @@ export function BlockNavigator({
               >
                 <div>
                   <p className="editor-navigator__title">
-                    {index + 1}. {block.blockType}
+                    {index + 1}. {getBlockLabel(block.blockType)}
                   </p>
-                  <p className="editor-navigator__meta">{block.blockKey}</p>
+                  <p className="editor-navigator__meta">Section #{block.sortOrder}</p>
                 </div>
                 <StatusBadge status={selected ? 'active' : 'draft'} label={`#${block.sortOrder}`} />
               </button>

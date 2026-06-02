@@ -67,11 +67,12 @@ export function BlockInspector({ block, disabled, onChangeProps }: BlockInspecto
     <div className="editor-inspector">
       {type === 'hero' ? (
         <>
-          <Input label="Eyebrow" value={asString(props.eyebrow)} disabled={disabled} onChange={(e) => handleField('eyebrow', e.target.value)} />
+          <Input label="Accroche" value={asString(props.eyebrow)} disabled={disabled} onChange={(e) => handleField('eyebrow', e.target.value)} />
           <Input label="Titre" value={asString(props.title)} disabled={disabled} onChange={(e) => handleField('title', e.target.value)} />
           <Input label="Sous-titre" value={asString(props.subtitle)} disabled={disabled} onChange={(e) => handleField('subtitle', e.target.value)} />
+          <Input label="URL image véhicule" value={asString(props.imageUrl)} disabled={disabled} onChange={(e) => handleField('imageUrl', e.target.value)} />
           <Input label="Texte bouton" value={asString(props.buttonText)} disabled={disabled} onChange={(e) => handleField('buttonText', e.target.value)} />
-          <Input label="Target bouton" value={asString(props.buttonTarget)} disabled={disabled} onChange={(e) => handleField('buttonTarget', e.target.value)} />
+          <Input label="Lien bouton" value={asString(props.buttonTarget)} disabled={disabled} onChange={(e) => handleField('buttonTarget', e.target.value)} />
         </>
       ) : null}
 
@@ -104,6 +105,50 @@ export function BlockInspector({ block, disabled, onChangeProps }: BlockInspecto
           <Input label="Label CTA" value={asString(props.label ?? props.text)} disabled={disabled} onChange={(e) => handleField('label', e.target.value)} />
           <Input label="Lien cible" value={asString(props.target ?? props.href)} disabled={disabled} onChange={(e) => handleField('target', e.target.value)} />
           <Input label="Description" value={asString(props.description)} disabled={disabled} onChange={(e) => handleField('description', e.target.value)} />
+        </>
+      ) : null}
+
+      {['benefits', 'offer_highlights', 'features', 'after_sales', 'testimonials', 'faq'].includes(
+        type,
+      ) ? (
+        <>
+          <Input label="Titre de section" value={asString(props.heading)} disabled={disabled} onChange={(e) => handleField('heading', e.target.value)} />
+          <Input label="Sous-titre" value={asString(props.subtitle)} disabled={disabled} onChange={(e) => handleField('subtitle', e.target.value)} />
+          <p className="ui-field__hint">
+            Les éléments de liste se modifient en mode avancé JSON (items, highlights, quotes…).
+          </p>
+        </>
+      ) : null}
+
+      {type === 'financing' ? (
+        <>
+          <Input label="Titre" value={asString(props.heading)} disabled={disabled} onChange={(e) => handleField('heading', e.target.value)} />
+          <Input label="Sous-titre" value={asString(props.subtitle)} disabled={disabled} onChange={(e) => handleField('subtitle', e.target.value)} />
+          <Input label="Texte bouton" value={asString(props.ctaLabel)} disabled={disabled} onChange={(e) => handleField('ctaLabel', e.target.value)} />
+          <Input label="Lien bouton" value={asString(props.ctaTarget)} disabled={disabled} onChange={(e) => handleField('ctaTarget', e.target.value)} />
+        </>
+      ) : null}
+
+      {type === 'final_cta' ? (
+        <>
+          <Input label="Titre" value={asString(props.title)} disabled={disabled} onChange={(e) => handleField('title', e.target.value)} />
+          <Input label="Sous-titre" value={asString(props.subtitle)} disabled={disabled} onChange={(e) => handleField('subtitle', e.target.value)} />
+          <Input label="Texte bouton" value={asString(props.buttonText)} disabled={disabled} onChange={(e) => handleField('buttonText', e.target.value)} />
+        </>
+      ) : null}
+
+      {type === 'footer_legal' ? (
+        <>
+          <label className="ui-field">
+            <span className="ui-field__label">Texte légal</span>
+            <textarea
+              className="ui-textarea"
+              rows={4}
+              value={asString(props.legalText)}
+              disabled={disabled}
+              onChange={(e) => handleField('legalText', e.target.value)}
+            />
+          </label>
         </>
       ) : null}
 
