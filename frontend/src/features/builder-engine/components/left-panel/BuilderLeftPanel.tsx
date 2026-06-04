@@ -10,7 +10,7 @@ export type LeftPanelTab = 'blocks' | 'sections' | 'media' | 'navigator';
 
 const TABS: { id: LeftPanelTab; label: string; icon: typeof Blocks }[] = [
   { id: 'blocks', label: 'Blocs', icon: Blocks },
-  { id: 'sections', label: 'Sections', icon: LayoutTemplate },
+  { id: 'sections', label: 'Modèles', icon: LayoutTemplate },
   { id: 'media', label: 'Médias', icon: Image },
   { id: 'navigator', label: 'Plan', icon: Layers },
 ];

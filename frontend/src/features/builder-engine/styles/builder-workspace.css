@@ -6,6 +6,20 @@
   width: 100%;
   max-width: none;
   overflow: hidden;
+  background: hsl(var(--background));
+}
+
+.builder-panel--left,
+.builder-panel--right {
+  background: hsl(var(--card));
+}
+
+.builder-panel--left {
+  box-shadow: inset -1px 0 0 hsl(var(--border));
+}
+
+.builder-panel--right {
+  box-shadow: inset 1px 0 0 hsl(var(--border));
 }
 
 .builder-workspace__body,

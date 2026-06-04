@@ -11,12 +11,10 @@ import { access } from 'fs/promises';
 import { PassThrough } from 'stream';
 import { AssetRenderService } from '../page-assets/asset-render.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { buildGrapesExportIndexHtml } from '../design-studio/design-document.builder';
 import {
   buildExportFilename,
   buildIndexHtml,
   buildLandingConfigJs,
-  STATIC_LEAD_FORM_JS,
   STATIC_MAIN_JS,
   STATIC_STYLE_CSS,
 } from './static-export.builder';
@@ -86,76 +84,41 @@ export class PageExportService {
       brand: landingPage.campaign.brand,
     };
 
-    let indexHtml: string;
-    let styleCss: string;
-    const zipEntries: ZipEntry[] = [];
+    const assetMap = await this.assetRenderService.buildAssetMapForBlocks(
+      blocks,
+      'export',
+    );
 
-    if (
-      pageVersion.designEngine === 'grapesjs' &&
-      pageVersion.designHtmlSnapshot?.trim()
-    ) {
-      indexHtml = buildGrapesExportIndexHtml(
-        shell,
-        pageVersion.designHtmlSnapshot,
-        'assets/style.css',
-      );
-      styleCss = [
-        '/* Auto Hall Visual Design Studio export */',
-        pageVersion.designCssSnapshot?.trim() ?? '',
-        '\n/* Base form styles */',
-        '.lp-lead-form__form { display: grid; gap: 0.75rem; }',
-        '.lp-lead-form__input { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d4d4d8; border-radius: 0.5rem; }',
-        '.lp-btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.65rem 1.25rem; border-radius: 999px; font-weight: 600; cursor: pointer; border: none; }',
-        '.lp-btn--primary { background: #b91c1c; color: #fff; }',
-      ].join('\n');
+    const renderContext = {
+      mode: 'export' as const,
+      assetMap,
+    };
 
-      zipEntries.push(
-        { kind: 'text', path: 'index.html', content: indexHtml },
-        { kind: 'text', path: 'assets/style.css', content: styleCss },
-        { kind: 'text', path: 'js/landing-config.js', content: landingConfigJs },
-        { kind: 'text', path: 'js/lead-form.js', content: STATIC_LEAD_FORM_JS },
-        {
-          kind: 'text',
-          path: 'README_DEPLOYMENT.txt',
-          content: [
-            'Auto Hall — Landing page (Visual Design Studio)',
-            'Déployez le dossier sur cPanel (fichiers statiques).',
-            'Le formulaire envoie les leads vers /api/public/leads (configuré dans js/landing-config.js).',
-          ].join('\n'),
-        },
-      );
-    } else {
-      const assetMap = await this.assetRenderService.buildAssetMapForBlocks(
-        blocks,
-        'export',
-      );
+    const indexHtml = buildIndexHtml(
+      shell,
+      blocks,
+      pageVersion.themeJson,
+      renderContext,
+    );
+    const styleCss = STATIC_STYLE_CSS;
 
-      const renderContext = {
-        mode: 'export' as const,
-        assetMap,
-      };
+    const zipEntries: ZipEntry[] = [
+      { kind: 'text', path: 'index.html', content: indexHtml },
+      { kind: 'text', path: 'assets/style.css', content: styleCss },
+      { kind: 'text', path: 'js/landing-config.js', content: landingConfigJs },
+      { kind: 'text', path: 'js/main.js', content: STATIC_MAIN_JS },
+    ];
 
-      indexHtml = buildIndexHtml(shell, blocks, pageVersion.themeJson, renderContext);
-      styleCss = STATIC_STYLE_CSS;
-
-      zipEntries.push(
-        { kind: 'text', path: 'index.html', content: indexHtml },
-        { kind: 'text', path: 'assets/style.css', content: styleCss },
-        { kind: 'text', path: 'js/landing-config.js', content: landingConfigJs },
-        { kind: 'text', path: 'js/main.js', content: STATIC_MAIN_JS },
-      );
-
-      for (const entry of Object.values(assetMap)) {
-        const exists = await access(entry.absolutePath)
-          .then(() => true)
-          .catch(() => false);
-        if (!exists) continue;
-        zipEntries.push({
-          kind: 'file',
-          path: entry.exportPath,
-          absolutePath: entry.absolutePath,
-        });
-      }
+    for (const entry of Object.values(assetMap)) {
+      const exists = await access(entry.absolutePath)
+        .then(() => true)
+        .catch(() => false);
+      if (!exists) continue;
+      zipEntries.push({
+        kind: 'file',
+        path: entry.exportPath,
+        absolutePath: entry.absolutePath,
+      });
     }
 
     const buffer = await this.createZipBuffer(zipEntries);

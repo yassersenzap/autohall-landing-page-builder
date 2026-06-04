@@ -9,9 +9,10 @@
 
 .builder-canvas-viewport {
   -webkit-overflow-scrolling: touch;
+  background-color: #ececef;
   background-image: radial-gradient(
     circle at 50% 0%,
-    hsl(var(--foreground) / 0.04),
+    hsl(var(--foreground) / 0.03),
     transparent 55%
   );
 }

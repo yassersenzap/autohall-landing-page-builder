@@ -6,7 +6,10 @@ import * as path from 'path';
 import { buildPublicAssetFileUrl } from '../landing-render/render-asset.resolve';
 import type { RenderAssetMap } from '../landing-render/render-asset.types';
 import { PrismaService } from '../prisma/prisma.service';
-import { extractUsedAssetIdsFromBlocks, resolveAssetPublicPath } from './asset-export.utils';
+import {
+  extractUsedAssetIdsFromBlocks,
+  resolveAssetPublicPath,
+} from './asset-export.utils';
 
 @Injectable()
 export class AssetRenderService {

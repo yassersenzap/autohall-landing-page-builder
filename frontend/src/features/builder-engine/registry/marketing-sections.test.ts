@@ -13,9 +13,8 @@ describe('marketing-sections', () => {
     }
   });
 
-  it('includes test-drive and lead-capture templates', () => {
+  it('includes the three V1 marketing sections', () => {
     const ids = MARKETING_SECTIONS.map((s) => s.id);
-    expect(ids).toContain('test-drive');
-    expect(ids).toContain('lead-capture');
+    expect(ids).toEqual(['test-drive', 'vehicle-offer', 'sav-service']);
   });
 });

@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 
 /**
- * Chemin relatif dans le ZIP exporté (futur) — le frontend ne doit pas le calculer.
+ * Chemin relatif dans le ZIP exporté — le frontend ne doit pas le calculer.
  */
 export function resolveAssetPublicPath(storedName: string): string {
   return `assets/images/${storedName}`;
