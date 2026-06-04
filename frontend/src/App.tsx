@@ -11,6 +11,7 @@ import LeadsPage from './pages/LeadsPage';
 import DashboardPage from './pages/DashboardPage';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
+import BuilderEngineLabPage from './pages/BuilderEngineLabPage';
 
 export default function App() {
   return (
@@ -40,6 +41,7 @@ export default function App() {
               path="/page-versions/:pageVersionId/preview"
               element={<PagePreviewPage />}
             />
+            <Route path="/builder-lab" element={<BuilderEngineLabPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
