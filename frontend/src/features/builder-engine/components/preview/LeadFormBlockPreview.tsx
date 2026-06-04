@@ -1,4 +1,5 @@
 import { parseLeadFormProps } from '../../lib/block-props';
+import { CanvasEmptyHint } from './CanvasEmptyHint';
 
 type LeadFormBlockPreviewProps = {
   propsJson: Record<string, unknown>;
@@ -57,8 +58,20 @@ export function LeadFormBlockPreview({ propsJson }: LeadFormBlockPreviewProps) {
       <div className="lp-section min-w-0 max-w-full box-border">
         <div className="lp-lead-form__layout min-w-0 max-w-full">
           <aside className="lp-lead-form__aside min-w-0 max-w-full">
-            {props.title ? <h2 className="lp-lead-form__title">{props.title}</h2> : null}
-            {props.subtitle ? <p className="lp-lead-form__subtitle">{props.subtitle}</p> : null}
+            {props.title ? (
+              <h2 className="lp-lead-form__title">{props.title}</h2>
+            ) : (
+              <CanvasEmptyHint className="lp-lead-form__title text-zinc-400">
+                Titre du formulaire à renseigner
+              </CanvasEmptyHint>
+            )}
+            {props.subtitle ? (
+              <p className="lp-lead-form__subtitle">{props.subtitle}</p>
+            ) : (
+              <CanvasEmptyHint className="lp-lead-form__subtitle text-zinc-400">
+                Texte d’aide à renseigner
+              </CanvasEmptyHint>
+            )}
             {reassurance}
           </aside>
           <div className="lp-lead-form__card min-w-0 max-w-full box-border">

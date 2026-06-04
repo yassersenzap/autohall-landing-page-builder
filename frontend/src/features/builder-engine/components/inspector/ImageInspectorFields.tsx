@@ -24,6 +24,9 @@ export function ImageInspectorFields({ blockId, propsJson }: ImageInspectorField
             patchProps({ imageAssetId: assetId, imageUrl: '' });
           }}
         />
+        <p className="text-xs text-muted-foreground">
+          Utilisez une image officielle ou validée par Auto Hall.
+        </p>
         <InspectorInput
           label="URL externe (optionnel)"
           value={asPropString(propsJson.imageUrl)}

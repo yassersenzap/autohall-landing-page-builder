@@ -1,5 +1,6 @@
 import { asPropString } from '../../lib/block-props';
 import { HeroBlockImage } from '../media/HeroBlockImage';
+import { CanvasEmptyHint } from './CanvasEmptyHint';
 
 type ImageBlockPreviewProps = {
   propsJson: Record<string, unknown>;
@@ -8,7 +9,7 @@ type ImageBlockPreviewProps = {
 export function ImageBlockPreview({ propsJson }: ImageBlockPreviewProps) {
   const imageUrl = asPropString(propsJson.imageUrl);
   const imageAssetId = asPropString(propsJson.imageAssetId);
-  const alt = asPropString(propsJson.alt) || 'Image';
+  const alt = asPropString(propsJson.alt);
   const caption = asPropString(propsJson.caption);
   const hasImage = Boolean(imageAssetId || imageUrl);
 
@@ -23,8 +24,13 @@ export function ImageBlockPreview({ propsJson }: ImageBlockPreviewProps) {
             className="w-full rounded-lg object-cover"
           />
         ) : (
-          <div className="flex h-48 items-center justify-center rounded-lg border border-dashed border-zinc-300 bg-zinc-50 text-sm text-zinc-400">
-            Image non définie
+          <div className="flex h-48 flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-zinc-300 bg-zinc-50 px-4 text-center">
+            <CanvasEmptyHint className="text-zinc-500">
+              Sélectionnez une image
+            </CanvasEmptyHint>
+            <p className="text-xs text-zinc-400">
+              Choisissez une image depuis la bibliothèque média
+            </p>
           </div>
         )}
         {caption ? (

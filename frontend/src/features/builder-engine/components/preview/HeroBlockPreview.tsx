@@ -6,6 +6,7 @@ import {
 } from '../../lib/block-design-props';
 import { parseHeroProps } from '../../lib/block-props';
 import { HeroBlockImage } from '../media/HeroBlockImage';
+import { CanvasEmptyHint } from './CanvasEmptyHint';
 
 type HeroBlockPreviewProps = {
   propsJson: Record<string, unknown>;
@@ -132,7 +133,17 @@ export function HeroBlockPreview({ propsJson }: HeroBlockPreviewProps) {
             <h1 className="builder-hero-premium__title font-bold tracking-tight text-balance">
               {props.title}
             </h1>
-          ) : null}
+          ) : (
+            <CanvasEmptyHint
+              size="lg"
+              className={cn(
+                'builder-hero-premium__title max-w-lg font-semibold tracking-tight opacity-60',
+                surface.subtitle,
+              )}
+            >
+              Titre principal à renseigner
+            </CanvasEmptyHint>
+          )}
 
           {props.subtitle ? (
             <p
@@ -143,7 +154,11 @@ export function HeroBlockPreview({ propsJson }: HeroBlockPreviewProps) {
             >
               {props.subtitle}
             </p>
-          ) : null}
+          ) : (
+            <CanvasEmptyHint className={cn('max-w-lg', surface.subtitle)}>
+              Sous-titre à renseigner
+            </CanvasEmptyHint>
+          )}
 
           {props.buttonText || props.secondaryButtonText ? (
             <div className="flex flex-wrap items-center gap-3 pt-1">
@@ -186,8 +201,13 @@ export function HeroBlockPreview({ propsJson }: HeroBlockPreviewProps) {
               />
             </div>
           ) : (
-            <div className="flex h-56 w-full max-w-md items-center justify-center rounded-3xl border border-dashed border-white/15 bg-white/5 text-sm text-white/50 backdrop-blur-sm">
-              Visuel véhicule
+            <div className="flex h-56 w-full max-w-md flex-col items-center justify-center gap-2 rounded-3xl border border-dashed border-white/15 bg-white/5 px-4 text-center backdrop-blur-sm">
+              <CanvasEmptyHint className="text-white/50">
+                Aucune image sélectionnée
+              </CanvasEmptyHint>
+              <p className="text-xs text-white/35">
+                Choisissez une image depuis la bibliothèque média
+              </p>
             </div>
           )}
         </div>

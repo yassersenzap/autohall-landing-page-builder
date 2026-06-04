@@ -36,7 +36,11 @@ export function FaqInspectorFields({ blockId, propsJson }: FaqInspectorFieldsPro
           label="Liste FAQ"
           listKey="items"
           columns={[
-            { key: 'question', label: 'Question', placeholder: 'Question ?' },
+            {
+              key: 'question',
+              label: 'Question',
+              placeholder: 'Ex : Quelles sont les conditions de l’offre ?',
+            },
             { key: 'answer', label: 'Réponse', placeholder: 'Réponse…' },
           ]}
           propsJson={propsJson}

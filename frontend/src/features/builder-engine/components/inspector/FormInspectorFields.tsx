@@ -22,12 +22,14 @@ export function FormInspectorFields({ blockId, propsJson }: FormInspectorFieldsP
           label="Titre du formulaire"
           value={asPropString(propsJson.title)}
           onChange={(e) => patchString('title', e.target.value)}
+          placeholder="Ex : Demander un essai"
         />
         <InspectorTextarea
           label="Texte d’aide"
           rows={3}
           value={asPropString(propsJson.subtitle)}
           onChange={(e) => patchString('subtitle', e.target.value)}
+          placeholder="Ex : Un conseiller vous recontacte sous 48h."
         />
         <InspectorTextarea
           label="Note confidentialité"

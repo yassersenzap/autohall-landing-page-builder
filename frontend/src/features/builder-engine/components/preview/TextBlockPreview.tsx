@@ -1,4 +1,5 @@
 import { asPropString } from '../../lib/block-props';
+import { CanvasEmptyHint } from './CanvasEmptyHint';
 
 type TextBlockPreviewProps = {
   propsJson: Record<string, unknown>;
@@ -13,7 +14,11 @@ export function TextBlockPreview({ propsJson }: TextBlockPreviewProps) {
       <div className="mx-auto max-w-2xl">
         {heading ? (
           <h2 className="text-xl font-semibold tracking-tight text-zinc-900">{heading}</h2>
-        ) : null}
+        ) : (
+          <CanvasEmptyHint className="text-zinc-400">
+            Titre à renseigner
+          </CanvasEmptyHint>
+        )}
         {content ? (
           <div className="mt-3 space-y-2 text-sm leading-relaxed text-zinc-600">
             {content.split('\n').map((line, i) => (
@@ -21,7 +26,9 @@ export function TextBlockPreview({ propsJson }: TextBlockPreviewProps) {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-zinc-400">Ajoutez un titre et un texte dans l’inspecteur.</p>
+          <CanvasEmptyHint className="mt-3 text-zinc-400">
+            Ajoutez un titre et un paragraphe depuis le panneau de droite.
+          </CanvasEmptyHint>
         )}
       </div>
     </section>

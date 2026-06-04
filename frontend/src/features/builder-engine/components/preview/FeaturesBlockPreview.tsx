@@ -6,6 +6,8 @@ import {
 } from '../../lib/block-design-props';
 import { asPropString } from '../../lib/block-props';
 import { parseListItems } from '../../lib/list-props';
+import { HeroBlockImage } from '../media/HeroBlockImage';
+import { CanvasEmptyHint } from './CanvasEmptyHint';
 
 type FeaturesBlockPreviewProps = {
   propsJson: Record<string, unknown>;
@@ -42,7 +44,9 @@ export function FeaturesBlockPreview({ propsJson }: FeaturesBlockPreviewProps) {
   const modelName = asPropString(propsJson.modelName);
   const modelTagline = asPropString(propsJson.modelTagline);
   const imageUrl = asPropString(propsJson.imageUrl);
-  const imageAlt = asPropString(propsJson.alt) || 'Véhicule';
+  const imageAlt = asPropString(propsJson.alt);
+  const imageAssetId = asPropString(propsJson.imageAssetId);
+  const hasFeatureImage = Boolean(imageUrl || imageAssetId);
   const items = parseListItems(propsJson, 'items');
   const alignment = parseImageAlignment(propsJson.imageAlignment);
   const theme = parseBackgroundTheme(propsJson.backgroundTheme);
@@ -51,23 +55,22 @@ export function FeaturesBlockPreview({ propsJson }: FeaturesBlockPreviewProps) {
 
   const mediaColumn = (
     <div className="relative flex items-center justify-center overflow-visible">
-      {imageUrl ? (
+      {hasFeatureImage ? (
         <div className="relative w-full overflow-visible">
           <div
             className="absolute -inset-6 rounded-[2rem] bg-gradient-to-tr from-red-500/15 via-transparent to-white/5 blur-2xl"
             aria-hidden
           />
-          <img
-            src={imageUrl}
-            alt={imageAlt}
-            loading="lazy"
-            decoding="async"
+          <HeroBlockImage
+            imageAssetId={imageAssetId}
+            imageUrl={imageUrl}
+            alt={imageAlt || ' '}
             className="builder-features-premium__vehicle relative mx-auto aspect-[16/10] w-full max-w-xl rounded-2xl object-cover shadow-2xl lg:max-w-none lg:translate-x-4 lg:scale-105"
           />
         </div>
       ) : (
-        <div className="flex aspect-[16/10] w-full max-w-xl items-center justify-center rounded-2xl border border-dashed border-white/20 bg-white/5 text-sm text-white/50">
-          Visuel modèle
+        <div className="flex aspect-[16/10] w-full max-w-xl flex-col items-center justify-center gap-1 rounded-2xl border border-dashed border-white/20 bg-white/5 px-4 text-center">
+          <CanvasEmptyHint className="text-white/50">Aucune image sélectionnée</CanvasEmptyHint>
         </div>
       )}
     </div>
@@ -81,16 +84,33 @@ export function FeaturesBlockPreview({ propsJson }: FeaturesBlockPreviewProps) {
       {modelTagline ? (
         <p className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">{modelTagline}</p>
       ) : null}
-      {items.length > 0 ? (
+      {items.some((item) => item.title.trim() || item.description.trim()) ? (
         <ul className="mt-6 grid gap-3">
-          {items.map((item, index) => (
-            <li key={`${item.title}-${index}`} className={cn('rounded-xl border p-4', surface.spec)}>
-              <strong className="text-sm font-semibold">{item.title}</strong>
-              <p className={cn('mt-1 text-sm', surface.specText)}>{item.description}</p>
-            </li>
-          ))}
+          {items.map((item, index) => {
+            if (!item.title.trim() && !item.description.trim()) return null;
+            return (
+              <li key={`${item.title}-${index}`} className={cn('rounded-xl border p-4', surface.spec)}>
+                {item.title.trim() ? (
+                  <strong className="text-sm font-semibold">{item.title}</strong>
+                ) : (
+                  <CanvasEmptyHint size="sm">Titre de l’avantage</CanvasEmptyHint>
+                )}
+                {item.description.trim() ? (
+                  <p className={cn('mt-1 text-sm', surface.specText)}>{item.description}</p>
+                ) : (
+                  <CanvasEmptyHint size="sm" className={cn('mt-1', surface.specText)}>
+                    Description à renseigner
+                  </CanvasEmptyHint>
+                )}
+              </li>
+            );
+          })}
         </ul>
-      ) : null}
+      ) : (
+        <CanvasEmptyHint className={cn('mt-6', surface.specText)}>
+          Ajoutez vos avantages depuis le panneau de droite
+        </CanvasEmptyHint>
+      )}
     </div>
   );
 

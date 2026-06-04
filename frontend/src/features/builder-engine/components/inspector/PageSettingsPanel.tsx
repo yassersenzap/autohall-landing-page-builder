@@ -1,5 +1,6 @@
 import { ShadInput, Label } from '@/components/ui/primitives';
 import { useBuilderDocumentStore } from '../../store/builder-document.store';
+import { PageReadinessPanel } from './PageReadinessPanel';
 import { InspectorSelect } from './InspectorPrimitives';
 
 export function PageSettingsPanel() {
@@ -11,6 +12,8 @@ export function PageSettingsPanel() {
       <p className="text-xs leading-relaxed text-muted-foreground">
         Réglages globaux de la landing. Enregistrés avec la page lors de la sauvegarde.
       </p>
+
+      <PageReadinessPanel />
 
       <div className="space-y-3 rounded-lg border border-border bg-card p-3">
         <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
@@ -59,13 +62,18 @@ export function PageSettingsPanel() {
           <ShadInput
             value={pageTheme.seoTitle}
             onChange={(e) => setPageTheme({ seoTitle: e.target.value })}
+            placeholder="Ex : Offre Ford Ranger Auto Hall"
           />
+          <p className="text-xs text-muted-foreground">
+            Titre affiché dans l’onglet du navigateur et pour les moteurs de recherche.
+          </p>
         </div>
         <div className="space-y-1.5">
           <Label className="text-xs">Description SEO</Label>
           <ShadInput
             value={pageTheme.seoDescription}
             onChange={(e) => setPageTheme({ seoDescription: e.target.value })}
+            placeholder="Résumé court de l’offre pour les moteurs de recherche"
           />
         </div>
       </div>

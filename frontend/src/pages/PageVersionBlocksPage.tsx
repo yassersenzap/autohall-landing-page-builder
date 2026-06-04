@@ -15,6 +15,10 @@ import { StudioTopBar } from '@/features/editor/components/StudioTopBar';
 import { usePageEditor } from '@/features/editor/hooks/usePageEditor';
 import type { EditorPageBlock } from '@/features/editor/types/editor.types';
 import { parsePageThemeFromJson } from '@/features/builder-engine/lib/page-theme';
+import {
+  getCriticalPageReadinessIssues,
+  getPageReadinessIssues,
+} from '@/features/builder-engine/lib/page-readiness';
 import { downloadPageVersionExport } from '@/lib/page-export';
 import { fetchPageVersion, publishPageVersion, updatePageVersion } from '@/lib/page-versions';
 import { ApiError } from '@/lib/api';
@@ -175,6 +179,17 @@ export default function PageVersionBlocksPage() {
   }
 
   async function handlePublish() {
+    const doc = useBuilderDocumentStore.getState();
+    const critical = getCriticalPageReadinessIssues(
+      getPageReadinessIssues(doc.blocks, doc.pageTheme),
+    );
+    if (critical.length > 0) {
+      showError(
+        `Publication impossible : ${critical.map((issue) => issue.message).join(' ')}`,
+      );
+      return;
+    }
+
     setPublishing(true);
     try {
       await publishPageVersion(pageVersionIdValue);
@@ -189,6 +204,16 @@ export default function PageVersionBlocksPage() {
   }
 
   async function handleExport() {
+    const doc = useBuilderDocumentStore.getState();
+    const critical = getCriticalPageReadinessIssues(
+      getPageReadinessIssues(doc.blocks, doc.pageTheme),
+    );
+    if (critical.length > 0) {
+      showError(
+        `Export : contenu incomplet — ${critical.map((issue) => issue.message).join(' ')}`,
+      );
+    }
+
     setExporting(true);
     try {
       await downloadPageVersionExport(

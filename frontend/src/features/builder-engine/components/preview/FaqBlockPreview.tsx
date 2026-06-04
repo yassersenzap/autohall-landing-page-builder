@@ -1,4 +1,5 @@
 import { asPropString } from '../../lib/block-props';
+import { CanvasEmptyHint } from './CanvasEmptyHint';
 
 type FaqItem = { question: string; answer: string };
 
@@ -39,7 +40,11 @@ export function FaqBlockPreview({ propsJson }: FaqBlockPreviewProps) {
               </li>
             ))
           ) : (
-            <li className="text-sm text-zinc-400">Ajoutez des questions dans l’inspecteur.</li>
+            <li>
+              <CanvasEmptyHint className="text-zinc-400">
+                Ajoutez vos questions fréquentes
+              </CanvasEmptyHint>
+            </li>
           )}
         </ul>
       </div>

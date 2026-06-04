@@ -24,17 +24,21 @@ export function HeroInspectorFields({ blockId, propsJson }: HeroInspectorFieldsP
           label="Accroche (eyebrow)"
           value={asPropString(propsJson.eyebrow)}
           onChange={(e) => patchString('eyebrow', e.target.value)}
+          placeholder="Ex : Nouvelle offre"
         />
         <InspectorInput
           label="Titre principal"
           value={asPropString(propsJson.title)}
           onChange={(e) => patchString('title', e.target.value)}
+          placeholder="Ex : Nouvelle offre Ford Ranger"
+          hint="Titre principal visible en haut de la landing page."
         />
         <InspectorTextarea
           label="Sous-titre"
           rows={3}
           value={asPropString(propsJson.subtitle)}
           onChange={(e) => patchString('subtitle', e.target.value)}
+          placeholder="Ex : Profitez d’une offre limitée dans le réseau Auto Hall."
         />
       </InspectorSection>
 
@@ -58,6 +62,7 @@ export function HeroInspectorFields({ blockId, propsJson }: HeroInspectorFieldsP
           label="Texte alternatif"
           value={asPropString(propsJson.alt)}
           onChange={(e) => patchString('alt', e.target.value)}
+          hint="Utilisez une image officielle ou validée par Auto Hall."
         />
       </InspectorSection>
 
@@ -77,6 +82,7 @@ export function HeroInspectorFields({ blockId, propsJson }: HeroInspectorFieldsP
           label="Bouton principal"
           value={asPropString(propsJson.buttonText)}
           onChange={(e) => patchString('buttonText', e.target.value)}
+          placeholder="Ex : Demander un essai"
         />
         <InspectorInput
           label="Lien bouton principal"
