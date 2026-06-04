@@ -9,11 +9,19 @@
 
 .builder-canvas-viewport {
   -webkit-overflow-scrolling: touch;
+  background-image: radial-gradient(
+    circle at 50% 0%,
+    hsl(var(--foreground) / 0.04),
+    transparent 55%
+  );
 }
 
 .builder-canvas-stage {
-  width: 100%;
-  max-width: none;
+  box-sizing: border-box;
+}
+
+.builder-canvas-scaler {
+  box-sizing: border-box;
 }
 
 .builder-canvas-frame {
@@ -21,7 +29,15 @@
 }
 
 .builder-canvas-zoom-host {
-  width: 100%;
+  box-sizing: border-box;
+}
+
+.builder-canvas-area[data-focus-mode='true'] .builder-canvas-viewport {
+  background-image: radial-gradient(
+    circle at 50% 20%,
+    hsl(var(--primary) / 0.06),
+    transparent 50%
+  );
 }
 
 .builder-canvas-device-document {

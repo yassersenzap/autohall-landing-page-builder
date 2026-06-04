@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import {
   ArrowLeft,
   Download,
@@ -34,6 +35,8 @@ type StudioTopBarProps = {
   onExport: () => void;
   onSave?: () => void;
   isSaving?: boolean;
+  /** Contrôles workspace (panneaux, focus) — injectés par le builder. */
+  workspaceToolbar?: ReactNode;
 };
 
 function statusVariant(status: string | undefined): 'default' | 'secondary' | 'muted' {
@@ -62,6 +65,7 @@ export function StudioTopBar({
   onExport,
   onSave,
   isSaving = false,
+  workspaceToolbar,
 }: StudioTopBarProps) {
   const breadcrumb = [campaignName, landingTitle].filter(Boolean);
 
@@ -97,15 +101,18 @@ export function StudioTopBar({
         ) : null}
       </div>
 
-      <ToggleGroup
-        value={deviceMode}
-        onChange={onDeviceModeChange}
-        ariaLabel="Viewport"
-        items={[
-          { value: 'desktop', label: 'Desktop', icon: <Monitor className="h-3.5 w-3.5" /> },
-          { value: 'mobile', label: 'Mobile', icon: <Smartphone className="h-3.5 w-3.5" /> },
-        ]}
-      />
+      <div className="flex items-center gap-2">
+        <ToggleGroup
+          value={deviceMode}
+          onChange={onDeviceModeChange}
+          ariaLabel="Viewport"
+          items={[
+            { value: 'desktop', label: 'Desktop', icon: <Monitor className="h-3.5 w-3.5" /> },
+            { value: 'mobile', label: 'Mobile', icon: <Smartphone className="h-3.5 w-3.5" /> },
+          ]}
+        />
+        {workspaceToolbar}
+      </div>
 
       <div className="flex items-center justify-end gap-1.5">
         {canWrite && onSave ? (

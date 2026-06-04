@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DndContext } from '@dnd-kit/core';
 import { useBuilderDocumentStore } from '../store/builder-document.store';
 import type { BuilderDocumentBlock } from '../types';
+import { WorkspaceUiProvider } from '../context/WorkspaceUiContext';
 import { CanvasArea } from './CanvasArea';
 
 vi.mock('./SortableBlockItem', () => ({
@@ -29,9 +30,11 @@ const heroBlock: BuilderDocumentBlock = {
 
 function renderCanvasArea() {
   return render(
-    <DndContext>
-      <CanvasArea />
-    </DndContext>,
+    <WorkspaceUiProvider>
+      <DndContext>
+        <CanvasArea />
+      </DndContext>
+    </WorkspaceUiProvider>,
   );
 }
 
@@ -51,11 +54,13 @@ describe('CanvasArea document chrome', () => {
     expect(document).toHaveClass('bg-canvas-paper');
     expect(document).toHaveClass('builder-canvas-device-document');
     expect(screen.getByTestId('canvas-zoom-controls')).toBeInTheDocument();
-    expect(screen.getByTestId('canvas-zoom-label')).toHaveTextContent('100%');
+    expect(screen.getByTestId('canvas-zoom-fit')).toBeInTheDocument();
+    expect(screen.getByTestId('canvas-zoom-1')).toBeInTheDocument();
+    expect(screen.getByTestId('canvas-zoom-label')).toBeInTheDocument();
 
     const stage = screen.getByTestId('canvas-document-stage');
     expect(stage).toHaveClass('mx-auto');
-    expect(stage).toHaveClass('w-full');
+    expect(stage).toHaveClass('justify-center');
   });
 
   it('utilise un fond de workspace sombre profond', () => {

@@ -4,7 +4,9 @@ import '@landing-styles';
 import { StudioToast } from '@/components/ui/StudioToast';
 import { useStudioToast } from '@/components/ui/use-studio-toast';
 import { BuilderEditorProvider } from '@/features/builder-engine/context/BuilderEditorContext';
+import { BuilderWorkspaceControls } from '@/features/builder-engine/components/BuilderWorkspaceControls';
 import { BuilderTriptychLayout } from '@/features/builder-engine/components/BuilderTriptychLayout';
+import { WorkspaceUiProvider } from '@/features/builder-engine/context/WorkspaceUiContext';
 import { BuilderWorkspaceLayout } from '@/features/builder-engine/components/BuilderWorkspaceLayout';
 import { apiBlocksToBuilderBlocks } from '@/features/builder-engine/lib/api-block-mapper';
 import { persistBuilderDocument } from '@/features/builder-engine/lib/persist-builder-document';
@@ -207,9 +209,11 @@ export default function PageVersionBlocksPage() {
       pageVersionId={pageVersionIdValue}
       landingPageId={state.landingPageId ?? null}
     >
+      <WorkspaceUiProvider>
       <BuilderWorkspaceLayout
         topbar={
           <StudioTopBar
+            workspaceToolbar={<BuilderWorkspaceControls />}
             campaignName={state.campaignName}
             landingTitle={state.landingPageTitle}
             versionLabel={versionTitle}
@@ -248,6 +252,7 @@ export default function PageVersionBlocksPage() {
           <BuilderTriptychLayout />
         )}
       </BuilderWorkspaceLayout>
+      </WorkspaceUiProvider>
 
       <StudioToast toast={toast} onDismiss={dismiss} />
     </BuilderEditorProvider>

@@ -10,9 +10,11 @@ import {
   type DragStartEvent,
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { cn } from '@/lib/utils';
 import { BUILDER_PALETTE, parsePaletteDragId } from '../constants/palette';
 import { useBuilderEditorContext } from '../context/BuilderEditorContext';
+import { useWorkspaceUi } from '../context/WorkspaceUiContext';
 import { useBuilderDocumentStore } from '../store/builder-document.store';
 import { CanvasArea } from './CanvasArea';
 import { BuilderLeftPanel } from './left-panel/BuilderLeftPanel';
@@ -20,6 +22,7 @@ import { RightInspector } from './RightInspector';
 
 export function BuilderTriptychLayout() {
   const { canWrite, leftPanelTab, setLeftPanelTab } = useBuilderEditorContext();
+  const { showLeftPanel, showRightPanel, focusMode, toggleFocusMode } = useWorkspaceUi();
   const blocks = useBuilderDocumentStore((s) => s.blocks);
   const addBlock = useBuilderDocumentStore((s) => s.addBlock);
   const reorderBlocks = useBuilderDocumentStore((s) => s.reorderBlocks);
@@ -31,6 +34,28 @@ export function BuilderTriptychLayout() {
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        (target.isContentEditable ||
+          target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT')
+      ) {
+        return;
+      }
+      if (event.key === 'f' || event.key === 'F') {
+        event.preventDefault();
+        toggleFocusMode();
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [toggleFocusMode]);
 
   function handleDragStart(event: DragStartEvent) {
     const paletteType = parsePaletteDragId(String(event.active.id));
@@ -90,10 +115,23 @@ export function BuilderTriptychLayout() {
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
     >
-      <div className="builder-workspace__grid grid h-full min-h-0 w-full max-w-none grid-cols-1 overflow-hidden lg:grid-cols-[15rem_minmax(0,1fr)_18rem]">
-        <BuilderLeftPanel activeTab={leftPanelTab} onTabChange={setLeftPanelTab} />
+      <div
+        className={cn(
+          'builder-workspace__grid grid h-full min-h-0 w-full max-w-none overflow-hidden',
+          'grid-cols-1',
+          showLeftPanel && showRightPanel && 'lg:grid-cols-[15rem_minmax(0,1fr)_18rem]',
+          showLeftPanel && !showRightPanel && 'lg:grid-cols-[15rem_minmax(0,1fr)]',
+          !showLeftPanel && showRightPanel && 'lg:grid-cols-[minmax(0,1fr)_18rem]',
+          !showLeftPanel && !showRightPanel && 'lg:grid-cols-1',
+          focusMode && 'builder-workspace__grid--focus',
+        )}
+        data-focus-mode={focusMode ? 'true' : 'false'}
+      >
+        {showLeftPanel ? (
+          <BuilderLeftPanel activeTab={leftPanelTab} onTabChange={setLeftPanelTab} />
+        ) : null}
         <CanvasArea />
-        <RightInspector />
+        {showRightPanel ? <RightInspector /> : null}
       </div>
 
       <DragOverlay dropAnimation={null}>

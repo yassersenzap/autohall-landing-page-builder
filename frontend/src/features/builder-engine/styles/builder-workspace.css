@@ -5,12 +5,23 @@
 .builder-workspace {
   width: 100%;
   max-width: none;
+  overflow: hidden;
 }
 
 .builder-workspace__body,
 .builder-workspace__grid {
   width: 100%;
   max-width: none;
+}
+
+.builder-workspace__grid--focus .builder-canvas-area {
+  /* Canvas dominant en mode focus */
+}
+
+.builder-workspace__grid > .builder-panel--left,
+.builder-workspace__grid > .builder-panel--right {
+  min-height: 0;
+  min-width: 0;
 }
 
 @media (max-width: 1023px) {
@@ -24,5 +35,11 @@
 
   .builder-panel--right {
     max-height: 14rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .builder-workspace__grid--focus {
+    grid-template-columns: minmax(0, 1fr) !important;
   }
 }
