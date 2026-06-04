@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useBuilderDocumentStore } from '../store/builder-document.store';
 import { sanitizePropsPatch } from './sanitize-props-patch';
 
-/** Patch typé string pour les champs inspecteur (validation future par schéma). */
+/** Patch typé pour l'inspecteur (validation future par schéma). */
 export function useBlockPropsPatch(blockId: string) {
   const updateBlockProps = useBuilderDocumentStore((s) => s.updateBlockProps);
 
@@ -13,5 +13,12 @@ export function useBlockPropsPatch(blockId: string) {
     [blockId, updateBlockProps],
   );
 
-  return { patchString };
+  const patchList = useCallback(
+    (key: string, items: Record<string, unknown>[]) => {
+      updateBlockProps(blockId, sanitizePropsPatch({ [key]: items }));
+    },
+    [blockId, updateBlockProps],
+  );
+
+  return { patchString, patchList };
 }

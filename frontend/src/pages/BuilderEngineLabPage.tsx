@@ -33,7 +33,7 @@ export default function BuilderEngineLabPage() {
           Studio
         </Link>
         <p className="text-xs font-medium text-muted-foreground">
-          Builder Engine · Lab (Étape 1)
+          Builder Engine · Lab
         </p>
         <ShadButton variant="outline" size="sm" onClick={() => resetDocument()}>
           <RotateCcw className="h-3.5 w-3.5" />

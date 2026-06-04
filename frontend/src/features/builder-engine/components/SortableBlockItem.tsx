@@ -84,7 +84,7 @@ export function SortableBlockItem({ block }: SortableBlockItemProps) {
         <div
           role="button"
           tabIndex={0}
-          className="w-full cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+          className="w-full min-w-0 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
           onClick={() => selectBlock(block.id)}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {

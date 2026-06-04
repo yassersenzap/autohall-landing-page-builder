@@ -41,16 +41,18 @@ export function CanvasArea() {
       >
         <div
           className={cn(
-            'w-full max-w-2xl rounded-xl border border-border/60 bg-background shadow-xl',
+            'w-full max-w-[72rem] rounded-xl border border-border/60 bg-background shadow-xl',
             'min-h-[min(70vh,40rem)]',
           )}
           onClick={(e) => e.stopPropagation()}
         >
           <div className="border-b border-border px-4 py-2">
-            <span className="text-xs font-medium text-muted-foreground">Page · 1200px</span>
+            <span className="text-xs font-medium text-muted-foreground">
+              Page · 1152px (72rem)
+            </span>
           </div>
 
-          <div className="overflow-hidden p-0">
+          <div className="min-w-0 overflow-hidden p-0">
             {blocks.length === 0 ? (
               <div className="p-4">
                 <div className="flex min-h-[16rem] flex-col items-center justify-center border border-dashed border-border bg-muted/20 px-6 text-center">
@@ -67,7 +69,7 @@ export function CanvasArea() {
                 items={blocks.map((b) => b.id)}
                 strategy={verticalListSortingStrategy}
               >
-                <ul className="flex flex-col gap-3 p-3">
+                <ul className="flex flex-col gap-2 p-2">
                   {blocks.map((block) => (
                     <SortableBlockItem key={block.id} block={block} />
                   ))}
