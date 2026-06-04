@@ -7,3 +7,20 @@ export { Tabs, TabsPanel, type TabItem } from './tabs';
 export { ScrollArea } from './scroll-area';
 export { Separator } from './separator';
 export { ToggleGroup, type ToggleGroupItem } from './toggle-group';
+export {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  MetricCard,
+} from './card';
+export {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from './table';
+export { StatusBadge } from './status-badge';

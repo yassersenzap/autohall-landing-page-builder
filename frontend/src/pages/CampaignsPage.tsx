@@ -1,31 +1,32 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
-import { EmptyState } from '../components/ui/EmptyState';
-import { Input } from '../components/ui/Input';
-import { PageHeader } from '../components/ui/PageHeader';
-import { StatusBadge } from '../components/ui/StatusBadge';
-import { ApiError, logoutClient, meRequest } from '../lib/api';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { LayoutGrid, RefreshCw } from 'lucide-react';
+import { campaignsTableColumns } from '@/components/campaigns/campaigns-table-columns';
+import { CreateCampaignPanel } from '@/components/campaigns/CreateCampaignPanel';
+import { StudioPageHeader } from '@/components/studio/StudioPageHeader';
+import { DataTable } from '@/components/ui/data-table';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  MetricCard,
+  ShadButton,
+} from '@/components/ui/primitives';
+import { ApiError, logoutClient, meRequest } from '@/lib/api';
 import {
   canManageCampaigns,
-  createCampaign,
   listCampaigns,
   type CampaignListItem,
-} from '../lib/campaigns';
+} from '@/lib/campaigns';
 
 export default function CampaignsPage() {
   const navigate = useNavigate();
   const [campaigns, setCampaigns] = useState<CampaignListItem[]>([]);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const [name, setName] = useState('');
-  const [brand, setBrand] = useState('Auto Hall');
-  const [model, setModel] = useState('');
-  const [campaignType, setCampaignType] = useState('PROMOTION');
 
   const loadData = useCallback(async () => {
     setError(null);
@@ -58,145 +59,75 @@ export default function CampaignsPage() {
     void loadData();
   }, [loadData]);
 
-  async function handleCreate(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setSubmitting(true);
-    setError(null);
-
-    try {
-      await createCampaign({
-        name,
-        brand,
-        campaignType,
-        model: model.trim() || undefined,
-      });
-      setName('');
-      setModel('');
-      await loadData();
-    } catch (err) {
-      setError(
-        err instanceof ApiError
-          ? err.message
-          : 'Impossible de créer la campagne.',
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
   const canWrite = role ? canManageCampaigns(role) : false;
-
-  function getOptionalCount(
-    source: CampaignListItem,
-    key: 'landingPagesCount' | 'versionsCount',
-  ): number | null {
-    const value = (source as Record<string, unknown>)[key];
-    return typeof value === 'number' ? value : null;
-  }
+  const activeCount = campaigns.filter((c) => c.status === 'ACTIVE').length;
+  const draftCount = campaigns.filter((c) => c.status === 'DRAFT').length;
 
   return (
-    <div className="studio-stack">
-      <PageHeader
+    <div className="space-y-8 font-sans">
+      <StudioPageHeader
         title="Campagnes"
-        subtitle="Gérez les campagnes marketing et leurs landing pages associées."
+        description="Gérez vos campagnes marketing, marques et landing pages associées."
         backTo="/dashboard"
         backLabel="Tableau de bord"
+        actions={
+          <ShadButton variant="outline" size="sm" onClick={() => void loadData()} disabled={loading}>
+            <RefreshCw className={loading ? 'h-3.5 w-3.5 animate-spin' : 'h-3.5 w-3.5'} />
+            Actualiser
+          </ShadButton>
+        }
       />
 
-      {loading ? <p className="ui-page-header__subtitle">Chargement…</p> : null}
-      {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
-
-      <Card title="Workflow recommandé">
-        <ol className="studio-workflow">
-          <li className="studio-workflow__item studio-workflow__item--active">1. Créer ou choisir une campagne</li>
-          <li className="studio-workflow__item">2. Ajouter une landing page</li>
-          <li className="studio-workflow__item">3. Créer une version et éditer le contenu</li>
-          <li className="studio-workflow__item">4. Prévisualiser, publier et exporter ZIP</li>
-        </ol>
-      </Card>
-
-      {canWrite ? (
-        <Card title="Nouvelle campagne">
-          <form className="campaign-form-grid" onSubmit={handleCreate}>
-            <Input
-              label="Nom"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              maxLength={180}
-            />
-            <Input
-              label="Marque"
-              value={brand}
-              onChange={(e) => setBrand(e.target.value)}
-              required
-              maxLength={100}
-            />
-            <Input
-              label="Modèle (optionnel)"
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
-              maxLength={100}
-            />
-            <Input
-              label="Type de campagne"
-              value={campaignType}
-              onChange={(e) => setCampaignType(e.target.value)}
-              required
-              maxLength={80}
-            />
-            <div className="campaign-form-grid__actions">
-              <Button type="submit" disabled={submitting}>
-                {submitting ? 'Création…' : 'Créer la campagne'}
-              </Button>
-            </div>
-          </form>
-        </Card>
+      {error ? (
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          {error}
+        </p>
       ) : null}
 
-      <Card title={`Campagnes (${campaigns.length})`}>
-        {campaigns.length === 0 && !loading ? (
-          <EmptyState
-            title="Aucune campagne disponible"
-            description="Une campagne regroupe vos landing pages et leurs versions. Créez votre première campagne pour démarrer le flow studio."
-          />
-        ) : (
-          <ul className="campaigns-list">
-            {campaigns.map((campaign) => (
-              <li key={campaign.id} className="campaigns-list__item">
-                <div className="campaigns-list__title">
-                  {campaign.name}
-                  <StatusBadge status={campaign.status} />
-                </div>
-                <div className="campaigns-list__meta">
-                  {campaign.brand}
-                  {campaign.model ? ` — ${campaign.model}` : ''} · Type :{' '}
-                  {campaign.campaignType}
-                </div>
-                <div className="campaigns-list__meta">
-                  Landing pages : {getOptionalCount(campaign, 'landingPagesCount') ?? '—'} · Versions :{' '}
-                  {getOptionalCount(campaign, 'versionsCount') ?? '—'}
-                </div>
-                <div className="campaigns-list__actions">
-                  <Link
-                    to={`/campaigns/${campaign.id}/landing-pages`}
-                    state={{ campaignName: campaign.name }}
-                    className="ui-btn ui-btn--primary ui-btn--sm"
-                  >
-                    Ouvrir
-                  </Link>
-                  <Link
-                    to={`/campaigns/${campaign.id}/landing-pages`}
-                    state={{ campaignName: campaign.name }}
-                    className="ui-btn ui-btn--secondary ui-btn--sm"
-                  >
-                    Nouvelle landing page
-                  </Link>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+      <div className="grid gap-3 sm:grid-cols-3">
+        <MetricCard
+          label="Total campagnes"
+          value={loading ? '…' : campaigns.length}
+          hint="Tous statuts"
+        />
+        <MetricCard
+          label="Actives"
+          value={loading ? '…' : activeCount}
+          trend="positive"
+        />
+        <MetricCard
+          label="Brouillons"
+          value={loading ? '…' : draftCount}
+          trend={draftCount > 0 ? 'warning' : 'neutral'}
+        />
+      </div>
+
+      {canWrite ? <CreateCampaignPanel onCreated={() => void loadData()} /> : null}
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <LayoutGrid className="h-4 w-4 text-muted-foreground" />
+            Liste des campagnes
+          </CardTitle>
+          <CardDescription>
+            Tri, recherche et accès rapide aux landing pages de chaque campagne.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <p className="py-12 text-center text-sm text-muted-foreground">Chargement…</p>
+          ) : (
+            <DataTable
+              columns={campaignsTableColumns}
+              data={campaigns}
+              searchColumnId="name"
+              searchPlaceholder="Rechercher une campagne…"
+              pageSize={8}
+              emptyMessage="Aucune campagne. Créez-en une pour démarrer."
+            />
+          )}
+        </CardContent>
       </Card>
     </div>
   );
