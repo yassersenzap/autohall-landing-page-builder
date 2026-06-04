@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { StudioThemeProvider } from './context/StudioThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedFullscreenRoute from './components/ProtectedFullscreenRoute';
 import CampaignLandingPagesPage from './pages/CampaignLandingPagesPage';
 import LandingPageVersionsPage from './pages/LandingPageVersionsPage';
 import PagePreviewPage from './pages/PagePreviewPage';
@@ -18,6 +19,12 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route element={<ProtectedFullscreenRoute />}>
+            <Route
+              path="/page-versions/:pageVersionId/blocks"
+              element={<PageVersionBlocksPage />}
+            />
+          </Route>
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/campaigns" element={<CampaignsPage />} />
@@ -30,10 +37,6 @@ export default function App() {
             <Route
               path="/landing-pages/:landingPageId/versions"
               element={<LandingPageVersionsPage />}
-            />
-            <Route
-              path="/page-versions/:pageVersionId/blocks"
-              element={<PageVersionBlocksPage />}
             />
             <Route
               path="/page-versions/:pageVersionId/preview"

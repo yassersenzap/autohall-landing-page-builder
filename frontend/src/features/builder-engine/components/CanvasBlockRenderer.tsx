@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { BuilderDocumentBlock } from '../types';
+import { useBuilderDocumentStore } from '../store/builder-document.store';
 import { FeaturesBlockPreview } from './preview/FeaturesBlockPreview';
 import { FinalCtaBlockPreview } from './preview/FinalCtaBlockPreview';
 import { FooterLegalBlockPreview } from './preview/FooterLegalBlockPreview';
@@ -8,33 +8,56 @@ import { LeadFormBlockPreview } from './preview/LeadFormBlockPreview';
 import { TrustBarBlockPreview } from './preview/TrustBarBlockPreview';
 
 type CanvasBlockRendererProps = {
-  block: BuilderDocumentBlock;
+  blockId: string;
 };
 
-export function CanvasBlockRenderer({ block }: CanvasBlockRendererProps): ReactNode {
-  const type = block.type.toLowerCase();
-
+function renderBlockContent(
+  type: string,
+  propsJson: Record<string, unknown>,
+  label: string,
+): ReactNode {
   switch (type) {
     case 'hero':
-      return <HeroBlockPreview propsJson={block.propsJson} />;
+      return <HeroBlockPreview propsJson={propsJson} />;
     case 'lead_form':
-      return <LeadFormBlockPreview propsJson={block.propsJson} />;
+      return <LeadFormBlockPreview propsJson={propsJson} />;
     case 'trust_bar':
-      return <TrustBarBlockPreview propsJson={block.propsJson} />;
+      return <TrustBarBlockPreview propsJson={propsJson} />;
     case 'features':
-      return <FeaturesBlockPreview propsJson={block.propsJson} />;
+      return <FeaturesBlockPreview propsJson={propsJson} />;
     case 'final_cta':
-      return <FinalCtaBlockPreview propsJson={block.propsJson} />;
+      return <FinalCtaBlockPreview propsJson={propsJson} />;
     case 'footer_legal':
-      return <FooterLegalBlockPreview propsJson={block.propsJson} />;
+      return <FooterLegalBlockPreview propsJson={propsJson} />;
     default:
       return (
         <div className="px-6 py-10 text-center">
           <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-            {block.label}
+            {label}
           </p>
-          <p className="mt-1 font-mono text-[0.65rem] text-zinc-400">{block.type}</p>
+          <p className="mt-1 font-mono text-[0.65rem] text-zinc-400">{type}</p>
         </div>
       );
   }
+}
+
+/**
+ * Rendu canvas branché sur le store — reflète immédiatement updateBlockProps.
+ */
+export function CanvasBlockRenderer({ blockId }: CanvasBlockRendererProps): ReactNode {
+  const block = useBuilderDocumentStore((s) => s.blocks.find((b) => b.id === blockId));
+
+  if (!block) return null;
+
+  const type = block.type.toLowerCase();
+
+  return (
+    <div
+      className="builder-canvas-block block w-full min-w-full max-w-none"
+      data-block-type={type}
+      data-testid={`canvas-block-${blockId}`}
+    >
+      {renderBlockContent(type, block.propsJson, block.label)}
+    </div>
+  );
 }

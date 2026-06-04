@@ -26,8 +26,8 @@ function PaletteDraggableItem({
     <div
       ref={setNodeRef}
       className={cn(
-        'group flex gap-2 rounded-lg border border-border bg-card/60 p-2.5 transition-colors',
-        'hover:border-border/80 hover:bg-accent/40',
+        'group flex gap-2 rounded-md border border-border/80 bg-card p-2 transition-colors',
+        'hover:border-border hover:bg-accent/30',
         isDragging && 'opacity-40',
       )}
     >
@@ -37,14 +37,14 @@ function PaletteDraggableItem({
         {...listeners}
         {...attributes}
       >
-        <p className="text-xs font-semibold text-foreground">{label}</p>
+        <p className="text-xs font-semibold leading-tight text-foreground">{label}</p>
         <p className="mt-0.5 line-clamp-2 text-[0.65rem] leading-snug text-muted-foreground">
           {description}
         </p>
       </button>
       <button
         type="button"
-        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground opacity-0 transition-opacity hover:bg-muted group-hover:opacity-100 disabled:pointer-events-none disabled:opacity-30"
+        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border/80 text-muted-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-30"
         title="Ajouter en bas de page"
         disabled={!canWrite}
         onClick={() => addBlock(type)}
@@ -57,16 +57,14 @@ function PaletteDraggableItem({
 
 export function LeftPanel() {
   return (
-    <aside className="flex h-full w-64 shrink-0 flex-col border-r border-border bg-background">
-      <header className="shrink-0 border-b border-border px-3 py-3">
-        <p className="text-[0.65rem] font-bold uppercase tracking-wider text-muted-foreground">
+    <aside className="builder-panel builder-panel--left flex h-full min-h-0 w-full flex-col border-b border-border bg-builder lg:max-h-none lg:border-b-0 lg:border-r">
+      <header className="shrink-0 border-b border-border px-3 py-2.5">
+        <p className="text-[0.6rem] font-bold uppercase tracking-wider text-muted-foreground">
           Composants
         </p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Glissez sur le canvas ou utilisez +
-        </p>
+        <p className="mt-0.5 text-[0.65rem] text-muted-foreground">Glisser ou +</p>
       </header>
-      <div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
+      <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto p-2">
         {BUILDER_PALETTE.map((item) => (
           <PaletteDraggableItem
             key={item.type}

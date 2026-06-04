@@ -1,30 +1,95 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Trash2 } from 'lucide-react';
-import { ShadButton } from '@/components/ui/primitives';
+import { Copy, GripVertical, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useBuilderEditorContext } from '../context/BuilderEditorContext';
 import { useBuilderDocumentStore } from '../store/builder-document.store';
-import type { BuilderDocumentBlock } from '../types';
 import { CanvasBlockRenderer } from './CanvasBlockRenderer';
 
 type SortableBlockItemProps = {
-  block: BuilderDocumentBlock;
+  blockId: string;
 };
 
-export function SortableBlockItem({ block }: SortableBlockItemProps) {
+type BlockHoverOverlayProps = {
+  canWrite: boolean;
+  dragAttributes: ReturnType<typeof useSortable>['attributes'];
+  dragListeners: ReturnType<typeof useSortable>['listeners'];
+  onDuplicate: () => void;
+  onDelete: () => void;
+};
+
+function BlockHoverOverlay({
+  canWrite,
+  dragAttributes,
+  dragListeners,
+  onDuplicate,
+  onDelete,
+}: BlockHoverOverlayProps) {
+  return (
+    <div
+      className="absolute right-3 top-3 z-30 flex items-center gap-0.5 rounded-lg border border-white/10 bg-black/75 p-0.5 shadow-xl backdrop-blur-md"
+      data-testid="block-hover-toolbar"
+    >
+      <button
+        type="button"
+        className="flex h-8 w-8 items-center justify-center rounded-md text-white/90 transition-colors hover:bg-white/10 disabled:opacity-40"
+        aria-label="Dupliquer"
+        disabled={!canWrite}
+        onClick={(e) => {
+          e.stopPropagation();
+          onDuplicate();
+        }}
+      >
+        <Copy className="h-3.5 w-3.5" aria-hidden />
+      </button>
+      <button
+        type="button"
+        className="flex h-8 w-8 cursor-grab items-center justify-center rounded-md text-white/90 transition-colors hover:bg-white/10 active:cursor-grabbing disabled:opacity-40"
+        aria-label="Déplacer"
+        disabled={!canWrite}
+        onClick={(e) => e.stopPropagation()}
+        {...dragAttributes}
+        {...dragListeners}
+      >
+        <GripVertical className="h-3.5 w-3.5" aria-hidden />
+      </button>
+      <button
+        type="button"
+        className="flex h-8 w-8 items-center justify-center rounded-md text-white/90 transition-colors hover:bg-red-500/20 hover:text-red-300 disabled:opacity-40"
+        aria-label="Supprimer"
+        disabled={!canWrite}
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete();
+        }}
+      >
+        <Trash2 className="h-3.5 w-3.5" aria-hidden />
+      </button>
+    </div>
+  );
+}
+
+/**
+ * Conteneur DnD transparent — rendu canvas abonné au store via blockId.
+ */
+export function SortableBlockItem({ blockId }: SortableBlockItemProps) {
   const { canWrite } = useBuilderEditorContext();
+  const block = useBuilderDocumentStore((s) => s.blocks.find((b) => b.id === blockId));
   const selectedBlockId = useBuilderDocumentStore((s) => s.selectedBlockId);
   const hoveredBlockId = useBuilderDocumentStore((s) => s.hoveredBlockId);
   const selectBlock = useBuilderDocumentStore((s) => s.selectBlock);
   const hoverBlock = useBuilderDocumentStore((s) => s.hoverBlock);
   const removeBlock = useBuilderDocumentStore((s) => s.removeBlock);
+  const duplicateBlock = useBuilderDocumentStore((s) => s.duplicateBlock);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging, isOver } =
-    useSortable({ id: block.id, disabled: !canWrite });
+    useSortable({ id: blockId, disabled: !canWrite });
 
-  const selected = selectedBlockId === block.id;
-  const hovered = hoveredBlockId === block.id;
+  if (!block) return null;
+
+  const selected = selectedBlockId === blockId;
+  const hovered = hoveredBlockId === blockId;
+  const showToolbar = (hovered || selected) && !isDragging;
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -35,70 +100,70 @@ export function SortableBlockItem({ block }: SortableBlockItemProps) {
     <li
       ref={setNodeRef}
       style={style}
-      className={cn('group relative list-none', isDragging && 'z-30')}
-      onMouseEnter={() => hoverBlock(block.id)}
+      data-testid="sortable-block-item"
+      data-builder-block-id={blockId}
+      data-selected={selected ? 'true' : 'false'}
+      className={cn(
+        'builder-sortable-block relative m-0 block w-full min-w-full max-w-none list-none p-0',
+        isDragging && 'z-30',
+      )}
+      onMouseEnter={() => hoverBlock(blockId)}
       onMouseLeave={() => hoverBlock(null)}
     >
       {isOver && !isDragging ? (
         <div
-          className="absolute inset-x-0 top-0 z-20 h-0.5 bg-primary shadow-[0_0_12px] shadow-primary/70"
+          className="pointer-events-none absolute inset-x-0 top-0 z-20 h-0.5 bg-primary shadow-[0_0_12px] shadow-primary/70"
           aria-hidden
         />
       ) : null}
 
       <div
         className={cn(
-          'relative',
-          selected && 'ring-2 ring-inset ring-primary/80',
-          hovered && !selected && 'ring-1 ring-inset ring-primary/30',
-          isDragging && 'opacity-90 shadow-2xl',
+          'builder-block-chrome relative block w-full min-w-full max-w-none transition-shadow duration-150',
+          hovered && !selected && 'ring-1 ring-inset ring-blue-400/40',
+          isDragging && 'opacity-95 shadow-2xl',
         )}
       >
         <div
           className={cn(
-            'absolute left-3 top-3 z-20 flex items-center gap-0.5 rounded-lg border border-black/10 bg-white/95 p-0.5 shadow-lg backdrop-blur-md',
-            'opacity-0 transition-opacity duration-150 group-hover:opacity-100',
-            (selected || isDragging) && 'opacity-100',
+            'builder-block-selection-badge pointer-events-none absolute left-3 top-3 z-30 flex max-w-[calc(100%-6rem)] items-center gap-2',
           )}
+          data-testid={selected ? 'block-selected-badge' : 'block-label-badge'}
         >
-          <button
-            type="button"
-            className="flex h-7 w-7 cursor-grab items-center justify-center rounded-md text-neutral-500 hover:bg-neutral-100 active:cursor-grabbing"
-            aria-label="Glisser pour réordonner"
-            {...attributes}
-            {...listeners}
+          <span
+            className={cn(
+              'truncate rounded-md px-2.5 py-1 text-[0.65rem] font-semibold tracking-wide shadow-lg backdrop-blur-sm',
+              selected
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-black/70 text-white',
+            )}
           >
-            <GripVertical className="h-3.5 w-3.5" />
-          </button>
-          <span className="max-w-[8rem] truncate px-1 text-[0.6rem] font-semibold text-neutral-600">
             {block.label}
           </span>
-          <ShadButton
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            className="h-7 w-7 text-neutral-400 hover:text-red-600"
-            aria-label="Supprimer"
-            disabled={!canWrite}
-            onClick={() => removeBlock(block.id)}
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </ShadButton>
         </div>
 
+        {showToolbar ? (
+          <BlockHoverOverlay
+            canWrite={canWrite}
+            dragAttributes={attributes}
+            dragListeners={listeners}
+            onDuplicate={() => duplicateBlock(blockId)}
+            onDelete={() => removeBlock(blockId)}
+          />
+        ) : null}
+
         <div
-          role="button"
-          tabIndex={0}
-          className="w-full min-w-0 cursor-pointer outline-none"
-          onClick={() => selectBlock(block.id)}
+          className="block w-full min-w-full max-w-none cursor-pointer"
+          onClick={() => selectBlock(blockId)}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
-              selectBlock(block.id);
+              selectBlock(blockId);
             }
           }}
+          role="presentation"
         >
-          <CanvasBlockRenderer block={block} />
+          <CanvasBlockRenderer blockId={blockId} />
         </div>
       </div>
     </li>

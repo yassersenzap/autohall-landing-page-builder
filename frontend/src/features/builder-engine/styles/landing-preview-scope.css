@@ -1,5 +1,6 @@
 /**
- * Isole le rendu landing du thème Studio (dark mode, tokens shadcn, inputs globaux).
+ * Isolation thème Studio + simulation mobile canvas.
+ * Ne surcharge PAS les grilles landing : landing-page.css reste la source de vérité en mode desktop.
  */
 
 .builder-landing-preview {
@@ -7,11 +8,11 @@
   isolation: isolate;
   position: relative;
   width: 100%;
-  min-width: 0;
-  background: #fafafa;
+  min-width: 100%;
+  max-width: none;
 }
 
-/* Tokens landing forcés en clair même si html[data-studio-theme='dark'] */
+/* Tokens landing (clair) — identique à la preview publique */
 .builder-landing-preview .lp-document,
 html[data-studio-theme='dark'] .builder-landing-preview .lp-document {
   --lp-primary: #b91c1c;
@@ -38,18 +39,23 @@ html[data-studio-theme='dark'] .builder-landing-preview .lp-document {
   --lp-max-width: 72rem;
   --lp-content-width: 42rem;
 
+  width: 100%;
+  max-width: none;
+  min-width: 100%;
   color: var(--lp-text);
   background-color: var(--lp-bg);
   font-family: var(--lp-font);
   line-height: 1.6;
 }
 
-.builder-landing-preview .lp-document .lp-section {
+.builder-landing-preview .lp-page {
+  display: block;
   width: 100%;
-  max-width: var(--lp-max-width);
-  margin-inline: auto;
-  padding-inline: var(--lp-section-x);
+  min-width: 100%;
+  max-width: none;
 }
+
+/* .lp-section conserve ses règles natives (max-width + padding) via landing-page.css */
 
 .builder-landing-preview .lp-document h1,
 .builder-landing-preview .lp-document h2,
@@ -83,41 +89,81 @@ html[data-studio-theme='dark'] .builder-landing-preview .lp-document {
   color: inherit;
 }
 
-/* Hero premium — typographie responsive selon le mode canvas */
-.builder-landing-preview[data-canvas-device='desktop'] .builder-hero-premium__title {
+/* Conteneurs canvas : pass-through, pas de corset flex/min-w-0 */
+.builder-sortable-block,
+.builder-canvas-block {
+  display: block;
+  width: 100%;
+  min-width: 100%;
+  max-width: none;
+}
+
+/* Typo / grilles premium hors mode canvas (le canvas utilise builder-canvas.css + @container) */
+.builder-landing-preview:not(.is-canvas-edit)[data-canvas-device='desktop'] .builder-hero-premium__title {
   font-size: clamp(2.75rem, 5vw, 4.5rem);
   line-height: 1.02;
   letter-spacing: -0.04em;
 }
 
-.builder-landing-preview[data-canvas-device='mobile'] .builder-hero-premium__title {
+.builder-landing-preview:not(.is-canvas-edit)[data-canvas-device='mobile'] .builder-hero-premium__title {
   font-size: 2.25rem;
   line-height: 1.08;
   letter-spacing: -0.03em;
 }
 
-.builder-landing-preview[data-canvas-device='desktop'] .builder-hero-premium__layout {
+.builder-landing-preview:not(.is-canvas-edit)[data-canvas-device='desktop'] .builder-hero-premium__layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
 }
 
-.builder-landing-preview[data-canvas-device='desktop'] .builder-hero-premium__layout--media-left > :first-child {
+.builder-landing-preview:not(.is-canvas-edit)[data-canvas-device='desktop']
+  .builder-hero-premium__layout--media-left
+  > :first-child {
   order: 2;
 }
 
-.builder-landing-preview[data-canvas-device='desktop'] .builder-hero-premium__layout--media-left > :last-child {
+.builder-landing-preview:not(.is-canvas-edit)[data-canvas-device='desktop']
+  .builder-hero-premium__layout--media-left
+  > :last-child {
   order: 1;
 }
 
-.builder-landing-preview[data-canvas-device='mobile'] .builder-hero-premium__layout {
-  display: flex;
-  flex-direction: column;
+.builder-landing-preview:not(.is-canvas-edit)[data-canvas-device='desktop'] .builder-features-premium__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  align-items: center;
 }
 
-.builder-landing-preview[data-canvas-device='mobile'] .builder-hero-premium img[alt]:not([alt='']) {
-  max-height: 220px;
+.builder-landing-preview:not(.is-canvas-edit)[data-canvas-device='desktop']
+  .builder-features-premium__layout--media-left {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+}
+
+/* Simulation iPhone : une colonne pour grilles landing + premium */
+.builder-landing-preview[data-canvas-device='mobile'] .builder-hero-premium__layout,
+.builder-landing-preview[data-canvas-device='mobile'] .builder-features-premium__layout,
+.builder-landing-preview[data-canvas-device='mobile'] .lp-hero__inner,
+.builder-landing-preview[data-canvas-device='mobile'] .lp-showcase,
+.builder-landing-preview[data-canvas-device='mobile'] .lp-lead-form__layout {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 1.5rem;
+}
+
+.builder-landing-preview[data-canvas-device='mobile'] .lp-hero__content,
+.builder-landing-preview[data-canvas-device='mobile'] .lp-hero__media,
+.builder-landing-preview[data-canvas-device='mobile'] .lp-showcase__media,
+.builder-landing-preview[data-canvas-device='mobile'] .lp-showcase__copy,
+.builder-landing-preview[data-canvas-device='mobile'] .builder-hero-premium__layout--media-left > *,
+.builder-landing-preview[data-canvas-device='mobile'] .builder-features-premium__layout--media-left > * {
+  order: unset !important;
+}
+
+.builder-landing-preview[data-canvas-device='mobile'] .builder-features-premium__vehicle,
+.builder-landing-preview[data-canvas-device='mobile'] .builder-hero-premium__vehicle {
   transform: none !important;
+  max-width: 100%;
 }
 
 /* Thèmes de fond par bloc (inspecteur Design) */
@@ -139,57 +185,4 @@ html[data-studio-theme='dark'] .builder-landing-preview .lp-document {
   --lp-primary-soft: rgba(220, 38, 38, 0.18);
   background-color: var(--lp-bg);
   color: var(--lp-text);
-}
-
-/* Alignement image (desktop canvas) */
-@media (min-width: 640px) {
-  .builder-landing-preview[data-canvas-device='desktop'] .lp-hero__inner {
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    align-items: center;
-  }
-
-  .builder-landing-preview[data-canvas-device='desktop'] .lp-showcase {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-    align-items: center;
-  }
-
-  .builder-landing-preview[data-canvas-device='desktop'] .builder-hero--media-left.lp-hero__inner {
-    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-  }
-
-  .builder-landing-preview[data-canvas-device='desktop'] .builder-hero--media-left .lp-hero__content {
-    order: 2;
-  }
-
-  .builder-landing-preview[data-canvas-device='desktop'] .builder-hero--media-left .lp-hero__media {
-    order: 1;
-  }
-
-  .builder-landing-preview[data-canvas-device='desktop'] .builder-showcase--media-left.lp-showcase {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  }
-
-  .builder-landing-preview[data-canvas-device='desktop'] .builder-showcase--media-left .lp-showcase__media {
-    order: 1;
-  }
-
-  .builder-landing-preview[data-canvas-device='desktop'] .builder-showcase--media-left .lp-showcase__copy {
-    order: 2;
-  }
-}
-
-/* Simulation mobile : une colonne dans le frame 390px */
-.builder-landing-preview[data-canvas-device='mobile'] .lp-hero__inner,
-.builder-landing-preview[data-canvas-device='mobile'] .lp-showcase,
-.builder-landing-preview[data-canvas-device='mobile'] .lp-lead-form__layout {
-  grid-template-columns: 1fr !important;
-}
-
-.builder-landing-preview[data-canvas-device='mobile'] .lp-hero__content,
-.builder-landing-preview[data-canvas-device='mobile'] .lp-hero__media,
-.builder-landing-preview[data-canvas-device='mobile'] .lp-showcase__media,
-.builder-landing-preview[data-canvas-device='mobile'] .lp-showcase__copy {
-  order: unset !important;
 }

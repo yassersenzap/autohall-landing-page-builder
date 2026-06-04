@@ -90,7 +90,7 @@ export function BuilderTriptychLayout() {
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
     >
-      <div className="flex h-full min-h-0 w-full overflow-hidden bg-background text-foreground">
+      <div className="builder-workspace__grid grid h-full min-h-0 w-full max-w-none grid-cols-1 overflow-hidden lg:grid-cols-[12.5rem_minmax(0,1fr)_17.5rem]">
         <LeftPanel />
         <CanvasArea />
         <RightInspector />

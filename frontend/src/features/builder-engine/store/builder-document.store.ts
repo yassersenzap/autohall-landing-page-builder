@@ -28,6 +28,7 @@ type BuilderDocumentState = {
 
   addBlock: (type: string, index?: number) => void;
   removeBlock: (blockId: string) => void;
+  duplicateBlock: (blockId: string) => void;
   selectBlock: (blockId: string | null) => void;
   hoverBlock: (blockId: string | null) => void;
   reorderBlocks: (activeId: string, overId: string) => void;
@@ -64,6 +65,27 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>((set, get) =
       blocks: normalizeSortOrder(blocks),
       selectedBlockId: selectedBlockId === blockId ? null : selectedBlockId,
       hoveredBlockId: get().hoveredBlockId === blockId ? null : get().hoveredBlockId,
+    });
+  },
+
+  duplicateBlock: (blockId) => {
+    const blocks = get().blocks;
+    const sourceIndex = blocks.findIndex((b) => b.id === blockId);
+    if (sourceIndex < 0) return;
+
+    const source = blocks[sourceIndex];
+    const copy: BuilderDocumentBlock = {
+      ...source,
+      id: crypto.randomUUID(),
+      propsJson: JSON.parse(JSON.stringify(source.propsJson)) as Record<string, unknown>,
+    };
+
+    const next = [...blocks];
+    next.splice(sourceIndex + 1, 0, copy);
+    set({
+      blocks: normalizeSortOrder(next),
+      selectedBlockId: copy.id,
+      hoveredBlockId: copy.id,
     });
   },
 

@@ -53,16 +53,22 @@ export function LeadFormBlockPreview({ propsJson }: LeadFormBlockPreviewProps) {
     ) : null;
 
   return (
-    <section className="lp-block lp-lead-form" id="lead-form">
-      <div className="lp-section">
-        <div className="lp-lead-form__layout">
-          <aside className="lp-lead-form__aside">
+    <section className="lp-block lp-lead-form min-w-0 max-w-full" id="lead-form">
+      <div className="lp-section min-w-0 max-w-full box-border">
+        <div className="lp-lead-form__layout min-w-0 max-w-full">
+          <aside className="lp-lead-form__aside min-w-0 max-w-full">
             {props.title ? <h2 className="lp-lead-form__title">{props.title}</h2> : null}
             {props.subtitle ? <p className="lp-lead-form__subtitle">{props.subtitle}</p> : null}
             {reassurance}
           </aside>
-          <div className="lp-lead-form__card">
-            <form className="lp-lead-form__form" action="#" method="post" noValidate onSubmit={(e) => e.preventDefault()}>
+          <div className="lp-lead-form__card min-w-0 max-w-full box-border">
+            <form
+              className="lp-lead-form__form min-w-0 max-w-full box-border"
+              action="#"
+              method="post"
+              noValidate
+              onSubmit={(e) => e.preventDefault()}
+            >
               <div className="lp-lead-form__grid">{fieldsHtml}</div>
               <p className="lp-lead-form__feedback" role="status" aria-live="polite" />
               {props.submitText ? (

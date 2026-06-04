@@ -5,6 +5,7 @@ import { StudioToast } from '@/components/ui/StudioToast';
 import { useStudioToast } from '@/components/ui/use-studio-toast';
 import { BuilderEditorProvider } from '@/features/builder-engine/context/BuilderEditorContext';
 import { BuilderTriptychLayout } from '@/features/builder-engine/components/BuilderTriptychLayout';
+import { BuilderWorkspaceLayout } from '@/features/builder-engine/components/BuilderWorkspaceLayout';
 import { apiBlocksToBuilderBlocks } from '@/features/builder-engine/lib/api-block-mapper';
 import { persistBuilderDocument } from '@/features/builder-engine/lib/persist-builder-document';
 import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
@@ -62,9 +63,7 @@ export default function PageVersionBlocksPage() {
       : { to: '/campaigns', state: undefined, label: 'Campagnes' };
 
   useEffect(() => {
-    document.documentElement.classList.add('lpb-studio-active');
     return () => {
-      document.documentElement.classList.remove('lpb-studio-active');
       resetDocument();
     };
   }, [resetDocument]);
@@ -178,56 +177,47 @@ export default function PageVersionBlocksPage() {
 
   return (
     <BuilderEditorProvider canWrite={canEditDocument}>
-      <div className="flex h-screen min-h-0 flex-col overflow-hidden">
-        <div className="shrink-0">
+      <BuilderWorkspaceLayout
+        topbar={
           <StudioTopBar
-          campaignName={state.campaignName}
-          landingTitle={state.landingPageTitle}
-          versionLabel={versionTitle}
-          status={versionStatus}
-          canWrite={status.canWrite}
-          publishing={publishing}
-          exporting={exporting}
-          deviceMode={deviceMode}
-          previewTo={`/page-versions/${pageVersionIdValue}/preview`}
-          previewState={{
-            versionNumber: state.versionNumber,
-            versionLabel: state.versionLabel,
-            landingPageId: state.landingPageId,
-            landingPageTitle: state.landingPageTitle,
-            campaignId: state.campaignId,
-            campaignName: state.campaignName,
-          }}
-          onDeviceModeChange={setDeviceMode}
-          onRefresh={() => void load()}
-          onSave={() => void handleSave()}
-          isSaving={isSaving}
-          onPublish={() => void handlePublish()}
-          onExport={() => void handleExport()}
-          backTo={versionsBackLink.to}
-          backLabel={versionsBackLink.label}
-          backState={versionsBackLink.state}
+            campaignName={state.campaignName}
+            landingTitle={state.landingPageTitle}
+            versionLabel={versionTitle}
+            status={versionStatus}
+            canWrite={status.canWrite}
+            publishing={publishing}
+            exporting={exporting}
+            deviceMode={deviceMode}
+            previewTo={`/page-versions/${pageVersionIdValue}/preview`}
+            previewState={{
+              versionNumber: state.versionNumber,
+              versionLabel: state.versionLabel,
+              landingPageId: state.landingPageId,
+              landingPageTitle: state.landingPageTitle,
+              campaignId: state.campaignId,
+              campaignName: state.campaignName,
+            }}
+            onDeviceModeChange={setDeviceMode}
+            onRefresh={() => void load()}
+            onSave={() => void handleSave()}
+            isSaving={isSaving}
+            onPublish={() => void handlePublish()}
+            onExport={() => void handleExport()}
+            backTo={versionsBackLink.to}
+            backLabel={versionsBackLink.label}
+            backState={versionsBackLink.state}
           />
-        </div>
-
-        {status.error ? (
-          <p className="shrink-0 border-b border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive">
-            {status.error}
+        }
+        banner={status.error ? status.error : undefined}
+      >
+        {status.loading ? (
+          <p className="flex h-full items-center justify-center text-sm text-muted-foreground">
+            Chargement des sections…
           </p>
-        ) : null}
-
-        <div className="relative min-h-0 flex-1 overflow-hidden">
-          {status.loading ? (
-            <p className="flex h-full items-center justify-center text-sm text-muted-foreground">
-              Chargement des sections…
-            </p>
-          ) : (
-            <div className="h-full overflow-hidden">
-              <BuilderTriptychLayout />
-            </div>
-          )}
-        </div>
-      </div>
+        ) : (
+          <BuilderTriptychLayout />
+        )}
+      </BuilderWorkspaceLayout>
 
       <StudioToast toast={toast} onDismiss={dismiss} />
     </BuilderEditorProvider>

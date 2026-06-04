@@ -1,3 +1,4 @@
+import { useBlockPropsJson } from '../../lib/use-block-props-json';
 import type { BuilderDocumentBlock } from '../../types';
 import { FeaturesInspectorFields } from './FeaturesInspectorFields';
 import { FinalCtaInspectorFields } from './FinalCtaInspectorFields';
@@ -19,9 +20,10 @@ function UnsupportedBlockInspector({ block }: BlockInspectorFormProps) {
 }
 
 export function BlockInspectorForm({ block }: BlockInspectorFormProps) {
+  const propsJson = useBlockPropsJson(block.id);
   const type = block.type.toLowerCase();
   const inspectorKey = `${block.id}:${type}`;
-  const common = { key: inspectorKey, blockId: block.id, propsJson: block.propsJson };
+  const common = { key: inspectorKey, blockId: block.id, propsJson };
 
   switch (type) {
     case 'hero':

@@ -1,0 +1,28 @@
+/**
+ * Workspace éditeur plein écran — canvas-first.
+ */
+
+.builder-workspace {
+  width: 100%;
+  max-width: none;
+}
+
+.builder-workspace__body,
+.builder-workspace__grid {
+  width: 100%;
+  max-width: none;
+}
+
+@media (max-width: 1023px) {
+  .builder-workspace__grid {
+    grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+
+  .builder-panel--left {
+    max-height: 11rem;
+  }
+
+  .builder-panel--right {
+    max-height: 14rem;
+  }
+}

@@ -69,7 +69,7 @@ export function HeroBlockPreview({ propsJson }: HeroBlockPreviewProps) {
   return (
     <section
       className={cn(
-        'builder-hero-premium relative isolate overflow-hidden',
+        'builder-hero-premium relative isolate w-full overflow-visible',
         surface.section,
       )}
     >
@@ -111,11 +111,11 @@ export function HeroBlockPreview({ propsJson }: HeroBlockPreviewProps) {
 
       <div
         className={cn(
-          'builder-hero-premium__layout relative mx-auto w-full max-w-6xl gap-10 px-6 py-14 sm:px-10 sm:py-16 lg:gap-12 lg:py-20',
+          'builder-hero-premium__layout relative mx-auto w-full min-w-0 max-w-6xl gap-10 px-4 py-14 sm:px-6 sm:py-16 lg:gap-12 lg:py-20',
           imageFirst && 'builder-hero-premium__layout--media-left',
         )}
       >
-        <div className="relative z-10 flex max-w-xl flex-col gap-6">
+        <div className="relative z-10 flex min-w-0 max-w-xl flex-col gap-6">
           {props.eyebrow ? (
             <p
               className={cn(
@@ -170,9 +170,9 @@ export function HeroBlockPreview({ propsJson }: HeroBlockPreviewProps) {
           ) : null}
         </div>
 
-        <div className="relative z-10 flex min-h-[240px] items-end justify-center lg:min-h-[420px] lg:justify-end">
+        <div className="relative z-10 flex min-h-[200px] min-w-0 items-end justify-center overflow-hidden sm:min-h-[240px] lg:min-h-[320px] lg:justify-end">
           {hasImage ? (
-            <div className="relative w-full max-w-lg lg:max-w-none">
+            <div className="relative w-full min-w-0 max-w-lg overflow-hidden lg:max-w-full">
               <div
                 className="absolute -inset-4 rounded-[2rem] bg-gradient-to-tr from-red-500/20 via-transparent to-white/10 blur-2xl"
                 aria-hidden
@@ -182,10 +182,7 @@ export function HeroBlockPreview({ propsJson }: HeroBlockPreviewProps) {
                 alt={props.alt}
                 loading="lazy"
                 decoding="async"
-                className={cn(
-                  'relative mx-auto w-full max-w-md object-contain drop-shadow-[0_40px_60px_rgba(0,0,0,0.45)]',
-                  'translate-y-4 sm:max-w-lg lg:max-h-[460px] lg:max-w-none lg:translate-y-10 lg:scale-110',
-                )}
+                className="builder-hero-premium__vehicle relative mx-auto h-auto w-full max-w-full object-contain drop-shadow-[0_40px_60px_rgba(0,0,0,0.45)]"
               />
             </div>
           ) : (
