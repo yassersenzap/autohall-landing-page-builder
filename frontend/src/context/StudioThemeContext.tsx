@@ -35,7 +35,9 @@ function readStoredTheme(): StudioThemeMode {
 }
 
 function applyThemeToDocument(mode: StudioThemeMode) {
-  document.documentElement.setAttribute('data-studio-theme', mode);
+  const root = document.documentElement;
+  root.setAttribute('data-studio-theme', mode);
+  root.classList.toggle('dark', mode === 'dark');
 }
 
 export function StudioThemeProvider({ children }: { children: ReactNode }) {

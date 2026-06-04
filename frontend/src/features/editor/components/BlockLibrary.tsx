@@ -1,5 +1,3 @@
-import { Button } from '../../../components/ui/Button';
-import { Card } from '../../../components/ui/Card';
 import {
   BLOCK_CATEGORY_LABELS,
   type EditorBlockCategory,
@@ -39,34 +37,44 @@ export function BlockLibrary({ blocks, canWrite, onAddBlock }: BlockLibraryProps
   const grouped = groupByCategory(blocks);
 
   return (
-    <Card title="Bibliothèque de sections" className="editor-panel">
-      <p className="editor-library__intro">
-        Ajoutez des sections métier : hero, offre, confiance, conversion et contenu.
-      </p>
-      <div className="editor-library">
-        {grouped.map(([category, items]) => (
-          <div key={category} className="editor-library__group">
-            <p className="editor-library__category">{BLOCK_CATEGORY_LABELS[category]}</p>
-            {items.map((item) => (
-              <div key={item.type} className="editor-library__item">
-                <div className="editor-library__icon">{item.icon}</div>
-                <div className="editor-library__body">
-                  <p className="editor-library__title">{item.label}</p>
-                  <p className="editor-library__desc">{item.description}</p>
-                </div>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  disabled={!canWrite}
-                  onClick={() => onAddBlock(item.type)}
-                >
-                  Ajouter
-                </Button>
+    <section className="editor-panel-surface">
+      <header className="editor-panel-surface__header">
+        <h2 className="editor-panel-surface__title">Sections</h2>
+      </header>
+      <div className="editor-panel-surface__body">
+        <p className="editor-library-panel__intro">
+          Ajoutez des blocs métier à votre page. Cliquez sur une carte pour l’insérer.
+        </p>
+        <div className="editor-library">
+          {grouped.map(([category, items]) => (
+            <div key={category} className="editor-library__group">
+              <p className="editor-library__category">{BLOCK_CATEGORY_LABELS[category]}</p>
+              <div className="editor-library__cards">
+                {items.map((item) => (
+                  <button
+                    key={item.type}
+                    type="button"
+                    className="editor-library__card"
+                    disabled={!canWrite}
+                    onClick={() => onAddBlock(item.type)}
+                  >
+                    <span className="editor-library__card-icon" aria-hidden="true">
+                      {item.icon}
+                    </span>
+                    <span className="editor-library__card-body">
+                      <span className="editor-library__title">{item.label}</span>
+                      <span className="editor-library__desc">{item.description}</span>
+                    </span>
+                    <span className="editor-library__card-action" aria-hidden="true">
+                      +
+                    </span>
+                  </button>
+                ))}
               </div>
-            ))}
-          </div>
-        ))}
+            </div>
+          ))}
+        </div>
       </div>
-    </Card>
+    </section>
   );
 }

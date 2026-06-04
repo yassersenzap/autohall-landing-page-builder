@@ -107,6 +107,48 @@ export function useBlockMutations({
     }
   }
 
+  async function duplicateBlock(blockId: string) {
+    if (!guardWrite()) return;
+    setState({ busy: true, error: null });
+
+    let snapshot: EditorPageBlock[] = [];
+    setBlocks((previous) => {
+      snapshot = previous;
+      return previous;
+    });
+
+    const source = snapshot.find((block) => block.id === blockId);
+    if (!source) {
+      setState({ busy: false, error: null });
+      return;
+    }
+
+    try {
+      const created = await createEditorBlock(pageVersionId, {
+        blockType: source.blockType as EditorBlockType,
+        propsJson: JSON.parse(JSON.stringify(source.propsJson)) as Record<string, unknown>,
+      });
+
+      setBlocks((previous) =>
+        [...previous, created.data].sort((a, b) => a.sortOrder - b.sortOrder),
+      );
+
+      const sourceIndex = snapshot.findIndex((block) => block.id === blockId);
+      setState({ busy: false, error: null });
+
+      if (sourceIndex >= 0) {
+        await moveBlock(created.data.id, sourceIndex + 1);
+      } else {
+        onSelectBlock(created.data.id);
+      }
+    } catch (error) {
+      setState({
+        busy: false,
+        error: normalizeError(error, 'Impossible de dupliquer le bloc.'),
+      });
+    }
+  }
+
   async function moveBlock(blockId: string, toIndex: number) {
     if (!guardWrite()) return;
     setState({ busy: true, error: null });
@@ -147,6 +189,7 @@ export function useBlockMutations({
     createBlock,
     updateBlock,
     deleteBlock,
+    duplicateBlock,
     moveBlock,
     clearMutationError: () => setState((previous) => ({ ...previous, error: null })),
   };

@@ -1,4 +1,3 @@
-import { Tabs } from '../../../components/ui/Tabs';
 import type { EditorDeviceMode } from '../types/editor.types';
 
 type DevicePreviewToggleProps = {
@@ -8,14 +7,23 @@ type DevicePreviewToggleProps = {
 
 export function DevicePreviewToggle({ mode, onChange }: DevicePreviewToggleProps) {
   return (
-    <Tabs
-      ariaLabel="Aperçu canvas"
-      items={[
-        { id: 'desktop', label: 'Desktop' },
-        { id: 'mobile', label: 'Mobile' },
-      ]}
-      activeId={mode}
-      onChange={(next) => onChange(next as EditorDeviceMode)}
-    />
+    <div className="editor-segmented" role="group" aria-label="Largeur du canvas">
+      <button
+        type="button"
+        className={['editor-segmented__btn', mode === 'desktop' ? 'is-active' : ''].filter(Boolean).join(' ')}
+        aria-pressed={mode === 'desktop'}
+        onClick={() => onChange('desktop')}
+      >
+        Desktop
+      </button>
+      <button
+        type="button"
+        className={['editor-segmented__btn', mode === 'mobile' ? 'is-active' : ''].filter(Boolean).join(' ')}
+        aria-pressed={mode === 'mobile'}
+        onClick={() => onChange('mobile')}
+      >
+        Mobile
+      </button>
+    </div>
   );
 }
