@@ -18,7 +18,8 @@ export default function StudioShell({ children }: StudioShellProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const isPreview = location.pathname.includes('/preview');
-  const isEditorStudio = location.pathname.includes('/blocks');
+  const isEditorStudio =
+    location.pathname.includes('/blocks') || location.pathname.includes('/builder-lab');
   const shellClass = [
     'studio-shell',
     isPreview ? 'studio-shell--focus' : '',
