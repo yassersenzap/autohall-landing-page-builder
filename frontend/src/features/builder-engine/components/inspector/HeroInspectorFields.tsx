@@ -7,7 +7,7 @@ import {
   InspectorSection,
   InspectorTextarea,
 } from './InspectorPrimitives';
-import { BlockDesignLayoutFields } from './BlockDesignLayoutFields';
+import { BlockStyleInspectorFields } from './BlockStyleInspectorFields';
 
 type HeroInspectorFieldsProps = {
   blockId: string;
@@ -66,16 +66,12 @@ export function HeroInspectorFields({ blockId, propsJson }: HeroInspectorFieldsP
         />
       </InspectorSection>
 
-      <InspectorSection value="layout" title="Mise en page">
-        <BlockDesignLayoutFields blockId={blockId} propsJson={propsJson} />
-      </InspectorSection>
-
-      <InspectorSection value="design" title="Design">
-        <p className="text-xs text-muted-foreground">
-          Thème de fond et alignement via la section Mise en page. Couleurs globales
-          dans Réglages page.
-        </p>
-      </InspectorSection>
+      <BlockStyleInspectorFields
+        blockId={blockId}
+        blockType="hero"
+        propsJson={propsJson}
+        showMedia
+      />
 
       <InspectorSection value="cta" title="Appels à l’action">
         <InspectorInput

@@ -1,5 +1,8 @@
 import { ShadInput, Label } from '@/components/ui/primitives';
-import { useBuilderDocumentStore } from '../../store/builder-document.store';
+import {
+  useBuilderDocumentStore,
+  type PageThemeDraft,
+} from '../../store/builder-document.store';
 import { PageReadinessPanel } from './PageReadinessPanel';
 import { InspectorSelect } from './InspectorPrimitives';
 
@@ -42,6 +45,42 @@ export function PageSettingsPanel() {
             { value: 'light', label: 'Clair' },
           ]}
           onChange={(value) => setPageTheme({ mode: value as 'light' | 'dark' })}
+        />
+        <InspectorSelect
+          label="Échelle des titres"
+          value={pageTheme.headingScale}
+          options={[
+            { value: 'compact', label: 'Compact' },
+            { value: 'normal', label: 'Normal' },
+            { value: 'large', label: 'Large' },
+          ]}
+          onChange={(value) =>
+            setPageTheme({ headingScale: value as PageThemeDraft['headingScale'] })
+          }
+        />
+        <InspectorSelect
+          label="Espacement des sections"
+          value={pageTheme.sectionSpacing}
+          options={[
+            { value: 'compact', label: 'Compact' },
+            { value: 'normal', label: 'Normal' },
+            { value: 'spacious', label: 'Aéré' },
+          ]}
+          onChange={(value) =>
+            setPageTheme({ sectionSpacing: value as PageThemeDraft['sectionSpacing'] })
+          }
+        />
+        <InspectorSelect
+          label="Style des boutons"
+          value={pageTheme.buttonStyle}
+          options={[
+            { value: 'pill', label: 'Pilule' },
+            { value: 'rounded', label: 'Arrondi' },
+            { value: 'square', label: 'Carré' },
+          ]}
+          onChange={(value) =>
+            setPageTheme({ buttonStyle: value as PageThemeDraft['buttonStyle'] })
+          }
         />
         <div className="space-y-1.5">
           <Label className="text-xs">Police</Label>

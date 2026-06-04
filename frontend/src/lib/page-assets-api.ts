@@ -25,6 +25,11 @@ export function assetFileAbsoluteUrl(assetId: string): string {
   return `${API_BASE_URL}${assetFileApiPath(assetId)}`;
 }
 
+/** URL publique pour preview canvas / export statique (sans JWT). */
+export function assetPublicFileUrl(assetId: string): string {
+  return `${API_BASE_URL}/api/public/assets/${assetId}/file`;
+}
+
 export async function listPageVersionAssets(
   pageVersionId: string,
 ): Promise<PageAsset[]> {

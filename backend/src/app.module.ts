@@ -13,6 +13,7 @@ import { PageBlocksModule } from './page-blocks/page-blocks.module';
 import { PageExportModule } from './page-export/page-export.module';
 import { PagePreviewModule } from './page-preview/page-preview.module';
 import { PageVersionsModule } from './page-versions/page-versions.module';
+import { DesignStudioModule } from './design-studio/design-studio.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
@@ -29,6 +30,7 @@ import { PrismaModule } from './prisma/prisma.module';
     PageBlocksModule,
     PageAssetsModule,
     PagePreviewModule,
+    DesignStudioModule,
     PageExportModule,
     LeadEventsModule,
     HealthModule,

@@ -14,6 +14,13 @@ type LandingPreviewScopeProps = {
  */
 export function LandingPreviewScope({ children, className }: LandingPreviewScopeProps) {
   const deviceMode = useBuilderDocumentStore((s) => s.deviceMode);
+  const pageTheme = useBuilderDocumentStore((s) => s.pageTheme);
+
+  const docStyle = {
+    ['--lp-primary' as string]: pageTheme.primaryColor,
+    ['--lp-font' as string]: `${pageTheme.fontFamily}, system-ui, sans-serif`,
+    ['--lp-display-font' as string]: `${pageTheme.fontFamily}, system-ui, sans-serif`,
+  };
 
   return (
     <div
@@ -21,7 +28,11 @@ export function LandingPreviewScope({ children, className }: LandingPreviewScope
       data-landing-preview="true"
       data-canvas-device={deviceMode}
     >
-      <article className="lp-document block w-full min-w-full" data-theme="light">
+      <article
+        className="lp-document block w-full min-w-full"
+        data-theme={pageTheme.mode}
+        style={docStyle}
+      >
         <main className="lp-page block w-full min-w-full">{children}</main>
       </article>
     </div>

@@ -23,16 +23,24 @@ function normalizeSortOrder(blocks: BuilderDocumentBlock[]): BuilderDocumentBloc
 
 export type PageThemeDraft = {
   primaryColor: string;
+  secondaryColor: string;
   mode: 'light' | 'dark';
   fontFamily: string;
+  headingScale: 'compact' | 'normal' | 'large';
+  sectionSpacing: 'compact' | 'normal' | 'spacious';
+  buttonStyle: 'rounded' | 'pill' | 'square';
   seoTitle: string;
   seoDescription: string;
 };
 
 const DEFAULT_PAGE_THEME: PageThemeDraft = {
   primaryColor: '#b91c1c',
+  secondaryColor: '#18181b',
   mode: 'dark',
   fontFamily: 'Inter',
+  headingScale: 'normal',
+  sectionSpacing: 'normal',
+  buttonStyle: 'pill',
   seoTitle: '',
   seoDescription: '',
 };
@@ -167,11 +175,20 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>((set, get) =
     if (Object.keys(safe).length === 0) return;
 
     set({
-      blocks: get().blocks.map((block) =>
-        block.id === blockId
-          ? { ...block, propsJson: { ...block.propsJson, ...safe } }
-          : block,
-      ),
+      blocks: get().blocks.map((block) => {
+        if (block.id !== blockId) return block;
+        const merged = { ...block.propsJson, ...safe };
+        if (safe.design && typeof safe.design === 'object' && !Array.isArray(safe.design)) {
+          const prev =
+            block.propsJson.design &&
+            typeof block.propsJson.design === 'object' &&
+            !Array.isArray(block.propsJson.design)
+              ? (block.propsJson.design as Record<string, unknown>)
+              : {};
+          merged.design = { ...prev, ...(safe.design as Record<string, unknown>) };
+        }
+        return { ...block, propsJson: merged };
+      }),
     });
   },
 
@@ -201,8 +218,12 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>((set, get) =
       page: {
         theme: {
           primaryColor: pageTheme.primaryColor,
+          secondaryColor: pageTheme.secondaryColor,
           mode: pageTheme.mode,
           fontFamily: pageTheme.fontFamily,
+          headingScale: pageTheme.headingScale,
+          sectionSpacing: pageTheme.sectionSpacing,
+          buttonStyle: pageTheme.buttonStyle,
         },
         seo: {
           title: pageTheme.seoTitle,

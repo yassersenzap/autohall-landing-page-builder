@@ -5,7 +5,7 @@ import ProtectedFullscreenRoute from './components/ProtectedFullscreenRoute';
 import CampaignLandingPagesPage from './pages/CampaignLandingPagesPage';
 import LandingPageVersionsPage from './pages/LandingPageVersionsPage';
 import PagePreviewPage from './pages/PagePreviewPage';
-import PageVersionBlocksPage from './pages/PageVersionBlocksPage';
+import PageVersionEditorRouter from './pages/PageVersionEditorRouter';
 import CampaignsPage from './pages/CampaignsPage';
 import LeadDetailPage from './pages/LeadDetailPage';
 import LeadsPage from './pages/LeadsPage';
@@ -22,7 +22,7 @@ export default function App() {
           <Route element={<ProtectedFullscreenRoute />}>
             <Route
               path="/page-versions/:pageVersionId/blocks"
-              element={<PageVersionBlocksPage />}
+              element={<PageVersionEditorRouter />}
             />
           </Route>
           <Route element={<ProtectedRoute />}>

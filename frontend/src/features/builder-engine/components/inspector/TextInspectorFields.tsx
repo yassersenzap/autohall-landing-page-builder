@@ -6,6 +6,7 @@ import {
   InspectorSection,
   InspectorTextarea,
 } from './InspectorPrimitives';
+import { BlockStyleInspectorFields } from './BlockStyleInspectorFields';
 
 type TextInspectorFieldsProps = {
   blockId: string;
@@ -32,6 +33,7 @@ export function TextInspectorFields({ blockId, propsJson }: TextInspectorFieldsP
           placeholder="Rédigez votre paragraphe ici…"
         />
       </InspectorSection>
+      <BlockStyleInspectorFields blockId={blockId} blockType="text" propsJson={propsJson} />
     </InspectorAccordion>
   );
 }

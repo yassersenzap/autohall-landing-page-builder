@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { buildGrapesPreviewDocument } from '../design-studio/design-document.builder';
 import { buildLandingPreviewFragment } from '../landing-render/landing-document.builder';
+import { resolveLandingTheme } from '../landing-render/landing-theme';
 import { AssetRenderService } from '../page-assets/asset-render.service';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -95,28 +97,53 @@ export class PagePreviewService {
 
     const { landingPage, blocks, ...version } = pageVersion;
 
-    const blockInputs = blocks.map((block) => ({
-      id: block.id,
-      blockType: block.blockType,
-      sortOrder: block.sortOrder,
-      propsJson: block.propsJson,
-    }));
+    const shell = {
+      title: landingPage.title,
+      campaignName: landingPage.campaign.name,
+      brand: landingPage.campaign.brand,
+    };
 
-    const assetMap = await this.assetRenderService.buildAssetMapForBlocks(
-      blocks,
-      'preview',
-    );
+    let render: PagePreviewRender;
 
-    const render = buildLandingPreviewFragment({
-      shell: {
-        title: landingPage.title,
-        campaignName: landingPage.campaign.name,
-        brand: landingPage.campaign.brand,
-      },
-      blocks: blockInputs,
-      themeJson: version.themeJson,
-      renderContext: { mode: 'preview', assetMap },
-    });
+    if (
+      version.designEngine === 'grapesjs' &&
+      version.designHtmlSnapshot?.trim()
+    ) {
+      const theme = resolveLandingTheme(version.themeJson);
+      const mainHtml = buildGrapesPreviewDocument(
+        shell,
+        version.designHtmlSnapshot,
+        version.designCssSnapshot ?? '',
+        theme.cssVariables,
+      );
+      render = {
+        themeMode: theme.mode,
+        themeStyle: theme.cssVariables,
+        headerHtml: '',
+        footerHtml: '',
+        blocksHtml: [],
+        mainHtml,
+      };
+    } else {
+      const blockInputs = blocks.map((block) => ({
+        id: block.id,
+        blockType: block.blockType,
+        sortOrder: block.sortOrder,
+        propsJson: block.propsJson,
+      }));
+
+      const assetMap = await this.assetRenderService.buildAssetMapForBlocks(
+        blocks,
+        'preview',
+      );
+
+      render = buildLandingPreviewFragment({
+        shell,
+        blocks: blockInputs,
+        themeJson: version.themeJson,
+        renderContext: { mode: 'preview', assetMap },
+      });
+    }
 
     return {
       pageVersion: {

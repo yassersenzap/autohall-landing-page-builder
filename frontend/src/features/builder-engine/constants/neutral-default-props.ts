@@ -2,6 +2,15 @@
  * Defaults pour nouveaux blocs du builder — contenu vide, structure conservée.
  * Ne pas confondre avec DEFAULT_EDITOR_BLOCK_PROPS (templates / legacy).
  */
+import {
+  DEFAULT_CTA_DESIGN,
+  DEFAULT_FEATURES_DESIGN,
+  DEFAULT_FOOTER_DESIGN,
+  DEFAULT_FORM_DESIGN,
+  DEFAULT_HERO_DESIGN,
+  DEFAULT_IMAGE_DESIGN,
+  DEFAULT_TEXT_DESIGN,
+} from './default-block-design';
 
 const STANDARD_LEAD_FORM_FIELDS = [
   { name: 'fullName', label: 'Nom complet', type: 'text', required: true },
@@ -27,8 +36,7 @@ export const BUILDER_NEUTRAL_DEFAULT_PROPS: Record<string, Record<string, unknow
     imageUrl: '',
     imageAssetId: '',
     alt: '',
-    imageAlignment: 'right',
-    backgroundTheme: 'light',
+    design: { ...DEFAULT_HERO_DESIGN },
   },
   lead_form: {
     title: '',
@@ -38,12 +46,12 @@ export const BUILDER_NEUTRAL_DEFAULT_PROPS: Record<string, Record<string, unknow
       'Vos données sont traitées conformément à notre politique de confidentialité.',
     reassurance: [],
     fields: STANDARD_LEAD_FORM_FIELDS.map((f) => ({ ...f })),
+    design: { ...DEFAULT_FORM_DESIGN },
   },
   trust_bar: {
     metrics: [],
   },
   features: {
-    layout: 'showcase',
     modelName: '',
     modelTagline: '',
     heading: '',
@@ -56,18 +64,19 @@ export const BUILDER_NEUTRAL_DEFAULT_PROPS: Record<string, Record<string, unknow
       { title: '', description: '' },
       { title: '', description: '' },
     ],
-    imageAlignment: 'right',
-    backgroundTheme: 'light',
+    design: { ...DEFAULT_FEATURES_DESIGN },
   },
   text: {
     heading: '',
     content: '',
+    design: { ...DEFAULT_TEXT_DESIGN },
   },
   image: {
     imageUrl: '',
     imageAssetId: '',
     alt: '',
     caption: '',
+    design: { ...DEFAULT_IMAGE_DESIGN },
   },
   faq: {
     heading: '',
@@ -79,9 +88,11 @@ export const BUILDER_NEUTRAL_DEFAULT_PROPS: Record<string, Record<string, unknow
     subtitle: '',
     buttonText: '',
     buttonTarget: '#lead-form',
+    design: { ...DEFAULT_CTA_DESIGN },
   },
   footer_legal: {
     legalText: '',
     links: [],
+    design: { ...DEFAULT_FOOTER_DESIGN },
   },
 };

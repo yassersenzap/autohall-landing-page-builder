@@ -6,6 +6,7 @@ import {
   InspectorInput,
   InspectorSection,
 } from './InspectorPrimitives';
+import { BlockStyleInspectorFields } from './BlockStyleInspectorFields';
 
 type ImageInspectorFieldsProps = {
   blockId: string;
@@ -41,6 +42,12 @@ export function ImageInspectorFields({ blockId, propsJson }: ImageInspectorField
           onChange={(e) => patchString('alt', e.target.value)}
         />
       </InspectorSection>
+      <BlockStyleInspectorFields
+        blockId={blockId}
+        blockType="image"
+        propsJson={propsJson}
+        showMedia
+      />
       <InspectorSection value="content" title="Légende">
         <InspectorInput
           label="Légende sous l’image"

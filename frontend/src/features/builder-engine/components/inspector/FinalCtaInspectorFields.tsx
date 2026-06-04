@@ -6,6 +6,7 @@ import {
   InspectorSection,
   InspectorTextarea,
 } from './InspectorPrimitives';
+import { BlockStyleInspectorFields } from './BlockStyleInspectorFields';
 
 type FinalCtaInspectorFieldsProps = {
   blockId: string;
@@ -31,6 +32,8 @@ export function FinalCtaInspectorFields({ blockId, propsJson }: FinalCtaInspecto
           onChange={(e) => patchString('subtitle', e.target.value)}
         />
       </InspectorSection>
+
+      <BlockStyleInspectorFields blockId={blockId} blockType="final_cta" propsJson={propsJson} />
 
       <InspectorSection value="action" title="Appel à l'action">
         <InspectorInput

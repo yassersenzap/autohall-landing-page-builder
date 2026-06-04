@@ -1,4 +1,11 @@
 import { Prisma } from '@prisma/client';
+import {
+  buildBlockSectionClasses,
+  buildButtonClasses,
+  buildInlineStyleVars,
+  buildMediaImgClasses,
+  normalizeBlockDesign,
+} from './block-style';
 import { resolveHeroImageSrc } from './render-asset.resolve';
 import type { LandingRenderContext } from './render-asset.types';
 
@@ -180,6 +187,11 @@ function renderSectionHeading(heading: string | null, subtitle: string | null): 
 }
 
 function renderLeadFormHtml(props: Record<string, unknown>): string {
+  const design = normalizeBlockDesign('lead_form', props);
+  const sectionClass = buildBlockSectionClasses('lead_form', 'lp-lead-form', design);
+  const inlineVars = buildInlineStyleVars(design);
+  const btnClass = `${buildButtonClasses(design)} lp-lead-form__submit`;
+
   const title = propString(props, 'title');
   const subtitle = propString(props, 'subtitle');
   const submitText = propString(props, 'submitText') ?? 'Envoyer ma demande';
@@ -211,7 +223,7 @@ function renderLeadFormHtml(props: Record<string, unknown>): string {
     : '';
 
   return `
-    <section class="lp-block lp-lead-form" id="lead-form">
+    <section class="${sectionClass}" id="lead-form"${inlineVars}>
       <div class="lp-section">
         <div class="lp-lead-form__layout">
           <aside class="lp-lead-form__aside">
@@ -223,7 +235,7 @@ function renderLeadFormHtml(props: Record<string, unknown>): string {
             <form class="lp-lead-form__form" action="#" method="post" novalidate>
               <div class="lp-lead-form__grid">${fieldsHtml}</div>
               <p class="lp-lead-form__feedback" role="status" aria-live="polite"></p>
-              <button type="submit" class="lp-btn lp-btn--primary lp-btn--lg lp-lead-form__submit">${escapeHtml(submitText)}</button>
+              <button type="submit" class="${btnClass}">${escapeHtml(submitText)}</button>
               ${privacyNote ? `<p class="lp-lead-form__privacy">${escapeHtml(privacyNote)}</p>` : ''}
             </form>
           </div>
@@ -236,6 +248,12 @@ function renderHeroHtml(
   props: Record<string, unknown>,
   context?: LandingRenderContext,
 ): string {
+  const design = normalizeBlockDesign('hero', props);
+  const sectionClass = buildBlockSectionClasses('hero', 'lp-hero', design);
+  const inlineVars = buildInlineStyleVars(design);
+  const imgClass = buildMediaImgClasses('lp-hero', design);
+  const primaryBtnClass = buildButtonClasses(design);
+
   const title = propString(props, 'title');
   const subtitle = propString(props, 'subtitle');
   const eyebrow = propString(props, 'eyebrow', 'kicker', 'badge');
@@ -245,31 +263,58 @@ function renderHeroHtml(
   const secondaryTarget =
     propString(props, 'secondaryButtonTarget', 'secondaryCtaTarget') ?? '#offer';
   const imageSrc = resolveHeroImageSrc(props, context);
-  const imageAlt = propString(props, 'alt', 'imageAlt') ?? 'Véhicule Auto Hall';
+  const imageAlt = propString(props, 'alt', 'imageAlt') ?? '';
 
   const actions: string[] = [];
   if (buttonText) {
-    actions.push(renderBtn(buttonTarget, buttonText, 'primary', 'lg'));
+    actions.push(
+      `<a class="${primaryBtnClass}" href="${escapeHtml(buttonTarget)}">${escapeHtml(buttonText)}</a>`,
+    );
   }
   if (secondaryText) {
-    actions.push(renderBtn(secondaryTarget, secondaryText, 'secondary', 'lg'));
+    actions.push(renderBtn(secondaryTarget, secondaryText, 'secondary', design.buttonSize));
   }
 
-  const mediaHtml = imageSrc
-    ? `<div class="lp-hero__media"><img class="lp-hero__img" src="${escapeHtml(imageSrc)}" alt="${escapeHtml(imageAlt)}" loading="eager" decoding="async" /></div>`
-    : `<div class="lp-hero__media lp-hero__media--placeholder" aria-hidden="true"><span>Visuel véhicule / offre</span></div>`;
+  const isBgLayout = design.layoutVariant === 'background_image';
+  const hideMedia = design.layoutVariant === 'minimal' || design.mediaPosition === 'none';
 
-  return `
-    <section class="lp-block lp-hero">
-      <div class="lp-hero__glow" aria-hidden="true"></div>
-      <div class="lp-hero__inner lp-section">
+  const bgMediaHtml =
+    isBgLayout && imageSrc
+      ? `<div class="lp-hero__bg" aria-hidden="true"><img class="${imgClass}" src="${escapeHtml(imageSrc)}" alt="" loading="eager" decoding="async" /></div>`
+      : '';
+
+  const overlayHtml =
+    isBgLayout && design.overlayOpacity !== 'none'
+      ? `<div class="lp-hero__overlay" aria-hidden="true"></div>`
+      : '';
+
+  const mediaHtml =
+    !hideMedia && !isBgLayout
+      ? imageSrc
+        ? `<div class="lp-hero__media"><img class="${imgClass}" src="${escapeHtml(imageSrc)}" alt="${escapeHtml(imageAlt)}" loading="eager" decoding="async" /></div>`
+        : `<div class="lp-hero__media lp-hero__media--placeholder" aria-hidden="true"><span>Aucune image sélectionnée</span></div>`
+      : '';
+
+  const contentHtml = `
         <div class="lp-hero__content">
           ${eyebrow ? `<p class="lp-hero__eyebrow">${escapeHtml(eyebrow)}</p>` : ''}
           ${title ? `<h1 class="lp-hero__title">${escapeHtml(title)}</h1>` : ''}
           ${subtitle ? `<p class="lp-hero__subtitle">${escapeHtml(subtitle)}</p>` : ''}
           ${actions.length ? `<div class="lp-hero__actions">${actions.join('')}</div>` : ''}
-        </div>
-        ${mediaHtml}
+        </div>`;
+
+  const innerOrder =
+    design.mediaPosition === 'left' && !isBgLayout
+      ? `${mediaHtml}${contentHtml}`
+      : `${contentHtml}${mediaHtml}`;
+
+  return `
+    <section class="${sectionClass}"${inlineVars}>
+      ${bgMediaHtml}
+      ${overlayHtml}
+      <div class="lp-hero__glow" aria-hidden="true"></div>
+      <div class="lp-hero__inner lp-section">
+        ${innerOrder}
       </div>
     </section>`;
 }
@@ -347,13 +392,21 @@ function renderOfferHighlightsHtml(props: Record<string, unknown>): string {
     </section>`;
 }
 
-function renderFeaturesShowcaseHtml(props: Record<string, unknown>): string {
+function renderFeaturesShowcaseHtml(
+  props: Record<string, unknown>,
+  context?: LandingRenderContext,
+): string {
+  const design = normalizeBlockDesign('features', props);
+  const sectionClass = buildBlockSectionClasses('features', 'lp-features lp-features--showcase', design);
+  const inlineVars = buildInlineStyleVars(design);
+  const imgClass = buildMediaImgClasses('lp-showcase', design);
+
   const heading = propString(props, 'heading', 'title');
   const subtitle = propString(props, 'subtitle');
   const modelName = propString(props, 'modelName', 'model');
   const modelTagline = propString(props, 'modelTagline', 'tagline');
-  const imageUrl = propString(props, 'imageUrl', 'src');
-  const imageAlt = propString(props, 'alt', 'imageAlt') ?? 'Véhicule';
+  const imageSrc = resolveHeroImageSrc(props, context);
+  const imageAlt = propString(props, 'alt', 'imageAlt') ?? '';
   const items = parseListItems(props, 'items');
 
   const specs = items
@@ -366,36 +419,52 @@ function renderFeaturesShowcaseHtml(props: Record<string, unknown>): string {
     )
     .join('');
 
-  const mediaHtml = imageUrl
-    ? `<div class="lp-showcase__media"><img class="lp-showcase__img" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(imageAlt)}" loading="lazy" decoding="async" /></div>`
-    : `<div class="lp-showcase__media lp-showcase__media--placeholder" aria-hidden="true"><span>Visuel modèle</span></div>`;
+  const mediaHtml = imageSrc
+    ? `<div class="lp-showcase__media"><img class="${imgClass}" src="${escapeHtml(imageSrc)}" alt="${escapeHtml(imageAlt)}" loading="lazy" decoding="async" /></div>`
+    : `<div class="lp-showcase__media lp-showcase__media--placeholder" aria-hidden="true"><span>Aucune image sélectionnée</span></div>`;
 
-  return `
-    <section class="lp-block lp-features lp-features--showcase" id="model">
-      <div class="lp-section">
-        <div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>
-        <div class="lp-showcase">
-          ${mediaHtml}
+  const copyHtml = `
           <div class="lp-showcase__copy">
             ${modelName ? `<p class="lp-showcase__model">${escapeHtml(modelName)}</p>` : ''}
             ${modelTagline ? `<p class="lp-showcase__tagline">${escapeHtml(modelTagline)}</p>` : ''}
             ${specs ? `<ul class="lp-showcase__specs">${specs}</ul>` : ''}
-          </div>
+          </div>`;
+
+  const showcaseInner =
+    design.mediaPosition === 'left' ? `${mediaHtml}${copyHtml}` : `${copyHtml}${mediaHtml}`;
+
+  return `
+    <section class="${sectionClass}" id="model"${inlineVars}>
+      <div class="lp-section">
+        <div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>
+        <div class="lp-showcase lp-showcase--media-${design.mediaPosition}">
+          ${showcaseInner}
         </div>
       </div>
     </section>`;
 }
 
-function renderFeaturesHtml(props: Record<string, unknown>): string {
-  const layout = propString(props, 'layout');
-  const imageUrl = propString(props, 'imageUrl', 'src');
-  if (layout === 'showcase' || imageUrl) {
-    return renderFeaturesShowcaseHtml(props);
+function renderFeaturesHtml(
+  props: Record<string, unknown>,
+  context?: LandingRenderContext,
+): string {
+  const design = normalizeBlockDesign('features', props);
+  if (design.layoutVariant === 'showcase') {
+    return renderFeaturesShowcaseHtml(props, context);
   }
 
+  const sectionClass = buildBlockSectionClasses('features', 'lp-features', design);
+  const inlineVars = buildInlineStyleVars(design);
   const heading = propString(props, 'heading', 'title');
   const subtitle = propString(props, 'subtitle');
   const items = parseListItems(props, 'items');
+
+  const gridClass =
+    design.layoutVariant === 'compact_row'
+      ? 'lp-features__row'
+      : design.layoutVariant === 'icon_list'
+        ? 'lp-features__icon-grid'
+        : 'lp-features__grid';
 
   const cards = items
     .map(
@@ -409,10 +478,10 @@ function renderFeaturesHtml(props: Record<string, unknown>): string {
     .join('');
 
   return `
-    <section class="lp-block lp-features">
+    <section class="${sectionClass}"${inlineVars}>
       <div class="lp-section">
         <div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>
-        <div class="lp-features__grid">${cards}</div>
+        <div class="${gridClass}">${cards}</div>
       </div>
     </section>`;
 }
@@ -526,27 +595,38 @@ function renderFaqHtml(props: Record<string, unknown>): string {
 }
 
 function renderFinalCtaHtml(props: Record<string, unknown>): string {
+  const design = normalizeBlockDesign('final_cta', props);
+  const sectionClass = buildBlockSectionClasses('final_cta', 'lp-final-cta', design);
+  const inlineVars = buildInlineStyleVars(design);
+  const btnClass = buildButtonClasses(design);
+
   const title = propString(props, 'title', 'heading');
   const subtitle = propString(props, 'subtitle', 'description');
-  const buttonText = propString(props, 'buttonText', 'label') ?? 'Je passe à l’action';
+  const buttonText = propString(props, 'buttonText', 'label');
   const buttonTarget = propString(props, 'buttonTarget', 'target') ?? '#lead-form';
 
+  const buttonHtml = buttonText
+    ? `<a class="${btnClass}" href="${escapeHtml(buttonTarget)}">${escapeHtml(buttonText)}</a>`
+    : '';
+
   return `
-    <section class="lp-block lp-final-cta">
+    <section class="${sectionClass}"${inlineVars}>
       <div class="lp-section">
         <div class="lp-final-cta__panel">
           ${title ? `<h2 class="lp-final-cta__title">${escapeHtml(title)}</h2>` : ''}
           ${subtitle ? `<p class="lp-final-cta__subtitle">${escapeHtml(subtitle)}</p>` : ''}
-          <a class="lp-btn lp-btn--primary lp-btn--lg" href="${escapeHtml(buttonTarget)}">${escapeHtml(buttonText)}</a>
+          ${buttonHtml}
         </div>
       </div>
     </section>`;
 }
 
 function renderFooterLegalHtml(props: Record<string, unknown>): string {
-  const legalText =
-    propString(props, 'legalText', 'text') ??
-    'Mentions légales — Auto Hall. Offre soumise à conditions.';
+  const design = normalizeBlockDesign('footer_legal', props);
+  const sectionClass = buildBlockSectionClasses('footer_legal', 'lp-footer-legal', design);
+  const inlineVars = buildInlineStyleVars(design);
+
+  const legalText = propString(props, 'legalText', 'text');
   const links = parseLinks(props);
 
   const linksHtml = links
@@ -557,9 +637,9 @@ function renderFooterLegalHtml(props: Record<string, unknown>): string {
     .join('');
 
   return `
-    <section class="lp-block lp-footer-legal">
+    <section class="${sectionClass}"${inlineVars}>
       <div class="lp-section">
-        <p class="lp-footer-legal__text">${escapeHtml(legalText)}</p>
+        ${legalText ? `<p class="lp-footer-legal__text">${escapeHtml(legalText)}</p>` : ''}
         ${linksHtml ? `<div class="lp-footer-legal__links">${linksHtml}</div>` : ''}
       </div>
     </section>`;
@@ -581,12 +661,21 @@ export function renderBlockHtml(
   }
 
   if (type === 'text') {
+    const design = normalizeBlockDesign('text', props);
+    const sectionClass = buildBlockSectionClasses('text', 'lp-text', design);
+    const inlineVars = buildInlineStyleVars(design);
     const content = propString(props, 'content', 'text', 'body') ?? '';
     const heading = propString(props, 'heading', 'title');
+    const widthClass =
+      design.contentWidth === 'wide'
+        ? 'lp-section'
+        : design.contentWidth === 'narrow'
+          ? 'lp-section lp-section--narrow'
+          : 'lp-section lp-section--narrow';
 
     return `
-    <section class="lp-block lp-text">
-      <div class="lp-section lp-section--narrow">
+    <section class="${sectionClass}"${inlineVars}>
+      <div class="${widthClass}">
         ${heading ? `<h2 class="lp-text__heading">${escapeHtml(heading)}</h2>` : ''}
         <div class="lp-text__body">${renderTextParagraphs(content)}</div>
       </div>
@@ -594,16 +683,20 @@ export function renderBlockHtml(
   }
 
   if (type === 'image') {
+    const design = normalizeBlockDesign('image', props);
+    const sectionClass = buildBlockSectionClasses('image', 'lp-media', design);
+    const inlineVars = buildInlineStyleVars(design);
+    const imgClass = buildMediaImgClasses('lp-media', design);
     const imageSrc = resolveHeroImageSrc(props, context);
-    const alt = propString(props, 'alt') ?? 'Image';
+    const alt = propString(props, 'alt') ?? '';
     const caption = propString(props, 'caption');
 
     if (imageSrc) {
       return `
-    <section class="lp-block lp-media">
+    <section class="${sectionClass}"${inlineVars}>
       <div class="lp-section">
         <figure class="lp-media__figure">
-          <img class="lp-media__img" src="${escapeHtml(imageSrc)}" alt="${escapeHtml(alt)}" loading="lazy" decoding="async" />
+          <img class="${imgClass}" src="${escapeHtml(imageSrc)}" alt="${escapeHtml(alt)}" loading="lazy" decoding="async" />
           ${caption ? `<figcaption class="lp-media__caption">${escapeHtml(caption)}</figcaption>` : ''}
         </figure>
       </div>
@@ -611,9 +704,9 @@ export function renderBlockHtml(
     }
 
     return `
-    <section class="lp-block lp-media lp-media--empty">
+    <section class="${sectionClass} lp-media--empty"${inlineVars}>
       <div class="lp-section">
-        <div class="lp-media__placeholder">Image non définie</div>
+        <div class="lp-media__placeholder">Sélectionnez une image</div>
       </div>
     </section>`;
   }
@@ -645,7 +738,7 @@ export function renderBlockHtml(
   }
 
   if (type === 'features') {
-    return renderFeaturesHtml(props);
+    return renderFeaturesHtml(props, context);
   }
 
   if (type === 'financing') {

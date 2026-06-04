@@ -45,7 +45,7 @@ export function buildIndexHtml(
 
 export const STATIC_STYLE_CSS = getLandingPageStylesheet();
 
-export const STATIC_MAIN_JS = `document.addEventListener('DOMContentLoaded', function () {
+export const STATIC_LEAD_FORM_JS = `document.addEventListener('DOMContentLoaded', function () {
   console.log('[AutoHall] Landing page statique chargée');
 
   var config = window.LANDING_CONFIG || {};
@@ -153,6 +153,9 @@ export const STATIC_MAIN_JS = `document.addEventListener('DOMContentLoaded', fun
   });
 });
 `;
+
+/** @deprecated Alias — préférer STATIC_LEAD_FORM_JS pour les exports studio. */
+export const STATIC_MAIN_JS = STATIC_LEAD_FORM_JS;
 
 export function buildExportFilename(slug: string, versionNumber: number): string {
   const safeSlug = slug

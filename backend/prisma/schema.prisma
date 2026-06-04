@@ -39,6 +39,12 @@ enum PageVersionStatus {
   ARCHIVED
 }
 
+/// Moteur d’édition de la version (blocs structurés vs studio visuel).
+enum DesignEngine {
+  blocks
+  grapesjs
+}
+
 enum ExportJobStatus {
   PENDING
   SUCCESS
@@ -174,8 +180,12 @@ model PageVersion {
   label         String?           @db.VarChar(120)
   status        PageVersionStatus @default(DRAFT)
   /// Thème page (couleurs, langue, etc.) — structure contrôlée côté API
-  themeJson     Json?             @map("theme_json")
-  createdById   String            @map("created_by") @db.Uuid
+  themeJson          Json?         @map("theme_json")
+  designEngine       DesignEngine  @default(blocks) @map("design_engine")
+  designProjectJson  Json?         @map("design_project_json")
+  designHtmlSnapshot String?       @map("design_html_snapshot") @db.Text
+  designCssSnapshot  String?       @map("design_css_snapshot") @db.Text
+  createdById        String        @map("created_by") @db.Uuid
   createdAt     DateTime          @default(now()) @map("created_at")
   updatedAt     DateTime          @updatedAt @map("updated_at")
 

@@ -1,11 +1,15 @@
 import { asPropString } from './block-props';
+import { normalizeBlockDesign } from './block-style';
 
 export type PageReadinessSeverity = 'critical' | 'warning';
+
+export type PageReadinessStatus = 'ready' | 'incomplete' | 'blocked';
 
 export type PageReadinessIssue = {
   code: string;
   severity: PageReadinessSeverity;
   message: string;
+  blockId?: string;
 };
 
 export type PageReadinessTheme = {
@@ -14,6 +18,7 @@ export type PageReadinessTheme = {
 };
 
 export type PageReadinessBlock = {
+  id?: string;
   type: string;
   propsJson?: Record<string, unknown> | unknown;
 };
@@ -50,19 +55,41 @@ export function getPageReadinessIssues(
   const heroBlocks = blocks.filter((b) => b.type === 'hero');
   for (const [index, block] of heroBlocks.entries()) {
     const props = propsOf(block);
+    const design = normalizeBlockDesign('hero', props);
     const label = heroBlocks.length > 1 ? ` (hero ${index + 1})` : '';
+    const bid = block.id;
     if (!asPropString(props.title).trim()) {
       issues.push({
         code: `hero-title-${index}`,
         severity: 'critical',
         message: `Hero${label} : titre principal manquant.`,
+        blockId: bid,
       });
     }
-    if (!hasHeroImage(props)) {
+    if (!asPropString(props.buttonText).trim()) {
+      issues.push({
+        code: `hero-cta-${index}`,
+        severity: 'critical',
+        message: `Hero${label} : CTA principal vide.`,
+        blockId: bid,
+      });
+    }
+    const needsImage =
+      design.layoutVariant !== 'minimal' && design.mediaPosition !== 'none';
+    if (needsImage && !hasHeroImage(props)) {
       issues.push({
         code: `hero-image-${index}`,
         severity: 'critical',
         message: `Hero${label} : aucune image sélectionnée.`,
+        blockId: bid,
+      });
+    }
+    if (hasHeroImage(props) && !asPropString(props.alt).trim()) {
+      issues.push({
+        code: `hero-alt-${index}`,
+        severity: 'warning',
+        message: `Hero${label} : texte alternatif image manquant.`,
+        blockId: bid,
       });
     }
   }
@@ -89,11 +116,33 @@ export function getPageReadinessIssues(
 
   for (const [index, block] of blocks.entries()) {
     if (block.type !== 'image') continue;
-    if (!hasImageBlockMedia(propsOf(block))) {
+    const props = propsOf(block);
+    if (!hasImageBlockMedia(props)) {
       issues.push({
         code: `image-block-${index}`,
         severity: 'critical',
         message: 'Bloc image : aucun média sélectionné.',
+        blockId: block.id,
+      });
+    } else if (!asPropString(props.alt).trim()) {
+      issues.push({
+        code: `image-alt-${index}`,
+        severity: 'warning',
+        message: 'Bloc image : texte alternatif manquant.',
+        blockId: block.id,
+      });
+    }
+  }
+
+  for (const block of blocks) {
+    if (block.type !== 'text') continue;
+    const props = propsOf(block);
+    if (!asPropString(props.heading).trim() && !asPropString(props.content).trim()) {
+      issues.push({
+        code: `text-empty-${block.id ?? 'x'}`,
+        severity: 'warning',
+        message: 'Section texte vide.',
+        blockId: block.id,
       });
     }
   }
@@ -120,4 +169,10 @@ export function getCriticalPageReadinessIssues(
   issues: PageReadinessIssue[],
 ): PageReadinessIssue[] {
   return issues.filter((issue) => issue.severity === 'critical');
+}
+
+export function getPageReadinessStatus(issues: PageReadinessIssue[]): PageReadinessStatus {
+  if (getCriticalPageReadinessIssues(issues).length > 0) return 'blocked';
+  if (issues.length > 0) return 'incomplete';
+  return 'ready';
 }

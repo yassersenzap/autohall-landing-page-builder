@@ -5,7 +5,8 @@ import {
   InspectorInput,
   InspectorSection,
 } from './InspectorPrimitives';
-import { BlockDesignLayoutFields } from './BlockDesignLayoutFields';
+import { MediaAssetField } from '../media/MediaAssetField';
+import { BlockStyleInspectorFields } from './BlockStyleInspectorFields';
 import { InspectorListField } from './InspectorListField';
 
 type FeaturesInspectorFieldsProps = {
@@ -14,7 +15,7 @@ type FeaturesInspectorFieldsProps = {
 };
 
 export function FeaturesInspectorFields({ blockId, propsJson }: FeaturesInspectorFieldsProps) {
-  const { patchString, patchList } = useBlockPropsPatch(blockId);
+  const { patchString, patchList, patchProps } = useBlockPropsPatch(blockId);
 
   return (
     <InspectorAccordion defaultValue={['content', 'model', 'design', 'specs']}>
@@ -42,14 +43,33 @@ export function FeaturesInspectorFields({ blockId, propsJson }: FeaturesInspecto
           value={asPropString(propsJson.modelTagline)}
           onChange={(e) => patchString('modelTagline', e.target.value)}
         />
+        <MediaAssetField
+          imageAssetId={asPropString(propsJson.imageAssetId)}
+          onPickAsset={(assetId) => {
+            patchProps({ imageAssetId: assetId, imageUrl: '' });
+          }}
+        />
         <InspectorInput
-          label="URL du visuel"
+          label="URL du visuel (optionnel)"
           value={asPropString(propsJson.imageUrl)}
-          onChange={(e) => patchString('imageUrl', e.target.value)}
+          onChange={(e) => {
+            patchString('imageUrl', e.target.value);
+            if (e.target.value.trim()) patchString('imageAssetId', '');
+          }}
+        />
+        <InspectorInput
+          label="Texte alternatif"
+          value={asPropString(propsJson.alt)}
+          onChange={(e) => patchString('alt', e.target.value)}
         />
       </InspectorSection>
 
-      <BlockDesignLayoutFields blockId={blockId} propsJson={propsJson} />
+      <BlockStyleInspectorFields
+        blockId={blockId}
+        blockType="features"
+        propsJson={propsJson}
+        showMedia
+      />
 
       <InspectorSection value="specs" title="Caractéristiques">
         <InspectorListField

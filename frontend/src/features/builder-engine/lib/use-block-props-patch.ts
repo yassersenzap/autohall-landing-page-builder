@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useBuilderEditorContext } from '../context/BuilderEditorContext';
 import { useBuilderDocumentStore } from '../store/builder-document.store';
+import { extractDesignRaw } from './block-style';
 import { sanitizePropsPatch } from './sanitize-props-patch';
 
 /** Patch typé pour l'inspecteur (validation future par schéma). */
@@ -32,5 +33,17 @@ export function useBlockPropsPatch(blockId: string) {
     [blockId, canWrite, updateBlockProps],
   );
 
-  return { patchString, patchList, patchProps, readOnly: !canWrite };
+  const patchDesign = useCallback(
+    (partial: Record<string, unknown>) => {
+      if (!canWrite) return;
+      const block = useBuilderDocumentStore.getState().blocks.find((b) => b.id === blockId);
+      const current = extractDesignRaw(
+        (block?.propsJson ?? {}) as Record<string, unknown>,
+      );
+      patchProps({ design: { ...current, ...partial } });
+    },
+    [blockId, canWrite, patchProps],
+  );
+
+  return { patchString, patchList, patchProps, patchDesign, readOnly: !canWrite };
 }

@@ -17,6 +17,8 @@ describe('HeroBlockPreview empty states', () => {
     );
 
     expect(screen.getByText('Titre principal à renseigner')).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
+    expect(screen.getByText('Titre principal à renseigner')).toHaveAttribute(
+      'data-builder-empty-hint',
+    );
   });
 });

@@ -6,6 +6,7 @@ import {
   InspectorSection,
   InspectorTextarea,
 } from './InspectorPrimitives';
+import { BlockStyleInspectorFields } from './BlockStyleInspectorFields';
 
 type FormInspectorFieldsProps = {
   blockId: string;
@@ -45,6 +46,12 @@ export function FormInspectorFields({ blockId, propsJson }: FormInspectorFieldsP
           lead. Personnalisation avancée à venir.
         </p>
       </InspectorSection>
+
+      <BlockStyleInspectorFields
+        blockId={blockId}
+        blockType="lead_form"
+        propsJson={propsJson}
+      />
 
       <InspectorSection value="submit" title="Soumission">
         <InspectorInput
