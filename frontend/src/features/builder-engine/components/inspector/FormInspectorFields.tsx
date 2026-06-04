@@ -16,7 +16,7 @@ export function FormInspectorFields({ blockId, propsJson }: FormInspectorFieldsP
   const { patchString } = useBlockPropsPatch(blockId);
 
   return (
-    <InspectorAccordion defaultValue={['content', 'submit']}>
+    <InspectorAccordion defaultValue={['content', 'fields', 'submit']}>
       <InspectorSection value="content" title="Contenu">
         <InspectorInput
           label="Titre du formulaire"
@@ -24,11 +24,24 @@ export function FormInspectorFields({ blockId, propsJson }: FormInspectorFieldsP
           onChange={(e) => patchString('title', e.target.value)}
         />
         <InspectorTextarea
-          label="Texte d'aide"
+          label="Texte d’aide"
           rows={3}
           value={asPropString(propsJson.subtitle)}
           onChange={(e) => patchString('subtitle', e.target.value)}
         />
+        <InspectorTextarea
+          label="Note confidentialité"
+          rows={2}
+          value={asPropString(propsJson.privacyNote)}
+          onChange={(e) => patchString('privacyNote', e.target.value)}
+        />
+      </InspectorSection>
+
+      <InspectorSection value="fields" title="Champs">
+        <p className="text-xs text-muted-foreground">
+          Les champs visibles (nom, téléphone, email…) sont configurés dans le catalogue
+          lead. Personnalisation avancée à venir.
+        </p>
       </InspectorSection>
 
       <InspectorSection value="submit" title="Soumission">

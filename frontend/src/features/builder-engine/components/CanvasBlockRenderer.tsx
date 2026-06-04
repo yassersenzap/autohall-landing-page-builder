@@ -5,6 +5,9 @@ import { FinalCtaBlockPreview } from './preview/FinalCtaBlockPreview';
 import { FooterLegalBlockPreview } from './preview/FooterLegalBlockPreview';
 import { HeroBlockPreview } from './preview/HeroBlockPreview';
 import { LeadFormBlockPreview } from './preview/LeadFormBlockPreview';
+import { FaqBlockPreview } from './preview/FaqBlockPreview';
+import { ImageBlockPreview } from './preview/ImageBlockPreview';
+import { TextBlockPreview } from './preview/TextBlockPreview';
 import { TrustBarBlockPreview } from './preview/TrustBarBlockPreview';
 
 type CanvasBlockRendererProps = {
@@ -29,6 +32,12 @@ function renderBlockContent(
       return <FinalCtaBlockPreview propsJson={propsJson} />;
     case 'footer_legal':
       return <FooterLegalBlockPreview propsJson={propsJson} />;
+    case 'text':
+      return <TextBlockPreview propsJson={propsJson} />;
+    case 'image':
+      return <ImageBlockPreview propsJson={propsJson} />;
+    case 'faq':
+      return <FaqBlockPreview propsJson={propsJson} />;
     default:
       return (
         <div className="px-6 py-10 text-center">

@@ -8,6 +8,7 @@ import { CampaignsModule } from './campaigns/campaigns.module';
 import { HealthModule } from './health/health.module';
 import { LeadEventsModule } from './lead-events/lead-events.module';
 import { LandingPagesModule } from './landing-pages/landing-pages.module';
+import { PageAssetsModule } from './page-assets/page-assets.module';
 import { PageBlocksModule } from './page-blocks/page-blocks.module';
 import { PageExportModule } from './page-export/page-export.module';
 import { PagePreviewModule } from './page-preview/page-preview.module';
@@ -26,6 +27,7 @@ import { PrismaModule } from './prisma/prisma.module';
     LandingPagesModule,
     PageVersionsModule,
     PageBlocksModule,
+    PageAssetsModule,
     PagePreviewModule,
     PageExportModule,
     LeadEventsModule,

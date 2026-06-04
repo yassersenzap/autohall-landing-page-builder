@@ -24,5 +24,13 @@ export function useBlockPropsPatch(blockId: string) {
     [blockId, canWrite, updateBlockProps],
   );
 
-  return { patchString, patchList, readOnly: !canWrite };
+  const patchProps = useCallback(
+    (patch: Record<string, unknown>) => {
+      if (!canWrite) return;
+      updateBlockProps(blockId, sanitizePropsPatch(patch));
+    },
+    [blockId, canWrite, updateBlockProps],
+  );
+
+  return { patchString, patchList, patchProps, readOnly: !canWrite };
 }

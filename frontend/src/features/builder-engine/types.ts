@@ -22,6 +22,8 @@ export type HeroBlockProps = {
   secondaryButtonText?: string;
   secondaryButtonTarget?: string;
   imageUrl?: string;
+  /** UUID d'un asset uploadé (LandingPageAsset) — pas de base64. */
+  imageAssetId?: string;
   alt?: string;
 };
 

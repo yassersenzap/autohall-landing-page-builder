@@ -5,6 +5,7 @@ import {
   type BlockBackgroundTheme,
 } from '../../lib/block-design-props';
 import { parseHeroProps } from '../../lib/block-props';
+import { HeroBlockImage } from '../media/HeroBlockImage';
 
 type HeroBlockPreviewProps = {
   propsJson: Record<string, unknown>;
@@ -62,7 +63,7 @@ export function HeroBlockPreview({ propsJson }: HeroBlockPreviewProps) {
   const props = parseHeroProps(propsJson);
   const alignment = parseImageAlignment(propsJson.imageAlignment);
   const theme = parseBackgroundTheme(propsJson.backgroundTheme);
-  const hasImage = Boolean(props.imageUrl);
+  const hasImage = Boolean(props.imageAssetId || props.imageUrl);
   const surface = heroSurface(theme, hasImage);
   const imageFirst = alignment === 'left';
 
@@ -75,10 +76,10 @@ export function HeroBlockPreview({ propsJson }: HeroBlockPreviewProps) {
     >
       {hasImage ? (
         <>
-          <img
-            src={props.imageUrl}
+          <HeroBlockImage
+            imageAssetId={props.imageAssetId}
+            imageUrl={props.imageUrl}
             alt=""
-            aria-hidden
             className="absolute inset-0 h-full w-full scale-105 object-cover blur-[2px]"
           />
           <div
@@ -177,11 +178,10 @@ export function HeroBlockPreview({ propsJson }: HeroBlockPreviewProps) {
                 className="absolute -inset-4 rounded-[2rem] bg-gradient-to-tr from-red-500/20 via-transparent to-white/10 blur-2xl"
                 aria-hidden
               />
-              <img
-                src={props.imageUrl}
+              <HeroBlockImage
+                imageAssetId={props.imageAssetId}
+                imageUrl={props.imageUrl}
                 alt={props.alt}
-                loading="lazy"
-                decoding="async"
                 className="builder-hero-premium__vehicle relative mx-auto h-auto w-full max-w-full object-contain drop-shadow-[0_40px_60px_rgba(0,0,0,0.45)]"
               />
             </div>

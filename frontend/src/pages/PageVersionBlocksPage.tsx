@@ -12,8 +12,9 @@ import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder
 import { StudioTopBar } from '@/features/editor/components/StudioTopBar';
 import { usePageEditor } from '@/features/editor/hooks/usePageEditor';
 import type { EditorPageBlock } from '@/features/editor/types/editor.types';
+import { parsePageThemeFromJson } from '@/features/builder-engine/lib/page-theme';
 import { downloadPageVersionExport } from '@/lib/page-export';
-import { publishPageVersion } from '@/lib/page-versions';
+import { fetchPageVersion, publishPageVersion, updatePageVersion } from '@/lib/page-versions';
 import { ApiError } from '@/lib/api';
 
 const LAST_DRAFT_STORAGE_KEY = 'autohall-studio-last-draft';
@@ -42,6 +43,9 @@ export default function PageVersionBlocksPage() {
   const baselineRef = useRef<EditorPageBlock[]>([]);
 
   const setInitialBlocks = useBuilderDocumentStore((s) => s.setInitialBlocks);
+  const setInitialPageTheme = useBuilderDocumentStore((s) => s.setInitialPageTheme);
+  const buildThemeJsonPayload = useBuilderDocumentStore((s) => s.buildThemeJsonPayload);
+  const themeDirty = useBuilderDocumentStore((s) => s.themeDirty);
   const resetDocument = useBuilderDocumentStore((s) => s.resetDocument);
   const documentBlocks = useBuilderDocumentStore((s) => s.blocks);
   const deviceMode = useBuilderDocumentStore((s) => s.deviceMode);
@@ -121,6 +125,23 @@ export default function PageVersionBlocksPage() {
     setInitialBlocks(apiBlocksToBuilderBlocks(sorted));
   }, [apiBlocks, setInitialBlocks, status.loading]);
 
+  useEffect(() => {
+    if (!state.landingPageId || status.loading) return;
+
+    void fetchPageVersion(state.landingPageId, pageVersionIdValue)
+      .then((response) => {
+        setInitialPageTheme(parsePageThemeFromJson(response.data.themeJson));
+      })
+      .catch(() => {
+        // Thème optionnel — ne bloque pas l’éditeur
+      });
+  }, [
+    pageVersionIdValue,
+    setInitialPageTheme,
+    state.landingPageId,
+    status.loading,
+  ]);
+
   async function handleSave() {
     if (!canEditDocument) return;
 
@@ -131,6 +152,11 @@ export default function PageVersionBlocksPage() {
         documentBlocks,
         baselineRef.current,
       );
+      if (themeDirty && state.landingPageId) {
+        await updatePageVersion(state.landingPageId, pageVersionIdValue, {
+          themeJson: buildThemeJsonPayload(),
+        });
+      }
       await load();
       showSuccess('Landing sauvegardée.');
     } catch (err) {
@@ -176,7 +202,11 @@ export default function PageVersionBlocksPage() {
   }
 
   return (
-    <BuilderEditorProvider canWrite={canEditDocument}>
+    <BuilderEditorProvider
+      canWrite={canEditDocument}
+      pageVersionId={pageVersionIdValue}
+      landingPageId={state.landingPageId ?? null}
+    >
       <BuilderWorkspaceLayout
         topbar={
           <StudioTopBar

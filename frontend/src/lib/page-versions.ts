@@ -75,3 +75,28 @@ export async function publishPageVersion(pageVersionId: string) {
 export function canManagePageVersions(role: string): boolean {
   return role === 'ADMIN' || role === 'SI_DIGITAL' || role === 'MARKETER';
 }
+
+export type PageVersionDetail = PageVersionListItem & {
+  themeJson: unknown;
+  updatedAt: string;
+};
+
+export async function fetchPageVersion(
+  landingPageId: string,
+  pageVersionId: string,
+) {
+  return apiRequest<PageVersionDetail>(
+    `${pageVersionsBase(landingPageId)}/${pageVersionId}`,
+  );
+}
+
+export async function updatePageVersion(
+  landingPageId: string,
+  pageVersionId: string,
+  payload: { themeJson?: Record<string, unknown>; label?: string },
+) {
+  return apiRequest<PageVersionDetail>(
+    `${pageVersionsBase(landingPageId)}/${pageVersionId}`,
+    { method: 'PATCH', body: payload },
+  );
+}

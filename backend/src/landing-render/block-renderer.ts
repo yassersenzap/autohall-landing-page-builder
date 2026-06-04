@@ -1,4 +1,6 @@
 import { Prisma } from '@prisma/client';
+import { resolveHeroImageSrc } from './render-asset.resolve';
+import type { LandingRenderContext } from './render-asset.types';
 
 export type RenderBlockInput = {
   blockType: string;
@@ -230,7 +232,10 @@ function renderLeadFormHtml(props: Record<string, unknown>): string {
     </section>`;
 }
 
-function renderHeroHtml(props: Record<string, unknown>): string {
+function renderHeroHtml(
+  props: Record<string, unknown>,
+  context?: LandingRenderContext,
+): string {
   const title = propString(props, 'title');
   const subtitle = propString(props, 'subtitle');
   const eyebrow = propString(props, 'eyebrow', 'kicker', 'badge');
@@ -239,7 +244,7 @@ function renderHeroHtml(props: Record<string, unknown>): string {
   const secondaryText = propString(props, 'secondaryButtonText', 'secondaryCtaText');
   const secondaryTarget =
     propString(props, 'secondaryButtonTarget', 'secondaryCtaTarget') ?? '#offer';
-  const imageUrl = propString(props, 'imageUrl', 'src', 'url');
+  const imageSrc = resolveHeroImageSrc(props, context);
   const imageAlt = propString(props, 'alt', 'imageAlt') ?? 'Véhicule Auto Hall';
 
   const actions: string[] = [];
@@ -250,8 +255,8 @@ function renderHeroHtml(props: Record<string, unknown>): string {
     actions.push(renderBtn(secondaryTarget, secondaryText, 'secondary', 'lg'));
   }
 
-  const mediaHtml = imageUrl
-    ? `<div class="lp-hero__media"><img class="lp-hero__img" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(imageAlt)}" loading="eager" decoding="async" /></div>`
+  const mediaHtml = imageSrc
+    ? `<div class="lp-hero__media"><img class="lp-hero__img" src="${escapeHtml(imageSrc)}" alt="${escapeHtml(imageAlt)}" loading="eager" decoding="async" /></div>`
     : `<div class="lp-hero__media lp-hero__media--placeholder" aria-hidden="true"><span>Visuel véhicule / offre</span></div>`;
 
   return `
@@ -560,12 +565,15 @@ function renderFooterLegalHtml(props: Record<string, unknown>): string {
     </section>`;
 }
 
-export function renderBlockHtml(block: RenderBlockInput): string {
+export function renderBlockHtml(
+  block: RenderBlockInput,
+  context?: LandingRenderContext,
+): string {
   const props = propsAsRecord(block.propsJson);
   const type = block.blockType.toLowerCase();
 
   if (type === 'hero') {
-    return renderHeroHtml(props);
+    return renderHeroHtml(props, context);
   }
 
   if (type === 'trust_bar') {
@@ -586,16 +594,16 @@ export function renderBlockHtml(block: RenderBlockInput): string {
   }
 
   if (type === 'image') {
-    const imageUrl = propString(props, 'imageUrl', 'src', 'url');
+    const imageSrc = resolveHeroImageSrc(props, context);
     const alt = propString(props, 'alt') ?? 'Image';
     const caption = propString(props, 'caption');
 
-    if (imageUrl) {
+    if (imageSrc) {
       return `
     <section class="lp-block lp-media">
       <div class="lp-section">
         <figure class="lp-media__figure">
-          <img class="lp-media__img" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(alt)}" loading="lazy" decoding="async" />
+          <img class="lp-media__img" src="${escapeHtml(imageSrc)}" alt="${escapeHtml(alt)}" loading="lazy" decoding="async" />
           ${caption ? `<figcaption class="lp-media__caption">${escapeHtml(caption)}</figcaption>` : ''}
         </figure>
       </div>
@@ -695,6 +703,9 @@ export function renderPageShellFooter(): string {
   </footer>`;
 }
 
-export function renderBlocksHtml(blocks: RenderBlockInput[]): string {
-  return blocks.map((block) => renderBlockHtml(block)).join('\n');
+export function renderBlocksHtml(
+  blocks: RenderBlockInput[],
+  context?: LandingRenderContext,
+): string {
+  return blocks.map((block) => renderBlockHtml(block, context)).join('\n');
 }

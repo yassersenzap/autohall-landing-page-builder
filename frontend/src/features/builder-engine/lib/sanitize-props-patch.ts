@@ -60,7 +60,11 @@ export function sanitizePropsPatch(
     if (typeof key !== 'string' || key.length === 0 || key.length > 64) continue;
 
     if (typeof value === 'string') {
-      out[key] = trimString(value, MAX_STRING_LENGTH);
+      const trimmed = trimString(value, MAX_STRING_LENGTH);
+      if (trimmed.toLowerCase().startsWith('data:')) {
+        continue;
+      }
+      out[key] = trimmed;
       continue;
     }
 

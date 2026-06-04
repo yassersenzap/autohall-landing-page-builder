@@ -15,6 +15,7 @@ export function parseHeroProps(propsJson: Record<string, unknown>): HeroBlockPro
     secondaryButtonText: asPropString(propsJson.secondaryButtonText),
     secondaryButtonTarget: asPropString(propsJson.secondaryButtonTarget) || '#offer',
     imageUrl: asPropString(propsJson.imageUrl),
+    imageAssetId: asPropString(propsJson.imageAssetId),
     alt: asPropString(propsJson.alt) || 'Véhicule Auto Hall',
   };
 }

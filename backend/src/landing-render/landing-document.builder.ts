@@ -8,6 +8,7 @@ import {
   type RenderBlockInput,
   type RenderPageShell,
 } from './block-renderer';
+import type { LandingRenderContext } from './render-asset.types';
 import { resolveLandingTheme } from './landing-theme';
 
 export type BuildLandingDocumentInput = {
@@ -16,11 +17,12 @@ export type BuildLandingDocumentInput = {
   themeJson: Prisma.JsonValue | null;
   includeScripts?: boolean;
   stylesheetHref?: string;
+  renderContext?: LandingRenderContext;
 };
 
 export function buildLandingDocumentHtml(input: BuildLandingDocumentInput): string {
   const theme = resolveLandingTheme(input.themeJson);
-  const body = renderBlocksHtml(input.blocks);
+  const body = renderBlocksHtml(input.blocks, input.renderContext);
   const header = renderPageShellHeader(input.shell);
   const footer = renderPageShellFooter();
   const stylesheet = input.stylesheetHref
@@ -59,6 +61,7 @@ export function buildLandingPreviewFragment(input: {
   shell: RenderPageShell;
   blocks: RenderBlockInput[];
   themeJson: Prisma.JsonValue | null;
+  renderContext?: LandingRenderContext;
 }): {
   themeMode: 'light' | 'dark';
   themeStyle: string;
@@ -72,7 +75,7 @@ export function buildLandingPreviewFragment(input: {
 
   const blocksHtml = blocksWithIds.map((block, index) => ({
     id: block.id ?? `block-${index}`,
-    html: renderBlockHtml(block),
+    html: renderBlockHtml(block, input.renderContext),
   }));
 
   const headerHtml = renderPageShellHeader(input.shell);

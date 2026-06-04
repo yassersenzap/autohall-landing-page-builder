@@ -137,8 +137,8 @@ export function CanvasArea() {
                     <LayoutTemplate className="mb-4 h-12 w-12 text-muted-foreground/40" />
                     <p className="text-sm font-semibold text-foreground">Canvas vide</p>
                     <p className="mt-2 max-w-xs text-xs leading-relaxed text-muted-foreground">
-                      Glissez un composant depuis le panneau gauche ou cliquez sur + pour
-                      commencer votre landing.
+                      Onglet <strong>Sections</strong> pour une page complète, ou{' '}
+                      <strong>Blocs</strong> pour ajouter section par section.
                     </p>
                   </div>
                 ) : (

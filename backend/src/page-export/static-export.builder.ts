@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { buildLandingDocumentHtml } from '../landing-render/landing-document.builder';
+import type { LandingRenderContext } from '../landing-render/render-asset.types';
 import { getLandingPageStylesheet } from '../landing-render/landing-styles';
 
 export type ExportBlock = {
@@ -30,6 +31,7 @@ export function buildIndexHtml(
   context: ExportPageContext,
   blocks: ExportBlock[],
   themeJson: Prisma.JsonValue | null = null,
+  renderContext?: LandingRenderContext,
 ): string {
   return buildLandingDocumentHtml({
     shell: context,
@@ -37,6 +39,7 @@ export function buildIndexHtml(
     themeJson,
     includeScripts: true,
     stylesheetHref: 'assets/style.css',
+    renderContext,
   });
 }
 

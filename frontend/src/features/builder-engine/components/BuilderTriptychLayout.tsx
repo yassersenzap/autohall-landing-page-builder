@@ -15,11 +15,11 @@ import { BUILDER_PALETTE, parsePaletteDragId } from '../constants/palette';
 import { useBuilderEditorContext } from '../context/BuilderEditorContext';
 import { useBuilderDocumentStore } from '../store/builder-document.store';
 import { CanvasArea } from './CanvasArea';
-import { LeftPanel } from './LeftPanel';
+import { BuilderLeftPanel } from './left-panel/BuilderLeftPanel';
 import { RightInspector } from './RightInspector';
 
 export function BuilderTriptychLayout() {
-  const { canWrite } = useBuilderEditorContext();
+  const { canWrite, leftPanelTab, setLeftPanelTab } = useBuilderEditorContext();
   const blocks = useBuilderDocumentStore((s) => s.blocks);
   const addBlock = useBuilderDocumentStore((s) => s.addBlock);
   const reorderBlocks = useBuilderDocumentStore((s) => s.reorderBlocks);
@@ -90,8 +90,8 @@ export function BuilderTriptychLayout() {
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
     >
-      <div className="builder-workspace__grid grid h-full min-h-0 w-full max-w-none grid-cols-1 overflow-hidden lg:grid-cols-[12.5rem_minmax(0,1fr)_17.5rem]">
-        <LeftPanel />
+      <div className="builder-workspace__grid grid h-full min-h-0 w-full max-w-none grid-cols-1 overflow-hidden lg:grid-cols-[15rem_minmax(0,1fr)_18rem]">
+        <BuilderLeftPanel activeTab={leftPanelTab} onTabChange={setLeftPanelTab} />
         <CanvasArea />
         <RightInspector />
       </div>

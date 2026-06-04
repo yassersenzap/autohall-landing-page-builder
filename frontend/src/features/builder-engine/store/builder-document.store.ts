@@ -1,12 +1,13 @@
 import { create } from 'zustand';
-import { BUILDER_PALETTE } from '../constants/palette';
 import { getDefaultBlockProps } from '../constants/default-block-props';
+import { getRegistryEntry } from '../registry/block-registry';
+import { getActivePaletteBlocks } from '../registry/block-registry';
 import type { BuilderDeviceMode } from '../lib/block-design-props';
 import { sanitizePropsPatch } from '../lib/sanitize-props-patch';
 import type { BuilderDocumentBlock } from '../types';
 
-function createBlockFromPalette(type: string, sortOrder: number): BuilderDocumentBlock {
-  const item = BUILDER_PALETTE.find((p) => p.type === type);
+function createBlockFromType(type: string, sortOrder: number): BuilderDocumentBlock {
+  const item = getRegistryEntry(type);
   return {
     id: crypto.randomUUID(),
     type,
@@ -20,13 +21,32 @@ function normalizeSortOrder(blocks: BuilderDocumentBlock[]): BuilderDocumentBloc
   return blocks.map((block, index) => ({ ...block, sortOrder: index }));
 }
 
+export type PageThemeDraft = {
+  primaryColor: string;
+  mode: 'light' | 'dark';
+  fontFamily: string;
+  seoTitle: string;
+  seoDescription: string;
+};
+
+const DEFAULT_PAGE_THEME: PageThemeDraft = {
+  primaryColor: '#b91c1c',
+  mode: 'dark',
+  fontFamily: 'Inter',
+  seoTitle: '',
+  seoDescription: '',
+};
+
 type BuilderDocumentState = {
   blocks: BuilderDocumentBlock[];
   selectedBlockId: string | null;
   hoveredBlockId: string | null;
   deviceMode: BuilderDeviceMode;
+  pageTheme: PageThemeDraft;
+  themeDirty: boolean;
 
   addBlock: (type: string, index?: number) => void;
+  addSection: (blockTypes: string[]) => void;
   removeBlock: (blockId: string) => void;
   duplicateBlock: (blockId: string) => void;
   selectBlock: (blockId: string | null) => void;
@@ -36,6 +56,9 @@ type BuilderDocumentState = {
   updateBlockProps: (blockId: string, patch: Record<string, unknown>) => void;
   setInitialBlocks: (blocks: BuilderDocumentBlock[]) => void;
   setDeviceMode: (mode: BuilderDeviceMode) => void;
+  setPageTheme: (patch: Partial<PageThemeDraft>) => void;
+  setInitialPageTheme: (theme: PageThemeDraft) => void;
+  buildThemeJsonPayload: () => Record<string, unknown>;
   resetDocument: () => void;
 };
 
@@ -44,17 +67,42 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>((set, get) =
   selectedBlockId: null,
   hoveredBlockId: null,
   deviceMode: 'desktop',
+  pageTheme: { ...DEFAULT_PAGE_THEME },
+  themeDirty: false,
 
   addBlock: (type, index) => {
+    const activeTypes = new Set(getActivePaletteBlocks().map((b) => b.type));
+    if (!activeTypes.has(type)) return;
+
     const blocks = [...get().blocks];
     const insertAt =
       index === undefined || index < 0 || index > blocks.length ? blocks.length : index;
-    const newBlock = createBlockFromPalette(type, insertAt);
+    const newBlock = createBlockFromType(type, insertAt);
     const next = [...blocks];
     next.splice(insertAt, 0, newBlock);
     set({
       blocks: normalizeSortOrder(next),
       selectedBlockId: newBlock.id,
+    });
+  },
+
+  addSection: (blockTypes) => {
+    const activeTypes = new Set(getActivePaletteBlocks().map((b) => b.type));
+    const blocks = [...get().blocks];
+    let insertAt = blocks.length;
+    let firstId: string | null = null;
+
+    for (const type of blockTypes) {
+      if (!activeTypes.has(type)) continue;
+      const newBlock = createBlockFromType(type, insertAt);
+      blocks.splice(insertAt, 0, newBlock);
+      if (!firstId) firstId = newBlock.id;
+      insertAt += 1;
+    }
+
+    set({
+      blocks: normalizeSortOrder(blocks),
+      selectedBlockId: firstId,
     });
   },
 
@@ -138,12 +186,40 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>((set, get) =
 
   setDeviceMode: (mode) => set({ deviceMode: mode }),
 
+  setPageTheme: (patch) =>
+    set((state) => ({
+      pageTheme: { ...state.pageTheme, ...patch },
+      themeDirty: true,
+    })),
+
+  setInitialPageTheme: (theme) =>
+    set({ pageTheme: theme, themeDirty: false }),
+
+  buildThemeJsonPayload: () => {
+    const { pageTheme } = get();
+    return {
+      page: {
+        theme: {
+          primaryColor: pageTheme.primaryColor,
+          mode: pageTheme.mode,
+          fontFamily: pageTheme.fontFamily,
+        },
+        seo: {
+          title: pageTheme.seoTitle,
+          description: pageTheme.seoDescription,
+        },
+      },
+    };
+  },
+
   resetDocument: () =>
     set({
       blocks: [],
       selectedBlockId: null,
       hoveredBlockId: null,
       deviceMode: 'desktop',
+      pageTheme: { ...DEFAULT_PAGE_THEME },
+      themeDirty: false,
     }),
 }));
 
