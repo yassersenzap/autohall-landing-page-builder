@@ -50,22 +50,24 @@ export function CanvasArea() {
             <span className="text-xs font-medium text-muted-foreground">Page · 1200px</span>
           </div>
 
-          <div className="p-4">
+          <div className="overflow-hidden p-0">
             {blocks.length === 0 ? (
-              <div className="flex min-h-[16rem] flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/20 px-6 text-center">
-                <LayoutTemplate className="mb-3 h-10 w-10 text-muted-foreground/50" />
-                <p className="text-sm font-medium text-foreground">Canvas vide</p>
-                <p className="mt-1 max-w-xs text-xs text-muted-foreground">
-                  Glissez un composant depuis le panneau gauche ou cliquez sur + pour
-                  commencer.
-                </p>
+              <div className="p-4">
+                <div className="flex min-h-[16rem] flex-col items-center justify-center border border-dashed border-border bg-muted/20 px-6 text-center">
+                  <LayoutTemplate className="mb-3 h-10 w-10 text-muted-foreground/50" />
+                  <p className="text-sm font-medium text-foreground">Canvas vide</p>
+                  <p className="mt-1 max-w-xs text-xs text-muted-foreground">
+                    Glissez un composant depuis le panneau gauche ou cliquez sur + pour
+                    commencer.
+                  </p>
+                </div>
               </div>
             ) : (
               <SortableContext
                 items={blocks.map((b) => b.id)}
                 strategy={verticalListSortingStrategy}
               >
-                <ul className="flex flex-col gap-2">
+                <ul className="flex flex-col gap-3 p-3">
                   {blocks.map((block) => (
                     <SortableBlockItem key={block.id} block={block} />
                   ))}

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { BUILDER_PALETTE } from '../constants/palette';
+import { getDefaultBlockProps } from '../constants/default-block-props';
 import type { BuilderDocumentBlock } from '../types';
 
 function createBlockFromPalette(type: string, sortOrder: number): BuilderDocumentBlock {
@@ -9,6 +10,7 @@ function createBlockFromPalette(type: string, sortOrder: number): BuilderDocumen
     type,
     label: item?.label ?? `[Bloc ${type}]`,
     sortOrder,
+    propsJson: getDefaultBlockProps(type),
   };
 }
 
@@ -27,6 +29,7 @@ type BuilderDocumentState = {
   hoverBlock: (blockId: string | null) => void;
   reorderBlocks: (activeId: string, overId: string) => void;
   moveBlockToIndex: (blockId: string, newIndex: number) => void;
+  updateBlockProps: (blockId: string, patch: Record<string, unknown>) => void;
   resetDocument: () => void;
 };
 
@@ -81,6 +84,16 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>((set, get) =
     const [moved] = blocks.splice(oldIndex, 1);
     blocks.splice(clamped, 0, moved);
     set({ blocks: normalizeSortOrder(blocks) });
+  },
+
+  updateBlockProps: (blockId, patch) => {
+    set({
+      blocks: get().blocks.map((block) =>
+        block.id === blockId
+          ? { ...block, propsJson: { ...block.propsJson, ...patch } }
+          : block,
+      ),
+    });
   },
 
   resetDocument: () =>
