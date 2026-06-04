@@ -4,6 +4,7 @@ import {
   ExternalLink,
   Monitor,
   RefreshCw,
+  Save,
   Smartphone,
   Upload,
 } from 'lucide-react';
@@ -31,6 +32,8 @@ type StudioTopBarProps = {
   onRefresh: () => void;
   onPublish: () => void;
   onExport: () => void;
+  onSave?: () => void;
+  isSaving?: boolean;
 };
 
 function statusVariant(status: string | undefined): 'default' | 'secondary' | 'muted' {
@@ -57,6 +60,8 @@ export function StudioTopBar({
   onRefresh,
   onPublish,
   onExport,
+  onSave,
+  isSaving = false,
 }: StudioTopBarProps) {
   const breadcrumb = [campaignName, landingTitle].filter(Boolean);
 
@@ -103,6 +108,18 @@ export function StudioTopBar({
       />
 
       <div className="flex items-center justify-end gap-1.5">
+        {canWrite && onSave ? (
+          <ShadButton
+            type="button"
+            size="sm"
+            disabled={isSaving}
+            onClick={onSave}
+            className="font-semibold"
+          >
+            <Save className="h-3.5 w-3.5" />
+            {isSaving ? 'Sauvegarde…' : 'Sauvegarder'}
+          </ShadButton>
+        ) : null}
         <ShadButton type="button" variant="ghost" size="sm" className="hidden sm:inline-flex" onClick={onRefresh}>
           <RefreshCw className="h-3.5 w-3.5" />
           Recharger

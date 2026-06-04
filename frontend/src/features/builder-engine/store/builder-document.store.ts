@@ -31,6 +31,7 @@ type BuilderDocumentState = {
   reorderBlocks: (activeId: string, overId: string) => void;
   moveBlockToIndex: (blockId: string, newIndex: number) => void;
   updateBlockProps: (blockId: string, patch: Record<string, unknown>) => void;
+  setInitialBlocks: (blocks: BuilderDocumentBlock[]) => void;
   resetDocument: () => void;
 };
 
@@ -97,6 +98,15 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>((set, get) =
           ? { ...block, propsJson: { ...block.propsJson, ...safe } }
           : block,
       ),
+    });
+  },
+
+  setInitialBlocks: (blocks) => {
+    const ordered = normalizeSortOrder([...blocks]);
+    set({
+      blocks: ordered,
+      selectedBlockId: ordered[0]?.id ?? null,
+      hoveredBlockId: null,
     });
   },
 

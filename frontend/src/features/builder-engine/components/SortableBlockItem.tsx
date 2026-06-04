@@ -3,6 +3,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Trash2 } from 'lucide-react';
 import { ShadButton } from '@/components/ui/primitives';
 import { cn } from '@/lib/utils';
+import { useBuilderEditorContext } from '../context/BuilderEditorContext';
 import { useBuilderDocumentStore } from '../store/builder-document.store';
 import type { BuilderDocumentBlock } from '../types';
 import { CanvasBlockRenderer } from './CanvasBlockRenderer';
@@ -12,6 +13,7 @@ type SortableBlockItemProps = {
 };
 
 export function SortableBlockItem({ block }: SortableBlockItemProps) {
+  const { canWrite } = useBuilderEditorContext();
   const selectedBlockId = useBuilderDocumentStore((s) => s.selectedBlockId);
   const hoveredBlockId = useBuilderDocumentStore((s) => s.hoveredBlockId);
   const selectBlock = useBuilderDocumentStore((s) => s.selectBlock);
@@ -19,7 +21,7 @@ export function SortableBlockItem({ block }: SortableBlockItemProps) {
   const removeBlock = useBuilderDocumentStore((s) => s.removeBlock);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging, isOver } =
-    useSortable({ id: block.id });
+    useSortable({ id: block.id, disabled: !canWrite });
 
   const selected = selectedBlockId === block.id;
   const hovered = hoveredBlockId === block.id;
@@ -75,6 +77,7 @@ export function SortableBlockItem({ block }: SortableBlockItemProps) {
             size="icon-sm"
             className="mr-1 text-muted-foreground hover:text-destructive"
             aria-label="Supprimer"
+            disabled={!canWrite}
             onClick={() => removeBlock(block.id)}
           >
             <Trash2 className="h-3.5 w-3.5" />
