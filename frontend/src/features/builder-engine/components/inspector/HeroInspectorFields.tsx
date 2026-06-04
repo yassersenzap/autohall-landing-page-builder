@@ -6,6 +6,7 @@ import {
   InspectorSection,
   InspectorTextarea,
 } from './InspectorPrimitives';
+import { BlockDesignLayoutFields } from './BlockDesignLayoutFields';
 
 type HeroInspectorFieldsProps = {
   blockId: string;
@@ -16,7 +17,7 @@ export function HeroInspectorFields({ blockId, propsJson }: HeroInspectorFieldsP
   const { patchString } = useBlockPropsPatch(blockId);
 
   return (
-    <InspectorAccordion defaultValue={['content', 'media', 'cta']}>
+    <InspectorAccordion defaultValue={['content', 'media', 'design', 'cta']}>
       <InspectorSection value="content" title="Contenu">
         <InspectorInput
           label="Titre"
@@ -39,6 +40,8 @@ export function HeroInspectorFields({ blockId, propsJson }: HeroInspectorFieldsP
           hint="URL complète du visuel"
         />
       </InspectorSection>
+
+      <BlockDesignLayoutFields blockId={blockId} propsJson={propsJson} />
 
       <InspectorSection value="cta" title="Appel à l'action">
         <InspectorInput

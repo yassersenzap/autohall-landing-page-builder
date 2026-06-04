@@ -5,6 +5,7 @@ import {
   InspectorInput,
   InspectorSection,
 } from './InspectorPrimitives';
+import { BlockDesignLayoutFields } from './BlockDesignLayoutFields';
 import { InspectorListField } from './InspectorListField';
 
 type FeaturesInspectorFieldsProps = {
@@ -16,7 +17,7 @@ export function FeaturesInspectorFields({ blockId, propsJson }: FeaturesInspecto
   const { patchString, patchList } = useBlockPropsPatch(blockId);
 
   return (
-    <InspectorAccordion defaultValue={['content', 'model', 'specs']}>
+    <InspectorAccordion defaultValue={['content', 'model', 'design', 'specs']}>
       <InspectorSection value="content" title="Contenu">
         <InspectorInput
           label="Titre de section"
@@ -47,6 +48,8 @@ export function FeaturesInspectorFields({ blockId, propsJson }: FeaturesInspecto
           onChange={(e) => patchString('imageUrl', e.target.value)}
         />
       </InspectorSection>
+
+      <BlockDesignLayoutFields blockId={blockId} propsJson={propsJson} />
 
       <InspectorSection value="specs" title="Caractéristiques">
         <InspectorListField

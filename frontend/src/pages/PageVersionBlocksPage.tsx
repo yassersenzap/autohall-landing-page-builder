@@ -10,7 +10,7 @@ import { persistBuilderDocument } from '@/features/builder-engine/lib/persist-bu
 import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
 import { StudioTopBar } from '@/features/editor/components/StudioTopBar';
 import { usePageEditor } from '@/features/editor/hooks/usePageEditor';
-import type { EditorDeviceMode, EditorPageBlock } from '@/features/editor/types/editor.types';
+import type { EditorPageBlock } from '@/features/editor/types/editor.types';
 import { downloadPageVersionExport } from '@/lib/page-export';
 import { publishPageVersion } from '@/lib/page-versions';
 import { ApiError } from '@/lib/api';
@@ -36,7 +36,6 @@ export default function PageVersionBlocksPage() {
   const [publishing, setPublishing] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [deviceMode, setDeviceMode] = useState<EditorDeviceMode>('desktop');
   const [versionStatus, setVersionStatus] = useState<string | undefined>(state.versionStatus);
 
   const baselineRef = useRef<EditorPageBlock[]>([]);
@@ -44,6 +43,8 @@ export default function PageVersionBlocksPage() {
   const setInitialBlocks = useBuilderDocumentStore((s) => s.setInitialBlocks);
   const resetDocument = useBuilderDocumentStore((s) => s.resetDocument);
   const documentBlocks = useBuilderDocumentStore((s) => s.blocks);
+  const deviceMode = useBuilderDocumentStore((s) => s.deviceMode);
+  const setDeviceMode = useBuilderDocumentStore((s) => s.setDeviceMode);
 
   const { toast, showSuccess, showError, dismiss } = useStudioToast();
 
@@ -177,8 +178,9 @@ export default function PageVersionBlocksPage() {
 
   return (
     <BuilderEditorProvider canWrite={canEditDocument}>
-      <div className="flex h-[calc(100vh-var(--studio-topbar-height,3.25rem))] min-h-0 flex-col overflow-hidden lg:h-[calc(100vh-3.25rem)]">
-        <StudioTopBar
+      <div className="flex h-screen min-h-0 flex-col overflow-hidden">
+        <div className="shrink-0">
+          <StudioTopBar
           campaignName={state.campaignName}
           landingTitle={state.landingPageTitle}
           versionLabel={versionTitle}
@@ -205,7 +207,8 @@ export default function PageVersionBlocksPage() {
           backTo={versionsBackLink.to}
           backLabel={versionsBackLink.label}
           backState={versionsBackLink.state}
-        />
+          />
+        </div>
 
         {status.error ? (
           <p className="shrink-0 border-b border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive">
@@ -213,13 +216,15 @@ export default function PageVersionBlocksPage() {
           </p>
         ) : null}
 
-        <div className="relative min-h-0 flex-1">
+        <div className="relative min-h-0 flex-1 overflow-hidden">
           {status.loading ? (
             <p className="flex h-full items-center justify-center text-sm text-muted-foreground">
               Chargement des sections…
             </p>
           ) : (
-            <BuilderTriptychLayout />
+            <div className="h-full overflow-hidden">
+              <BuilderTriptychLayout />
+            </div>
           )}
         </div>
       </div>

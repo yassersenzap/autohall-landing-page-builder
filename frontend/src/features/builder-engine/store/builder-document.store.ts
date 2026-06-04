@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { BUILDER_PALETTE } from '../constants/palette';
 import { getDefaultBlockProps } from '../constants/default-block-props';
+import type { BuilderDeviceMode } from '../lib/block-design-props';
 import { sanitizePropsPatch } from '../lib/sanitize-props-patch';
 import type { BuilderDocumentBlock } from '../types';
 
@@ -23,6 +24,7 @@ type BuilderDocumentState = {
   blocks: BuilderDocumentBlock[];
   selectedBlockId: string | null;
   hoveredBlockId: string | null;
+  deviceMode: BuilderDeviceMode;
 
   addBlock: (type: string, index?: number) => void;
   removeBlock: (blockId: string) => void;
@@ -32,6 +34,7 @@ type BuilderDocumentState = {
   moveBlockToIndex: (blockId: string, newIndex: number) => void;
   updateBlockProps: (blockId: string, patch: Record<string, unknown>) => void;
   setInitialBlocks: (blocks: BuilderDocumentBlock[]) => void;
+  setDeviceMode: (mode: BuilderDeviceMode) => void;
   resetDocument: () => void;
 };
 
@@ -39,6 +42,7 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>((set, get) =
   blocks: [],
   selectedBlockId: null,
   hoveredBlockId: null,
+  deviceMode: 'desktop',
 
   addBlock: (type, index) => {
     const blocks = [...get().blocks];
@@ -110,11 +114,14 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>((set, get) =
     });
   },
 
+  setDeviceMode: (mode) => set({ deviceMode: mode }),
+
   resetDocument: () =>
     set({
       blocks: [],
       selectedBlockId: null,
       hoveredBlockId: null,
+      deviceMode: 'desktop',
     }),
 }));
 

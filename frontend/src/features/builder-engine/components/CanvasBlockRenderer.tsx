@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import type { BuilderDocumentBlock } from '../types';
-import { LandingPreviewScope } from './LandingPreviewScope';
 import { FeaturesBlockPreview } from './preview/FeaturesBlockPreview';
 import { FinalCtaBlockPreview } from './preview/FinalCtaBlockPreview';
 import { FooterLegalBlockPreview } from './preview/FooterLegalBlockPreview';
@@ -12,7 +11,7 @@ type CanvasBlockRendererProps = {
   block: BuilderDocumentBlock;
 };
 
-function renderBlockContent(block: BuilderDocumentBlock): ReactNode {
+export function CanvasBlockRenderer({ block }: CanvasBlockRendererProps): ReactNode {
   const type = block.type.toLowerCase();
 
   switch (type) {
@@ -38,8 +37,4 @@ function renderBlockContent(block: BuilderDocumentBlock): ReactNode {
         </div>
       );
   }
-}
-
-export function CanvasBlockRenderer({ block }: CanvasBlockRendererProps) {
-  return <LandingPreviewScope>{renderBlockContent(block)}</LandingPreviewScope>;
 }

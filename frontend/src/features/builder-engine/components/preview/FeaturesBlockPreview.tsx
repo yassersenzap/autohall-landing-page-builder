@@ -1,3 +1,10 @@
+import { cn } from '@/lib/utils';
+import {
+  blockBackgroundThemeAttr,
+  mediaLayoutModifier,
+  parseBackgroundTheme,
+  parseImageAlignment,
+} from '../../lib/block-design-props';
 import { asPropString } from '../../lib/block-props';
 import { parseListItems } from '../../lib/list-props';
 import { SectionHeading } from './SectionHeading';
@@ -14,6 +21,9 @@ export function FeaturesBlockPreview({ propsJson }: FeaturesBlockPreviewProps) {
   const imageUrl = asPropString(propsJson.imageUrl);
   const imageAlt = asPropString(propsJson.alt) || 'Véhicule';
   const items = parseListItems(propsJson, 'items');
+  const alignment = parseImageAlignment(propsJson.imageAlignment);
+  const theme = parseBackgroundTheme(propsJson.backgroundTheme);
+  const themeAttr = blockBackgroundThemeAttr(theme);
 
   const media = imageUrl ? (
     <div className="lp-showcase__media">
@@ -32,10 +42,14 @@ export function FeaturesBlockPreview({ propsJson }: FeaturesBlockPreviewProps) {
   );
 
   return (
-    <section className="lp-block lp-features lp-features--showcase" id="model">
+    <section
+      className="lp-block lp-features lp-features--showcase"
+      id="model"
+      data-block-theme={themeAttr}
+    >
       <div className="lp-section">
         <SectionHeading heading={heading} subtitle={subtitle} />
-        <div className="lp-showcase">
+        <div className={cn('lp-showcase', mediaLayoutModifier('showcase', alignment))}>
           {media}
           <div className="lp-showcase__copy">
             {modelName ? <p className="lp-showcase__model">{modelName}</p> : null}

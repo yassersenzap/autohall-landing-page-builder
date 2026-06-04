@@ -210,6 +210,8 @@ export const DEFAULT_EDITOR_BLOCK_PROPS: Record<
     secondaryButtonTarget: '#offer',
     imageUrl: VEHICLE_IMAGE,
     alt: 'Véhicule Auto Hall',
+    imageAlignment: 'right',
+    backgroundTheme: 'dark',
   },
   trust_bar: {
     metrics: [
@@ -265,6 +267,8 @@ export const DEFAULT_EDITOR_BLOCK_PROPS: Record<
       { title: 'Connectivité', description: 'Navigation, Bluetooth et recharge USB.' },
       { title: 'Confort', description: 'Climatisation, sellerie premium et hayon électrique.' },
     ],
+    imageAlignment: 'right',
+    backgroundTheme: 'light',
   },
   financing: {
     heading: 'Financez votre véhicule sereinement',
