@@ -2,6 +2,7 @@ import { useDraggable } from '@dnd-kit/core';
 import { Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BUILDER_PALETTE, paletteDragId } from '../constants/palette';
+import { useBuilderEditorContext } from '../context/BuilderEditorContext';
 import { useBuilderDocumentStore } from '../store/builder-document.store';
 
 function PaletteDraggableItem({
@@ -13,10 +14,12 @@ function PaletteDraggableItem({
   label: string;
   description: string;
 }) {
+  const { canWrite } = useBuilderEditorContext();
   const addBlock = useBuilderDocumentStore((s) => s.addBlock);
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: paletteDragId(type),
     data: { kind: 'palette', type, label },
+    disabled: !canWrite,
   });
 
   return (
@@ -41,8 +44,9 @@ function PaletteDraggableItem({
       </button>
       <button
         type="button"
-        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground opacity-0 transition-opacity hover:bg-muted group-hover:opacity-100"
+        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground opacity-0 transition-opacity hover:bg-muted group-hover:opacity-100 disabled:pointer-events-none disabled:opacity-30"
         title="Ajouter en bas de page"
+        disabled={!canWrite}
         onClick={() => addBlock(type)}
       >
         <Plus className="h-3.5 w-3.5" />

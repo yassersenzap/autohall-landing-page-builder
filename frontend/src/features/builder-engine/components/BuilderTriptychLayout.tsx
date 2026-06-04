@@ -12,12 +12,14 @@ import {
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useState } from 'react';
 import { BUILDER_PALETTE, parsePaletteDragId } from '../constants/palette';
+import { useBuilderEditorContext } from '../context/BuilderEditorContext';
 import { useBuilderDocumentStore } from '../store/builder-document.store';
 import { CanvasArea } from './CanvasArea';
 import { LeftPanel } from './LeftPanel';
 import { RightInspector } from './RightInspector';
 
 export function BuilderTriptychLayout() {
+  const { canWrite } = useBuilderEditorContext();
   const blocks = useBuilderDocumentStore((s) => s.blocks);
   const addBlock = useBuilderDocumentStore((s) => s.addBlock);
   const reorderBlocks = useBuilderDocumentStore((s) => s.reorderBlocks);
@@ -43,6 +45,8 @@ export function BuilderTriptychLayout() {
 
   function handleDragEnd(event: DragEndEvent) {
     setActiveDragLabel(null);
+    if (!canWrite) return;
+
     const { active, over } = event;
     if (!over) return;
 
