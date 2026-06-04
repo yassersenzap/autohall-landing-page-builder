@@ -1,7 +1,7 @@
 import { useEffect, useState, type RefObject } from 'react';
 import { computeFitScale } from './canvas-frame';
 
-const VIEWPORT_PADDING_X = 80;
+const VIEWPORT_PADDING_X = 48;
 
 export function useCanvasFitScale(
   viewportRef: RefObject<HTMLElement | null>,

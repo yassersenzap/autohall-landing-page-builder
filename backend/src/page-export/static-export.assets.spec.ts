@@ -35,5 +35,7 @@ describe('static export assets', () => {
     expect(html).toContain('src="assets/images/export-hero.png"');
     expect(html).not.toMatch(/\/api\/assets\//);
     expect(html).not.toContain('data:image');
+    expect(html).toContain('js/lead-form.js');
+    expect(html).toContain('js/landing-config.js');
   });
 });

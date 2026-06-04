@@ -9,6 +9,7 @@
 
 .builder-canvas-viewport {
   -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
   background-color: #ececef;
   background-image: radial-gradient(
     circle at 50% 0%,
@@ -19,6 +20,8 @@
 
 .builder-canvas-stage {
   box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .builder-canvas-scaler {

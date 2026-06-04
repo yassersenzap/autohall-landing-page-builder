@@ -156,7 +156,7 @@ export function CanvasArea() {
       >
         <div
           data-testid="canvas-document-stage"
-          className="builder-canvas-stage mx-auto flex min-h-full min-w-min justify-center px-4 py-8 pb-16 sm:px-10 sm:py-10"
+          className="builder-canvas-stage mx-auto flex min-h-full w-full max-w-full justify-center px-3 py-6 pb-12 sm:px-6 sm:py-8"
         >
           <div
             className="builder-canvas-scaler shrink-0"
@@ -202,7 +202,7 @@ export function CanvasArea() {
                       <LayoutTemplate className="mb-4 h-12 w-12 text-muted-foreground/40" />
                       <p className="text-sm font-semibold text-foreground">Canvas vide</p>
                       <p className="mt-2 max-w-xs text-xs leading-relaxed text-muted-foreground">
-                        Onglet <strong>Sections</strong> pour une page complète, ou{' '}
+                        Onglet <strong>Modèles</strong> pour une page complète, ou{' '}
                         <strong>Blocs</strong> pour ajouter section par section.
                       </p>
                     </div>

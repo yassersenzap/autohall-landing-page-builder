@@ -113,7 +113,7 @@ export function BlockStyleInspectorFields({
           />
         ) : null}
         <InspectorSelect
-          label="Fond de section"
+          label="Thème clair / sombre"
           value={(d('backgroundMode') || 'light') as BlockBackgroundTheme}
           options={BACKGROUND_THEME_OPTIONS}
           onChange={(value) => patchDesign({ backgroundMode: value })}

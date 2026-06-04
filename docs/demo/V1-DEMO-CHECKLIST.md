@@ -8,6 +8,7 @@ Parcours officiel : **builder blocs** (éditeur sections + modèles V1).
 # Terminal 1 — backend
 cd backend
 npx prisma migrate deploy
+npm run db:seed
 npm run start:dev
 
 # Terminal 2 — frontend
@@ -25,37 +26,48 @@ Variables utiles :
 - Email : `admin@autohall.local`
 - Mot de passe : `Autohall_Dev_2026!`
 
-## Scénario démo (≈ 15 min)
+## Données seed utiles
 
-1. **Login** — http://localhost:5173/login
-2. **Dashboard** — vérifier vue d’ensemble
-3. **Campagnes** — ouvrir ou créer une campagne
-4. **Landing page** — créer une landing (titre + slug)
-5. **Versions** — créer une nouvelle version (brouillon)
-6. **Builder** — ouvrir `/page-versions/:id/blocks` (accès direct, sans écran intermédiaire)
-7. **Modèle** — panneau gauche → onglet **Modèles** → « Essai véhicule » → **Appliquer le modèle** → confirmer
-8. **Contenu** — modifier titre, sous-titre, CTA du Hero dans l’inspecteur (panneau droit)
-9. **Image** — onglet **Médias** → upload → sélectionner dans le bloc Hero
-10. **Sauvegarder** — bouton **Enregistrer** (topbar)
-11. **Preview** — **Aperçu** → desktop + mobile
-12. **Publier** — **Publier** (readiness OK : titre + formulaire + contenu minimum)
-13. **Export ZIP** — **Export ZIP** → télécharger
-14. **ZIP local** — extraire → ouvrir `index.html` → vérifier CSS, images (`assets/images/`), formulaire visible
-15. **Lead** — soumettre le formulaire (backend doit tourner) → vérifier dans **Leads**
-16. **Sécurité ZIP** — pas de `localhost` dans les `src` images, pas de token, pas de base64
+- Campagne : **Campagne démo — Offre printemps**
+- Landing : **Landing démo — Offre printemps** (`demo-offre-printemps`)
+- Version : **v1 — Version initiale** (hero seedé, modifiable dans le builder)
+
+## Scénario démo (15 étapes)
+
+1. **Lancer** backend + frontend (voir Prérequis).
+2. **Login** — http://localhost:5173/login (`admin@autohall.local`).
+3. **Dashboard** — http://localhost:5173/dashboard
+4. **Campagnes** — ouvrir **Campagne démo — Offre printemps**
+5. **Landing seed** — ouvrir **Landing démo — Offre printemps**
+6. **Versions** — ouvrir **v1 — Version initiale**
+7. **Builder** — accès direct `/page-versions/:id/blocks` (pas d’écran intermédiaire)
+8. **Modèle** — panneau gauche → **Modèles** → **Essai véhicule** → **Appliquer le modèle** → confirmer
+9. **Hero** — inspecteur : titre, sous-titre, CTA, thème clair/sombre, position image
+10. **Image** — onglet **Médias** → upload → sélectionner dans le Hero
+11. **Sauvegarder** — **Enregistrer**
+12. **Preview** — **Aperçu** (desktop + mobile)
+13. **Publier** — **Publier** (checklist préparation OK)
+14. **Export ZIP** — **Export ZIP** → extraire → ouvrir `index.html`
+15. **Lead** — soumettre le formulaire → vérifier dans **Leads**
+
+## Vérifications ZIP
+
+- `index.html`, `assets/style.css`, `js/landing-config.js`, `js/lead-form.js`
+- Images uploadées dans `assets/images/` (chemins relatifs)
+- Pas de `localhost`, pas de `/api/assets`, pas de base64, pas de token
+- Formulaire POST vers `/api/public/leads` (backend requis pour la soumission)
 
 ## Dépannage rapide
 
 | Problème | Action |
 |----------|--------|
-| Preview vide | Sauvegarder d’abord ; vérifier blocs présents |
+| Preview vide | Sauvegarder ; vérifier blocs présents |
 | Export refusé | Publier la version |
-| Lead non reçu | Vérifier `PUBLIC_API_BASE_URL` ; CORS backend |
-| Image absente ZIP | Utiliser upload média (pas URL externe) |
+| Lead non reçu | `PUBLIC_API_BASE_URL` + backend actif |
+| Canvas trop petit | Bouton **Ajuster** ou **100 %** ; masquer panneaux (Focus) |
+| Image absente ZIP | Upload média (pas URL externe seule) |
 
-## DB locale — colonnes GrapesJS obsolètes
-
-Si la migration `design_studio_fields` avait été appliquée localement, les colonnes peuvent rester en base sans impacter le code V1. Nettoyage optionnel :
+## DB locale — colonnes GrapesJS obsolètes (optionnel)
 
 ```sql
 ALTER TABLE page_versions

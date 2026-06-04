@@ -15,6 +15,7 @@ import {
   buildExportFilename,
   buildIndexHtml,
   buildLandingConfigJs,
+  STATIC_LEAD_FORM_JS,
   STATIC_MAIN_JS,
   STATIC_STYLE_CSS,
 } from './static-export.builder';
@@ -106,6 +107,7 @@ export class PageExportService {
       { kind: 'text', path: 'index.html', content: indexHtml },
       { kind: 'text', path: 'assets/style.css', content: styleCss },
       { kind: 'text', path: 'js/landing-config.js', content: landingConfigJs },
+      { kind: 'text', path: 'js/lead-form.js', content: STATIC_LEAD_FORM_JS },
       { kind: 'text', path: 'js/main.js', content: STATIC_MAIN_JS },
     ];
 

@@ -32,7 +32,7 @@ export function buildLandingDocumentHtml(input: BuildLandingDocumentInput): stri
   const scripts = input.includeScripts
     ? `
   <script src="js/landing-config.js"></script>
-  <script src="js/main.js"></script>`
+  <script src="js/lead-form.js"></script>`
     : '';
 
   return `<!DOCTYPE html>
