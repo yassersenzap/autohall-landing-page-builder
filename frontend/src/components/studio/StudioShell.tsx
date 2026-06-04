@@ -18,13 +18,19 @@ export default function StudioShell({ children }: StudioShellProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const isPreview = location.pathname.includes('/preview');
-  const shellClass = ['studio-shell', isPreview ? 'studio-shell--focus' : '']
+  const isEditorStudio = location.pathname.includes('/blocks');
+  const shellClass = [
+    'studio-shell',
+    isPreview ? 'studio-shell--focus' : '',
+    isEditorStudio ? 'studio-shell--immersive' : '',
+  ]
     .filter(Boolean)
     .join(' ');
 
   const contentClass = [
     'studio-content',
     isPreview ? 'studio-content--wide studio-content--flush' : '',
+    isEditorStudio ? 'studio-content--immersive' : '',
   ]
     .filter(Boolean)
     .join(' ');

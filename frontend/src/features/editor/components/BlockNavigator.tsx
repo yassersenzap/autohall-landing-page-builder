@@ -1,5 +1,3 @@
-import { Card } from '../../../components/ui/Card';
-import { StatusBadge } from '../../../components/ui/StatusBadge';
 import { getBlockLabel } from '../../landing/landing-block-catalog';
 import type { EditorPageBlock } from '../types/editor.types';
 
@@ -15,34 +13,38 @@ export function BlockNavigator({
   onSelectBlock,
 }: BlockNavigatorProps) {
   return (
-    <Card title="Navigateur" className="editor-panel">
-      <ul className="editor-navigator">
-        {blocks.map((block, index) => {
-          const selected = block.id === selectedBlockId;
-          return (
-            <li key={block.id}>
-              <button
-                type="button"
-                className={[
-                  'editor-navigator__item',
-                  selected ? 'is-selected' : '',
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
-                onClick={() => onSelectBlock(block.id)}
-              >
-                <div>
-                  <p className="editor-navigator__title">
-                    {index + 1}. {getBlockLabel(block.blockType)}
-                  </p>
-                  <p className="editor-navigator__meta">Section #{block.sortOrder}</p>
-                </div>
-                <StatusBadge status={selected ? 'active' : 'draft'} label={`#${block.sortOrder}`} />
-              </button>
-            </li>
-          );
-        })}
-      </ul>
-    </Card>
+    <section className="editor-panel-surface">
+      <header className="editor-panel-surface__header">
+        <h2 className="editor-panel-surface__title">Structure</h2>
+      </header>
+      <div className="editor-panel-surface__body editor-panel-surface__body--compact">
+        <ul className="editor-navigator">
+          {blocks.map((block, index) => {
+            const selected = block.id === selectedBlockId;
+            return (
+              <li key={block.id}>
+                <button
+                  type="button"
+                  className={[
+                    'editor-navigator__item',
+                    selected ? 'is-selected' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  onClick={() => onSelectBlock(block.id)}
+                >
+                  <span>
+                    <span className="editor-navigator__title">
+                      {getBlockLabel(block.blockType)}
+                    </span>
+                  </span>
+                  <span className="editor-navigator__index">{index + 1}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
   );
 }

@@ -99,6 +99,10 @@ export function usePageEditor({ pageVersionId, navigateToLogin }: UsePageEditorI
     await mutations.moveBlock(blockId, toIndex);
   }
 
+  async function duplicateBlock(blockId: string) {
+    await mutations.duplicateBlock(blockId);
+  }
+
   return {
     blocks,
     selectedBlockId,
@@ -109,6 +113,7 @@ export function usePageEditor({ pageVersionId, navigateToLogin }: UsePageEditorI
     createBlock,
     updateBlock,
     deleteBlock,
+    duplicateBlock,
     moveBlock,
     clearEditorError: mutations.clearMutationError,
   };

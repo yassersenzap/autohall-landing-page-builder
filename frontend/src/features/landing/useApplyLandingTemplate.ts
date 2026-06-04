@@ -1,16 +1,32 @@
 import { useState } from 'react';
-import { createEditorBlock } from '../editor/api/editorApi';
+import { createEditorBlock, deleteEditorBlock } from '../editor/api/editorApi';
 import type { EditorPageBlock } from './landing-block-catalog';
 import {
   getLandingTemplate,
   type LandingTemplateId,
 } from './landing-templates';
 
+export type TemplateApplyMode = 'replace' | 'append';
+
+type ApplyTemplateOptions = {
+  mode?: TemplateApplyMode;
+  existingBlocks?: EditorPageBlock[];
+};
+
 type ApplyTemplateResult = {
   applying: boolean;
   error: string | null;
-  applyTemplate: (templateId: LandingTemplateId) => Promise<EditorPageBlock[] | null>;
+  applyTemplate: (
+    templateId: LandingTemplateId,
+    options?: ApplyTemplateOptions,
+  ) => Promise<EditorPageBlock[] | null>;
 };
+
+async function deleteAllBlocks(blocks: EditorPageBlock[], pageVersionId: string) {
+  for (const block of blocks) {
+    await deleteEditorBlock(pageVersionId, block.id);
+  }
+}
 
 export function useApplyLandingTemplate(
   pageVersionId: string,
@@ -19,7 +35,10 @@ export function useApplyLandingTemplate(
   const [applying, setApplying] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function applyTemplate(templateId: LandingTemplateId) {
+  async function applyTemplate(
+    templateId: LandingTemplateId,
+    options: ApplyTemplateOptions = {},
+  ) {
     if (!canWrite) {
       setError('Votre rôle ne permet pas d’appliquer un modèle.');
       return null;
@@ -31,18 +50,27 @@ export function useApplyLandingTemplate(
       return null;
     }
 
+    const mode = options.mode ?? 'replace';
+    const existing = options.existingBlocks ?? [];
+
     setApplying(true);
     setError(null);
 
     const created: EditorPageBlock[] = [];
 
     try {
+      if (mode === 'replace' && existing.length > 0) {
+        await deleteAllBlocks(existing, pageVersionId);
+      }
+
+      const startIndex = mode === 'append' ? existing.length : 0;
+
       for (let index = 0; index < template.blocks.length; index += 1) {
         const spec = template.blocks[index];
         const response = await createEditorBlock(pageVersionId, {
           blockType: spec.blockType,
           propsJson: spec.propsJson,
-          sortOrder: index,
+          sortOrder: startIndex + index + 1,
         });
         created.push(response.data);
       }

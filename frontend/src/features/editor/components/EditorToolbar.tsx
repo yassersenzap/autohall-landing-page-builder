@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button';
-import { PageHeader } from '../../../components/ui/PageHeader';
 import { StatusBadge } from '../../../components/ui/StatusBadge';
 import { DevicePreviewToggle } from './DevicePreviewToggle';
 import type { EditorDeviceMode } from '../types/editor.types';
@@ -43,49 +42,48 @@ export function EditorToolbar({
   onChangeDeviceMode,
 }: EditorToolbarProps) {
   return (
-    <div className="editor-toolbar">
-      <div className="editor-toolbar__helper" role="note" aria-label="Guide rapide">
-        <p className="editor-toolbar__helper-title">Guide rapide</p>
-        <div className="editor-toolbar__helper-steps">
-          <span>1. Ajouter un bloc</span>
-          <span>2. Modifier le contenu</span>
-          <span>3. Prévisualiser puis publier</span>
+    <header className="editor-toolbar editor-toolbar--builder">
+      <div className="editor-toolbar__main">
+        <div className="editor-toolbar__titles">
+          <Link to={backTo} state={backState} className="editor-toolbar__back">
+            <span aria-hidden="true">←</span> {backLabel}
+          </Link>
+          <h1 className="editor-toolbar__title">{title}</h1>
+          {subtitle ? <p className="editor-toolbar__subtitle">{subtitle}</p> : null}
         </div>
-      </div>
-      <PageHeader
-        title={title}
-        subtitle={subtitle}
-        backTo={backTo}
-        backLabel={backLabel}
-        backState={backState}
-        actions={
-          <>
-            {status ? <StatusBadge status={status} /> : null}
+        <div className="editor-toolbar__actions">
+          {status ? (
+            <div className="editor-toolbar__group">
+              <StatusBadge status={status} />
+            </div>
+          ) : null}
+          <div className="editor-toolbar__group">
             <DevicePreviewToggle mode={deviceMode} onChange={onChangeDeviceMode} />
+          </div>
+          <div className="editor-toolbar__group">
             <Button variant="ghost" size="sm" onClick={onRefresh}>
               Recharger
             </Button>
             <Link to={previewTo} state={previewState} className="ui-btn ui-btn--secondary ui-btn--sm">
-              Preview
+              Aperçu
             </Link>
-            {canWrite ? (
-              <Button size="sm" disabled={publishing} onClick={onPublish}>
-                {publishing ? 'Publication…' : 'Publier'}
-              </Button>
-            ) : null}
-            {status === 'PUBLISHED' ? (
-              <Button
-                size="sm"
-                variant="secondary"
-                disabled={exporting}
-                onClick={onExport}
-              >
-                {exporting ? 'Export…' : 'Exporter ZIP'}
-              </Button>
-            ) : null}
-          </>
-        }
-      />
-    </div>
+          </div>
+          {canWrite ? (
+            <div className="editor-toolbar__group">
+              {status !== 'PUBLISHED' ? (
+                <Button size="sm" disabled={publishing} onClick={onPublish}>
+                  {publishing ? 'Publication…' : 'Publier'}
+                </Button>
+              ) : null}
+              {status === 'PUBLISHED' ? (
+                <Button size="sm" variant="primary" disabled={exporting} onClick={onExport}>
+                  {exporting ? 'Export…' : 'Exporter ZIP'}
+                </Button>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </header>
   );
 }
