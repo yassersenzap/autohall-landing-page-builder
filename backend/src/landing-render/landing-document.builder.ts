@@ -45,7 +45,7 @@ export function buildLandingDocumentHtml(input: BuildLandingDocumentInput): stri
   ${stylesheet}
 </head>
 <body>
-  <article class="lp-document" data-theme="${theme.mode}" style="${theme.cssVariables}">
+  <article class="lp-document" data-theme="${theme.mode}" data-section-spacing="${theme.sectionSpacing}" data-heading-scale="${theme.headingScale}" data-button-style="${theme.buttonStyle}" style="${theme.cssVariables}">
 ${header}
     <main class="lp-page">
 ${body}

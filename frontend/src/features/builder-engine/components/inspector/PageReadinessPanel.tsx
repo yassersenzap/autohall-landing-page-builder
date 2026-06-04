@@ -8,7 +8,7 @@ import {
 import { useBuilderDocumentStore } from '../../store/builder-document.store';
 
 const STATUS_LABEL = {
-  ready: 'Prêt à publier',
+  ready: 'Prêt',
   incomplete: 'À compléter',
   blocked: 'Bloquant',
 } as const;

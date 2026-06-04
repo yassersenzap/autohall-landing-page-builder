@@ -292,7 +292,7 @@ function renderHeroHtml(
     !hideMedia && !isBgLayout
       ? imageSrc
         ? `<div class="lp-hero__media"><img class="${imgClass}" src="${escapeHtml(imageSrc)}" alt="${escapeHtml(imageAlt)}" loading="eager" decoding="async" /></div>`
-        : `<div class="lp-hero__media lp-hero__media--placeholder" aria-hidden="true"><span>Aucune image sélectionnée</span></div>`
+        : `<div class="lp-hero__media lp-hero__media--placeholder" aria-hidden="true"><span>Visuel véhicule — ajoutez une photo</span></div>`
       : '';
 
   const contentHtml = `

@@ -23,6 +23,8 @@ export type PageReadinessBlock = {
   propsJson?: Record<string, unknown> | unknown;
 };
 
+const MIN_SECTIONS_WARNING = 3;
+
 function propsOf(block: PageReadinessBlock): Record<string, unknown> {
   const raw = block.propsJson;
   if (raw !== null && typeof raw === 'object' && !Array.isArray(raw)) {
@@ -41,8 +43,21 @@ function hasImageBlockMedia(props: Record<string, unknown>): boolean {
   return hasHeroImage(props);
 }
 
+function parseFaqItems(props: Record<string, unknown>): { question: string; answer: string }[] {
+  const raw = props.items;
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter((item): item is Record<string, unknown> => item !== null && typeof item === 'object')
+    .map((item) => ({
+      question: asPropString(item.question).trim(),
+      answer: asPropString(item.answer).trim(),
+    }))
+    .filter((item) => item.question && item.answer);
+}
+
 /**
- * Contrôles avant publication / export — ne modifie pas propsJson.
+ * Contrôles qualité avant publication — ne modifie pas propsJson.
+ * Seuls les points critiques bloquent la publication.
  */
 export function getPageReadinessIssues(
   blocks: PageReadinessBlock[],
@@ -55,7 +70,6 @@ export function getPageReadinessIssues(
   const heroBlocks = blocks.filter((b) => b.type === 'hero');
   for (const [index, block] of heroBlocks.entries()) {
     const props = propsOf(block);
-    const design = normalizeBlockDesign('hero', props);
     const label = heroBlocks.length > 1 ? ` (hero ${index + 1})` : '';
     const bid = block.id;
     if (!asPropString(props.title).trim()) {
@@ -74,13 +88,14 @@ export function getPageReadinessIssues(
         blockId: bid,
       });
     }
-    const needsImage =
+    const design = normalizeBlockDesign('hero', props);
+    const suggestsImage =
       design.layoutVariant !== 'minimal' && design.mediaPosition !== 'none';
-    if (needsImage && !hasHeroImage(props)) {
+    if (suggestsImage && !hasHeroImage(props)) {
       issues.push({
         code: `hero-image-${index}`,
-        severity: 'critical',
-        message: `Hero${label} : aucune image sélectionnée.`,
+        severity: 'warning',
+        message: `Hero${label} : aucune image — la page reste publiable.`,
         blockId: bid,
       });
     }
@@ -94,12 +109,26 @@ export function getPageReadinessIssues(
     }
   }
 
-  if (!blocks.some((b) => b.type === 'lead_form')) {
+  const hasLeadForm = blocks.some((b) => b.type === 'lead_form');
+  if (!hasLeadForm) {
     issues.push({
       code: 'lead-form-missing',
-      severity: 'warning',
-      message: 'Aucun formulaire de contact sur la page.',
+      severity: 'critical',
+      message: 'Aucun formulaire de contact — obligatoire pour capturer des leads.',
     });
+  }
+
+  for (const [index, block] of blocks.entries()) {
+    if (block.type !== 'lead_form') continue;
+    const props = propsOf(block);
+    if (!asPropString(props.submitText).trim()) {
+      issues.push({
+        code: `lead-form-submit-${index}`,
+        severity: 'critical',
+        message: 'Formulaire : texte du bouton d’envoi manquant.',
+        blockId: block.id,
+      });
+    }
   }
 
   for (const [index, block] of blocks.entries()) {
@@ -108,8 +137,9 @@ export function getPageReadinessIssues(
     if (!asPropString(props.buttonText).trim()) {
       issues.push({
         code: `final-cta-button-${index}`,
-        severity: 'critical',
+        severity: 'warning',
         message: 'Bloc CTA final : texte du bouton manquant.',
+        blockId: block.id,
       });
     }
   }
@@ -145,6 +175,40 @@ export function getPageReadinessIssues(
         blockId: block.id,
       });
     }
+  }
+
+  for (const block of blocks) {
+    if (block.type !== 'footer_legal') continue;
+    const props = propsOf(block);
+    if (!asPropString(props.legalText).trim()) {
+      issues.push({
+        code: `footer-empty-${block.id ?? 'x'}`,
+        severity: 'warning',
+        message: 'Pied de page : mentions légales vides.',
+        blockId: block.id,
+      });
+    }
+  }
+
+  for (const block of blocks) {
+    if (block.type !== 'faq') continue;
+    const props = propsOf(block);
+    if (parseFaqItems(props).length === 0) {
+      issues.push({
+        code: `faq-empty-${block.id ?? 'x'}`,
+        severity: 'warning',
+        message: 'FAQ : aucune question/réponse renseignée.',
+        blockId: block.id,
+      });
+    }
+  }
+
+  if (blocks.length > 0 && blocks.length < MIN_SECTIONS_WARNING) {
+    issues.push({
+      code: 'sections-few',
+      severity: 'warning',
+      message: `Peu de sections (${blocks.length}) — une landing complète en a généralement plus.`,
+    });
   }
 
   if (!seoTitle) {

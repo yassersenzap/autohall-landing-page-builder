@@ -3,12 +3,21 @@ import {
   useBuilderDocumentStore,
   type PageThemeDraft,
 } from '../../store/builder-document.store';
+import {
+  PREMIUM_STYLE_PRESETS,
+  type PremiumStylePresetId,
+} from '@/features/landing/premium-landing-presets';
 import { PageReadinessPanel } from './PageReadinessPanel';
 import { InspectorSelect } from './InspectorPrimitives';
 
 export function PageSettingsPanel() {
   const pageTheme = useBuilderDocumentStore((s) => s.pageTheme);
   const setPageTheme = useBuilderDocumentStore((s) => s.setPageTheme);
+
+  function applyStylePreset(presetId: PremiumStylePresetId) {
+    const preset = PREMIUM_STYLE_PRESETS.find((p) => p.id === presetId);
+    if (preset) setPageTheme(preset.theme);
+  }
 
   return (
     <div className="space-y-4">
@@ -20,8 +29,19 @@ export function PageSettingsPanel() {
 
       <div className="space-y-3 rounded-lg border border-border bg-card p-3">
         <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
-          Design
+          Style global
         </p>
+        <InspectorSelect
+          label="Preset Auto Hall"
+          value=""
+          options={[
+            { value: '', label: '— Personnaliser —' },
+            ...PREMIUM_STYLE_PRESETS.map((p) => ({ value: p.id, label: p.name })),
+          ]}
+          onChange={(value) => {
+            if (value) applyStylePreset(value as PremiumStylePresetId);
+          }}
+        />
         <div className="space-y-1.5">
           <Label className="text-xs">Couleur primaire</Label>
           <div className="flex gap-2">

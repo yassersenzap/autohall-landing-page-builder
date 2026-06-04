@@ -16,6 +16,7 @@ export function SectionsTab() {
   const addSection = useBuilderDocumentStore((s) => s.addSection);
   const blocks = useBuilderDocumentStore((s) => s.blocks);
   const setInitialBlocks = useBuilderDocumentStore((s) => s.setInitialBlocks);
+  const setPageTheme = useBuilderDocumentStore((s) => s.setPageTheme);
   const [confirmTemplate, setConfirmTemplate] = useState<LandingTemplateId | null>(null);
 
   const { applying, applyTemplate } = useApplyLandingTemplate(
@@ -41,6 +42,10 @@ export function SectionsTab() {
     });
     if (created?.length) {
       setInitialBlocks(apiBlocksToBuilderBlocks(created));
+      const template = LANDING_TEMPLATES.find((t) => t.id === templateId);
+      if (template?.themeDefaults) {
+        setPageTheme(template.themeDefaults);
+      }
     }
     setConfirmTemplate(null);
   }

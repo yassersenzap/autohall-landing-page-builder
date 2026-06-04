@@ -5,6 +5,9 @@ export type LandingTheme = {
   primaryColor: string;
   fontFamily: string;
   cssVariables: string;
+  sectionSpacing: 'compact' | 'normal' | 'spacious';
+  headingScale: 'compact' | 'normal' | 'large';
+  buttonStyle: 'rounded' | 'pill' | 'square';
 };
 
 const DEFAULT_PRIMARY = '#b91c1c';
@@ -88,5 +91,8 @@ export function resolveLandingTheme(
     primaryColor,
     fontFamily,
     cssVariables,
+    sectionSpacing,
+    headingScale,
+    buttonStyle,
   };
 }

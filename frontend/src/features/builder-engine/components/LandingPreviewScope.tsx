@@ -18,6 +18,8 @@ export function LandingPreviewScope({ children, className }: LandingPreviewScope
 
   const docStyle = {
     ['--lp-primary' as string]: pageTheme.primaryColor,
+    ['--lp-primary-hover' as string]: pageTheme.primaryColor,
+    ['--lp-primary-soft' as string]: `${pageTheme.primaryColor}1f`,
     ['--lp-font' as string]: `${pageTheme.fontFamily}, system-ui, sans-serif`,
     ['--lp-display-font' as string]: `${pageTheme.fontFamily}, system-ui, sans-serif`,
   };
@@ -31,6 +33,9 @@ export function LandingPreviewScope({ children, className }: LandingPreviewScope
       <article
         className="lp-document block w-full min-w-full"
         data-theme={pageTheme.mode}
+        data-section-spacing={pageTheme.sectionSpacing}
+        data-heading-scale={pageTheme.headingScale}
+        data-button-style={pageTheme.buttonStyle}
         style={docStyle}
       >
         <main className="lp-page block w-full min-w-full">{children}</main>

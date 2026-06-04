@@ -68,7 +68,7 @@ export function HeroBlockPreview({ propsJson }: HeroBlockPreviewProps) {
       </div>
     ) : (
       <div className="lp-hero__media lp-hero__media--placeholder" aria-hidden>
-        <CanvasEmptyHint>Aucune image sélectionnée</CanvasEmptyHint>
+        <CanvasEmptyHint>Visuel véhicule — ajoutez une photo</CanvasEmptyHint>
       </div>
     )
   ) : null;
