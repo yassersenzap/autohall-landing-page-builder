@@ -1,12 +1,19 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import LeadDashboardSection from '../components/dashboard/LeadDashboardSection';
-import { Card } from '../components/ui/Card';
-import { EmptyState } from '../components/ui/EmptyState';
-import { PageHeader } from '../components/ui/PageHeader';
-import { ApiError, meRequest, type AuthUser } from '../lib/api';
-import { getLeadDashboardKpis, type LeadDashboardKpis } from '../lib/lead-dashboard';
-import { canViewLeads } from '../lib/leads';
+import { FileEdit, LayoutGrid, Users } from 'lucide-react';
+import { LeadDashboardMetrics } from '@/components/dashboard/LeadDashboardMetrics';
+import { StudioPageHeader } from '@/components/studio/StudioPageHeader';
+import {
+  Card,
+  CardContent,
+  MetricCard,
+  ShadButton,
+  buttonVariants,
+} from '@/components/ui/primitives';
+import { cn } from '@/lib/utils';
+import { ApiError, meRequest, type AuthUser } from '@/lib/api';
+import { getLeadDashboardKpis, type LeadDashboardKpis } from '@/lib/lead-dashboard';
+import { canViewLeads } from '@/lib/leads';
 
 const LAST_DRAFT_STORAGE_KEY = 'autohall-studio-last-draft';
 
@@ -77,93 +84,85 @@ export default function DashboardPage() {
   }, []);
 
   if (loading) {
-    return <p className="ui-page-header__subtitle">Chargement du tableau de bord…</p>;
+    return (
+      <div className="flex min-h-[12rem] items-center justify-center text-sm text-muted-foreground">
+        Chargement du tableau de bord…
+      </div>
+    );
   }
 
   if (error) {
-    return <p className="ui-alert ui-alert--error">{error}</p>;
+    return (
+      <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        {error}
+      </p>
+    );
   }
 
+  const showLeads = user && canViewLeads(user.role);
+
   return (
-    <div className="studio-stack">
-      <PageHeader
+    <div className="space-y-8 font-sans">
+      <StudioPageHeader
         title="Tableau de bord"
-        subtitle="Vue d’ensemble — campagnes, landing pages et performance des leads."
+        description={
+          user
+            ? `Bienvenue, ${user.fullName} — vue d’ensemble des campagnes et des leads.`
+            : 'Vue d’ensemble des campagnes et des leads.'
+        }
+        actions={
+          <>
+            <Link to="/campaigns" className={cn(buttonVariants({ variant: 'default', size: 'sm' }))}>
+              <LayoutGrid className="h-3.5 w-3.5" />
+              Campagnes
+            </Link>
+            {showLeads ? (
+              <Link to="/leads" className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }))}>
+                <Users className="h-3.5 w-3.5" />
+                Leads
+              </Link>
+            ) : null}
+            {lastDraft ? (
+              <Link
+                to={`/page-versions/${lastDraft.pageVersionId}/blocks`}
+                className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
+              >
+                <FileEdit className="h-3.5 w-3.5" />
+                {lastDraft.label}
+              </Link>
+            ) : (
+              <ShadButton variant="outline" size="sm" disabled>
+                <FileEdit className="h-3.5 w-3.5" />
+                Aucun brouillon
+              </ShadButton>
+            )}
+          </>
+        }
       />
 
-      <Card title="Workflow studio">
-        <ol className="studio-workflow">
-          <li className="studio-workflow__item">Campagnes</li>
-          <li className="studio-workflow__item">Landing pages et versions</li>
-          <li className="studio-workflow__item">Visual editor</li>
-          <li className="studio-workflow__item">Preview</li>
-          <li className="studio-workflow__item">Publish</li>
-          <li className="studio-workflow__item">Export ZIP</li>
-          <li className="studio-workflow__item">Suivi des leads</li>
-        </ol>
-      </Card>
-
-      <Card title="Actions rapides">
-        <div className="dashboard-quick-actions dashboard-quick-actions--stack">
-          <Link to="/campaigns" className="ui-btn ui-btn--primary ui-btn--md">
-            Créer une landing page
+      {!showLeads ? (
+        <div className="grid gap-3 sm:grid-cols-3">
+          <MetricCard label="Espace" value="Studio" hint="Connecté au builder" />
+          <Link to="/campaigns" className="block transition-opacity hover:opacity-90">
+            <MetricCard label="Campagnes" value="→" hint="Gérer les landings" trend="positive" />
           </Link>
-          <Link to="/campaigns" className="ui-btn ui-btn--secondary ui-btn--md">
-            Voir les campagnes
-          </Link>
-          {user && canViewLeads(user.role) ? (
-            <Link to="/leads" className="ui-btn ui-btn--secondary ui-btn--md">
-              Consulter les leads
-            </Link>
-          ) : null}
-          {lastDraft ? (
-            <Link
-              to={`/page-versions/${lastDraft.pageVersionId}/blocks`}
-              className="ui-btn ui-btn--ghost ui-btn--md"
-            >
-              Ouvrir le dernier brouillon ({lastDraft.label})
-            </Link>
-          ) : (
-            <button type="button" className="ui-btn ui-btn--ghost ui-btn--md" disabled>
-              Ouvrir le dernier brouillon (indisponible)
-            </button>
-          )}
         </div>
-      </Card>
-
-      {user ? (
-        <Card title="Session active">
-          <ul className="dashboard-session__list">
-            <li className="dashboard-session__item">
-              <strong>Nom</strong>
-              <span>{user.fullName}</span>
-            </li>
-            <li className="dashboard-session__item">
-              <strong>Email</strong>
-              <span>{user.email}</span>
-            </li>
-            <li className="dashboard-session__item">
-              <strong>Rôle</strong>
-              <span>{user.role}</span>
-            </li>
-          </ul>
-        </Card>
       ) : null}
 
-      {user && canViewLeads(user.role) ? (
-        <>
-          {kpisError ? <p className="ui-alert ui-alert--error">{kpisError}</p> : null}
-          {kpis ? (
-            <LeadDashboardSection kpis={kpis} />
-          ) : (
-            <Card title="Indicateurs leads">
-              <EmptyState
-                title="Indicateurs indisponibles"
-                description="Les données leads ne sont pas encore chargées. Actualisez la page pour réessayer."
-              />
-            </Card>
-          )}
-        </>
+      {kpisError ? (
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          {kpisError}
+        </p>
+      ) : null}
+
+      {showLeads && kpis ? <LeadDashboardMetrics kpis={kpis} /> : null}
+
+      {showLeads && !kpis && !kpisError ? (
+        <Card>
+          <CardContent className="py-10 text-center text-sm text-muted-foreground">
+            Indicateurs indisponibles. Actualisez la page.
+          </CardContent>
+        </Card>
       ) : null}
     </div>
   );
