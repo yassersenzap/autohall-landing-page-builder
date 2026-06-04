@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { BUILDER_PALETTE } from '../constants/palette';
 import { getDefaultBlockProps } from '../constants/default-block-props';
+import { sanitizePropsPatch } from '../lib/sanitize-props-patch';
 import type { BuilderDocumentBlock } from '../types';
 
 function createBlockFromPalette(type: string, sortOrder: number): BuilderDocumentBlock {
@@ -87,10 +88,13 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>((set, get) =
   },
 
   updateBlockProps: (blockId, patch) => {
+    const safe = sanitizePropsPatch(patch);
+    if (Object.keys(safe).length === 0) return;
+
     set({
       blocks: get().blocks.map((block) =>
         block.id === blockId
-          ? { ...block, propsJson: { ...block.propsJson, ...patch } }
+          ? { ...block, propsJson: { ...block.propsJson, ...safe } }
           : block,
       ),
     });

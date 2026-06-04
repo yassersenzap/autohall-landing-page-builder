@@ -24,3 +24,12 @@ export type HeroBlockProps = {
   imageUrl?: string;
   alt?: string;
 };
+
+export type LeadFormBlockProps = {
+  title?: string;
+  subtitle?: string;
+  submitText?: string;
+  privacyNote?: string;
+  reassurance?: string[];
+  fields?: import('@/lib/lead-form-block').LeadFormField[];
+};

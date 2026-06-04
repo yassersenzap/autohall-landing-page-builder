@@ -1,3 +1,9 @@
+export {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from './accordion';
 export { ShadButton, buttonVariants, type ButtonProps } from './button';
 export { ShadInput, type ShadInputProps } from './input';
 export { ShadTextarea, type ShadTextareaProps } from './textarea';
