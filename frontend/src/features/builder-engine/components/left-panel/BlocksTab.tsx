@@ -5,7 +5,6 @@ import { paletteDragId } from '../../constants/palette';
 import { useBuilderEditorContext } from '../../context/BuilderEditorContext';
 import {
   getActivePaletteBlocks,
-  getDisabledPaletteBlocks,
   type BlockRegistryEntry,
 } from '../../registry/block-registry';
 import { useBuilderDocumentStore } from '../../store/builder-document.store';
@@ -59,45 +58,16 @@ function PaletteDraggableItem({ entry }: { entry: BlockRegistryEntry }) {
   );
 }
 
-function DisabledBlockItem({ entry }: { entry: BlockRegistryEntry }) {
-  return (
-    <div className="rounded-md border border-dashed border-border/60 bg-muted/20 px-2 py-2 opacity-70">
-      <p className="text-xs font-medium text-muted-foreground">
-        {entry.label}
-        <span className="ml-1.5 rounded bg-muted px-1 py-0.5 text-[0.55rem] font-semibold uppercase">
-          Bientôt
-        </span>
-      </p>
-      <p className="mt-0.5 text-[0.65rem] text-muted-foreground/80">
-        {entry.description}
-      </p>
-    </div>
-  );
-}
-
 export function BlocksTab() {
   const active = getActivePaletteBlocks();
-  const disabled = getDisabledPaletteBlocks();
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div className="flex h-full min-h-0 flex-col" data-testid="blocks-tab">
       <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto p-2">
         {active.map((entry) => (
           <PaletteDraggableItem key={entry.type} entry={entry} />
         ))}
       </div>
-      {disabled.length > 0 ? (
-        <div className="shrink-0 border-t border-border p-2">
-          <p className="mb-1.5 px-0.5 text-[0.55rem] font-bold uppercase tracking-wider text-muted-foreground">
-            À venir
-          </p>
-          <div className="space-y-1">
-            {disabled.slice(0, 4).map((entry) => (
-              <DisabledBlockItem key={entry.type} entry={entry} />
-            ))}
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

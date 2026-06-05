@@ -1,13 +1,15 @@
 import type { PageThemeDraft } from '../builder-engine/store/builder-document.store';
+import {
+  DEFAULT_AUTOHALL_CONSENT_LABEL,
+  DEFAULT_AUTOHALL_FORM_CONFIG,
+  DEFAULT_AUTOHALL_REQUIRED_NOTE,
+  buildAutoHallLeadFormFields,
+} from '../builder-engine/constants/autohall-lead-form';
 import type { EditorBlockType } from './landing-block-catalog';
 import { BUILDER_NEUTRAL_DEFAULT_PROPS } from '../builder-engine/constants/neutral-default-props';
 
-/** Modèles V1 premium — 4 parcours Auto Hall, sans images externes. */
-export type LandingTemplateId =
-  | 'test_drive'
-  | 'seasonal_offer'
-  | 'after_sales'
-  | 'quick_lead';
+/** 3 templates V1 stables — blocs palette uniquement. */
+export type LandingTemplateId = 'vehicle_offer' | 'sav_offer' | 'quick_lead';
 
 export type LandingTemplateBlock = {
   blockType: EditorBlockType;
@@ -20,7 +22,6 @@ export type LandingTemplate = {
   description: string;
   audience: string;
   blocks: LandingTemplateBlock[];
-  /** Thème page suggéré à l’application du modèle (local, sauvegardé avec la page). */
   themeDefaults?: Partial<PageThemeDraft>;
 };
 
@@ -40,129 +41,61 @@ function block(
   };
 }
 
+function campaignForm(overrides: Record<string, unknown> = {}): LandingTemplateBlock {
+  return block('lead_form', {
+    title: 'Contactez-nous',
+    subtitle: 'Un conseiller Auto Hall vous recontacte.',
+    submitText: 'Envoyer votre demande',
+    privacyNote:
+      'Conformément à la loi 09-08, vous disposez d’un droit d’accès et de rectification de vos données.',
+    consentLabel: DEFAULT_AUTOHALL_CONSENT_LABEL,
+    requiredFieldsNote: DEFAULT_AUTOHALL_REQUIRED_NOTE,
+    formConfig: { ...DEFAULT_AUTOHALL_FORM_CONFIG },
+    fields: buildAutoHallLeadFormFields(DEFAULT_AUTOHALL_FORM_CONFIG),
+    design: { layoutVariant: 'card_right', backgroundMode: 'light' },
+    ...overrides,
+  });
+}
+
 export const LANDING_TEMPLATES: LandingTemplate[] = [
   {
-    id: 'test_drive',
-    name: 'Essai véhicule',
-    description: 'Hero premium, confiance, formulaire, FAQ courte et mentions légales.',
-    audience: 'Demande d’essai en concession',
-    themeDefaults: {
-      mode: 'light',
-      primaryColor: '#b91c1c',
-      headingScale: 'normal',
-      sectionSpacing: 'normal',
-      buttonStyle: 'pill',
-      seoTitle: 'Essai véhicule — Auto Hall',
-      seoDescription: 'Réservez votre essai en concession Auto Hall.',
-    },
-    blocks: [
-      block('hero', {
-        eyebrow: 'Essai en concession',
-        title: 'Réservez votre essai',
-        subtitle: 'Indiquez vos coordonnées — un conseiller vous rappelle sous 48 h.',
-        buttonText: 'Demander un essai',
-        buttonTarget: '#lead-form',
-        secondaryButtonText: '',
-        design: {
-          layoutVariant: 'split_image_right',
-          backgroundMode: 'light',
-          mediaPosition: 'right',
-          headingSize: 'large',
-          buttonSize: 'lg',
-          buttonRadius: 'pill',
-        },
-      }),
-      block('trust_bar', {
-        metrics: [
-          { value: '48 h', label: 'Délai de rappel' },
-          { value: '100 %', label: 'Véhicules contrôlés' },
-          { value: '15+', label: 'Années d’expérience' },
-          { value: 'Réseau', label: 'National Auto Hall' },
-        ],
-      }),
-      block('lead_form', {
-        title: 'Votre demande d’essai',
-        subtitle: 'Nom, téléphone et modèle souhaité.',
-        submitText: 'Envoyer ma demande',
-        privacyNote: 'Vos données sont utilisées uniquement pour traiter votre demande.',
-        design: { layoutVariant: 'card_right', backgroundMode: 'light' },
-      }),
-      block('faq', {
-        heading: 'Questions fréquentes',
-        subtitle: 'Informations utiles avant votre essai.',
-        items: [
-          {
-            question: 'Comment se déroule l’essai ?',
-            answer: 'Un conseiller vous contacte pour fixer un créneau en concession.',
-          },
-          {
-            question: 'Quels documents prévoir ?',
-            answer: 'Permis de conduire en cours de validité et pièce d’identité.',
-          },
-        ],
-      }),
-      block('footer_legal', {
-        legalText: 'Offre soumise à conditions. Auto Hall — mentions légales à compléter.',
-        design: { layoutVariant: 'legal_full', backgroundMode: 'neutral' },
-      }),
-    ],
-  },
-  {
-    id: 'seasonal_offer',
+    id: 'vehicle_offer',
     name: 'Offre véhicule',
-    description: 'Hero impact, caractéristiques, visuel, CTA et formulaire.',
-    audience: 'Campagne promotionnelle',
+    description: 'Hero, points forts, formulaire Auto Hall, FAQ et footer.',
+    audience: 'Campagne promotionnelle véhicule',
     themeDefaults: {
       mode: 'dark',
-      primaryColor: '#b91c1c',
-      headingScale: 'large',
-      sectionSpacing: 'spacious',
-      buttonStyle: 'rounded',
+      primaryColor: '#003B73',
       seoTitle: 'Offre véhicule — Auto Hall',
-      seoDescription: 'Découvrez l’offre du moment dans le réseau Auto Hall.',
+      seoDescription: 'Découvrez l’offre du moment et contactez un conseiller Auto Hall.',
     },
     blocks: [
       block('hero', {
         eyebrow: 'Offre en cours',
-        title: 'Votre offre du moment',
-        subtitle: 'Stock limité — personnalisez les conditions et le financement.',
-        buttonText: 'Profiter de l’offre',
+        title: 'Profitez de l’offre du moment',
+        subtitle: 'Contactez-nous pour connaître les conditions en concession.',
+        buttonText: 'Je suis intéressé',
         buttonTarget: '#lead-form',
-        design: {
-          layoutVariant: 'split_image_right',
-          backgroundMode: 'dark',
-          mediaPosition: 'right',
-          headingSize: 'xlarge',
-        },
+        promoBadge: 'Offre limitée',
+        design: { layoutVariant: 'split_image_right', backgroundMode: 'dark', mediaPosition: 'right' },
       }),
       block('features', {
-        heading: 'Points clés',
-        modelName: 'Modèle',
-        modelTagline: 'Courte description du véhicule.',
+        heading: 'Points forts',
+        subtitle: 'Les atouts du véhicule ou de l’offre.',
         items: [
-          { title: 'Motorisation', description: 'À compléter selon le véhicule.' },
-          { title: 'Équipements', description: 'Liste des équipements principaux.' },
-          { title: 'Garantie', description: 'Conditions de garantie constructeur.' },
+          { title: 'Garantie', description: 'Conditions constructeur à préciser.' },
+          { title: 'Essai', description: 'Essai en concession sur rendez-vous.' },
+          { title: 'Accompagnement', description: 'Conseiller dédié Auto Hall.' },
         ],
         design: { layoutVariant: 'grid_cards', backgroundMode: 'light' },
       }),
-      block('image', {
-        alt: '',
-        caption: 'Visuel véhicule — uploadez votre photo officielle.',
-        design: { layoutVariant: 'contained', mediaRadius: 'medium', mediaShadow: 'soft' },
-      }),
-      block('final_cta', {
-        title: 'Intéressé par cette offre ?',
-        subtitle: 'Laissez vos coordonnées, un conseiller vous recontacte.',
-        buttonText: 'Je suis intéressé',
-        buttonTarget: '#lead-form',
-        design: { layoutVariant: 'simple_band', backgroundMode: 'dark', alignment: 'center' },
-      }),
-      block('lead_form', {
-        title: 'Recevoir l’offre',
-        subtitle: 'Un conseiller vous recontacte rapidement.',
-        submitText: 'Recevoir l’offre',
-        design: { layoutVariant: 'card_below', backgroundMode: 'light' },
+      campaignForm({ title: 'Contactez-moi', submitText: 'Envoyer' }),
+      block('faq', {
+        heading: 'Questions fréquentes',
+        items: [
+          { question: 'Comment profiter de l’offre ?', answer: 'Remplissez le formulaire, un conseiller vous rappelle.' },
+          { question: 'Puis-je essayer le véhicule ?', answer: 'Oui, sur rendez-vous en concession.' },
+        ],
       }),
       block('footer_legal', {
         legalText: 'Offre soumise à conditions. Auto Hall — mentions légales à compléter.',
@@ -170,18 +103,15 @@ export const LANDING_TEMPLATES: LandingTemplate[] = [
     ],
   },
   {
-    id: 'after_sales',
-    name: 'SAV & services',
-    description: 'Hero sobre, contenu, prestations, formulaire et footer.',
-    audience: 'Prise de contact atelier / SAV',
+    id: 'sav_offer',
+    name: 'Offre SAV',
+    description: 'Hero SAV, avantages, formulaire avec ville, réassurance et footer.',
+    audience: 'Campagne service après-vente',
     themeDefaults: {
       mode: 'light',
-      primaryColor: '#18181b',
-      headingScale: 'normal',
-      sectionSpacing: 'normal',
-      buttonStyle: 'rounded',
-      seoTitle: 'Services & SAV — Auto Hall',
-      seoDescription: 'Entretien, garantie et prise de rendez-vous atelier Auto Hall.',
+      primaryColor: '#003B73',
+      seoTitle: 'Offres SAV — Auto Hall',
+      seoDescription: 'Services, entretien et prise de contact atelier Auto Hall.',
     },
     blocks: [
       block('hero', {
@@ -190,34 +120,23 @@ export const LANDING_TEMPLATES: LandingTemplate[] = [
         subtitle: 'Prise de rendez-vous, garantie et suivi atelier.',
         buttonText: 'Prendre contact',
         buttonTarget: '#lead-form',
-        imageUrl: '',
-        imageAssetId: '',
-        design: {
-          layoutVariant: 'split_image_right',
-          backgroundMode: 'light',
-          mediaPosition: 'right',
-        },
+        design: { layoutVariant: 'split_image_right', backgroundMode: 'light', mediaPosition: 'right' },
       }),
-      block('text', {
-        heading: 'Nos prestations',
-        content:
-          'Décrivez ici vos services atelier, horaires d’ouverture et engagements qualité.',
-        design: { layoutVariant: 'left_aligned', contentWidth: 'narrow' },
-      }),
-      block('features', {
-        heading: 'Services disponibles',
+      block('benefits', {
+        heading: 'Nos engagements',
         items: [
-          { title: 'Entretien', description: 'Révisions et maintenance.' },
-          { title: 'Garantie', description: 'Suivi et prise en charge.' },
-          { title: 'Pièces', description: 'Pièces d’origine constructeur.' },
+          { title: 'Réseau national', description: 'Concessionnaires Auto Hall partout au Maroc.' },
+          { title: 'Réponse rapide', description: 'Un conseiller vous recontacte sous 48 h.' },
+          { title: 'Données protégées', description: 'Traitement conforme à la loi 09-08.' },
         ],
-        design: { layoutVariant: 'icon_list', backgroundMode: 'neutral' },
       }),
-      block('lead_form', {
-        title: 'Demande de rendez-vous',
-        subtitle: 'Nous vous rappelons pour confirmer le créneau.',
-        submitText: 'Envoyer ma demande',
-        design: { layoutVariant: 'full_width', backgroundMode: 'light' },
+      campaignForm({ title: 'Demande SAV', subtitle: 'Sélectionnez votre ville et laissez vos coordonnées.' }),
+      block('trust_bar', {
+        metrics: [
+          { value: 'Réseau', label: 'Auto Hall' },
+          { value: '48 h', label: 'Réponse conseiller' },
+          { value: 'Sécurisé', label: 'Données personnelles' },
+        ],
       }),
       block('footer_legal', {
         legalText: 'Auto Hall — mentions légales et politique de confidentialité à compléter.',
@@ -227,14 +146,11 @@ export const LANDING_TEMPLATES: LandingTemplate[] = [
   {
     id: 'quick_lead',
     name: 'Capture lead rapide',
-    description: 'Hero minimal, formulaire, confiance et footer — idéal campagne courte.',
+    description: 'Hero minimal, formulaire complet, réassurance et footer.',
     audience: 'Collecte de contacts rapide',
     themeDefaults: {
       mode: 'light',
       primaryColor: '#b91c1c',
-      headingScale: 'compact',
-      sectionSpacing: 'compact',
-      buttonStyle: 'pill',
       seoTitle: 'Contact — Auto Hall',
       seoDescription: 'Laissez vos coordonnées, un conseiller Auto Hall vous recontacte.',
     },
@@ -245,26 +161,13 @@ export const LANDING_TEMPLATES: LandingTemplate[] = [
         subtitle: 'Une question sur un véhicule ou un service ?',
         buttonText: 'Accéder au formulaire',
         buttonTarget: '#lead-form',
-        secondaryButtonText: '',
-        design: {
-          layoutVariant: 'minimal',
-          backgroundMode: 'light',
-          mediaPosition: 'none',
-          alignment: 'center',
-          headingSize: 'large',
-        },
+        design: { layoutVariant: 'centered', backgroundMode: 'light', mediaPosition: 'none', alignment: 'center' },
       }),
-      block('lead_form', {
-        title: 'Vos coordonnées',
-        subtitle: 'Remplissez le formulaire — réponse sous 48 h.',
-        submitText: 'Envoyer',
-        privacyNote: 'Vos données ne sont pas partagées avec des tiers.',
-        design: { layoutVariant: 'card_below', backgroundMode: 'light' },
-      }),
+      campaignForm({ design: { layoutVariant: 'card_below' } }),
       block('trust_bar', {
         metrics: [
           { value: '48 h', label: 'Réponse garantie' },
-          { value: 'Réseau', label: 'Concessionnaires Auto Hall' },
+          { value: 'Réseau', label: 'National Auto Hall' },
         ],
       }),
       block('footer_legal', {

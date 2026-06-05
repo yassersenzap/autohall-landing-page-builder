@@ -16,6 +16,7 @@ export const EDITOR_BLOCK_TYPES = [
   'faq',
   'final_cta',
   'footer_legal',
+  'vehicle_range',
 ] as const;
 
 export type EditorBlockType = (typeof EDITOR_BLOCK_TYPES)[number];
@@ -334,6 +335,11 @@ export const DEFAULT_EDITOR_BLOCK_PROPS: Record<
       { label: 'Mentions légales', href: '#' },
       { label: 'Politique de confidentialité', href: '#' },
     ],
+  },
+  vehicle_range: {
+    heading: 'Notre gamme',
+    subtitle: '',
+    vehicles: [],
   },
 };
 

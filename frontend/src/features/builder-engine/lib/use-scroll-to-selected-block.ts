@@ -9,7 +9,12 @@ export function useScrollToSelectedBlock(scrollRootRef: RefObject<HTMLElement | 
   const prevSelectedRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!selectedBlockId || selectedBlockId === prevSelectedRef.current) return;
+    if (!selectedBlockId) {
+      prevSelectedRef.current = null;
+      return;
+    }
+
+    if (selectedBlockId === prevSelectedRef.current) return;
     prevSelectedRef.current = selectedBlockId;
 
     const root = scrollRootRef.current;

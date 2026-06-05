@@ -12,6 +12,8 @@ export function useBlockPropsPatch(blockId: string) {
   const patchString = useCallback(
     (key: string, value: string) => {
       if (!canWrite) return;
+      const exists = useBuilderDocumentStore.getState().blocks.some((b) => b.id === blockId);
+      if (!exists) return;
       updateBlockProps(blockId, sanitizePropsPatch({ [key]: value }));
     },
     [blockId, canWrite, updateBlockProps],
@@ -20,6 +22,8 @@ export function useBlockPropsPatch(blockId: string) {
   const patchList = useCallback(
     (key: string, items: Record<string, unknown>[]) => {
       if (!canWrite) return;
+      const exists = useBuilderDocumentStore.getState().blocks.some((b) => b.id === blockId);
+      if (!exists) return;
       updateBlockProps(blockId, sanitizePropsPatch({ [key]: items }));
     },
     [blockId, canWrite, updateBlockProps],
@@ -28,6 +32,8 @@ export function useBlockPropsPatch(blockId: string) {
   const patchProps = useCallback(
     (patch: Record<string, unknown>) => {
       if (!canWrite) return;
+      const exists = useBuilderDocumentStore.getState().blocks.some((b) => b.id === blockId);
+      if (!exists) return;
       updateBlockProps(blockId, sanitizePropsPatch(patch));
     },
     [blockId, canWrite, updateBlockProps],

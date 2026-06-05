@@ -1,4 +1,4 @@
-import { parseLeadFormFields } from '@/lib/lead-form-block';
+import { resolveLeadFormFieldsFromProps } from '../constants/autohall-lead-form';
 import type { HeroBlockProps, LeadFormBlockProps } from '../types';
 
 export function asPropString(value: unknown): string {
@@ -31,6 +31,6 @@ export function parseLeadFormProps(propsJson: Record<string, unknown>): LeadForm
     submitText: asPropString(propsJson.submitText) || 'Envoyer ma demande',
     privacyNote: asPropString(propsJson.privacyNote),
     reassurance,
-    fields: parseLeadFormFields(propsJson),
+    fields: resolveLeadFormFieldsFromProps(propsJson),
   };
 }

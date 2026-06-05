@@ -57,7 +57,7 @@ export function RightInspector() {
         {mode === 'page' ? (
           <PageSettingsPanel />
         ) : activeBlock ? (
-          <BlockInspectorForm block={activeBlock} />
+          <BlockInspectorForm key={activeBlock.id} block={activeBlock} />
         ) : (
           <div
             className={cn(

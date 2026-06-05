@@ -5,6 +5,7 @@ import { getActivePaletteBlocks } from '../registry/block-registry';
 import type { BuilderDeviceMode } from '../lib/block-design-props';
 import { sanitizePropsPatch } from '../lib/sanitize-props-patch';
 import type { BuilderDocumentBlock } from '../types';
+import { findBlockById, sanitizeBlockSelection } from './block-selection';
 
 function createBlockFromType(type: string, sortOrder: number): BuilderDocumentBlock {
   const item = getRegistryEntry(type);
@@ -66,6 +67,12 @@ type BuilderDocumentState = {
   setDeviceMode: (mode: BuilderDeviceMode) => void;
   setPageTheme: (patch: Partial<PageThemeDraft>) => void;
   setInitialPageTheme: (theme: PageThemeDraft) => void;
+  restoreLocalDraft: (payload: {
+    blocks: BuilderDocumentBlock[];
+    pageTheme: PageThemeDraft;
+    themeDirty: boolean;
+    selectedBlockId: string | null;
+  }) => void;
   buildThemeJsonPayload: () => Record<string, unknown>;
   resetDocument: () => void;
 };
@@ -115,12 +122,19 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>((set, get) =
   },
 
   removeBlock: (blockId) => {
-    const blocks = get().blocks.filter((b) => b.id !== blockId);
-    const selectedBlockId = get().selectedBlockId;
+    const current = get().blocks;
+    if (!findBlockById(current, blockId)) return;
+
+    const blocks = normalizeSortOrder(current.filter((b) => b.id !== blockId));
+    const selection = sanitizeBlockSelection(
+      blocks,
+      get().selectedBlockId,
+      get().hoveredBlockId,
+    );
+
     set({
-      blocks: normalizeSortOrder(blocks),
-      selectedBlockId: selectedBlockId === blockId ? null : selectedBlockId,
-      hoveredBlockId: get().hoveredBlockId === blockId ? null : get().hoveredBlockId,
+      blocks,
+      ...selection,
     });
   },
 
@@ -145,9 +159,23 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>((set, get) =
     });
   },
 
-  selectBlock: (blockId) => set({ selectedBlockId: blockId }),
+  selectBlock: (blockId) => {
+    if (blockId === null) {
+      set({ selectedBlockId: null });
+      return;
+    }
+    const exists = findBlockById(get().blocks, blockId);
+    set({ selectedBlockId: exists ? blockId : null });
+  },
 
-  hoverBlock: (blockId) => set({ hoveredBlockId: blockId }),
+  hoverBlock: (blockId) => {
+    if (blockId === null) {
+      set({ hoveredBlockId: null });
+      return;
+    }
+    const exists = findBlockById(get().blocks, blockId);
+    set({ hoveredBlockId: exists ? blockId : null });
+  },
 
   reorderBlocks: (activeId, overId) => {
     const blocks = [...get().blocks];
@@ -171,25 +199,39 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>((set, get) =
   },
 
   updateBlockProps: (blockId, patch) => {
+    if (!findBlockById(get().blocks, blockId)) return;
+
     const safe = sanitizePropsPatch(patch);
     if (Object.keys(safe).length === 0) return;
 
-    set({
-      blocks: get().blocks.map((block) => {
-        if (block.id !== blockId) return block;
-        const merged = { ...block.propsJson, ...safe };
-        if (safe.design && typeof safe.design === 'object' && !Array.isArray(safe.design)) {
-          const prev =
-            block.propsJson.design &&
-            typeof block.propsJson.design === 'object' &&
-            !Array.isArray(block.propsJson.design)
-              ? (block.propsJson.design as Record<string, unknown>)
-              : {};
-          merged.design = { ...prev, ...(safe.design as Record<string, unknown>) };
-        }
-        return { ...block, propsJson: merged };
-      }),
+    let changed = false;
+    const blocks = get().blocks.map((block) => {
+      if (block.id !== blockId) return block;
+      changed = true;
+      const merged = { ...block.propsJson, ...safe };
+      if (safe.design && typeof safe.design === 'object' && !Array.isArray(safe.design)) {
+        const prev =
+          block.propsJson.design &&
+          typeof block.propsJson.design === 'object' &&
+          !Array.isArray(block.propsJson.design)
+            ? (block.propsJson.design as Record<string, unknown>)
+            : {};
+        merged.design = { ...prev, ...(safe.design as Record<string, unknown>) };
+      }
+      if (safe.formConfig && typeof safe.formConfig === 'object' && !Array.isArray(safe.formConfig)) {
+        const prev =
+          block.propsJson.formConfig &&
+          typeof block.propsJson.formConfig === 'object' &&
+          !Array.isArray(block.propsJson.formConfig)
+            ? (block.propsJson.formConfig as Record<string, unknown>)
+            : {};
+        merged.formConfig = { ...prev, ...(safe.formConfig as Record<string, unknown>) };
+      }
+      return { ...block, propsJson: merged };
     });
+
+    if (!changed) return;
+    set({ blocks });
   },
 
   setInitialBlocks: (blocks) => {
@@ -211,6 +253,21 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>((set, get) =
 
   setInitialPageTheme: (theme) =>
     set({ pageTheme: theme, themeDirty: false }),
+
+  restoreLocalDraft: (payload) => {
+    const blocks = normalizeSortOrder([...payload.blocks]);
+    const selection = sanitizeBlockSelection(
+      blocks,
+      payload.selectedBlockId,
+      null,
+    );
+    set({
+      blocks,
+      pageTheme: payload.pageTheme,
+      themeDirty: payload.themeDirty,
+      ...selection,
+    });
+  },
 
   buildThemeJsonPayload: () => {
     const { pageTheme } = get();

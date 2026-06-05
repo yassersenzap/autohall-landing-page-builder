@@ -97,4 +97,18 @@ describe('SortableBlockItem hover interaction', () => {
     expect(item).toHaveAttribute('data-selected', 'true');
     expect(screen.getByTestId('block-selected-badge')).toHaveTextContent('Bloc Hero');
   });
+
+  it('supprime le bloc via la barre d’outils sans conserver la sélection', () => {
+    renderBlockItem();
+    act(() => {
+      useBuilderDocumentStore.getState().selectBlock('block-hero-1');
+    });
+
+    fireEvent.mouseEnter(screen.getByTestId('sortable-block-item'));
+    fireEvent.click(screen.getByRole('button', { name: /supprimer/i }));
+
+    expect(useBuilderDocumentStore.getState().blocks).toHaveLength(0);
+    expect(useBuilderDocumentStore.getState().selectedBlockId).toBeNull();
+    expect(screen.queryByTestId('sortable-block-item')).not.toBeInTheDocument();
+  });
 });

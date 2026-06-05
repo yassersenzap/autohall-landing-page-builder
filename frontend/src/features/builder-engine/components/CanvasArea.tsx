@@ -4,8 +4,10 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { LayoutTemplate } from 'lucide-react';
+import { LayoutTemplate, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ShadButton } from '@/components/ui/primitives';
+import { useBuilderEditorContext } from '../context/BuilderEditorContext';
 import { useWorkspaceUi } from '../context/WorkspaceUiContext';
 import {
   CANVAS_DESKTOP_MAX_WIDTH,
@@ -30,9 +32,11 @@ const ZOOM_PRESETS: { id: CanvasZoomLevel | 'fit'; label: string }[] = [
 
 export function CanvasArea() {
   const blocks = useBuilderDocumentStore((s) => s.blocks);
+  const addBlock = useBuilderDocumentStore((s) => s.addBlock);
   const deviceMode = useBuilderDocumentStore((s) => s.deviceMode);
   const selectedBlockId = useBuilderDocumentStore((s) => s.selectedBlockId);
   const selectBlock = useBuilderDocumentStore((s) => s.selectBlock);
+  const { canWrite, openSectionsTab } = useBuilderEditorContext();
 
   const {
     zoomMode,
@@ -198,17 +202,42 @@ export function CanvasArea() {
                   onClick={(e) => e.stopPropagation()}
                 >
                   {blocks.length === 0 ? (
-                    <div className="flex min-h-[28rem] flex-col items-center justify-center px-8 text-center">
-                      <LayoutTemplate className="mb-4 h-12 w-12 text-muted-foreground/40" />
-                      <p className="text-sm font-semibold text-foreground">Canvas vide</p>
-                      <p className="mt-2 max-w-xs text-xs leading-relaxed text-muted-foreground">
-                        Onglet <strong>Modèles</strong> pour une page complète, ou{' '}
-                        <strong>Blocs</strong> pour ajouter section par section.
+                    <div
+                      className="flex min-h-[28rem] flex-col items-center justify-center px-8 text-center"
+                      data-testid="canvas-empty-state"
+                    >
+                      <LayoutTemplate className="mb-4 h-12 w-12 text-primary/40" aria-hidden />
+                      <p className="text-base font-semibold text-foreground">
+                        Commencez avec un modèle Auto Hall ou ajoutez un bloc
                       </p>
+                      <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
+                        Choisissez une structure prête à l’emploi ou démarrez par une bannière Hero.
+                      </p>
+                      <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+                        <ShadButton
+                          type="button"
+                          size="sm"
+                          onClick={() => openSectionsTab()}
+                        >
+                          <LayoutTemplate className="h-4 w-4" />
+                          Choisir un modèle
+                        </ShadButton>
+                        <ShadButton
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          disabled={!canWrite}
+                          onClick={() => addBlock('hero')}
+                        >
+                          <Plus className="h-4 w-4" />
+                          Ajouter un Hero
+                        </ShadButton>
+                      </div>
                     </div>
                   ) : (
                     <LandingPreviewScope className="is-canvas-edit rounded-none">
                       <SortableContext
+                        key={blocks.map((b) => b.id).join('|')}
                         items={blocks.map((b) => b.id)}
                         strategy={verticalListSortingStrategy}
                       >

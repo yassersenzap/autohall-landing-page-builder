@@ -1,4 +1,5 @@
 import { useBlockPropsJson } from '../../lib/use-block-props-json';
+import { useBuilderDocumentStore } from '../../store/builder-document.store';
 import type { BuilderDocumentBlock } from '../../types';
 import { FeaturesInspectorFields } from './FeaturesInspectorFields';
 import { FinalCtaInspectorFields } from './FinalCtaInspectorFields';
@@ -9,6 +10,10 @@ import { HeroInspectorFields } from './HeroInspectorFields';
 import { ImageInspectorFields } from './ImageInspectorFields';
 import { TextInspectorFields } from './TextInspectorFields';
 import { TrustInspectorFields } from './TrustInspectorFields';
+import { BenefitsInspectorFields } from './BenefitsInspectorFields';
+import { OfferInspectorFields } from './OfferInspectorFields';
+import { FinancingInspectorFields } from './FinancingInspectorFields';
+import { VehicleRangeInspectorFields } from './VehicleRangeInspectorFields';
 import { getRegistryEntry } from '../../registry/block-registry';
 import { isBackendSupportedBlockType } from '../../registry/backend-block-types';
 
@@ -29,10 +34,22 @@ function UnsupportedBlockInspector({ block }: BlockInspectorFormProps) {
 }
 
 export function BlockInspectorForm({ block }: BlockInspectorFormProps) {
-  const propsJson = useBlockPropsJson(block.id);
-  const type = block.type.toLowerCase();
-  const inspectorKey = `${block.id}:${type}`;
-  const common = { key: inspectorKey, blockId: block.id, propsJson };
+  const liveBlock = useBuilderDocumentStore((s) =>
+    s.blocks.find((entry) => entry.id === block.id),
+  );
+
+  if (!liveBlock) {
+    return (
+      <p className="rounded-md border border-dashed border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+        Cette section n’existe plus dans le document.
+      </p>
+    );
+  }
+
+  const propsJson = useBlockPropsJson(liveBlock.id);
+  const type = liveBlock.type.toLowerCase();
+  const inspectorKey = `${liveBlock.id}:${type}`;
+  const common = { key: inspectorKey, blockId: liveBlock.id, propsJson };
 
   switch (type) {
     case 'hero':
@@ -53,6 +70,14 @@ export function BlockInspectorForm({ block }: BlockInspectorFormProps) {
       return <ImageInspectorFields {...common} />;
     case 'faq':
       return <FaqInspectorFields {...common} />;
+    case 'benefits':
+      return <BenefitsInspectorFields {...common} />;
+    case 'offer_highlights':
+      return <OfferInspectorFields {...common} />;
+    case 'financing':
+      return <FinancingInspectorFields {...common} />;
+    case 'vehicle_range':
+      return <VehicleRangeInspectorFields {...common} />;
     default:
       return <UnsupportedBlockInspector block={block} />;
   }

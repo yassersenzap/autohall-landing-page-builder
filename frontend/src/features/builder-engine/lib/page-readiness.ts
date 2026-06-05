@@ -95,7 +95,7 @@ export function getPageReadinessIssues(
       issues.push({
         code: `hero-image-${index}`,
         severity: 'warning',
-        message: `Hero${label} : aucune image — la page reste publiable.`,
+        message: `Hero${label} : aucune image — ajoutez une image véhicule dans le Hero.`,
         blockId: bid,
       });
     }
@@ -126,6 +126,17 @@ export function getPageReadinessIssues(
         code: `lead-form-submit-${index}`,
         severity: 'critical',
         message: 'Formulaire : texte du bouton d’envoi manquant.',
+        blockId: block.id,
+      });
+    }
+    const formConfig = props.formConfig as Record<string, unknown> | undefined;
+    const showConsent = formConfig?.showConsent !== false;
+    const consentLabel = asPropString(props.consentLabel).trim();
+    if (showConsent && !consentLabel) {
+      issues.push({
+        code: `lead-form-consent-${index}`,
+        severity: 'critical',
+        message: 'Formulaire : complétez le consentement données personnelles.',
         blockId: block.id,
       });
     }
@@ -208,6 +219,14 @@ export function getPageReadinessIssues(
       code: 'sections-few',
       severity: 'warning',
       message: `Peu de sections (${blocks.length}) — une landing complète en a généralement plus.`,
+    });
+  }
+
+  if (!blocks.some((b) => b.type === 'benefits') && !blocks.some((b) => b.type === 'trust_bar')) {
+    issues.push({
+      code: 'reassurance-missing',
+      severity: 'warning',
+      message: 'Ajoutez au moins une section de réassurance (avantages ou bandeau confiance).',
     });
   }
 

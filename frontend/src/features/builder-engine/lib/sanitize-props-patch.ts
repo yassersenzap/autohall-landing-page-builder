@@ -50,6 +50,27 @@ function sanitizeArrayValue(value: unknown[]): unknown[] {
     .filter((item) => item !== null && (typeof item !== 'object' || Object.keys(item).length > 0));
 }
 
+const FORM_CONFIG_KEYS = new Set([
+  'showCivility',
+  'useSplitName',
+  'showCity',
+  'showVehicleModel',
+  'showMessage',
+  'showEmail',
+  'showConsent',
+]);
+
+function sanitizeFormConfigObject(value: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [key, raw] of Object.entries(value)) {
+    if (!FORM_CONFIG_KEYS.has(key)) continue;
+    if (typeof raw === 'boolean') {
+      out[key] = raw;
+    }
+  }
+  return out;
+}
+
 function sanitizeDesignObject(value: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   let keyCount = 0;
@@ -89,6 +110,19 @@ export function sanitizePropsPatch(
       !Array.isArray(value)
     ) {
       const sanitized = sanitizeDesignObject(value as Record<string, unknown>);
+      if (Object.keys(sanitized).length > 0) {
+        out[key] = sanitized;
+      }
+      continue;
+    }
+
+    if (
+      key === 'formConfig' &&
+      value !== null &&
+      typeof value === 'object' &&
+      !Array.isArray(value)
+    ) {
+      const sanitized = sanitizeFormConfigObject(value as Record<string, unknown>);
       if (Object.keys(sanitized).length > 0) {
         out[key] = sanitized;
       }

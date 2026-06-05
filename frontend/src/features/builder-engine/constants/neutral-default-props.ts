@@ -12,17 +12,12 @@ import {
   DEFAULT_TEXT_DESIGN,
 } from './default-block-design';
 
-const STANDARD_LEAD_FORM_FIELDS = [
-  { name: 'fullName', label: 'Nom complet', type: 'text', required: true },
-  { name: 'phone', label: 'Téléphone', type: 'tel', required: true },
-  { name: 'email', label: 'Email', type: 'email', required: false },
-  {
-    name: 'vehicleModel',
-    label: 'Modèle souhaité',
-    type: 'text',
-    required: false,
-  },
-] as const;
+import {
+  DEFAULT_AUTOHALL_CONSENT_LABEL,
+  DEFAULT_AUTOHALL_FORM_CONFIG,
+  DEFAULT_AUTOHALL_REQUIRED_NOTE,
+  buildAutoHallLeadFormFields,
+} from './autohall-lead-form';
 
 export const BUILDER_NEUTRAL_DEFAULT_PROPS: Record<string, Record<string, unknown>> = {
   hero: {
@@ -33,6 +28,8 @@ export const BUILDER_NEUTRAL_DEFAULT_PROPS: Record<string, Record<string, unknow
     buttonTarget: '#lead-form',
     secondaryButtonText: '',
     secondaryButtonTarget: '#offer',
+    campaignType: 'promo',
+    promoBadge: '',
     imageUrl: '',
     imageAssetId: '',
     alt: '',
@@ -43,9 +40,12 @@ export const BUILDER_NEUTRAL_DEFAULT_PROPS: Record<string, Record<string, unknow
     subtitle: '',
     submitText: 'Envoyer ma demande',
     privacyNote:
-      'Vos données sont traitées conformément à notre politique de confidentialité.',
+      'Conformément à la loi 09-08, vous disposez d’un droit d’accès et de rectification de vos données.',
+    consentLabel: DEFAULT_AUTOHALL_CONSENT_LABEL,
+    requiredFieldsNote: DEFAULT_AUTOHALL_REQUIRED_NOTE,
+    formConfig: { ...DEFAULT_AUTOHALL_FORM_CONFIG },
+    fields: buildAutoHallLeadFormFields(DEFAULT_AUTOHALL_FORM_CONFIG),
     reassurance: [],
-    fields: STANDARD_LEAD_FORM_FIELDS.map((f) => ({ ...f })),
     design: { ...DEFAULT_FORM_DESIGN },
   },
   trust_bar: {
@@ -94,5 +94,46 @@ export const BUILDER_NEUTRAL_DEFAULT_PROPS: Record<string, Record<string, unknow
     legalText: '',
     links: [],
     design: { ...DEFAULT_FOOTER_DESIGN },
+  },
+  benefits: {
+    heading: '',
+    subtitle: '',
+    items: [
+      { title: '', description: '' },
+      { title: '', description: '' },
+      { title: '', description: '' },
+    ],
+  },
+  offer_highlights: {
+    heading: '',
+    subtitle: '',
+    modelName: '',
+    tagline: '',
+    priceLabel: 'À partir de',
+    priceValue: '',
+    monthlyValue: '',
+    buttonText: '',
+    buttonTarget: '#lead-form',
+    imageUrl: '',
+    imageAssetId: '',
+    alt: '',
+    highlights: [],
+  },
+  financing: {
+    heading: '',
+    subtitle: '',
+    paymentExample: '',
+    bullets: [],
+    ctaLabel: 'Demander un financement',
+    ctaTarget: '#lead-form',
+  },
+  vehicle_range: {
+    heading: '',
+    subtitle: '',
+    vehicles: [
+      { name: '', energy: 'Thermique', tag: '', imageUrl: '', imageAssetId: '', alt: '', ctaText: 'Découvrir', ctaTarget: '#lead-form' },
+      { name: '', energy: 'HEV', tag: '', imageUrl: '', imageAssetId: '', alt: '', ctaText: 'Découvrir', ctaTarget: '#lead-form' },
+      { name: '', energy: 'Thermique', tag: '', imageUrl: '', imageAssetId: '', alt: '', ctaText: 'Découvrir', ctaTarget: '#lead-form' },
+    ],
   },
 };

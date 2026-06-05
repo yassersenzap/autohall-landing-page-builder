@@ -33,6 +33,7 @@ const BLOCK_ICON_MAP: Record<EditorBlockType, LucideIcon> = {
   faq: CircleHelp,
   final_cta: LayoutTemplate,
   footer_legal: FileText,
+  vehicle_range: LayoutTemplate,
 };
 
 export function BlockTypeIcon({

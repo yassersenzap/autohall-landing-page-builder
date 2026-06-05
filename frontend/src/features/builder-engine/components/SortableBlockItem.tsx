@@ -58,8 +58,15 @@ function BlockHoverOverlay({
         className="flex h-8 w-8 items-center justify-center rounded-md text-white/90 transition-colors hover:bg-red-500/20 hover:text-red-300 disabled:opacity-40"
         aria-label="Supprimer"
         disabled={!canWrite}
+        onPointerDown={(e) => {
+          e.stopPropagation();
+        }}
+        onMouseDown={(e) => {
+          e.stopPropagation();
+        }}
         onClick={(e) => {
           e.stopPropagation();
+          e.preventDefault();
           onDelete();
         }}
       >
@@ -95,6 +102,11 @@ export function SortableBlockItem({ blockId }: SortableBlockItemProps) {
     transform: CSS.Transform.toString(transform),
     transition,
   };
+
+  function handleDelete() {
+    hoverBlock(null);
+    removeBlock(blockId);
+  }
 
   return (
     <li
@@ -148,7 +160,7 @@ export function SortableBlockItem({ blockId }: SortableBlockItemProps) {
             dragAttributes={attributes}
             dragListeners={listeners}
             onDuplicate={() => duplicateBlock(blockId)}
-            onDelete={() => removeBlock(blockId)}
+            onDelete={handleDelete}
           />
         ) : null}
 

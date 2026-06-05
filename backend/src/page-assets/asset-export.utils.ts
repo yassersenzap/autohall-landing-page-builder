@@ -16,6 +16,31 @@ export function extractUsedAssetIdsFromBlocks(
 ): string[] {
   const ids = new Set<string>();
 
+  function walk(value: unknown): void {
+    if (value === null || value === undefined) return;
+
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        walk(item);
+      }
+      return;
+    }
+
+    if (typeof value !== 'object') return;
+
+    const record = value as Record<string, unknown>;
+    const assetId = record.imageAssetId;
+    if (typeof assetId === 'string' && assetId.trim().length > 0) {
+      ids.add(assetId.trim());
+    }
+
+    for (const nested of Object.values(record)) {
+      if (nested !== null && typeof nested === 'object') {
+        walk(nested);
+      }
+    }
+  }
+
   for (const block of blocks) {
     if (!block.propsJson || typeof block.propsJson !== 'object') {
       continue;
@@ -23,12 +48,7 @@ export function extractUsedAssetIdsFromBlocks(
     if (Array.isArray(block.propsJson)) {
       continue;
     }
-
-    const record = block.propsJson as Record<string, unknown>;
-    const assetId = record.imageAssetId;
-    if (typeof assetId === 'string' && assetId.trim().length > 0) {
-      ids.add(assetId.trim());
-    }
+    walk(block.propsJson);
   }
 
   return [...ids];

@@ -8,6 +8,11 @@ import {
 } from './block-style';
 import { resolveHeroImageSrc } from './render-asset.resolve';
 import type { LandingRenderContext } from './render-asset.types';
+import {
+  renderLeadFormConsentHtml,
+  renderLeadFormFieldsHtml,
+  renderLeadFormRequiredNoteHtml,
+} from './lead-form-fields.render';
 
 export type RenderBlockInput = {
   blockType: string;
@@ -197,21 +202,10 @@ function renderLeadFormHtml(props: Record<string, unknown>): string {
   const submitText = propString(props, 'submitText') ?? 'Envoyer ma demande';
   const privacyNote = propString(props, 'privacyNote', 'legalNote');
   const reassurance = parseStringList(props, 'reassurance');
-  const fields = parseLeadFormFields(props);
 
-  const fieldsHtml = fields
-    .map((field) => {
-      const requiredAttr = field.required ? ' required' : '';
-      const inputType = escapeHtml(field.type || 'text');
-      const isFullWidth =
-        field.name === 'fullName' || field.name === 'message' || fields.length <= 2;
-      return `
-        <label class="lp-lead-form__field${isFullWidth ? ' lp-lead-form__field--full' : ''}">
-          <span class="lp-lead-form__label">${escapeHtml(field.label)}${field.required ? ' <span aria-hidden="true">*</span>' : ''}</span>
-          <input class="lp-lead-form__input" type="${inputType}" name="${escapeHtml(field.name)}"${requiredAttr} autocomplete="on" />
-        </label>`;
-    })
-    .join('');
+  const fieldsHtml = renderLeadFormFieldsHtml(props);
+  const consentHtml = renderLeadFormConsentHtml(props);
+  const requiredNoteHtml = renderLeadFormRequiredNoteHtml(props);
 
   const reassuranceHtml = reassurance.length
     ? `<ul class="lp-lead-form__reassurance">${reassurance
@@ -233,7 +227,9 @@ function renderLeadFormHtml(props: Record<string, unknown>): string {
           </aside>
           <div class="lp-lead-form__card">
             <form class="lp-lead-form__form" action="#" method="post" novalidate>
+              ${requiredNoteHtml}
               <div class="lp-lead-form__grid">${fieldsHtml}</div>
+              ${consentHtml}
               <p class="lp-lead-form__feedback" role="status" aria-live="polite"></p>
               <button type="submit" class="${btnClass}">${escapeHtml(submitText)}</button>
               ${privacyNote ? `<p class="lp-lead-form__privacy">${escapeHtml(privacyNote)}</p>` : ''}
@@ -295,9 +291,18 @@ function renderHeroHtml(
         : `<div class="lp-hero__media lp-hero__media--placeholder" aria-hidden="true"><span>Visuel véhicule — ajoutez une photo</span></div>`
       : '';
 
+  const campaignType = propString(props, 'campaignType');
+  const promoBadge = propString(props, 'promoBadge');
+  const campaignClass =
+    campaignType &&
+    ['promo', 'sav', 'gamme', 'lead_capture'].includes(campaignType)
+      ? ` lp-hero--campaign-${campaignType}`
+      : '';
+
   const contentHtml = `
         <div class="lp-hero__content">
           ${eyebrow ? `<p class="lp-hero__eyebrow">${escapeHtml(eyebrow)}</p>` : ''}
+          ${promoBadge ? `<span class="lp-hero__badge">${escapeHtml(promoBadge)}</span>` : ''}
           ${title ? `<h1 class="lp-hero__title">${escapeHtml(title)}</h1>` : ''}
           ${subtitle ? `<p class="lp-hero__subtitle">${escapeHtml(subtitle)}</p>` : ''}
           ${actions.length ? `<div class="lp-hero__actions">${actions.join('')}</div>` : ''}
@@ -309,7 +314,7 @@ function renderHeroHtml(
       : `${contentHtml}${mediaHtml}`;
 
   return `
-    <section class="${sectionClass}"${inlineVars}>
+    <section class="${sectionClass}${campaignClass}"${inlineVars}>
       ${bgMediaHtml}
       ${overlayHtml}
       <div class="lp-hero__glow" aria-hidden="true"></div>
@@ -367,10 +372,60 @@ function renderBenefitsHtml(props: Record<string, unknown>): string {
     </section>`;
 }
 
-function renderOfferHighlightsHtml(props: Record<string, unknown>): string {
+function renderOfferHighlightsHtml(
+  props: Record<string, unknown>,
+  context?: LandingRenderContext,
+): string {
+  const modelName = propString(props, 'modelName', 'model');
+  const tagline = propString(props, 'tagline', 'modelTagline');
+  const priceLabel = propString(props, 'priceLabel') ?? 'À partir de';
+  const priceValue = propString(props, 'priceValue', 'price');
+  const monthlyValue = propString(props, 'monthlyValue', 'monthlyFrom');
+  const buttonText = propString(props, 'buttonText', 'ctaLabel');
+  const buttonTarget = propString(props, 'buttonTarget', 'ctaTarget') ?? '#lead-form';
+  const imageSrc = resolveHeroImageSrc(props, context);
+  const imageAlt = propString(props, 'alt') ?? '';
   const heading = propString(props, 'heading', 'title');
   const subtitle = propString(props, 'subtitle');
   const items = parseListItems(props, 'highlights', 'items');
+
+  if (modelName || imageSrc || priceValue || monthlyValue) {
+    const highlightsHtml = items
+      .map(
+        (item) =>
+          `<li class="lp-vehicle-offer__highlight"><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.description)}</span></li>`,
+      )
+      .join('');
+
+    const priceHtml = priceValue
+      ? `<p class="lp-vehicle-offer__price"><span class="lp-vehicle-offer__price-label">${escapeHtml(priceLabel)}</span> <strong>${escapeHtml(priceValue)}</strong></p>`
+      : '';
+    const monthlyHtml = monthlyValue
+      ? `<p class="lp-vehicle-offer__monthly">${escapeHtml(monthlyValue)}</p>`
+      : '';
+
+    const mediaHtml = imageSrc
+      ? `<div class="lp-vehicle-offer__media"><img class="lp-vehicle-offer__img" src="${escapeHtml(imageSrc)}" alt="${escapeHtml(imageAlt)}" loading="lazy" decoding="async" /></div>`
+      : `<div class="lp-vehicle-offer__media lp-vehicle-offer__media--placeholder" aria-hidden="true"><span>Visuel véhicule</span></div>`;
+
+    return `
+    <section class="lp-block lp-vehicle-offer" id="offer">
+      <div class="lp-section">
+        ${heading || subtitle ? `<div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>` : ''}
+        <div class="lp-vehicle-offer__panel">
+          ${mediaHtml}
+          <div class="lp-vehicle-offer__body">
+            ${modelName ? `<p class="lp-vehicle-offer__model">${escapeHtml(modelName)}</p>` : ''}
+            ${tagline ? `<p class="lp-vehicle-offer__tagline">${escapeHtml(tagline)}</p>` : ''}
+            ${priceHtml}
+            ${monthlyHtml}
+            ${highlightsHtml ? `<ul class="lp-vehicle-offer__highlights">${highlightsHtml}</ul>` : ''}
+            ${buttonText ? `<div class="lp-vehicle-offer__cta">${renderBtn(buttonTarget, buttonText, 'primary', 'lg')}</div>` : ''}
+          </div>
+        </div>
+      </div>
+    </section>`;
+  }
 
   const cards = items
     .map(
@@ -388,6 +443,79 @@ function renderOfferHighlightsHtml(props: Record<string, unknown>): string {
       <div class="lp-section">
         <div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>
         <div class="lp-offer-highlights__grid">${cards}</div>
+      </div>
+    </section>`;
+}
+
+type VehicleRangeItem = {
+  name: string;
+  energy: string;
+  tag: string;
+  imageSrc: string | null;
+  imageAlt: string;
+  ctaText: string;
+  ctaTarget: string;
+};
+
+function parseVehicleRangeItems(
+  props: Record<string, unknown>,
+  context?: LandingRenderContext,
+): VehicleRangeItem[] {
+  return parseObjectList(props, 'vehicles')
+    .map((item) => {
+      const imageAssetId = propString(item, 'imageAssetId');
+      const imageUrl = propString(item, 'imageUrl');
+      const merged = { ...item, imageAssetId, imageUrl };
+      return {
+        name: propString(item, 'name', 'modelName') ?? '',
+        energy: propString(item, 'energy', 'type') ?? '',
+        tag: propString(item, 'tag', 'badge') ?? '',
+        imageSrc: resolveHeroImageSrc(merged, context),
+        imageAlt: propString(item, 'alt') ?? '',
+        ctaText: propString(item, 'ctaText', 'buttonText') ?? 'Découvrir',
+        ctaTarget: propString(item, 'ctaTarget', 'buttonTarget') ?? '#lead-form',
+      };
+    })
+    .filter((item) => item.name);
+}
+
+function renderVehicleRangeHtml(
+  props: Record<string, unknown>,
+  context?: LandingRenderContext,
+): string {
+  const heading = propString(props, 'heading', 'title');
+  const subtitle = propString(props, 'subtitle');
+  const vehicles = parseVehicleRangeItems(props, context);
+
+  const cards = vehicles
+    .map((vehicle) => {
+      const mediaHtml = vehicle.imageSrc
+        ? `<img class="lp-vehicle-card__img" src="${escapeHtml(vehicle.imageSrc)}" alt="${escapeHtml(vehicle.imageAlt)}" loading="lazy" decoding="async" />`
+        : `<div class="lp-vehicle-card__placeholder" aria-hidden="true">Visuel modèle</div>`;
+      const tagHtml = vehicle.tag
+        ? `<span class="lp-vehicle-card__tag">${escapeHtml(vehicle.tag)}</span>`
+        : '';
+      const energyHtml = vehicle.energy
+        ? `<span class="lp-vehicle-card__energy">${escapeHtml(vehicle.energy)}</span>`
+        : '';
+      return `
+      <article class="lp-vehicle-card">
+        <div class="lp-vehicle-card__media">${mediaHtml}</div>
+        <div class="lp-vehicle-card__body">
+          ${tagHtml}
+          <h3 class="lp-vehicle-card__name">${escapeHtml(vehicle.name)}</h3>
+          ${energyHtml}
+          <a class="lp-btn lp-btn--secondary lp-btn--md lp-vehicle-card__cta" href="${escapeHtml(vehicle.ctaTarget)}">${escapeHtml(vehicle.ctaText)}</a>
+        </div>
+      </article>`;
+    })
+    .join('');
+
+  return `
+    <section class="lp-block lp-vehicle-range">
+      <div class="lp-section">
+        <div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>
+        <div class="lp-vehicle-range__grid">${cards}</div>
       </div>
     </section>`;
 }
@@ -734,7 +862,11 @@ export function renderBlockHtml(
   }
 
   if (type === 'offer_highlights') {
-    return renderOfferHighlightsHtml(props);
+    return renderOfferHighlightsHtml(props, context);
+  }
+
+  if (type === 'vehicle_range') {
+    return renderVehicleRangeHtml(props, context);
   }
 
   if (type === 'features') {

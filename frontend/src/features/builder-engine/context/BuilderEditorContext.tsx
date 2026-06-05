@@ -8,6 +8,7 @@ type BuilderEditorContextValue = {
   leftPanelTab: LeftPanelTab;
   setLeftPanelTab: (tab: LeftPanelTab) => void;
   openMediaLibrary: () => void;
+  openSectionsTab: () => void;
 };
 
 const BuilderEditorContext = createContext<BuilderEditorContextValue | null>(null);
@@ -29,6 +30,10 @@ export function BuilderEditorProvider({
     setLeftPanelTab('media');
   }, []);
 
+  const openSectionsTab = useCallback(() => {
+    setLeftPanelTab('sections');
+  }, []);
+
   const value = useMemo(
     () => ({
       canWrite,
@@ -37,8 +42,9 @@ export function BuilderEditorProvider({
       leftPanelTab,
       setLeftPanelTab,
       openMediaLibrary,
+      openSectionsTab,
     }),
-    [canWrite, landingPageId, leftPanelTab, openMediaLibrary, pageVersionId],
+    [canWrite, landingPageId, leftPanelTab, openMediaLibrary, openSectionsTab, pageVersionId],
   );
 
   return (
@@ -56,6 +62,7 @@ export function useBuilderEditorContext(): BuilderEditorContextValue {
       leftPanelTab: 'blocks',
       setLeftPanelTab: () => undefined,
       openMediaLibrary: () => undefined,
+      openSectionsTab: () => undefined,
     };
   }
   return ctx;

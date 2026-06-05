@@ -27,7 +27,14 @@ describe('getPageReadinessIssues', () => {
           type: 'hero',
           propsJson: { title: 'Offre', buttonText: 'Go', imageUrl: '', imageAssetId: '' },
         },
-        { type: 'lead_form', propsJson: { submitText: 'Envoyer' } },
+        {
+          type: 'lead_form',
+          propsJson: {
+            submitText: 'Envoyer',
+            consentLabel: 'J’accepte.',
+            formConfig: { showConsent: true },
+          },
+        },
       ],
       { seoTitle: 'T', seoDescription: 'D' },
     );

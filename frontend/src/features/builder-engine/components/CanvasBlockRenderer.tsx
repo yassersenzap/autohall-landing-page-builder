@@ -9,6 +9,10 @@ import { FaqBlockPreview } from './preview/FaqBlockPreview';
 import { ImageBlockPreview } from './preview/ImageBlockPreview';
 import { TextBlockPreview } from './preview/TextBlockPreview';
 import { TrustBarBlockPreview } from './preview/TrustBarBlockPreview';
+import { BenefitsBlockPreview } from './preview/BenefitsBlockPreview';
+import { OfferBlockPreview } from './preview/OfferBlockPreview';
+import { FinancingBlockPreview } from './preview/FinancingBlockPreview';
+import { VehicleRangeBlockPreview } from './preview/VehicleRangeBlockPreview';
 
 type CanvasBlockRendererProps = {
   blockId: string;
@@ -36,6 +40,14 @@ function renderBlockContent(
       return <TextBlockPreview propsJson={propsJson} />;
     case 'image':
       return <ImageBlockPreview propsJson={propsJson} />;
+    case 'benefits':
+      return <BenefitsBlockPreview propsJson={propsJson} />;
+    case 'offer_highlights':
+      return <OfferBlockPreview propsJson={propsJson} />;
+    case 'financing':
+      return <FinancingBlockPreview propsJson={propsJson} />;
+    case 'vehicle_range':
+      return <VehicleRangeBlockPreview propsJson={propsJson} />;
     case 'faq':
       return <FaqBlockPreview propsJson={propsJson} />;
     default:

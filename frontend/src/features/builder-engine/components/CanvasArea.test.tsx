@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DndContext } from '@dnd-kit/core';
+import { BuilderEditorProvider } from '../context/BuilderEditorContext';
 import { useBuilderDocumentStore } from '../store/builder-document.store';
 import type { BuilderDocumentBlock } from '../types';
 import { WorkspaceUiProvider } from '../context/WorkspaceUiContext';
@@ -30,11 +32,13 @@ const heroBlock: BuilderDocumentBlock = {
 
 function renderCanvasArea() {
   return render(
-    <WorkspaceUiProvider>
-      <DndContext>
-        <CanvasArea />
-      </DndContext>
-    </WorkspaceUiProvider>,
+    <BuilderEditorProvider canWrite pageVersionId="v1">
+      <WorkspaceUiProvider>
+        <DndContext>
+          <CanvasArea />
+        </DndContext>
+      </WorkspaceUiProvider>
+    </BuilderEditorProvider>,
   );
 }
 
@@ -106,5 +110,27 @@ describe('CanvasBlockRenderer pass-through', () => {
     expect(wrapper).not.toHaveClass('max-w-5xl');
     expect(wrapper).not.toHaveClass('px-6');
     expect(screen.queryByTestId('block-full-bleed')).not.toBeInTheDocument();
+  });
+});
+
+describe('CanvasArea empty state', () => {
+  beforeEach(() => {
+    useBuilderDocumentStore.getState().resetDocument();
+  });
+
+  it('shows pro empty state actions', async () => {
+    const user = userEvent.setup();
+    renderCanvasArea();
+
+    expect(screen.getByTestId('canvas-empty-state')).toBeInTheDocument();
+    expect(
+      screen.getByText(/Commencez avec un modèle Auto Hall/i),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Choisir un modèle/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Ajouter un Hero/i })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /Ajouter un Hero/i }));
+    expect(useBuilderDocumentStore.getState().blocks).toHaveLength(1);
+    expect(useBuilderDocumentStore.getState().blocks[0]?.type).toBe('hero');
   });
 });

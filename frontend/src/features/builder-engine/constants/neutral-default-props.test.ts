@@ -49,15 +49,19 @@ describe('neutral-default-props', () => {
   it('exposes neutral props for all stable builder block types', () => {
     expect(Object.keys(BUILDER_NEUTRAL_DEFAULT_PROPS).sort()).toEqual(
       [
+        'benefits',
         'faq',
         'features',
         'final_cta',
+        'financing',
         'footer_legal',
         'hero',
         'image',
         'lead_form',
+        'offer_highlights',
         'text',
         'trust_bar',
+        'vehicle_range',
       ].sort(),
     );
   });

@@ -15,6 +15,7 @@ export const BACKEND_SUPPORTED_BLOCK_TYPES = new Set([
   'after_sales',
   'testimonials',
   'button',
+  'vehicle_range',
 ]);
 
 export function isBackendSupportedBlockType(type: string): boolean {

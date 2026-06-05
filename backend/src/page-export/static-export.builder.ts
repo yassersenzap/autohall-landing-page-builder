@@ -85,10 +85,21 @@ export const STATIC_LEAD_FORM_JS = `document.addEventListener('DOMContentLoaded'
       }
 
       var fields = collectFormFields(form);
-      var fullName = fields.fullName || fields.name || '';
-      var phone = fields.phone || '';
+      var firstName = (fields.firstName || '').trim();
+      var lastName = (fields.lastName || '').trim();
+      var fullName = (fields.fullName || '').trim();
+      if (!fullName && (firstName || lastName)) {
+        fullName = (firstName + ' ' + lastName).trim();
+      }
+      var phone = (fields.phone || '').trim();
+      var consent = form.querySelector('input[name="consent"]');
 
-      if (!fullName.trim() || !phone.trim()) {
+      if (consent && !consent.checked) {
+        showFeedback(form, 'Veuillez accepter le traitement de vos données personnelles.', 'error');
+        return;
+      }
+
+      if (!fullName || !phone) {
         showFeedback(form, 'Nom et téléphone sont obligatoires.', 'error');
         return;
       }
@@ -106,6 +117,8 @@ export const STATIC_LEAD_FORM_JS = `document.addEventListener('DOMContentLoaded'
         phone: phone.trim(),
         email: fields.email || undefined,
         vehicleModel: fields.vehicleModel || undefined,
+        city: fields.city || undefined,
+        message: fields.message || undefined,
         sourceUrl: window.location.href,
         rawPayload: fields,
         metadata: {

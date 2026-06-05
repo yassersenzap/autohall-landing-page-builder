@@ -17,4 +17,21 @@ describe('sanitizePropsPatch', () => {
     const patch = sanitizePropsPatch({ imageAssetId: id });
     expect(patch.imageAssetId).toBe(id);
   });
+
+  it('preserves formConfig boolean flags', () => {
+    const patch = sanitizePropsPatch({
+      formConfig: {
+        showCivility: true,
+        showCity: false,
+        showMessage: true,
+        unknownKey: 'drop-me',
+      },
+    });
+
+    expect(patch.formConfig).toEqual({
+      showCivility: true,
+      showCity: false,
+      showMessage: true,
+    });
+  });
 });

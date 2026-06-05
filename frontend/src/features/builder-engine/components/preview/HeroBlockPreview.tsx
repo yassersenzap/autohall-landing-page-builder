@@ -1,4 +1,4 @@
-import { parseHeroProps } from '../../lib/block-props';
+import { asPropString, parseHeroProps } from '../../lib/block-props';
 import {
   buildButtonClasses,
   buildCanvasInlineStyle,
@@ -19,18 +19,26 @@ type HeroBlockPreviewProps = {
 export function HeroBlockPreview({ propsJson }: HeroBlockPreviewProps) {
   const props = parseHeroProps(propsJson);
   const design = getDesignFromProps('hero', propsJson);
-  const sectionClass = buildCanvasSectionClass('hero', 'lp-hero', propsJson);
+  const campaignType = asPropString(propsJson.campaignType);
+  const promoBadge = asPropString(propsJson.promoBadge);
+  const campaignClass =
+    campaignType && ['promo', 'sav', 'gamme', 'lead_capture'].includes(campaignType)
+      ? ` lp-hero--campaign-${campaignType}`
+      : '';
+  const sectionClass = buildCanvasSectionClass('hero', 'lp-hero', propsJson) + campaignClass;
   const inlineStyle = buildCanvasInlineStyle(design);
   const imgClass = buildMediaImgClasses('lp-hero', design);
-  const primaryBtnClass = buildButtonClasses(design);
 
   const hasImage = Boolean(props.imageAssetId || props.imageUrl);
   const isBgLayout = design.layoutVariant === 'background_image';
   const hideMedia = design.layoutVariant === 'minimal' || design.mediaPosition === 'none';
 
+  const primaryBtnClass = buildButtonClasses(design);
+
   const content = (
     <div className="lp-hero__content">
       {props.eyebrow ? <p className="lp-hero__eyebrow">{props.eyebrow}</p> : null}
+      {promoBadge ? <span className="lp-hero__badge">{promoBadge}</span> : null}
       {props.title ? (
         <h1 className="lp-hero__title">{props.title}</h1>
       ) : (

@@ -15,7 +15,13 @@ describe('block-registry', () => {
     expect(getRegistryEntry('lead_form')?.availability).toBe('stable');
   });
 
-  it('marks gallery as disabled', () => {
-    expect(getRegistryEntry('gallery')?.availability).toBe('disabled');
+  it('hides incomplete campaign blocks from palette', () => {
+    expect(getRegistryEntry('offer_highlights')?.availability).toBe('disabled');
+    expect(getRegistryEntry('vehicle_range')?.availability).toBe('disabled');
+    expect(getRegistryEntry('financing')?.availability).toBe('disabled');
+    const activeTypes = getActivePaletteBlocks().map((b) => b.type);
+    expect(activeTypes).not.toContain('vehicle_range');
+    expect(activeTypes).not.toContain('financing');
+    expect(activeTypes).not.toContain('offer_highlights');
   });
 });

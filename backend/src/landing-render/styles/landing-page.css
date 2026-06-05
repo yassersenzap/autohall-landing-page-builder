@@ -1527,3 +1527,184 @@
     width: 100%;
   }
 }
+
+/* Auto Hall Campaign Landing Sprint */
+.lp-hero__badge {
+  display: inline-flex;
+  margin: 0 0 0.75rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--lp-primary);
+  color: #fff;
+}
+.lp-hero--campaign-promo {
+  background: linear-gradient(155deg, #09090b, color-mix(in srgb, var(--lp-primary) 35%, #09090b));
+}
+.lp-hero--campaign-sav {
+  background: linear-gradient(165deg, #ffffff, #f4f4f5);
+  color: #18181b;
+}
+.lp-hero--campaign-sav .lp-hero__subtitle {
+  color: #52525b;
+}
+.lp-hero__media {
+  background: var(--lp-surface-muted);
+}
+.lp-hero__media--placeholder span {
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+}
+
+.lp-lead-form__select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 16px) calc(50% - 2px), calc(100% - 11px) calc(50% - 2px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 2rem;
+}
+.lp-lead-form__field--consent {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+.lp-lead-form__checkbox {
+  margin-top: 0.2rem;
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--lp-primary);
+}
+.lp-lead-form__consent-text {
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--lp-text-muted);
+}
+.lp-lead-form__required-note {
+  margin: 0 0 0.75rem;
+  font-size: 0.75rem;
+  color: var(--lp-text-muted);
+}
+
+.lp-vehicle-offer__panel {
+  display: grid;
+  gap: 1.5rem;
+  align-items: center;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border-radius: var(--lp-radius-xl);
+  border: 1px solid var(--lp-border);
+  background: var(--lp-surface);
+  box-shadow: var(--lp-shadow-md);
+}
+.lp-vehicle-offer__media {
+  border-radius: var(--lp-radius-lg);
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  background: var(--lp-surface-muted);
+}
+.lp-vehicle-offer__media--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 12rem;
+  color: var(--lp-text-muted);
+  font-size: 0.8125rem;
+  border: 1px dashed var(--lp-border);
+}
+.lp-vehicle-offer__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.lp-vehicle-offer__model {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lp-primary);
+}
+.lp-vehicle-offer__tagline {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+  font-weight: 650;
+}
+.lp-vehicle-offer__highlights {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+.lp-vehicle-offer__highlights li {
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--lp-radius-md);
+  border: 1px solid var(--lp-border);
+  background: var(--lp-surface-muted);
+  font-size: 0.875rem;
+}
+
+.lp-vehicle-range__grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+.lp-vehicle-card {
+  border: 1px solid var(--lp-border);
+  border-radius: var(--lp-radius-lg);
+  overflow: hidden;
+  background: var(--lp-surface);
+  box-shadow: var(--lp-shadow-sm);
+}
+.lp-vehicle-card__media {
+  aspect-ratio: 16 / 10;
+  background: var(--lp-surface-muted);
+}
+.lp-vehicle-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.lp-vehicle-card__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 0.75rem;
+  color: var(--lp-text-muted);
+}
+.lp-vehicle-card__body {
+  padding: 1rem;
+  display: grid;
+  gap: 0.35rem;
+}
+.lp-vehicle-card__tag {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: var(--lp-primary-soft);
+  color: var(--lp-primary);
+}
+.lp-vehicle-card__name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 650;
+}
+.lp-vehicle-card__energy {
+  font-size: 0.75rem;
+  color: var(--lp-text-muted);
+}
+
+@media (min-width: 900px) {
+  .lp-vehicle-offer__panel {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
