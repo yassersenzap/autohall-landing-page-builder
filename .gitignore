@@ -27,6 +27,7 @@ out/
 .next/
 .nuxt/
 .vite/
+vite.config.ts.timestamp-*
 
 # NestJS / TypeScript
 *.tsbuildinfo
@@ -34,10 +35,14 @@ out/
 # Testing / coverage
 coverage/
 .nyc_output/
+playwright-report/
+test-results/
+blob-report/
 
 # Prisma
 *.db
 *.db-journal
+backend/generated/
 **/generated/prisma/
 
 # OS
@@ -58,11 +63,16 @@ $RECYCLE.BIN/
 
 # Cursor / local tooling
 .cursor/
+.ai-local/
 
 # Local storage (exports, uploads, assets générés)
 storage/
 uploads/
 exports/
+output/
+*.zip
+*.tar
+*.tar.gz
 
 # Temporary files
 tmp/

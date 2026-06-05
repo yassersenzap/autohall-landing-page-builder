@@ -6,7 +6,7 @@
 **Projet :** Builder interne de landing pages Auto Hall  
 **Stack cible :** React, NestJS, PostgreSQL, Docker, Export ZIP compatible cPanel
 
-> **Recette opérationnelle alignée sur le code actuel :** voir [`11-recette-mvp-stabilisation.md`](./11-recette-mvp-stabilisation.md) et [`CHECKLIST-DEMO.md`](./CHECKLIST-DEMO.md).
+> **Recette opérationnelle alignée sur le code actuel :** voir [`11-recette-mvp-stabilisation.md`](./11-recette-mvp-stabilisation.md). La checklist V1 historique se trouve dans [`../demo/V1-DEMO-CHECKLIST.md`](../demo/V1-DEMO-CHECKLIST.md).
 
 ---
 
