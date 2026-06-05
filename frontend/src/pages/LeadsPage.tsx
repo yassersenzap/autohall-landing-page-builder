@@ -196,7 +196,7 @@ export default function LeadsPage() {
 
   if (role && !canViewLeads(role)) {
     return (
-      <div className="studio-stack">
+      <div className="ds-page-stack">
         <p className="ui-alert ui-alert--error">
           Accès refusé : votre rôle ne permet pas de consulter les leads.
         </p>
@@ -208,7 +208,7 @@ export default function LeadsPage() {
   }
 
   return (
-    <div className="studio-stack leads-page" data-page="leads">
+    <div className="ds-page-stack leads-page" data-page="leads">
       <StudioPageHeader
         title="Leads reçus"
         description="Soumissions issues des landing pages exportées et du formulaire public."

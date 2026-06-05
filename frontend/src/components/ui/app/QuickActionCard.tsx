@@ -49,10 +49,13 @@ export function QuickActionCard({
 
   const isInteractive = !disabled && (href || onClick);
   const cardClass = cn(
-    'quick-action-card ah-card-pro h-full',
-    isInteractive && 'ah-card-pro--interactive',
-    variant === 'primary' && !disabled && 'ah-card-pro--primary',
-    disabled && 'opacity-55 pointer-events-none',
+    'quick-action-card h-full rounded-[var(--radius-lg)] border border-border bg-card text-card-foreground shadow-[var(--shadow-card)]',
+    isInteractive &&
+      'transition-[border-color,box-shadow,transform] hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-px',
+    variant === 'primary' &&
+      !disabled &&
+      'border-[color-mix(in_srgb,var(--color-primary)_28%,var(--color-border))] bg-[linear-gradient(165deg,var(--color-primary-soft)_0%,var(--color-surface)_42%)]',
+    disabled && 'pointer-events-none opacity-55',
     className,
   );
 

@@ -1,35 +1,37 @@
-/* Auto Hall Studio OS — hiérarchie typographique */
+/* Auto Hall Landing Studio - product typography hierarchy */
 
 .ah-page-title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.375rem, 2vw, 1.75rem);
-  font-weight: 650;
-  letter-spacing: -0.035em;
-  line-height: 1.15;
+  font-size: clamp(1.5rem, 2vw, 1.875rem);
+  font-weight: 720;
+  letter-spacing: -0.04em;
+  line-height: 1.08;
   color: var(--color-text);
 }
 
 .ah-section-title {
   margin: 0;
   font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.3;
   text-transform: uppercase;
-  color: var(--color-text-soft);
+  color: var(--color-text-muted);
 }
 
 .ah-card-title {
   margin: 0;
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  letter-spacing: -0.018em;
+  line-height: 1.25;
   color: var(--color-text);
 }
 
 .ah-body {
   font-size: var(--studio-text-base);
-  line-height: 1.55;
+  line-height: 1.58;
   color: var(--color-text);
 }
 
@@ -41,15 +43,16 @@
 
 .ah-label {
   font-size: var(--studio-text-xs);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--color-text-muted);
+  font-weight: 650;
+  letter-spacing: 0.012em;
+  line-height: 1.35;
+  color: var(--color-text-secondary);
 }
 
 .ah-caption {
-  font-size: 0.6875rem;
-  line-height: 1.4;
-  color: var(--color-text-soft);
+  font-size: 0.75rem;
+  line-height: 1.42;
+  color: var(--color-text-muted);
 }
 
 .ah-table-text {
@@ -60,57 +63,29 @@
 
 .ah-studio-label {
   font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
   text-transform: uppercase;
   color: var(--studio-editor-text-muted);
 }
 
-/* Light — hiérarchie typographique produit */
-html[data-studio-theme='light'] .ah-page-title {
-  font-size: clamp(1.5rem, 2.2vw, 1.875rem);
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 1.12;
-  color: var(--color-text);
+.ui-page-header__title {
+  font-weight: 720;
+  letter-spacing: -0.045em;
+  line-height: 1.08;
 }
 
-html[data-studio-theme='light'] .ah-section-title {
-  font-size: 0.75rem;
-  font-weight: 650;
-  letter-spacing: 0.06em;
-  color: var(--color-text-secondary);
-}
-
-html[data-studio-theme='light'] .ah-card-title {
-  font-size: 0.9375rem;
-  font-weight: 650;
-  letter-spacing: -0.015em;
-  color: var(--color-text);
-}
-
-html[data-studio-theme='light'] .ah-muted {
+.ui-page-header__subtitle {
   color: var(--color-text-muted);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
-html[data-studio-theme='light'] .ah-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--color-text-secondary);
+html[data-studio-theme='dark'] .ah-page-title,
+html[data-studio-theme='dark'] .ui-page-header__title {
+  font-weight: 680;
 }
 
-html[data-studio-theme='light'] .ah-caption {
-  color: var(--color-text-muted);
-  font-size: 0.75rem;
-}
-
-html[data-studio-theme='light'] .ui-page-header__title {
-  font-weight: 700;
-  letter-spacing: -0.04em;
-}
-
-html[data-studio-theme='light'] .ui-page-header__subtitle {
-  color: var(--color-text-muted);
+html[data-studio-theme='dark'] .ah-section-title {
+  color: var(--color-text-soft);
 }

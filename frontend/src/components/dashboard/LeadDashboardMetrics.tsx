@@ -96,10 +96,10 @@ export function LeadDashboardMetrics({ kpis }: LeadDashboardMetricsProps) {
   return (
     <section className="space-y-6" aria-labelledby="lead-metrics-heading">
       <div>
-        <h2 id="lead-metrics-heading" className="text-lg font-semibold tracking-tight">
+        <h2 id="lead-metrics-heading" className="ds-section-title text-[length:inherit] normal-case tracking-[0.06em]">
           Performance leads
         </h2>
-        <p className="text-sm text-muted-foreground">
+        <p className="ds-muted mt-1">
           Indicateurs consolidés — volume, contact et répartition par statut.
         </p>
       </div>

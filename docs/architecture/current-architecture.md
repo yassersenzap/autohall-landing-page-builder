@@ -56,6 +56,20 @@ Les formulaires exportes envoient les leads vers l'API publique du backend.
 - NestJS expose les modules auth, campaigns, landing-pages, page-versions, studio-v2, studio-v2-renderer, page-assets, leads et health.
 - React/Vite expose l'application privee, protegee par authentification.
 
+## Design system frontend (2026)
+
+L'interface applicative repose sur un design system centralise dans `frontend/src/design-system/` :
+
+- `tokens/` — palette light/dark, ombres, rayons, typo (`tokens.css`, `typography.css`)
+- `styles/` — shell applicatif (`shell.css`) et surfaces command center / studio (`surfaces.css`)
+- `layout/` — `AppShell`, sidebar, navigation
+- `components/` — `CommandHero`, `ActionCard`, `MetricTile`, `StatusPill`
+- `icons/` — tailles et stroke standardises
+
+Les styles legacy (`studio-effects.css`, `studio-layout.css`, etc.) restent importes temporairement pour les pages non encore migrees (tables leads, formulaires). La source de verite des tokens est `design-system/tokens/tokens.css` ; `styles/studio-tokens.css` re-exporte ce fichier.
+
+Direction artistique : fond gris bleute (light) / noir bleute (dark), cartes structurees, sidebar separee, topbar compacte, rouge Auto Hall en CTA, bleu studio pour l'editeur.
+
 ## Regles de maintenance
 
 - Toute evolution UI du Studio doit rester sur le Studio officiel.

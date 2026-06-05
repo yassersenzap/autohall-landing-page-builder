@@ -1,4 +1,5 @@
 import { Moon, Sun } from 'lucide-react';
+import { ShadButton } from '@/components/ui/primitives';
 import { useStudioTheme } from '../../context/StudioThemeContext';
 
 export function ThemeToggle() {
@@ -6,9 +7,10 @@ export function ThemeToggle() {
   const isLight = mode === 'light';
 
   return (
-    <button
+    <ShadButton
       type="button"
-      className="ah-btn ah-btn--secondary ah-btn--sm ah-glass !gap-1.5"
+      variant="secondary"
+      size="sm"
       onClick={toggleMode}
       aria-label={isLight ? 'Activer le mode sombre' : 'Activer le mode clair'}
       title={isLight ? 'Mode sombre' : 'Mode clair'}
@@ -19,6 +21,6 @@ export function ThemeToggle() {
         <Sun className="h-3.5 w-3.5 text-[var(--color-warning)]" aria-hidden />
       )}
       <span>{isLight ? 'Sombre' : 'Clair'}</span>
-    </button>
+    </ShadButton>
   );
 }

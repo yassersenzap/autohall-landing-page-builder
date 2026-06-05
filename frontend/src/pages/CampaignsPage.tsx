@@ -12,9 +12,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  MetricCard,
   ShadButton,
 } from '@/components/ui/primitives';
+import { MetricStrip, MetricTile } from '@/design-system';
 import { ApiError, logoutClient, meRequest } from '@/lib/api';
 import {
   canManageCampaigns,
@@ -67,7 +67,7 @@ export default function CampaignsPage() {
   const draftCount = campaigns.filter((c) => c.status === 'DRAFT').length;
 
   return (
-    <div className="studio-stack font-sans">
+    <div className="ds-page-stack font-sans">
       <StudioPageHeader
         title="Campagnes"
         description="Gérez vos campagnes marketing, marques et landing pages associées."
@@ -87,23 +87,11 @@ export default function CampaignsPage() {
         </p>
       ) : null}
 
-      <div className="grid gap-3 sm:grid-cols-3">
-        <MetricCard
-          label="Total campagnes"
-          value={loading ? '…' : campaigns.length}
-          hint="Tous statuts"
-        />
-        <MetricCard
-          label="Actives"
-          value={loading ? '…' : activeCount}
-          trend="positive"
-        />
-        <MetricCard
-          label="Brouillons"
-          value={loading ? '…' : draftCount}
-          trend={draftCount > 0 ? 'warning' : 'neutral'}
-        />
-      </div>
+      <MetricStrip>
+        <MetricTile label="Total campagnes" value={loading ? '…' : campaigns.length} />
+        <MetricTile label="Actives" value={loading ? '…' : activeCount} />
+        <MetricTile label="Brouillons" value={loading ? '…' : draftCount} />
+      </MetricStrip>
 
       {canWrite ? <CreateCampaignPanel onCreated={() => void loadData()} /> : null}
 
