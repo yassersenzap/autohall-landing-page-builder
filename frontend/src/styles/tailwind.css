@@ -54,7 +54,7 @@ html[data-studio-theme='light'] {
   --destructive: var(--color-danger);
   --destructive-foreground: #ffffff;
   --border: var(--color-border);
-  --input: var(--color-border-strong);
+  --input: var(--color-input-border);
   --ring: var(--studio-focus-ring);
   --builder: var(--color-surface);
   --builder-foreground: var(--color-text);
@@ -80,7 +80,7 @@ html[data-studio-theme='dark'] {
   --destructive: var(--color-danger);
   --destructive-foreground: #ffffff;
   --border: var(--color-border);
-  --input: var(--color-border-strong);
+  --input: var(--color-input-border);
   --ring: var(--studio-focus-ring);
   --builder: var(--color-bg-soft);
   --builder-foreground: var(--color-text);
