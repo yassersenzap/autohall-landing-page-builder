@@ -45,6 +45,32 @@ export async function fetchStudioV2Readiness(
   return response.data;
 }
 
+function formatStudioV2ExportError(payload: unknown): string {
+  if (!payload || typeof payload !== 'object') {
+    return 'Export impossible.';
+  }
+
+  const body = payload as {
+    message?: string;
+    issues?: Array<{ level?: string; message?: string }>;
+  };
+
+  const base =
+    typeof body.message === 'string' && body.message.trim()
+      ? body.message.trim()
+      : 'Export impossible.';
+
+  const critical = Array.isArray(body.issues)
+    ? body.issues.find((issue) => issue.level === 'critical')
+    : undefined;
+
+  if (critical?.message) {
+    return `${base} ${critical.message}`;
+  }
+
+  return base;
+}
+
 export async function downloadStudioV2Export(pageVersionId: string): Promise<void> {
   const token = getAccessToken();
   const response = await fetch(studioV2ExportUrl(pageVersionId), {
@@ -53,11 +79,7 @@ export async function downloadStudioV2Export(pageVersionId: string): Promise<voi
 
   if (!response.ok) {
     const payload = await response.json().catch(() => null);
-    const message =
-      payload && typeof payload === 'object' && 'message' in payload
-        ? String((payload as { message: string }).message)
-        : 'Export impossible.';
-    throw new Error(message);
+    throw new Error(formatStudioV2ExportError(payload));
   }
 
   const blob = await response.blob();

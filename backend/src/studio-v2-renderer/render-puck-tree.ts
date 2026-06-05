@@ -1,9 +1,27 @@
 import {
+  renderBadgeBlock,
+  renderButtonBlock,
+  renderCardBlock,
+  renderDividerBlock,
+  renderEventScheduleBlock,
+  renderFinancingHighlightBlock,
+  renderHeadingBlock,
+  renderParagraphBlock,
+  renderQuoteBlock,
+  renderStackBlock,
+  renderStatsBlock,
+  renderTestimonialsBlock,
+  renderTextImageBlock,
+} from './components/creative.render';
+import {
   renderBenefits,
   renderCtaSection,
   renderFaq,
   renderFooterLegal,
+  renderMediaImage,
   renderSlotChildren,
+  renderSpacer,
+  renderStepsBlock,
   renderVehicleOffer,
   renderVehicleRange,
 } from './components/content.render';
@@ -52,6 +70,10 @@ export function createRenderContext(
         return renderContainer(props, (p) => renderSlotChildren(p, 'items', ctx.renderNode));
       case 'Columns':
         return renderColumns(props, (p) => '', ctx);
+      case 'Spacer':
+        return renderSpacer(props);
+      case 'StackBlock':
+        return renderStackBlock(props, ctx.renderNode);
       case 'HeroAutoHall':
         return renderHeroAutoHall(props, ctx);
       case 'LeadFormAutoHall':
@@ -62,6 +84,34 @@ export function createRenderContext(
         return renderVehicleRange(props, ctx);
       case 'Benefits':
         return renderBenefits(props);
+      case 'StepsBlock':
+        return renderStepsBlock(props);
+      case 'MediaImage':
+        return renderMediaImage(props, ctx);
+      case 'TextImageBlock':
+        return renderTextImageBlock(props, ctx);
+      case 'HeadingBlock':
+        return renderHeadingBlock(props);
+      case 'ParagraphBlock':
+        return renderParagraphBlock(props);
+      case 'ButtonBlock':
+        return renderButtonBlock(props);
+      case 'BadgeBlock':
+        return renderBadgeBlock(props);
+      case 'DividerBlock':
+        return renderDividerBlock(props);
+      case 'CardBlock':
+        return renderCardBlock(props);
+      case 'QuoteBlock':
+        return renderQuoteBlock(props);
+      case 'StatsBlock':
+        return renderStatsBlock(props);
+      case 'TestimonialsBlock':
+        return renderTestimonialsBlock(props);
+      case 'EventScheduleBlock':
+        return renderEventScheduleBlock(props);
+      case 'FinancingHighlightBlock':
+        return renderFinancingHighlightBlock(props);
       case 'FAQ':
         return renderFaq(props);
       case 'CTASection':

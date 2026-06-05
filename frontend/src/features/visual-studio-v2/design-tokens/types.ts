@@ -20,7 +20,8 @@ export type StudioV2ThemePresetId =
   | 'ford-promo'
   | 'sav-red'
   | 'gamme-hev-green'
-  | 'premium-dark';
+  | 'premium-dark'
+  | 'racing-sport';
 
 export type StudioV2SeoMeta = {
   title?: string;

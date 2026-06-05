@@ -27,17 +27,44 @@ function walkNodes(nodes: PuckNode[], visit: (node: PuckNode) => void): void {
   }
 }
 
+function countBlocks(nodes: PuckNode[]): number {
+  let count = 0;
+  walkNodes(nodes, () => {
+    count += 1;
+  });
+  return count;
+}
+
 export function validateStudioV2Readiness(document: PuckDocument): ReadinessIssue[] {
   const issues: ReadinessIssue[] = [];
   const content = document.content ?? [];
+  const rootProps = document.root?.props;
+
+  if (!rootProps?.title?.trim()) {
+    issues.push({
+      level: 'warning',
+      code: 'PAGE_TITLE_MISSING',
+      message: 'Titre de page manquant (paramètres racine).',
+    });
+  }
 
   if (content.length === 0) {
-    issues.push({ level: 'critical', code: 'EMPTY_PAGE', message: 'La page est vide.' });
+    issues.push({ level: 'critical', code: 'EMPTY_PAGE', message: 'Aucun bloc sur la page.' });
     return issues;
+  }
+
+  const blockCount = countBlocks(content);
+  if (blockCount < 3) {
+    issues.push({
+      level: 'warning',
+      code: 'PAGE_TOO_SHORT',
+      message: 'Landing courte — ajoutez au moins 3 blocs pour une page crédible.',
+    });
   }
 
   let hasForm = false;
   let hasHero = false;
+  let hasCta = false;
 
   walkNodes(content, (node) => {
     if (!(ALLOWED_STUDIO_V2_COMPONENTS as readonly string[]).includes(node.type)) {
@@ -57,7 +84,7 @@ export function validateStudioV2Readiness(document: PuckDocument): ReadinessIssu
         issues.push({
           level: 'critical',
           code: 'FORM_NO_SUBMIT',
-          message: 'Le formulaire doit avoir un texte de bouton envoi.',
+          message: 'Le formulaire doit avoir un libellé de bouton.',
         });
       }
       if (!props.consentText || !String(props.consentText).trim()) {
@@ -78,27 +105,58 @@ export function validateStudioV2Readiness(document: PuckDocument): ReadinessIssu
           message: 'Le hero doit avoir un titre.',
         });
       }
-      const cta =
-        props.ctaPrimaryLabel ?? props.ctaLabel;
-      if (cta && String(cta).trim() && !String(props.ctaPrimaryHref ?? props.ctaHref ?? '').trim()) {
-        issues.push({
-          level: 'warning',
-          code: 'HERO_CTA_NO_LINK',
-          message: 'Le CTA principal du hero n’a pas de lien.',
-        });
+      const cta = props.ctaPrimaryLabel ?? props.ctaLabel;
+      const href = props.ctaPrimaryHref ?? props.ctaHref;
+      if (cta && String(cta).trim()) {
+        hasCta = true;
+        if (!String(href ?? '').trim()) {
+          issues.push({
+            level: 'warning',
+            code: 'CTA_NO_DESTINATION',
+            message: 'Un bouton du hero n’a pas de destination.',
+          });
+        }
       }
       if (!props.imageAssetId && !props.imageUrl) {
         issues.push({
           level: 'warning',
           code: 'HERO_NO_IMAGE',
-          message: 'Le hero n’a pas d’image.',
+          message: 'Image hero manquante — remplacez le placeholder.',
         });
       }
       if (!props.imageAlt || !String(props.imageAlt).trim()) {
         issues.push({
           level: 'warning',
           code: 'HERO_NO_ALT',
-          message: 'Le hero n’a pas de texte alternatif image.',
+          message: 'Texte alternatif image manquant sur le hero.',
+        });
+      }
+    }
+
+    if (node.type === 'VehicleOffer' || node.type === 'MediaImage') {
+      if (!props.imageAssetId && !props.imageUrl) {
+        issues.push({
+          level: 'warning',
+          code: 'MEDIA_PLACEHOLDER',
+          message: `Image manquante sur le bloc ${node.type === 'VehicleOffer' ? 'offre' : 'image'}.`,
+        });
+      }
+      if (!props.imageAlt || !String(props.imageAlt).trim()) {
+        issues.push({
+          level: 'warning',
+          code: 'MEDIA_NO_ALT',
+          message: 'Texte alternatif manquant sur une image.',
+        });
+      }
+    }
+
+    if (node.type === 'CTASection') {
+      hasCta = true;
+      if (props.buttonLabel && !String(props.buttonHref ?? '').trim()) {
+        issues.push({
+          level: 'warning',
+          code: 'CTA_NO_DESTINATION',
+          message: 'Le CTA final n’a pas de destination.',
         });
       }
     }
@@ -124,16 +182,16 @@ export function validateStudioV2Readiness(document: PuckDocument): ReadinessIssu
     issues.push({
       level: 'critical',
       code: 'NO_FORM',
-      message: 'La page doit contenir un formulaire lead.',
+      message: 'Ajoutez un formulaire lead ou rendez-vous.',
     });
   }
 
-  const seo = document.root?.props?.seo;
+  const seo = rootProps?.seo;
   if (!seo?.title?.trim() || !seo?.description?.trim()) {
     issues.push({
       level: 'warning',
       code: 'SEO_INCOMPLETE',
-      message: 'SEO title ou description manquant.',
+      message: 'Meta title ou description SEO manquants.',
     });
   }
 
@@ -141,7 +199,27 @@ export function validateStudioV2Readiness(document: PuckDocument): ReadinessIssu
     issues.push({
       level: 'warning',
       code: 'NO_HERO',
-      message: 'Aucun hero détecté sur la page.',
+      message: 'Aucun hero — recommandé pour une landing marketing.',
+    });
+  }
+
+  if (!hasCta) {
+    issues.push({
+      level: 'warning',
+      code: 'NO_CTA',
+      message: 'Aucun bouton d’action détecté (hero ou CTA).',
+    });
+  }
+
+  let hasFooter = false;
+  walkNodes(content, (node) => {
+    if (node.type === 'FooterLegal') hasFooter = true;
+  });
+  if (!hasFooter) {
+    issues.push({
+      level: 'warning',
+      code: 'NO_FOOTER',
+      message: 'Pied de page légal absent — recommandé pour la production.',
     });
   }
 

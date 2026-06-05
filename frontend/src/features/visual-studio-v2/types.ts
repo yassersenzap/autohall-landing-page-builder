@@ -18,14 +18,30 @@ export const ALLOWED_STUDIO_V2_COMPONENTS = [
   'Section',
   'Container',
   'Columns',
+  'Spacer',
+  'StackBlock',
   'HeroAutoHall',
   'LeadFormAutoHall',
   'VehicleOffer',
   'VehicleRange',
   'Benefits',
+  'StepsBlock',
   'FAQ',
   'CTASection',
   'FooterLegal',
+  'MediaImage',
+  'TextImageBlock',
+  'HeadingBlock',
+  'ParagraphBlock',
+  'ButtonBlock',
+  'BadgeBlock',
+  'DividerBlock',
+  'CardBlock',
+  'QuoteBlock',
+  'StatsBlock',
+  'TestimonialsBlock',
+  'EventScheduleBlock',
+  'FinancingHighlightBlock',
 ] as const;
 
 export type AllowedStudioV2Component = (typeof ALLOWED_STUDIO_V2_COMPONENTS)[number];
@@ -122,8 +138,26 @@ export type BenefitItem = {
 export type BenefitsProps = {
   title?: string;
   subtitle?: string;
-  layout?: 'cards' | 'list' | 'icons';
+  layout?: 'cards' | 'list' | 'icons' | 'trust';
   items?: BenefitItem[];
+};
+
+export type StepsBlockProps = {
+  title?: string;
+  subtitle?: string;
+  steps?: { title?: string; description?: string }[];
+};
+
+export type SpacerProps = {
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+};
+
+export type MediaImageProps = {
+  imageAssetId?: string;
+  imageUrl?: string;
+  imageAlt?: string;
+  caption?: string;
+  alignment?: ContentAlignment;
 };
 
 export type FaqItem = {
