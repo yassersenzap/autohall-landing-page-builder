@@ -119,7 +119,7 @@ export default function CampaignLandingPagesPage() {
   }
 
   return (
-    <div className="studio-stack font-sans">
+    <div className="ds-page-stack font-sans">
       <StudioPageHeader
         title="Landing pages"
         description={campaignName ? `Campagne : ${campaignName}` : `Campagne ${campaignId}`}

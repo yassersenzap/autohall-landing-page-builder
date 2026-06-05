@@ -189,7 +189,7 @@ export default function LandingPageVersionsPage() {
   }
 
   return (
-    <div className="studio-stack font-sans">
+    <div className="ds-page-stack font-sans">
       <StudioPageHeader
         title="Centre de production"
         description={

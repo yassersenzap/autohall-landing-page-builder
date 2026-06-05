@@ -17,10 +17,7 @@ html[data-studio-theme='dark'] .ah-mesh-app {
 
 html[data-studio-theme='light'] body,
 html[data-studio-theme='light'] .ah-mesh-app {
-  background:
-    radial-gradient(circle at 1px 1px, rgba(11, 59, 117, 0.035) 1px, transparent 0) 0 0 / 36px 36px,
-    linear-gradient(180deg, #f8fbff 0%, var(--color-bg) 18rem),
-    var(--color-bg);
+  background: linear-gradient(180deg, #f8fbff 0%, var(--color-bg) 14rem);
 }
 
 /* ── Glass : feutré, pas flashy ── */

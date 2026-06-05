@@ -9,6 +9,8 @@ import {
   Smartphone,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { StatusPill } from '@/design-system';
+import { cn } from '@/lib/utils';
 import type { StudioV2SaveStatus } from '../types';
 
 export type StudioV2Viewport = 'desktop' | 'mobile';
@@ -35,23 +37,24 @@ type StudioV2ToolbarProps = {
 function SaveStatusPill({ status }: { status: StudioV2SaveStatus }) {
   if (status === 'loading' || status === 'saving') {
     return (
-      <span className="ah-status-dirty">
+      <StatusPill variant="loading">
         <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
         {status === 'saving' ? 'Enregistrement…' : 'Chargement…'}
-      </span>
+      </StatusPill>
     );
   }
-  if (status === 'dirty') {
-    return <span className="ah-status-dirty">Modifications non enregistrées</span>;
-  }
-  if (status === 'error') {
-    return <span className="ah-status-dirty">Erreur</span>;
+  if (status === 'dirty' || status === 'error') {
+    return (
+      <StatusPill variant="dirty">
+        {status === 'error' ? 'Erreur' : 'Modifications non enregistrées'}
+      </StatusPill>
+    );
   }
   return (
-    <span className="ah-status-saved">
+    <StatusPill variant="saved">
       <Check className="h-3 w-3" aria-hidden />
       Enregistré
-    </span>
+    </StatusPill>
   );
 }
 
@@ -73,12 +76,12 @@ export function StudioV2Toolbar({
   exportDisabled,
 }: StudioV2ToolbarProps) {
   return (
-    <header className="visual-studio-v2-toolbar ah-glass">
+    <header className="visual-studio-v2-toolbar ds-studio-topbar">
       <div className="flex min-w-0 items-center gap-3">
         <Link
           to={backTo}
           state={backState}
-          className="ah-editor-btn visual-studio-v2-toolbar__link !gap-1.5"
+          className="ds-toolbar-btn visual-studio-v2-toolbar__link !gap-1.5"
         >
           <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
           {backLabel}
@@ -99,7 +102,10 @@ export function StudioV2Toolbar({
         <div className="visual-studio-v2-toolbar__group" role="group" aria-label="Appareil">
           <button
             type="button"
-            className={`visual-studio-v2-toolbar__chip ah-editor-btn !rounded-none !border-0 ${viewport === 'desktop' ? 'ah-editor-btn--active' : ''}`}
+            className={cn(
+              'visual-studio-v2-toolbar__chip ds-toolbar-btn !rounded-none !border-0',
+              viewport === 'desktop' && 'ds-toolbar-btn--active',
+            )}
             onClick={() => onViewportChange('desktop')}
             title="Desktop"
           >
@@ -107,7 +113,10 @@ export function StudioV2Toolbar({
           </button>
           <button
             type="button"
-            className={`visual-studio-v2-toolbar__chip ah-editor-btn !rounded-none !border-0 ${viewport === 'mobile' ? 'ah-editor-btn--active' : ''}`}
+            className={cn(
+              'visual-studio-v2-toolbar__chip ds-toolbar-btn !rounded-none !border-0',
+              viewport === 'mobile' && 'ds-toolbar-btn--active',
+            )}
             onClick={() => onViewportChange('mobile')}
             title="Mobile"
           >
@@ -131,7 +140,7 @@ export function StudioV2Toolbar({
         {canWrite ? (
           <button
             type="button"
-            className="ah-editor-btn"
+            className="ds-toolbar-btn"
             disabled={saveStatus === 'saving' || saveStatus === 'loading'}
             onClick={onSave}
           >
@@ -140,7 +149,7 @@ export function StudioV2Toolbar({
           </button>
         ) : null}
 
-        <button type="button" className="ah-editor-btn ah-editor-btn--primary" onClick={onPreview}>
+        <button type="button" className="ds-toolbar-btn ds-toolbar-btn--primary" onClick={onPreview}>
           <Eye className="h-3.5 w-3.5" aria-hidden />
           Aperçu
         </button>
@@ -148,7 +157,7 @@ export function StudioV2Toolbar({
         {canWrite ? (
           <button
             type="button"
-            className="ah-editor-btn ah-editor-btn--cta"
+            className="ds-toolbar-btn ds-toolbar-btn--cta"
             disabled={exportDisabled || saveStatus === 'saving'}
             onClick={onExport}
           >

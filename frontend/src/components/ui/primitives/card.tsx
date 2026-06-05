@@ -1,13 +1,13 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
+const cardSurface = cn(
+  'rounded-[var(--radius-lg)] border border-border bg-card text-card-foreground',
+  'shadow-[var(--shadow-card)] transition-[border-color,box-shadow,transform]',
+);
+
 export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div
-      className={cn('ah-card-pro text-card-foreground', className)}
-      {...props}
-    />
-  );
+  return <div className={cn(cardSurface, className)} {...props} />;
 }
 
 export function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
@@ -15,9 +15,7 @@ export function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElemen
 }
 
 export function CardTitle({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) {
-  return (
-    <h3 className={cn('ah-card-title', className)} {...props} />
-  );
+  return <h3 className={cn('ah-card-title', className)} {...props} />;
 }
 
 export function CardDescription({ className, ...props }: HTMLAttributes<HTMLParagraphElement>) {
@@ -45,7 +43,7 @@ const trendAccent: Record<NonNullable<MetricCardProps['trend']>, string> = {
 
 export function MetricCard({ label, value, hint, trend = 'neutral', className }: MetricCardProps) {
   return (
-    <Card className={cn('metric-card overflow-hidden', trendAccent[trend], className)}>
+    <Card className={cn('overflow-hidden', trendAccent[trend], className)}>
       <CardContent className="p-4">
         <p className="ah-label">{label}</p>
         <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums text-foreground">

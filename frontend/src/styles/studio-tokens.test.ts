@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import tokensSource from './studio-tokens.css?raw';
+import tokensSource from '../design-system/tokens/tokens.css?raw';
 
 describe('Auto Hall Studio OS tokens', () => {
   it('defines layered color tokens without pure black backgrounds', () => {

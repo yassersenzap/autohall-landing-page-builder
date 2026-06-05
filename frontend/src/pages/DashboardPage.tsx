@@ -9,15 +9,14 @@ import {
   Users,
 } from 'lucide-react';
 import { LeadDashboardMetrics } from '@/components/dashboard/LeadDashboardMetrics';
-import { StudioPageHeader } from '@/components/studio/StudioPageHeader';
-import { ActionBar, QuickActionCard } from '@/components/ui/app';
+import { ShadButton, buttonVariants } from '@/components/ui/primitives';
 import {
-  Card,
-  CardContent,
-  MetricCard,
-  ShadButton,
-  buttonVariants,
-} from '@/components/ui/primitives';
+  ActionCard,
+  ActionCardGrid,
+  CommandHero,
+  MetricStrip,
+  MetricTile,
+} from '@/design-system';
 import { useStudioSession } from '@/hooks/useStudioSession';
 import { cn } from '@/lib/utils';
 import { ApiError, meRequest, type AuthUser } from '@/lib/api';
@@ -105,116 +104,142 @@ export default function DashboardPage() {
   const studioState = session ? studioNavState(session) : undefined;
 
   return (
-    <div className="studio-stack font-sans">
-      <StudioPageHeader
+    <div className="ds-page-stack font-sans">
+      <CommandHero
         title="Centre de commande"
         description={
           user
-            ? `Bienvenue, ${user.fullName} — production de landing pages Auto Hall.`
-            : 'Production de landing pages Auto Hall.'
+            ? `Bienvenue, ${user.fullName} — pilotez la production de landing pages Auto Hall.`
+            : 'Pilotez la production de landing pages Auto Hall.'
         }
         actions={
-          <ActionBar>
+          <>
             {session ? (
               <Link
                 to={getStudioRoute(session.pageVersionId)}
                 state={studioState}
-                className={cn(buttonVariants({ variant: 'default', size: 'sm' }))}
+                className={cn(buttonVariants({ variant: 'default', size: 'default' }))}
               >
-                <PenLine className="h-3.5 w-3.5" />
+                <PenLine className="h-4 w-4" />
                 Ouvrir le Studio
               </Link>
             ) : (
-              <ShadButton variant="default" size="sm" disabled>
-                <PenLine className="h-3.5 w-3.5" />
+              <ShadButton variant="default" disabled>
+                <PenLine className="h-4 w-4" />
                 Ouvrir le Studio
               </ShadButton>
             )}
-            <Link to="/campaigns" className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }))}>
-              <LayoutGrid className="h-3.5 w-3.5" />
+            <Link
+              to="/campaigns"
+              className={cn(buttonVariants({ variant: 'secondary', size: 'default' }))}
+            >
+              <LayoutGrid className="h-4 w-4" />
               Campagnes
             </Link>
-          </ActionBar>
+          </>
         }
       />
 
-      <section aria-label="Actions rapides">
-        <h2 className="ah-section-title mb-3">Actions rapides</h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <QuickActionCard
+      <MetricStrip>
+        <MetricTile label="Produit" value="Landing Studio" />
+        <MetricTile label="Session Studio" value={session ? 'Active' : '—'} />
+        {showLeads && kpis ? (
+          <>
+            <MetricTile label="Leads totaux" value={kpis.totalLeads} />
+            <MetricTile label="Contactés" value={`${kpis.contactedRatePercent} %`} />
+            <MetricTile
+              label="Relances"
+              value={kpis.overdueFollowUps}
+            />
+          </>
+        ) : (
+          <Link to="/campaigns" className="block transition-opacity hover:opacity-90">
+            <MetricTile label="Campagnes" value="Gérer →" />
+          </Link>
+        )}
+      </MetricStrip>
+
+      <section aria-label="Actions de production">
+        <h2 className="ds-section-title mb-3">Production</h2>
+        <ActionCardGrid>
+          <ActionCard
             title="Ouvrir le Studio"
-            description={session ? session.label : 'Ouvrez une version pour activer le Studio.'}
+            description={
+              session
+                ? `Reprendre ${session.label} — éditeur visuel officiel.`
+                : 'Ouvrez une version pour activer le Studio.'
+            }
             icon={PenLine}
             href={session ? getStudioRoute(session.pageVersionId) : undefined}
             variant="primary"
+            size="large"
             disabled={!session}
             disabledHint="Créez une campagne, une landing et une version pour démarrer."
+            spanClass="ds-bento__span-6"
           />
-          <QuickActionCard
+          <ActionCard
             title="Créer une campagne"
-            description="Lancez une nouvelle campagne marketing et ses landing pages."
+            description="Lancez une nouvelle campagne et ses landing pages."
             icon={Plus}
             href="/campaigns"
+            spanClass="ds-bento__span-3"
           />
-          <QuickActionCard
-            title="Voir les campagnes"
-            description="Accédez aux landings, versions et actions de production."
+          <ActionCard
+            title="Campagnes"
+            description="Landings, versions et actions de production."
             icon={LayoutGrid}
             href="/campaigns"
+            spanClass="ds-bento__span-3"
           />
           {session ? (
-            <QuickActionCard
-              title="Aperçu de la dernière version"
+            <ActionCard
+              title="Aperçu"
               description={`Prévisualiser ${session.label}`}
               icon={Eye}
               href={getPreviewRoute(session.pageVersionId)}
+              spanClass="ds-bento__span-3"
             />
           ) : (
-            <QuickActionCard
+            <ActionCard
               title="Aperçu"
-              description="Disponible après ouverture d’une version dans le Studio."
+              description="Disponible après ouverture d'une version."
               icon={Eye}
               disabled
-              disabledHint="Aucune version récente en session."
+              disabledHint="Aucune version en session."
+              spanClass="ds-bento__span-3"
             />
           )}
           {session ? (
-            <QuickActionCard
+            <ActionCard
               title="Export ZIP"
               description="Télécharger le package de la dernière version."
               icon={Download}
               onClick={() => void handleExportLatest()}
               disabled={exporting}
               disabledHint={exporting ? 'Export en cours…' : undefined}
+              spanClass="ds-bento__span-3"
             />
           ) : (
-            <QuickActionCard
+            <ActionCard
               title="Export ZIP"
-              description="Disponible pour une version publiée ou prête."
+              description="Disponible pour une version prête."
               icon={Download}
               disabled
-              disabledHint="Ouvrez le Studio sur une version pour exporter."
+              disabledHint="Ouvrez le Studio sur une version."
+              spanClass="ds-bento__span-3"
             />
           )}
           {showLeads ? (
-            <QuickActionCard
-              title="Voir les leads"
+            <ActionCard
+              title="Leads"
               description="Suivi des demandes et conversions landing."
               icon={Users}
               href="/leads"
+              spanClass="ds-bento__span-3"
             />
           ) : null}
-        </div>
+        </ActionCardGrid>
       </section>
-
-      {!showLeads ? (
-        <div className="grid gap-3 sm:grid-cols-3">
-          <MetricCard label="Produit" value="Landing Studio" hint="Éditeur officiel" />
-          <Link to="/campaigns" className="block transition-opacity hover:opacity-90">
-            <MetricCard label="Campagnes" value="→" hint="Gérer les landings" trend="positive" />
-          </Link>
-        </div>
-      ) : null}
 
       {kpisError ? (
         <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
@@ -223,14 +248,6 @@ export default function DashboardPage() {
       ) : null}
 
       {showLeads && kpis ? <LeadDashboardMetrics kpis={kpis} /> : null}
-
-      {showLeads && !kpis && !kpisError ? (
-        <Card>
-          <CardContent className="py-10 text-center text-sm text-muted-foreground">
-            Indicateurs indisponibles. Actualisez la page.
-          </CardContent>
-        </Card>
-      ) : null}
     </div>
   );
 }
