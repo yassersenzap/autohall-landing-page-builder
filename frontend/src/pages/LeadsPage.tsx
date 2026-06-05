@@ -218,7 +218,7 @@ export default function LeadsPage() {
 
       {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
 
-      <Card title="Filtres" padding="none">
+      <Card title="Filtres" padding="none" className="leads-filter-card">
         <LeadsFilters
         values={filters}
         campaigns={campaigns}
@@ -231,7 +231,7 @@ export default function LeadsPage() {
         />
       </Card>
 
-      <Card padding="none">
+      <Card padding="none" className="leads-results-card">
         <LeadsTable
           leads={leads}
           pagination={pagination}

@@ -38,14 +38,14 @@ type MetricCardProps = {
 
 const trendAccent: Record<NonNullable<MetricCardProps['trend']>, string> = {
   neutral: '',
-  positive: 'border-l-2 border-l-emerald-500/60',
-  negative: 'border-l-2 border-l-destructive/60',
-  warning: 'border-l-2 border-l-amber-500/60',
+  positive: 'border-l-[3px] border-l-[var(--color-success)]',
+  negative: 'border-l-[3px] border-l-[var(--color-danger)]',
+  warning: 'border-l-[3px] border-l-[var(--color-warning)]',
 };
 
 export function MetricCard({ label, value, hint, trend = 'neutral', className }: MetricCardProps) {
   return (
-    <Card className={cn('overflow-hidden', trendAccent[trend], className)}>
+    <Card className={cn('metric-card overflow-hidden', trendAccent[trend], className)}>
       <CardContent className="p-4">
         <p className="ah-label">{label}</p>
         <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums text-foreground">

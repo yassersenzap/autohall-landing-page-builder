@@ -1,156 +1,75 @@
-/* Auto Hall Studio OS — effets premium (Framer / Figma / Codex) */
+/* Auto Hall Studio OS — polish premium retenu (Linear / Framer / Figma)
+   Principe : designed, not decorated. Bordures nettes, surfaces étagées,
+   ombres discrètes, accents intentionnels. Pas de glow gratuit, pas de
+   gradients criards, pas de shine animé. */
 
-/* ── Mesh backgrounds ── */
+/* ── App background : très subtil, neutre ── */
 .ah-mesh-app {
   position: relative;
   isolation: isolate;
 }
 
-.ah-mesh-app::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
+html[data-studio-theme='dark'] .ah-mesh-app {
   background:
-    radial-gradient(ellipse 90% 60% at 50% -30%, var(--mesh-glow-1), transparent 55%),
-    radial-gradient(ellipse 50% 40% at 100% 0%, var(--mesh-glow-2), transparent 50%),
-    radial-gradient(ellipse 40% 35% at 0% 100%, var(--mesh-glow-3), transparent 45%);
-  opacity: var(--mesh-opacity);
+    radial-gradient(1200px 600px at 50% -280px, rgba(91, 140, 255, 0.05), transparent 70%),
+    var(--color-bg);
 }
 
-.ah-mesh-app > * {
-  position: relative;
-  z-index: 1;
-}
+/* Workspace light : studio-light-identity.css */
 
-html[data-studio-theme='light'] {
-  --mesh-glow-1: rgba(29, 78, 216, 0.07);
-  --mesh-glow-2: rgba(196, 30, 30, 0.05);
-  --mesh-glow-3: rgba(29, 78, 216, 0.04);
-  --mesh-opacity: 1;
-  --mesh-dots: rgba(17, 19, 24, 0.04);
-}
-
-html[data-studio-theme='dark'] {
-  --mesh-glow-1: rgba(59, 130, 246, 0.09);
-  --mesh-glow-2: rgba(239, 68, 68, 0.06);
-  --mesh-glow-3: rgba(59, 130, 246, 0.05);
-  --mesh-opacity: 0.85;
-  --mesh-dots: rgba(255, 255, 255, 0.03);
-}
-
-.studio-main::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image: radial-gradient(var(--mesh-dots) 1px, transparent 1px);
-  background-size: 24px 24px;
-  mask-image: linear-gradient(to bottom, black 0%, transparent 85%);
-  opacity: 0.6;
-}
-
-.studio-main > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* ── Glass panels ── */
+/* ── Glass : feutré, pas flashy ── */
 .ah-glass {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
-  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.1);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.1);
 }
 
 html[data-studio-theme='light'] {
-  --glass-bg: rgba(255, 255, 255, 0.72);
-  --glass-border: rgba(17, 19, 24, 0.08);
-  --glass-blur: 16px;
-  --glass-shadow: 0 8px 32px rgba(17, 19, 24, 0.06);
+  --glass-bg: var(--color-surface);
+  --glass-border: var(--color-border);
+  --glass-blur: 0px;
+  --glass-shadow: var(--shadow-sm);
 }
 
 html[data-studio-theme='dark'] {
-  --glass-bg: rgba(17, 21, 29, 0.65);
-  --glass-border: rgba(255, 255, 255, 0.06);
-  --glass-blur: 20px;
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --glass-bg: rgba(19, 21, 25, 0.72);
+  --glass-border: var(--color-border);
+  --glass-blur: 16px;
+  --glass-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 8px 28px rgba(0, 0, 0, 0.3);
 }
 
-/* ── Premium cards ── */
+/* ── Cards : nette, surface étagée, hover sobre ── */
 .ah-card-pro {
   position: relative;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   transition:
-    border-color 0.2s ease,
-    box-shadow 0.25s ease,
-    transform 0.2s ease;
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
 }
 
-.ah-card-pro::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--color-accent) 0%, transparent),
-    color-mix(in srgb, var(--color-primary) 0%, transparent)
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  pointer-events: none;
-}
-
-.ah-card-pro:hover::before {
-  opacity: 1;
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--color-accent) 35%, transparent),
-    color-mix(in srgb, var(--color-primary) 25%, transparent)
-  );
-}
-
-.ah-card-pro:hover {
+html[data-studio-theme='dark'] .ah-card-pro:hover {
   border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-md), var(--glow-card);
-  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
-html[data-studio-theme='light'] {
-  --glow-card: 0 0 0 1px rgba(29, 78, 216, 0.04);
-}
-
-html[data-studio-theme='dark'] {
-  --glow-card: 0 0 24px rgba(59, 130, 246, 0.06);
-}
-
+/* Carte mise en avant : liseré accent discret, pas de gradient criard */
 .ah-card-pro--primary {
-  border-color: color-mix(in srgb, var(--color-primary) 22%, var(--color-border));
-  background: linear-gradient(
-    165deg,
-    color-mix(in srgb, var(--color-primary-soft) 80%, var(--color-surface)),
-    var(--color-surface)
-  );
+  border-color: color-mix(in srgb, var(--color-primary) 26%, var(--color-border));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-primary-soft) 55%, transparent), transparent 64%),
+    var(--color-surface);
 }
 
 .ah-card-pro--primary:hover {
-  border-color: color-mix(in srgb, var(--color-primary) 40%, var(--color-border));
-  box-shadow: var(--shadow-md), var(--glow-primary-soft);
+  border-color: color-mix(in srgb, var(--color-primary) 42%, var(--color-border));
 }
 
-/* ── Premium buttons ── */
+/* ── Buttons : solides, plats, hover net (Linear-like) — pas de shine ── */
 .ah-btn {
   position: relative;
   display: inline-flex;
@@ -158,120 +77,75 @@ html[data-studio-theme='dark'] {
   justify-content: center;
   gap: 0.5rem;
   font-family: var(--font-sans);
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-weight: 550;
+  letter-spacing: -0.005em;
   white-space: nowrap;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
   cursor: pointer;
   text-decoration: none;
-  overflow: hidden;
+  user-select: none;
   transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
-    box-shadow 0.25s ease,
-    transform 0.15s ease;
-}
-
-.ah-btn::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 40%,
-    rgba(255, 255, 255, 0.12) 50%,
-    transparent 60%
-  );
-  transform: translateX(-120%);
-  transition: transform 0.5s ease;
-  pointer-events: none;
-}
-
-.ah-btn:hover:not(:disabled)::after {
-  transform: translateX(120%);
+    background 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.08s ease;
 }
 
 .ah-btn:active:not(:disabled) {
-  transform: scale(0.97);
+  transform: translateY(0.5px);
 }
 
 .ah-btn:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-accent);
 }
 
 .ah-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
-  transform: none;
 }
 
 .ah-btn--sm {
   min-height: 2rem;
-  padding: 0 0.75rem;
-  font-size: 0.75rem;
+  padding: 0 0.7rem;
+  font-size: 0.78rem;
   border-radius: var(--radius-sm);
 }
 
 .ah-btn--md {
   min-height: 2.25rem;
-  padding: 0 1rem;
+  padding: 0 0.9rem;
   font-size: 0.8125rem;
 }
 
 .ah-btn--lg {
-  min-height: 2.5rem;
-  padding: 0 1.25rem;
+  min-height: 2.625rem;
+  padding: 0 1.15rem;
   font-size: 0.875rem;
 }
 
 .ah-btn--primary {
   color: #fff;
-  background: linear-gradient(180deg, var(--btn-primary-top), var(--btn-primary-bottom));
-  border-color: var(--btn-primary-border);
-  box-shadow: var(--btn-primary-shadow);
+  background: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 75%, #000);
+  box-shadow: var(--shadow-sm);
 }
 
 .ah-btn--primary:hover:not(:disabled) {
-  background: linear-gradient(180deg, var(--btn-primary-top-hover), var(--btn-primary-bottom-hover));
-  box-shadow: var(--btn-primary-shadow-hover);
-}
-
-html[data-studio-theme='light'] {
-  --btn-primary-top: #d42b2b;
-  --btn-primary-bottom: #b91c1c;
-  --btn-primary-top-hover: #e03535;
-  --btn-primary-bottom-hover: #c41e1e;
-  --btn-primary-border: rgba(153, 27, 27, 0.5);
-  --btn-primary-shadow: 0 1px 2px rgba(153, 27, 27, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  --btn-primary-shadow-hover: 0 4px 16px rgba(185, 28, 28, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  --glow-primary-soft: 0 0 20px rgba(185, 28, 28, 0.15);
-}
-
-html[data-studio-theme='dark'] {
-  --btn-primary-top: #f55;
-  --btn-primary-bottom: #dc2626;
-  --btn-primary-top-hover: #f77;
-  --btn-primary-bottom-hover: #ef4444;
-  --btn-primary-border: rgba(248, 113, 113, 0.35);
-  --btn-primary-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  --btn-primary-shadow-hover: 0 0 24px rgba(239, 68, 68, 0.35), 0 4px 12px rgba(0, 0, 0, 0.4);
-  --glow-primary-soft: 0 0 28px rgba(239, 68, 68, 0.2);
+  background: var(--color-primary-hover);
 }
 
 .ah-btn--secondary {
   color: var(--color-text);
   background: var(--color-surface-2);
   border-color: var(--color-border);
-  box-shadow: var(--shadow-sm);
 }
 
 .ah-btn--secondary:hover:not(:disabled) {
   background: var(--color-surface-3);
   border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-md);
 }
 
 .ah-btn--ghost {
@@ -282,8 +156,7 @@ html[data-studio-theme='dark'] {
 
 .ah-btn--ghost:hover:not(:disabled) {
   color: var(--color-text);
-  background: var(--color-primary-soft);
-  border-color: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  background: var(--color-surface-2);
 }
 
 .ah-btn--outline {
@@ -294,96 +167,73 @@ html[data-studio-theme='dark'] {
 
 .ah-btn--outline:hover:not(:disabled) {
   background: var(--color-surface-2);
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-  box-shadow: 0 0 16px var(--color-accent-soft);
+  border-color: var(--color-text-soft);
 }
 
 .ah-btn--accent {
   color: #fff;
-  background: linear-gradient(180deg, var(--btn-accent-top), var(--btn-accent-bottom));
-  border-color: var(--btn-accent-border);
-  box-shadow: var(--btn-accent-shadow);
+  background: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-accent) 72%, #000);
+  box-shadow: var(--shadow-sm);
 }
 
 .ah-btn--accent:hover:not(:disabled) {
-  box-shadow: var(--btn-accent-shadow-hover);
-}
-
-html[data-studio-theme='light'] {
-  --btn-accent-top: #2563eb;
-  --btn-accent-bottom: #1d4ed8;
-  --btn-accent-border: rgba(29, 78, 216, 0.4);
-  --btn-accent-shadow: 0 1px 2px rgba(29, 78, 216, 0.2);
-  --btn-accent-shadow-hover: 0 0 24px rgba(37, 99, 235, 0.3);
-}
-
-html[data-studio-theme='dark'] {
-  --btn-accent-top: #4b8df8;
-  --btn-accent-bottom: #2563eb;
-  --btn-accent-border: rgba(96, 165, 250, 0.35);
-  --btn-accent-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --btn-accent-shadow-hover: 0 0 28px rgba(59, 130, 246, 0.35);
+  background: color-mix(in srgb, var(--color-accent) 88%, #fff);
 }
 
 .ah-btn--destructive {
   color: var(--color-danger);
-  background: var(--color-danger);
-  background: color-mix(in srgb, var(--color-danger) 12%, var(--color-surface));
-  border-color: color-mix(in srgb, var(--color-danger) 25%, transparent);
+  background: color-mix(in srgb, var(--color-danger) 11%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-danger) 24%, transparent);
 }
 
 .ah-btn--destructive:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--color-danger) 18%, var(--color-surface));
+  background: color-mix(in srgb, var(--color-danger) 16%, var(--color-surface));
 }
 
-/* ── Premium inputs ── */
+/* ── Inputs : compacts, focus accent net ── */
 .ah-input {
   width: 100%;
   min-height: 2.25rem;
-  padding: 0 0.75rem;
+  padding: 0 0.7rem;
   font-size: 0.8125rem;
   color: var(--color-text);
   background: var(--color-surface-2);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
   transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    background 0.16s ease;
 }
 
 .ah-input::placeholder {
   color: var(--color-text-soft);
 }
 
-.ah-input:hover:not(:disabled) {
+.ah-input:hover:not(:disabled):not(:focus) {
   border-color: var(--color-border-strong);
 }
 
 .ah-input:focus {
   outline: none;
   border-color: var(--color-accent);
-  box-shadow:
-    0 0 0 3px var(--color-accent-soft),
-    inset 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
   background: var(--color-surface);
 }
 
-/* ── Icon wells ── */
+/* ── Icon wells : sobres ── */
 .ah-icon-well {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-lg);
-  transition: box-shadow 0.25s ease, background 0.2s ease;
+  border-radius: var(--radius-md);
+  transition: background 0.18s ease, color 0.18s ease;
 }
 
 .ah-icon-well--primary {
-  background: linear-gradient(135deg, var(--color-primary-soft), color-mix(in srgb, var(--color-accent-soft) 50%, transparent));
+  background: var(--color-primary-soft);
   color: var(--color-primary);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .ah-icon-well--muted {
@@ -391,23 +241,23 @@ html[data-studio-theme='dark'] {
   color: var(--color-text-muted);
 }
 
-.ah-card-pro:hover .ah-icon-well--primary {
-  box-shadow: var(--glow-primary-soft);
+.ah-card-pro:hover .ah-icon-well--muted {
+  color: var(--color-text);
 }
 
-/* ── Editor toolbar buttons ── */
+/* ── Editor toolbar buttons — compacts, nets ── */
 .ah-editor-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.375rem;
   min-height: 1.875rem;
-  padding: 0 0.625rem;
+  padding: 0 0.6rem;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 550;
   color: var(--studio-editor-text-muted);
-  background: var(--studio-editor-panel-2);
-  border: 1px solid var(--studio-editor-border);
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all 0.15s ease;
@@ -415,35 +265,34 @@ html[data-studio-theme='dark'] {
 
 .ah-editor-btn:hover:not(:disabled) {
   color: var(--studio-editor-text);
-  border-color: var(--studio-editor-border-strong);
-  background: color-mix(in srgb, var(--studio-editor-accent-soft) 40%, var(--studio-editor-panel-2));
+  background: var(--studio-editor-panel-2);
+  border-color: var(--studio-editor-border);
 }
 
 .ah-editor-btn--active {
-  color: var(--studio-editor-accent);
-  border-color: color-mix(in srgb, var(--studio-editor-accent) 40%, var(--studio-editor-border));
-  background: var(--studio-editor-accent-soft);
-  box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
+  color: var(--studio-editor-text);
+  border-color: var(--studio-editor-border-strong);
+  background: var(--studio-editor-panel-2);
 }
 
 .ah-editor-btn--primary {
   color: #fff;
-  background: linear-gradient(180deg, #4b8df8, #2563eb);
-  border-color: rgba(96, 165, 250, 0.4);
+  background: var(--studio-editor-accent);
+  border-color: color-mix(in srgb, var(--studio-editor-accent) 70%, #000);
 }
 
 .ah-editor-btn--primary:hover:not(:disabled) {
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.35);
+  background: color-mix(in srgb, var(--studio-editor-accent) 88%, #fff);
 }
 
 .ah-editor-btn--cta {
   color: #fff;
-  background: linear-gradient(180deg, #f55, #dc2626);
-  border-color: rgba(248, 113, 113, 0.4);
+  background: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 72%, #000);
 }
 
 .ah-editor-btn--cta:hover:not(:disabled) {
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.35);
+  background: var(--color-primary-hover);
 }
 
 .ah-editor-btn:disabled {
@@ -451,44 +300,40 @@ html[data-studio-theme='dark'] {
   cursor: not-allowed;
 }
 
-/* ── Status pill glow ── */
-.ah-status-saved {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.2rem 0.5rem;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  border-radius: 999px;
-  background: rgba(74, 222, 128, 0.12);
-  color: var(--color-success);
-}
-
+/* ── Save status pills ── */
+.ah-status-saved,
 .ah-status-dirty {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.2rem 0.5rem;
+  padding: 0.2rem 0.55rem;
   font-size: 0.6875rem;
   font-weight: 600;
   border-radius: 999px;
-  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid transparent;
+}
+
+.ah-status-saved {
+  background: color-mix(in srgb, var(--color-success) 14%, transparent);
+  border-color: color-mix(in srgb, var(--color-success) 26%, transparent);
+  color: var(--color-success);
+}
+
+.ah-status-dirty {
+  background: color-mix(in srgb, var(--color-warning) 14%, transparent);
+  border-color: color-mix(in srgb, var(--color-warning) 26%, transparent);
   color: var(--color-warning);
-  animation: ah-pulse-soft 2s ease-in-out infinite;
 }
 
-@keyframes ah-pulse-soft {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.75; }
-}
-
-/* ── Canvas dot grid (Framer-like) ── */
+/* ── Canvas dot grid (Framer-like, discret) ── */
 .ah-editor-canvas-grid {
   background-color: var(--studio-editor-canvas);
   background-image: radial-gradient(
     circle at center,
-    var(--studio-editor-border) 1px,
+    color-mix(in srgb, var(--studio-editor-border) 65%, transparent) 1px,
     transparent 1px
   );
-  background-size: 20px 20px;
+  background-size: 22px 22px;
 }
+
+/* Light theme craft : studio-light-identity.css + studio-components.css */

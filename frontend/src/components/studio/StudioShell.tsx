@@ -63,7 +63,7 @@ export default function StudioShell({ children }: StudioShellProps) {
                     .join(' ')
                 }
               >
-                <Icon className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
+                <Icon className="studio-nav-link__icon" aria-hidden />
                 {item.label}
               </NavLink>
             );
@@ -85,7 +85,7 @@ export default function StudioShell({ children }: StudioShellProps) {
                   .join(' ')
               }
             >
-              <PenLine className="h-4 w-4 shrink-0" aria-hidden />
+              <PenLine className="studio-nav-link__icon" aria-hidden />
               <span className="min-w-0 truncate">Ouvrir le Studio</span>
             </NavLink>
           ) : (
@@ -108,7 +108,7 @@ export default function StudioShell({ children }: StudioShellProps) {
 
       <div className="studio-main">
         <header className="studio-topbar">
-          <p className="ah-caption hidden sm:block">
+          <p className="studio-topbar__brand hidden sm:block">
             Auto Hall Landing Studio
           </p>
           <div className="studio-topbar__spacer" />

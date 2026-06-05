@@ -105,7 +105,7 @@ export function createCampaignsTableColumns(
         const navState = hasStudio ? studioNavState(studioSession!) : undefined;
 
         return (
-          <div className="flex flex-wrap justify-end gap-1">
+          <div className="flex flex-nowrap items-center justify-end gap-1.5">
             {hasStudio ? (
               <>
                 <Link
@@ -120,17 +120,19 @@ export function createCampaignsTableColumns(
                 <Link
                   to={getPreviewRoute(studioSession!.pageVersionId)}
                   state={navState}
-                  className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }), 'h-8')}
+                  className={cn(buttonVariants({ variant: 'secondary', size: 'icon' }), 'h-8')}
                   title="Aperçu"
+                  aria-label="Aperçu"
                 >
                   <Eye className="h-3.5 w-3.5" />
                 </Link>
                 <ShadButton
                   type="button"
-                  variant="outline"
-                  size="sm"
+                  variant="secondary"
+                  size="icon"
                   className="h-8"
                   title="Export ZIP"
+                  aria-label="Export ZIP"
                   onClick={() => void downloadStudioV2Export(studioSession!.pageVersionId)}
                 >
                   <Download className="h-3.5 w-3.5" />
@@ -139,15 +141,16 @@ export function createCampaignsTableColumns(
             ) : null}
             <Link
               to={`/leads?campaignId=${campaign.id}`}
-              className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'h-8')}
+              className={cn(buttonVariants({ variant: 'secondary', size: 'icon' }), 'h-8')}
               title="Leads"
+              aria-label="Leads"
             >
               <Users className="h-3.5 w-3.5" />
             </Link>
             <Link
               to={`/campaigns/${campaign.id}/landing-pages`}
               state={linkState}
-              className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'h-8')}
+              className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'h-8')}
             >
               <ExternalLink className="h-3.5 w-3.5" />
               Landings

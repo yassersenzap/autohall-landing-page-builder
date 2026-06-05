@@ -53,7 +53,7 @@ export default function LoginPage() {
         <ThemeToggle />
       </div>
 
-      <Card className="ah-glass relative z-[1] w-full max-w-md !transform-none hover:!transform-none hover:!shadow-[var(--glass-shadow)]">
+      <Card className="login-card-premium relative z-[1] w-full max-w-md !transform-none">
         <CardHeader className="space-y-2 text-center">
           <p className="ah-section-title">Auto Hall</p>
           <CardTitle className="ah-page-title text-center">Landing Studio</CardTitle>

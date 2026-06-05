@@ -8,16 +8,6 @@
   letter-spacing: -0.035em;
   line-height: 1.15;
   color: var(--color-text);
-  background: linear-gradient(135deg, var(--color-text), color-mix(in srgb, var(--color-text) 75%, var(--color-text-muted)));
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-
-html[data-studio-theme='light'] .ah-page-title {
-  background: linear-gradient(135deg, #111318, #3d4558);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
 }
 
 .ah-section-title {
@@ -74,4 +64,53 @@ html[data-studio-theme='light'] .ah-page-title {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--studio-editor-text-muted);
+}
+
+/* Light — hiérarchie typographique produit */
+html[data-studio-theme='light'] .ah-page-title {
+  font-size: clamp(1.5rem, 2.2vw, 1.875rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.12;
+  color: var(--color-text);
+}
+
+html[data-studio-theme='light'] .ah-section-title {
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
+}
+
+html[data-studio-theme='light'] .ah-card-title {
+  font-size: 0.9375rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  color: var(--color-text);
+}
+
+html[data-studio-theme='light'] .ah-muted {
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+html[data-studio-theme='light'] .ah-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--color-text-secondary);
+}
+
+html[data-studio-theme='light'] .ah-caption {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+html[data-studio-theme='light'] .ui-page-header__title {
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+html[data-studio-theme='light'] .ui-page-header__subtitle {
+  color: var(--color-text-muted);
 }

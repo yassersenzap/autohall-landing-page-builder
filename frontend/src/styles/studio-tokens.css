@@ -49,7 +49,8 @@ html[data-studio-theme='dark'] {
 
   --studio-content-max: 68rem;
   --studio-sidebar-width: 15.5rem;
-  --studio-topbar-height: 3.25rem;
+  --studio-topbar-height: 3.75rem;
+  --studio-content-top: 2rem;
   --studio-btn-height-sm: 2.125rem;
   --studio-btn-height-md: 2.375rem;
 
@@ -59,55 +60,43 @@ html[data-studio-theme='dark'] {
   --studio-text-lg: 1.125rem;
   --studio-text-xl: 1.5rem;
 
-  /* Landing Studio editor (immersif) */
-  --studio-editor-bg: #0b0e14;
-  --studio-editor-bg-soft: #0f131b;
-  --studio-editor-panel: #131820;
-  --studio-editor-panel-2: #171d28;
-  --studio-editor-border: #252d3d;
-  --studio-editor-border-strong: #313b4f;
-  --studio-editor-text: #e8ecf4;
-  --studio-editor-text-muted: #9aa3b5;
-  --studio-editor-text-soft: #6b7589;
-  --studio-editor-accent: #3b82f6;
-  --studio-editor-accent-soft: rgba(59, 130, 246, 0.14);
-  --studio-editor-canvas: #0b0e14;
-  --studio-editor-canvas-paper: #ffffff;
-  --studio-editor-focus: rgba(59, 130, 246, 0.35);
 }
 
-/* Light — doux, pas blanc agressif */
+/* Light — identité Auto Hall : workspace bleu-gris, cartes blanches, hiérarchie forte */
 html[data-studio-theme='light'] {
-  --color-bg: #f5f6f8;
-  --color-bg-soft: #eceef2;
+  --color-bg: #f5f7fb;
+  --color-bg-soft: #eef2f7;
   --color-surface: #ffffff;
-  --color-surface-2: #fafbfc;
-  --color-surface-3: #f3f4f7;
+  --color-surface-2: #f8fafc;
+  --color-surface-3: #f1f5f9;
   --color-panel: #ffffff;
-  --color-border: #e2e5eb;
-  --color-border-strong: #cdd2dc;
-  --color-text: #111318;
-  --color-text-muted: #5c6478;
-  --color-text-soft: #8b93a7;
-  --color-primary: #c41e1e;
-  --color-primary-hover: #a31818;
-  --color-primary-soft: rgba(196, 30, 30, 0.08);
-  --color-accent: #1d4ed8;
-  --color-accent-soft: rgba(29, 78, 216, 0.08);
-  --color-danger: #dc2626;
-  --color-success: #15803d;
-  --color-warning: #b45309;
+  --color-border-subtle: #e2e8f0;
+  --color-border: #cbd5e1;
+  --color-border-strong: #94a3b8;
+  --color-text: #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-muted: #64748b;
+  --color-text-soft: #7c8797;
+  --color-primary: #d71920;
+  --color-primary-hover: #b9151b;
+  --color-primary-soft: #fff3f4;
+  --color-accent: #0b3b75;
+  --color-accent-hover: #082f5d;
+  --color-accent-soft: #eaf2ff;
+  --color-danger: #d92d20;
+  --color-success: #039855;
+  --color-warning: #dc6803;
 
   --studio-bg: var(--color-bg);
   --studio-bg-subtle: var(--color-bg-soft);
   --studio-surface: var(--color-surface);
-  --studio-surface-raised: var(--color-surface);
+  --studio-surface-raised: #ffffff;
   --studio-surface-elevated: var(--color-surface-2);
-  --studio-surface-hover: var(--color-surface-3);
+  --studio-surface-hover: #f1f5f9;
   --studio-border: var(--color-border);
   --studio-border-strong: var(--color-border-strong);
   --studio-text: var(--color-text);
-  --studio-text-secondary: #2a3142;
+  --studio-text-secondary: #374151;
   --studio-text-muted: var(--color-text-muted);
   --studio-primary: var(--color-primary);
   --studio-primary-hover: var(--color-primary-hover);
@@ -115,54 +104,73 @@ html[data-studio-theme='light'] {
   --studio-primary-foreground: #ffffff;
   --studio-accent: var(--color-accent);
   --studio-success: var(--color-success);
-  --studio-success-soft: rgba(21, 128, 61, 0.1);
+  --studio-success-soft: #ecfdf3;
   --studio-warning: var(--color-warning);
-  --studio-warning-soft: rgba(180, 83, 9, 0.1);
+  --studio-warning-soft: #fffaeb;
   --studio-danger: var(--color-danger);
-  --studio-danger-soft: rgba(220, 38, 38, 0.08);
-  --studio-sidebar-bg: var(--color-surface-2);
+  --studio-danger-soft: #fef3f2;
+  --studio-sidebar-bg: #ffffff;
   --studio-sidebar-text: var(--color-text);
-  --studio-sidebar-muted: var(--color-text-soft);
-  --studio-sidebar-active: rgba(17, 19, 24, 0.04);
-  --studio-sidebar-active-border: rgba(196, 30, 30, 0.28);
+  --studio-sidebar-muted: var(--color-text-muted);
+  --studio-sidebar-active: #fff3f4;
+  --studio-sidebar-active-border: color-mix(in srgb, var(--color-primary) 28%, var(--color-border));
   --studio-sidebar-border: var(--color-border);
   --studio-preview-chrome: #1a1f2b;
-  --studio-table-head: var(--color-surface-3);
-  --studio-focus-ring: rgba(196, 30, 30, 0.28);
+  --studio-table-head: #f1f5f9;
+  --studio-focus-ring: rgba(11, 59, 117, 0.24);
+  --studio-input: #ffffff;
 
-  --shadow-sm: 0 1px 2px rgba(17, 19, 24, 0.04);
-  --shadow-md: 0 4px 14px rgba(17, 19, 24, 0.06);
-  --shadow-lg: 0 12px 32px rgba(17, 19, 24, 0.08);
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 8px 18px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 18px 44px rgba(15, 23, 42, 0.12);
+
+  /* Landing Studio editor — workspace créatif clair */
+  --studio-editor-bg: #eef2f7;
+  --studio-editor-bg-soft: #e2e8f0;
+  --studio-editor-panel: #ffffff;
+  --studio-editor-panel-2: #f8fafc;
+  --studio-editor-border: #cbd5e1;
+  --studio-editor-border-strong: #94a3b8;
+  --studio-editor-text: #0f172a;
+  --studio-editor-text-muted: #64748b;
+  --studio-editor-text-soft: #7c8797;
+  --studio-editor-accent: #0b3b75;
+  --studio-editor-accent-soft: #eaf2ff;
+  --studio-editor-canvas: #e4ebf2;
+  --studio-editor-canvas-paper: #ffffff;
+  --studio-editor-focus: rgba(11, 59, 117, 0.22);
 }
 
-/* Dark — premium Codex-like, pas noir pur */
+/* Dark — premium Linear/Codex, neutre froid, surfaces étagées, jamais noir pur */
 html[data-studio-theme='dark'] {
-  --color-bg: #080a0f;
-  --color-bg-soft: #0d1117;
-  --color-surface: #11151d;
-  --color-surface-2: #161b26;
-  --color-surface-3: #1c2230;
-  --color-panel: #141923;
-  --color-border: #232b3a;
-  --color-border-strong: #313b4f;
-  --color-text: #e8ecf4;
-  --color-text-muted: #9aa3b5;
-  --color-text-soft: #6b7589;
-  --color-primary: #ef4444;
-  --color-primary-hover: #f87171;
-  --color-primary-soft: rgba(239, 68, 68, 0.12);
-  --color-accent: #3b82f6;
-  --color-accent-soft: rgba(59, 130, 246, 0.14);
+  --color-bg: #0a0b0d;
+  --color-bg-soft: #0e1013;
+  --color-surface: #16181c;
+  --color-surface-2: #1c1f24;
+  --color-surface-3: #24272e;
+  --color-panel: #131519;
+  --color-border: #282b32;
+  --color-border-subtle: #22252b;
+  --color-border-strong: #383c45;
+  --color-text: #eceef2;
+  --color-text-secondary: #c8ced8;
+  --color-text-muted: #9a9ea8;
+  --color-text-soft: #6b6f79;
+  --color-primary: #f0494e;
+  --color-primary-hover: #f76e72;
+  --color-primary-soft: rgba(240, 73, 78, 0.13);
+  --color-accent: #5b8cff;
+  --color-accent-soft: rgba(91, 140, 255, 0.14);
   --color-danger: #f87171;
-  --color-success: #4ade80;
-  --color-warning: #fbbf24;
+  --color-success: #3fbb6a;
+  --color-warning: #f5b544;
 
   --studio-bg: var(--color-bg);
   --studio-bg-subtle: var(--color-bg-soft);
   --studio-surface: var(--color-surface);
   --studio-surface-raised: var(--color-surface-2);
   --studio-surface-elevated: var(--color-surface-3);
-  --studio-surface-hover: #1a2130;
+  --studio-surface-hover: #20232a;
   --studio-border: var(--color-border);
   --studio-border-strong: var(--color-border-strong);
   --studio-text: var(--color-text);
@@ -192,6 +200,22 @@ html[data-studio-theme='dark'] {
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
   --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 18px 44px rgba(0, 0, 0, 0.5);
+
+  /* Landing Studio editor — thème sombre */
+  --studio-editor-bg: #0a0b0d;
+  --studio-editor-bg-soft: #0e1013;
+  --studio-editor-panel: #131519;
+  --studio-editor-panel-2: #1a1d22;
+  --studio-editor-border: #282b32;
+  --studio-editor-border-strong: #383c45;
+  --studio-editor-text: #eceef2;
+  --studio-editor-text-muted: #9a9ea8;
+  --studio-editor-text-soft: #6b6f79;
+  --studio-editor-accent: #5b8cff;
+  --studio-editor-accent-soft: rgba(91, 140, 255, 0.14);
+  --studio-editor-canvas: #0e1013;
+  --studio-editor-canvas-paper: #ffffff;
+  --studio-editor-focus: rgba(91, 140, 255, 0.32);
 }
 
 /* shadcn / Tailwind bridge */

@@ -33,11 +33,11 @@ export function QuickActionCard({
     <>
       <div
         className={cn(
-          'ah-icon-well mb-3 h-11 w-11',
+          'ah-icon-well ah-icon-well--card mb-3',
           variant === 'primary' ? 'ah-icon-well--primary' : 'ah-icon-well--muted',
         )}
       >
-        <Icon className="h-5 w-5" aria-hidden />
+        <Icon aria-hidden />
       </div>
       <h3 className="ah-card-title">{title}</h3>
       <p className="ah-muted mt-1.5">
@@ -47,8 +47,10 @@ export function QuickActionCard({
     </>
   );
 
+  const isInteractive = !disabled && (href || onClick);
   const cardClass = cn(
-    'ah-card-pro h-full',
+    'quick-action-card ah-card-pro h-full',
+    isInteractive && 'ah-card-pro--interactive',
     variant === 'primary' && !disabled && 'ah-card-pro--primary',
     disabled && 'opacity-55 pointer-events-none',
     className,
@@ -60,7 +62,7 @@ export function QuickActionCard({
   if (disabled || (!href && !onClick)) {
     return (
       <div className={cardClass}>
-        <CardContent className="p-5">{inner}</CardContent>
+        <CardContent className="quick-action-card__content p-5">{inner}</CardContent>
       </div>
     );
   }
@@ -69,7 +71,7 @@ export function QuickActionCard({
     return (
       <Link to={href} className={wrapClass}>
         <div className={cn(cardClass, 'cursor-pointer')}>
-          <CardContent className="p-5">{inner}</CardContent>
+          <CardContent className="quick-action-card__content p-5">{inner}</CardContent>
         </div>
       </Link>
     );
@@ -78,7 +80,7 @@ export function QuickActionCard({
   return (
     <button type="button" onClick={onClick} className={cn(wrapClass, 'w-full text-left')}>
       <div className={cn(cardClass, 'cursor-pointer')}>
-        <CardContent className="p-5">{inner}</CardContent>
+        <CardContent className="quick-action-card__content p-5">{inner}</CardContent>
       </div>
     </button>
   );

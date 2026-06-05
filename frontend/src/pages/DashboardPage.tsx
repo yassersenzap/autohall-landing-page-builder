@@ -105,7 +105,7 @@ export default function DashboardPage() {
   const studioState = session ? studioNavState(session) : undefined;
 
   return (
-    <div className="space-y-8 font-sans">
+    <div className="studio-stack font-sans">
       <StudioPageHeader
         title="Centre de commande"
         description={
