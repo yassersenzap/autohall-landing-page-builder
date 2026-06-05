@@ -1,0 +1,339 @@
+/* Auto Hall Studio OS — polish premium retenu (Linear / Framer / Figma)
+   Principe : designed, not decorated. Bordures nettes, surfaces étagées,
+   ombres discrètes, accents intentionnels. Pas de glow gratuit, pas de
+   gradients criards, pas de shine animé. */
+
+/* ── App background : très subtil, neutre ── */
+.ah-mesh-app {
+  position: relative;
+  isolation: isolate;
+}
+
+html[data-studio-theme='dark'] .ah-mesh-app {
+  background:
+    radial-gradient(1200px 600px at 50% -280px, rgba(91, 140, 255, 0.05), transparent 70%),
+    var(--color-bg);
+}
+
+/* Workspace light : studio-light-identity.css */
+
+/* ── Glass : feutré, pas flashy ── */
+.ah-glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.1);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.1);
+}
+
+html[data-studio-theme='light'] {
+  --glass-bg: var(--color-surface);
+  --glass-border: var(--color-border);
+  --glass-blur: 0px;
+  --glass-shadow: var(--shadow-sm);
+}
+
+html[data-studio-theme='dark'] {
+  --glass-bg: rgba(19, 21, 25, 0.72);
+  --glass-border: var(--color-border);
+  --glass-blur: 16px;
+  --glass-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 8px 28px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Cards : nette, surface étagée, hover sobre ── */
+.ah-card-pro {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+html[data-studio-theme='dark'] .ah-card-pro:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+/* Carte mise en avant : liseré accent discret, pas de gradient criard */
+.ah-card-pro--primary {
+  border-color: color-mix(in srgb, var(--color-primary) 26%, var(--color-border));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-primary-soft) 55%, transparent), transparent 64%),
+    var(--color-surface);
+}
+
+.ah-card-pro--primary:hover {
+  border-color: color-mix(in srgb, var(--color-primary) 42%, var(--color-border));
+}
+
+/* ── Buttons : solides, plats, hover net (Linear-like) — pas de shine ── */
+.ah-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  font-weight: 550;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  user-select: none;
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.08s ease;
+}
+
+.ah-btn:active:not(:disabled) {
+  transform: translateY(0.5px);
+}
+
+.ah-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-accent);
+}
+
+.ah-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ah-btn--sm {
+  min-height: 2rem;
+  padding: 0 0.7rem;
+  font-size: 0.78rem;
+  border-radius: var(--radius-sm);
+}
+
+.ah-btn--md {
+  min-height: 2.25rem;
+  padding: 0 0.9rem;
+  font-size: 0.8125rem;
+}
+
+.ah-btn--lg {
+  min-height: 2.625rem;
+  padding: 0 1.15rem;
+  font-size: 0.875rem;
+}
+
+.ah-btn--primary {
+  color: #fff;
+  background: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 75%, #000);
+  box-shadow: var(--shadow-sm);
+}
+
+.ah-btn--primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.ah-btn--secondary {
+  color: var(--color-text);
+  background: var(--color-surface-2);
+  border-color: var(--color-border);
+}
+
+.ah-btn--secondary:hover:not(:disabled) {
+  background: var(--color-surface-3);
+  border-color: var(--color-border-strong);
+}
+
+.ah-btn--ghost {
+  color: var(--color-text-muted);
+  background: transparent;
+  border-color: transparent;
+}
+
+.ah-btn--ghost:hover:not(:disabled) {
+  color: var(--color-text);
+  background: var(--color-surface-2);
+}
+
+.ah-btn--outline {
+  color: var(--color-text);
+  background: transparent;
+  border-color: var(--color-border-strong);
+}
+
+.ah-btn--outline:hover:not(:disabled) {
+  background: var(--color-surface-2);
+  border-color: var(--color-text-soft);
+}
+
+.ah-btn--accent {
+  color: #fff;
+  background: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-accent) 72%, #000);
+  box-shadow: var(--shadow-sm);
+}
+
+.ah-btn--accent:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-accent) 88%, #fff);
+}
+
+.ah-btn--destructive {
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 11%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-danger) 24%, transparent);
+}
+
+.ah-btn--destructive:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-danger) 16%, var(--color-surface));
+}
+
+/* ── Inputs : compacts, focus accent net ── */
+.ah-input {
+  width: 100%;
+  min-height: 2.25rem;
+  padding: 0 0.7rem;
+  font-size: 0.8125rem;
+  color: var(--color-text);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    background 0.16s ease;
+}
+
+.ah-input::placeholder {
+  color: var(--color-text-soft);
+}
+
+.ah-input:hover:not(:disabled):not(:focus) {
+  border-color: var(--color-border-strong);
+}
+
+.ah-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+  background: var(--color-surface);
+}
+
+/* ── Icon wells : sobres ── */
+.ah-icon-well {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.ah-icon-well--primary {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.ah-icon-well--muted {
+  background: var(--color-surface-3);
+  color: var(--color-text-muted);
+}
+
+.ah-card-pro:hover .ah-icon-well--muted {
+  color: var(--color-text);
+}
+
+/* ── Editor toolbar buttons — compacts, nets ── */
+.ah-editor-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-height: 1.875rem;
+  padding: 0 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 550;
+  color: var(--studio-editor-text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ah-editor-btn:hover:not(:disabled) {
+  color: var(--studio-editor-text);
+  background: var(--studio-editor-panel-2);
+  border-color: var(--studio-editor-border);
+}
+
+.ah-editor-btn--active {
+  color: var(--studio-editor-text);
+  border-color: var(--studio-editor-border-strong);
+  background: var(--studio-editor-panel-2);
+}
+
+.ah-editor-btn--primary {
+  color: #fff;
+  background: var(--studio-editor-accent);
+  border-color: color-mix(in srgb, var(--studio-editor-accent) 70%, #000);
+}
+
+.ah-editor-btn--primary:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--studio-editor-accent) 88%, #fff);
+}
+
+.ah-editor-btn--cta {
+  color: #fff;
+  background: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 72%, #000);
+}
+
+.ah-editor-btn--cta:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.ah-editor-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Save status pills ── */
+.ah-status-saved,
+.ah-status-dirty {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.ah-status-saved {
+  background: color-mix(in srgb, var(--color-success) 14%, transparent);
+  border-color: color-mix(in srgb, var(--color-success) 26%, transparent);
+  color: var(--color-success);
+}
+
+.ah-status-dirty {
+  background: color-mix(in srgb, var(--color-warning) 14%, transparent);
+  border-color: color-mix(in srgb, var(--color-warning) 26%, transparent);
+  color: var(--color-warning);
+}
+
+/* ── Canvas dot grid (Framer-like, discret) ── */
+.ah-editor-canvas-grid {
+  background-color: var(--studio-editor-canvas);
+  background-image: radial-gradient(
+    circle at center,
+    color-mix(in srgb, var(--studio-editor-border) 65%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
+}
+
+/* Light theme craft : studio-light-identity.css + studio-components.css */

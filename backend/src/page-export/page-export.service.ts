@@ -6,12 +6,16 @@ import {
 import { PageVersionStatus } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import archiver from 'archiver';
+import { createReadStream } from 'fs';
+import { access } from 'fs/promises';
 import { PassThrough } from 'stream';
+import { AssetRenderService } from '../page-assets/asset-render.service';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   buildExportFilename,
   buildIndexHtml,
   buildLandingConfigJs,
+  STATIC_LEAD_FORM_JS,
   STATIC_MAIN_JS,
   STATIC_STYLE_CSS,
 } from './static-export.builder';
@@ -22,11 +26,16 @@ export type PageExportResult = {
   mimeType: string;
 };
 
+type ZipTextEntry = { kind: 'text'; path: string; content: string };
+type ZipFileEntry = { kind: 'file'; path: string; absolutePath: string };
+type ZipEntry = ZipTextEntry | ZipFileEntry;
+
 @Injectable()
 export class PageExportService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
+    private readonly assetRenderService: AssetRenderService,
   ) {}
 
   async exportZip(pageVersionId: string): Promise<PageExportResult> {
@@ -62,16 +71,6 @@ export class PageExportService {
 
     const leadEndpoint = this.resolvePublicLeadEndpoint();
 
-    const indexHtml = buildIndexHtml(
-      {
-        title: landingPage.title,
-        campaignName: landingPage.campaign.name,
-        brand: landingPage.campaign.brand,
-      },
-      blocks,
-      pageVersion.themeJson,
-    );
-
     const landingConfigJs = buildLandingConfigJs({
       leadEndpoint,
       campaignId: landingPage.campaignId,
@@ -80,12 +79,51 @@ export class PageExportService {
       landingSlug: landingPage.slug,
     });
 
-    const buffer = await this.createZipBuffer({
-      'index.html': indexHtml,
-      'assets/style.css': STATIC_STYLE_CSS,
-      'js/landing-config.js': landingConfigJs,
-      'js/main.js': STATIC_MAIN_JS,
-    });
+    const shell = {
+      title: landingPage.title,
+      campaignName: landingPage.campaign.name,
+      brand: landingPage.campaign.brand,
+    };
+
+    const assetMap = await this.assetRenderService.buildAssetMapForBlocks(
+      blocks,
+      'export',
+    );
+
+    const renderContext = {
+      mode: 'export' as const,
+      assetMap,
+    };
+
+    const indexHtml = buildIndexHtml(
+      shell,
+      blocks,
+      pageVersion.themeJson,
+      renderContext,
+    );
+    const styleCss = STATIC_STYLE_CSS;
+
+    const zipEntries: ZipEntry[] = [
+      { kind: 'text', path: 'index.html', content: indexHtml },
+      { kind: 'text', path: 'assets/style.css', content: styleCss },
+      { kind: 'text', path: 'js/landing-config.js', content: landingConfigJs },
+      { kind: 'text', path: 'js/lead-form.js', content: STATIC_LEAD_FORM_JS },
+      { kind: 'text', path: 'js/main.js', content: STATIC_MAIN_JS },
+    ];
+
+    for (const entry of Object.values(assetMap)) {
+      const exists = await access(entry.absolutePath)
+        .then(() => true)
+        .catch(() => false);
+      if (!exists) continue;
+      zipEntries.push({
+        kind: 'file',
+        path: entry.exportPath,
+        absolutePath: entry.absolutePath,
+      });
+    }
+
+    const buffer = await this.createZipBuffer(zipEntries);
 
     const filename = buildExportFilename(
       landingPage.slug,
@@ -114,7 +152,7 @@ export class PageExportService {
     return `http://localhost:${port}/api/public/leads`;
   }
 
-  private createZipBuffer(files: Record<string, string>): Promise<Buffer> {
+  private createZipBuffer(entries: ZipEntry[]): Promise<Buffer> {
     return new Promise((resolve, reject) => {
       const archive = archiver('zip', { zlib: { level: 9 } });
       const stream = new PassThrough();
@@ -127,8 +165,14 @@ export class PageExportService {
 
       archive.pipe(stream);
 
-      for (const [path, content] of Object.entries(files)) {
-        archive.append(content, { name: path });
+      for (const entry of entries) {
+        if (entry.kind === 'text') {
+          archive.append(entry.content, { name: entry.path });
+        } else {
+          archive.append(createReadStream(entry.absolutePath), {
+            name: entry.path,
+          });
+        }
       }
 
       void archive.finalize();

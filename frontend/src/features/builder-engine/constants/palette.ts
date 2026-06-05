@@ -1,37 +1,8 @@
+import { getActivePaletteBlocks } from '../registry/block-registry';
 import type { BuilderPaletteItem } from '../types';
 
-export const BUILDER_PALETTE: BuilderPaletteItem[] = [
-  {
-    type: 'hero',
-    label: 'Bloc Hero',
-    description: 'Bannière principale et accroche.',
-  },
-  {
-    type: 'lead_form',
-    label: 'Bloc Formulaire',
-    description: 'Collecte de leads et contact.',
-  },
-  {
-    type: 'trust_bar',
-    label: 'Bloc Confiance',
-    description: 'Indicateurs de réassurance.',
-  },
-  {
-    type: 'features',
-    label: 'Bloc Caractéristiques',
-    description: 'Points forts véhicule ou offre.',
-  },
-  {
-    type: 'final_cta',
-    label: 'Bloc CTA final',
-    description: 'Appel à l’action de clôture.',
-  },
-  {
-    type: 'footer_legal',
-    label: 'Bloc Pied de page',
-    description: 'Mentions légales.',
-  },
-];
+/** @deprecated Préférer BUILDER_BLOCK_REGISTRY — conservé pour compat DnD. */
+export const BUILDER_PALETTE: BuilderPaletteItem[] = getActivePaletteBlocks();
 
 export const PALETTE_DRAG_PREFIX = 'palette:';
 

@@ -1,3 +1,5 @@
+import { sanitizeBlockDesignProps } from './block-design-props';
+
 /**
  * Nettoie les patches avant fusion dans propsJson.
  * Limite aux scalaires et listes d'objets plats — prêt pour validation Zod côté store/API.
@@ -49,6 +51,31 @@ function sanitizeArrayValue(value: unknown[]): unknown[] {
     .filter((item) => item !== null && (typeof item !== 'object' || Object.keys(item).length > 0));
 }
 
+const FORM_CONFIG_KEYS = new Set([
+  'showCivility',
+  'useSplitName',
+  'showCity',
+  'showVehicleModel',
+  'showMessage',
+  'showEmail',
+  'showConsent',
+]);
+
+function sanitizeFormConfigObject(value: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [key, raw] of Object.entries(value)) {
+    if (!FORM_CONFIG_KEYS.has(key)) continue;
+    if (typeof raw === 'boolean') {
+      out[key] = raw;
+    }
+  }
+  return out;
+}
+
+function sanitizeDesignObject(value: Record<string, unknown>): Record<string, unknown> {
+  return sanitizeBlockDesignProps(value);
+}
+
 export function sanitizePropsPatch(
   patch: Record<string, unknown>,
 ): Record<string, unknown> {
@@ -59,8 +86,38 @@ export function sanitizePropsPatch(
 
     if (typeof key !== 'string' || key.length === 0 || key.length > 64) continue;
 
+    if (
+      key === 'design' &&
+      value !== null &&
+      typeof value === 'object' &&
+      !Array.isArray(value)
+    ) {
+      const sanitized = sanitizeDesignObject(value as Record<string, unknown>);
+      if (Object.keys(sanitized).length > 0) {
+        out[key] = sanitized;
+      }
+      continue;
+    }
+
+    if (
+      key === 'formConfig' &&
+      value !== null &&
+      typeof value === 'object' &&
+      !Array.isArray(value)
+    ) {
+      const sanitized = sanitizeFormConfigObject(value as Record<string, unknown>);
+      if (Object.keys(sanitized).length > 0) {
+        out[key] = sanitized;
+      }
+      continue;
+    }
+
     if (typeof value === 'string') {
-      out[key] = trimString(value, MAX_STRING_LENGTH);
+      const trimmed = trimString(value, MAX_STRING_LENGTH);
+      if (trimmed.toLowerCase().startsWith('data:')) {
+        continue;
+      }
+      out[key] = trimmed;
       continue;
     }
 

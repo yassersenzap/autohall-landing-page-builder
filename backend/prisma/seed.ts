@@ -4,6 +4,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import {
   CampaignStatus,
   FormFieldType,
+  Prisma,
   LandingPageStatus,
   LeadEventStatus,
   LeadRequestType,
@@ -13,6 +14,7 @@ import {
 } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { Pool } from 'pg';
+import { buildDefaultStudioV2Document } from '../src/studio-v2/default-document';
 
 function loadEnv(): void {
   const rootEnv = join(__dirname, '..', '..', '.env');
@@ -102,6 +104,11 @@ async function runSeed(prisma: PrismaClient): Promise<void> {
           theme: {
             primaryColor: '#003B73',
             fontFamily: 'Inter',
+            mode: 'dark',
+          },
+          seo: {
+            title: 'Offre véhicule — Auto Hall',
+            description: 'Landing démo promotion Auto Hall.',
           },
         },
       },
@@ -120,6 +127,11 @@ async function runSeed(prisma: PrismaClient): Promise<void> {
           theme: {
             primaryColor: '#003B73',
             fontFamily: 'Inter',
+            mode: 'dark',
+          },
+          seo: {
+            title: 'Offre véhicule — Auto Hall',
+            description: 'Landing démo promotion Auto Hall.',
           },
         },
       },
@@ -127,36 +139,130 @@ async function runSeed(prisma: PrismaClient): Promise<void> {
     },
   });
 
-  await prisma.pageBlock.upsert({
-    where: {
-      pageVersionId_blockKey: {
-        pageVersionId: pageVersion.id,
-        blockKey: 'block_hero_001',
-      },
-    },
-    update: {
+  await prisma.pageBlock.deleteMany({ where: { pageVersionId: pageVersion.id } });
+
+  const demoBlocks: Array<{ blockKey: string; blockType: string; sortOrder: number; propsJson: Record<string, unknown> }> = [
+    {
+      blockKey: 'block_hero',
       blockType: 'hero',
       sortOrder: 1,
       propsJson: {
+        eyebrow: 'Offre en cours',
         title: 'Promo exclusive Auto Hall',
-        subtitle: 'Découvrez nos offres du mois',
+        subtitle: 'Découvrez nos offres du moment en concession.',
         buttonText: 'Je suis intéressé',
         buttonTarget: '#lead-form',
+        promoBadge: 'Offre limitée',
+        design: { layoutVariant: 'split_image_right', backgroundMode: 'dark', mediaPosition: 'right' },
       },
+    },
+    {
+      blockKey: 'block_features',
+      blockType: 'features',
+      sortOrder: 2,
+      propsJson: {
+        heading: 'Points forts',
+        subtitle: 'Les atouts du véhicule ou de l’offre.',
+        items: [
+          { title: 'Garantie', description: 'Conditions constructeur à préciser.' },
+          { title: 'Essai', description: 'Essai en concession sur rendez-vous.' },
+        ],
+        design: { layoutVariant: 'grid_cards', backgroundMode: 'light' },
+      },
+    },
+    {
+      blockKey: 'block_form',
+      blockType: 'lead_form',
+      sortOrder: 3,
+      propsJson: {
+        title: 'Contactez-nous',
+        subtitle: 'Un conseiller vous recontacte.',
+        submitText: 'Envoyer votre demande',
+        consentLabel:
+          'J’ai lu et j’accepte sans réserve les termes de la clause relative à la protection des données personnelles.',
+        requiredFieldsNote: '* Champs obligatoires.',
+        formConfig: {
+          showCivility: true,
+          useSplitName: true,
+          showCity: true,
+          showVehicleModel: true,
+          showMessage: false,
+          showEmail: true,
+          showConsent: true,
+        },
+        fields: [
+          { name: 'civility', label: 'Civilité', type: 'select', required: false },
+          { name: 'lastName', label: 'Nom', type: 'text', required: true },
+          { name: 'firstName', label: 'Prénom', type: 'text', required: true },
+          { name: 'email', label: 'Email', type: 'email', required: false },
+          { name: 'phone', label: 'Téléphone', type: 'tel', required: true },
+          { name: 'city', label: 'Ville', type: 'select', required: true },
+          { name: 'vehicleModel', label: 'Modèle souhaité', type: 'text', required: false },
+        ],
+        design: { layoutVariant: 'card_right' },
+      },
+    },
+    {
+      blockKey: 'block_faq',
+      blockType: 'faq',
+      sortOrder: 4,
+      propsJson: {
+        heading: 'Questions fréquentes',
+        items: [
+          {
+            question: 'Comment profiter de l’offre ?',
+            answer: 'Remplissez le formulaire, un conseiller vous rappelle.',
+          },
+        ],
+      },
+    },
+    {
+      blockKey: 'block_footer',
+      blockType: 'footer_legal',
+      sortOrder: 5,
+      propsJson: {
+        legalText: 'Auto Hall — mentions légales à compléter avant publication.',
+      },
+    },
+  ];
+
+  const studioDocument = buildDefaultStudioV2Document() as Prisma.InputJsonValue;
+
+  await prisma.pageVersionStudioDocument.upsert({
+    where: { pageVersionId: pageVersion.id },
+    update: {
+      engine: 'puck',
+      documentJson: studioDocument,
     },
     create: {
       pageVersionId: pageVersion.id,
-      blockKey: 'block_hero_001',
-      blockType: 'hero',
-      sortOrder: 1,
-      propsJson: {
-        title: 'Promo exclusive Auto Hall',
-        subtitle: 'Découvrez nos offres du mois',
-        buttonText: 'Je suis intéressé',
-        buttonTarget: '#lead-form',
-      },
+      engine: 'puck',
+      documentJson: studioDocument,
     },
   });
+
+  for (const spec of demoBlocks) {
+    await prisma.pageBlock.upsert({
+      where: {
+        pageVersionId_blockKey: {
+          pageVersionId: pageVersion.id,
+          blockKey: spec.blockKey,
+        },
+      },
+      update: {
+        blockType: spec.blockType,
+        sortOrder: spec.sortOrder,
+        propsJson: spec.propsJson as Prisma.InputJsonValue,
+      },
+      create: {
+        pageVersionId: pageVersion.id,
+        blockKey: spec.blockKey,
+        blockType: spec.blockType,
+        sortOrder: spec.sortOrder,
+        propsJson: spec.propsJson as Prisma.InputJsonValue,
+      },
+    });
+  }
 
   const form = await prisma.form.upsert({
     where: { pageVersionId: pageVersion.id },
@@ -267,6 +373,7 @@ async function runSeed(prisma: PrismaClient): Promise<void> {
   console.log(`[seed] Admin : ${SEED_ADMIN_EMAIL} (mot de passe documenté dans prisma/seed.ts — dev uniquement)`);
   console.log(`[seed] Campagne : ${campaign.name}`);
   console.log(`[seed] Landing : /${landingPage.slug} (version ${pageVersion.versionNumber})`);
+  console.log(`[seed] Landing Studio : document prêt pour la version ${pageVersion.id}`);
 }
 
 async function main(): Promise<void> {

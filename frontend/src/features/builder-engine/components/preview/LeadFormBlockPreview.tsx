@@ -1,18 +1,32 @@
-import { parseLeadFormProps } from '../../lib/block-props';
+import { resolveLeadFormFieldsFromProps } from '../../constants/autohall-lead-form';
+import { asPropString } from '../../lib/block-props';
+import { buildCanvasSectionClass, buildCanvasInlineStyle, getDesignFromProps } from '../../lib/block-style';
+import { CanvasEmptyHint } from './CanvasEmptyHint';
 
 type LeadFormBlockPreviewProps = {
   propsJson: Record<string, unknown>;
 };
 
-/**
- * Preview alignée sur `.lp-lead-form` (landing-page.css).
- */
 export function LeadFormBlockPreview({ propsJson }: LeadFormBlockPreviewProps) {
-  const props = parseLeadFormProps(propsJson);
+  const fields = resolveLeadFormFieldsFromProps(propsJson);
+  const design = getDesignFromProps('lead_form', propsJson);
+  const sectionClass = buildCanvasSectionClass('lead_form', 'lp-lead-form', propsJson);
+  const inlineStyle = buildCanvasInlineStyle(design);
+  const title = asPropString(propsJson.title);
+  const subtitle = asPropString(propsJson.subtitle);
+  const submitText = asPropString(propsJson.submitText) || 'Envoyer votre demande';
+  const privacyNote = asPropString(propsJson.privacyNote);
+  const consentLabel = asPropString(propsJson.consentLabel);
+  const requiredNote = asPropString(propsJson.requiredFieldsNote) || '* Champs obligatoires.';
+  const formConfig = propsJson.formConfig as Record<string, unknown> | undefined;
+  const showConsent = formConfig?.showConsent !== false;
 
-  const fieldsHtml = props.fields?.map((field) => {
+  const fieldsHtml = fields.map((field) => {
     const isFullWidth =
-      field.name === 'fullName' || field.name === 'message' || (props.fields?.length ?? 0) <= 2;
+      field.fullWidth ||
+      field.name === 'fullName' ||
+      field.name === 'message' ||
+      field.type === 'textarea';
     return (
       <label
         key={field.name}
@@ -20,63 +34,51 @@ export function LeadFormBlockPreview({ propsJson }: LeadFormBlockPreviewProps) {
       >
         <span className="lp-lead-form__label">
           {field.label}
-          {field.required ? (
-            <>
-              {' '}
-              <span aria-hidden="true">*</span>
-            </>
-          ) : null}
+          {field.required ? <span aria-hidden="true"> *</span> : null}
         </span>
-        <input
-          className="lp-lead-form__input"
-          type={field.type || 'text'}
-          name={field.name}
-          disabled
-          readOnly
-          aria-disabled="true"
-          tabIndex={-1}
-        />
+        {field.type === 'select' ? (
+          <select className="lp-lead-form__input lp-lead-form__select" name={field.name} disabled>
+            {field.options?.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        ) : field.type === 'textarea' ? (
+          <textarea className="lp-lead-form__input lp-lead-form__textarea" name={field.name} rows={3} disabled readOnly />
+        ) : (
+          <input className="lp-lead-form__input" type={field.type || 'text'} name={field.name} disabled readOnly />
+        )}
       </label>
     );
   });
 
-  const reassurance =
-    props.reassurance && props.reassurance.length > 0 ? (
-      <ul className="lp-lead-form__reassurance">
-        {props.reassurance.map((item) => (
-          <li key={item} className="lp-lead-form__reassurance-item">
-            <span className="lp-lead-form__check" aria-hidden="true" />
-            {item}
-          </li>
-        ))}
-      </ul>
-    ) : null;
-
   return (
-    <section className="lp-block lp-lead-form" id="lead-form">
+    <section className={sectionClass} id="lead-form" style={inlineStyle}>
       <div className="lp-section">
         <div className="lp-lead-form__layout">
           <aside className="lp-lead-form__aside">
-            {props.title ? <h2 className="lp-lead-form__title">{props.title}</h2> : null}
-            {props.subtitle ? <p className="lp-lead-form__subtitle">{props.subtitle}</p> : null}
-            {reassurance}
+            {title ? (
+              <h2 className="lp-lead-form__title">{title}</h2>
+            ) : (
+              <CanvasEmptyHint className="lp-lead-form__title opacity-60">Titre du formulaire</CanvasEmptyHint>
+            )}
+            {subtitle ? <p className="lp-lead-form__subtitle">{subtitle}</p> : null}
           </aside>
           <div className="lp-lead-form__card">
             <form className="lp-lead-form__form" action="#" method="post" noValidate onSubmit={(e) => e.preventDefault()}>
+              <p className="lp-lead-form__required-note">{requiredNote}</p>
               <div className="lp-lead-form__grid">{fieldsHtml}</div>
-              <p className="lp-lead-form__feedback" role="status" aria-live="polite" />
-              {props.submitText ? (
-                <button
-                  type="button"
-                  className="lp-btn lp-btn--primary lp-btn--lg lp-lead-form__submit"
-                  tabIndex={-1}
-                >
-                  {props.submitText}
-                </button>
+              {showConsent && consentLabel ? (
+                <label className="lp-lead-form__field lp-lead-form__field--consent lp-lead-form__field--full">
+                  <input className="lp-lead-form__checkbox" type="checkbox" name="consent" disabled />
+                  <span className="lp-lead-form__consent-text">{consentLabel}</span>
+                </label>
               ) : null}
-              {props.privacyNote ? (
-                <p className="lp-lead-form__privacy">{props.privacyNote}</p>
-              ) : null}
+              <button type="button" className="lp-btn lp-btn--primary lp-btn--lg lp-lead-form__submit" tabIndex={-1}>
+                {submitText}
+              </button>
+              {privacyNote ? <p className="lp-lead-form__privacy">{privacyNote}</p> : null}
             </form>
           </div>
         </div>

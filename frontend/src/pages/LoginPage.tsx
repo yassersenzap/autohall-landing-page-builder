@@ -1,16 +1,22 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { ThemeToggle } from '../components/studio/ThemeToggle';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { ApiError, loginRequest } from '../lib/api';
-import { isAuthenticated, setAccessToken } from '../lib/auth-storage';
+import { ThemeToggle } from '@/components/studio/ThemeToggle';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  ShadButton,
+  ShadInput,
+} from '@/components/ui/primitives';
+import { ApiError, loginRequest } from '@/lib/api';
+import { isAuthenticated, setAccessToken } from '@/lib/auth-storage';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const redirectTo =
-    (location.state as { from?: string } | null)?.from ?? '/dashboard';
+  const redirectTo = (location.state as { from?: string } | null)?.from ?? '/dashboard';
 
   const [email, setEmail] = useState('admin@autohall.local');
   const [password, setPassword] = useState('');
@@ -42,48 +48,57 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="auth-page">
-      <div style={{ position: 'fixed', top: '1rem', right: '1rem' }}>
+    <main className="ah-mesh-app relative flex min-h-screen items-center justify-center bg-[var(--color-bg)] px-4 py-12">
+      <div className="absolute right-4 top-4 z-10">
         <ThemeToggle />
       </div>
-      <section className="auth-card">
-        <h1 className="auth-card__title">Connexion</h1>
-        <p className="auth-card__subtitle">
-          Accès réservé aux utilisateurs Auto Hall.
-        </p>
 
-        <form className="ui-form-stack" onSubmit={handleSubmit}>
-          <Input
-            label="Email"
-            type="email"
-            name="email"
-            autoComplete="username"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-          <Input
-            label="Mot de passe"
-            type="password"
-            name="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-            minLength={8}
-          />
-          {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
-          <Button type="submit" disabled={loading}>
-            {loading ? 'Connexion…' : 'Se connecter'}
-          </Button>
-        </form>
+      <Card className="login-card-premium relative z-[1] w-full max-w-md !transform-none">
+        <CardHeader className="space-y-2 text-center">
+          <p className="ah-section-title">Auto Hall</p>
+          <CardTitle className="ah-page-title text-center">Landing Studio</CardTitle>
+          <CardDescription className="ah-muted text-center">
+            Accès réservé aux équipes Auto Hall.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+            <ShadInput
+              label="Email"
+              type="email"
+              name="email"
+              autoComplete="username"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+            />
+            <ShadInput
+              label="Mot de passe"
+              type="password"
+              name="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+              minLength={8}
+            />
+            {error ? (
+              <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {error}
+              </p>
+            ) : null}
+            <ShadButton type="submit" disabled={loading} className="w-full">
+              {loading ? 'Connexion…' : 'Se connecter'}
+            </ShadButton>
+          </form>
 
-        <p className="auth-card__footer">
-          <Link to="/" className="ui-link">
-            Retour à l&apos;accueil
-          </Link>
-        </p>
-      </section>
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            <Link to="/" className="font-medium text-primary hover:underline">
+              Retour à l&apos;accueil
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
     </main>
   );
 }

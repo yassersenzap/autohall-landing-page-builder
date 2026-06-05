@@ -1,4 +1,5 @@
 import { parseMetrics } from '../../lib/list-props';
+import { CanvasEmptyHint } from './CanvasEmptyHint';
 
 type TrustBarBlockPreviewProps = {
   propsJson: Record<string, unknown>;
@@ -6,7 +7,17 @@ type TrustBarBlockPreviewProps = {
 
 export function TrustBarBlockPreview({ propsJson }: TrustBarBlockPreviewProps) {
   const metrics = parseMetrics(propsJson);
-  if (metrics.length === 0) return null;
+  if (metrics.length === 0) {
+    return (
+      <section className="lp-block lp-trust-bar" aria-label="Réassurance">
+        <div className="lp-section py-6">
+          <CanvasEmptyHint className="text-center text-zinc-400">
+            Ajoutez vos indicateurs de confiance (chiffres, labels)
+          </CanvasEmptyHint>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="lp-block lp-trust-bar" aria-label="Réassurance">

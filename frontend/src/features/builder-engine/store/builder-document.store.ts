@@ -1,11 +1,14 @@
 import { create } from 'zustand';
-import { BUILDER_PALETTE } from '../constants/palette';
 import { getDefaultBlockProps } from '../constants/default-block-props';
+import { getRegistryEntry } from '../registry/block-registry';
+import { getActivePaletteBlocks } from '../registry/block-registry';
+import type { BuilderDeviceMode } from '../lib/block-design-props';
 import { sanitizePropsPatch } from '../lib/sanitize-props-patch';
 import type { BuilderDocumentBlock } from '../types';
+import { findBlockById, sanitizeBlockSelection } from './block-selection';
 
-function createBlockFromPalette(type: string, sortOrder: number): BuilderDocumentBlock {
-  const item = BUILDER_PALETTE.find((p) => p.type === type);
+function createBlockFromType(type: string, sortOrder: number): BuilderDocumentBlock {
+  const item = getRegistryEntry(type);
   return {
     id: crypto.randomUUID(),
     type,
@@ -19,19 +22,58 @@ function normalizeSortOrder(blocks: BuilderDocumentBlock[]): BuilderDocumentBloc
   return blocks.map((block, index) => ({ ...block, sortOrder: index }));
 }
 
+export type PageThemeDraft = {
+  primaryColor: string;
+  secondaryColor: string;
+  mode: 'light' | 'dark';
+  fontFamily: string;
+  headingScale: 'compact' | 'normal' | 'large';
+  sectionSpacing: 'compact' | 'normal' | 'spacious';
+  buttonStyle: 'rounded' | 'pill' | 'square';
+  seoTitle: string;
+  seoDescription: string;
+};
+
+const DEFAULT_PAGE_THEME: PageThemeDraft = {
+  primaryColor: '#b91c1c',
+  secondaryColor: '#18181b',
+  mode: 'dark',
+  fontFamily: 'Inter',
+  headingScale: 'normal',
+  sectionSpacing: 'normal',
+  buttonStyle: 'pill',
+  seoTitle: '',
+  seoDescription: '',
+};
+
 type BuilderDocumentState = {
   blocks: BuilderDocumentBlock[];
   selectedBlockId: string | null;
   hoveredBlockId: string | null;
+  deviceMode: BuilderDeviceMode;
+  pageTheme: PageThemeDraft;
+  themeDirty: boolean;
 
   addBlock: (type: string, index?: number) => void;
+  addSection: (blockTypes: string[]) => void;
   removeBlock: (blockId: string) => void;
+  duplicateBlock: (blockId: string) => void;
   selectBlock: (blockId: string | null) => void;
   hoverBlock: (blockId: string | null) => void;
   reorderBlocks: (activeId: string, overId: string) => void;
   moveBlockToIndex: (blockId: string, newIndex: number) => void;
   updateBlockProps: (blockId: string, patch: Record<string, unknown>) => void;
   setInitialBlocks: (blocks: BuilderDocumentBlock[]) => void;
+  setDeviceMode: (mode: BuilderDeviceMode) => void;
+  setPageTheme: (patch: Partial<PageThemeDraft>) => void;
+  setInitialPageTheme: (theme: PageThemeDraft) => void;
+  restoreLocalDraft: (payload: {
+    blocks: BuilderDocumentBlock[];
+    pageTheme: PageThemeDraft;
+    themeDirty: boolean;
+    selectedBlockId: string | null;
+  }) => void;
+  buildThemeJsonPayload: () => Record<string, unknown>;
   resetDocument: () => void;
 };
 
@@ -39,12 +81,18 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>((set, get) =
   blocks: [],
   selectedBlockId: null,
   hoveredBlockId: null,
+  deviceMode: 'desktop',
+  pageTheme: { ...DEFAULT_PAGE_THEME },
+  themeDirty: false,
 
   addBlock: (type, index) => {
+    const activeTypes = new Set(getActivePaletteBlocks().map((b) => b.type));
+    if (!activeTypes.has(type)) return;
+
     const blocks = [...get().blocks];
     const insertAt =
       index === undefined || index < 0 || index > blocks.length ? blocks.length : index;
-    const newBlock = createBlockFromPalette(type, insertAt);
+    const newBlock = createBlockFromType(type, insertAt);
     const next = [...blocks];
     next.splice(insertAt, 0, newBlock);
     set({
@@ -53,19 +101,81 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>((set, get) =
     });
   },
 
-  removeBlock: (blockId) => {
-    const blocks = get().blocks.filter((b) => b.id !== blockId);
-    const selectedBlockId = get().selectedBlockId;
+  addSection: (blockTypes) => {
+    const activeTypes = new Set(getActivePaletteBlocks().map((b) => b.type));
+    const blocks = [...get().blocks];
+    let insertAt = blocks.length;
+    let firstId: string | null = null;
+
+    for (const type of blockTypes) {
+      if (!activeTypes.has(type)) continue;
+      const newBlock = createBlockFromType(type, insertAt);
+      blocks.splice(insertAt, 0, newBlock);
+      if (!firstId) firstId = newBlock.id;
+      insertAt += 1;
+    }
+
     set({
       blocks: normalizeSortOrder(blocks),
-      selectedBlockId: selectedBlockId === blockId ? null : selectedBlockId,
-      hoveredBlockId: get().hoveredBlockId === blockId ? null : get().hoveredBlockId,
+      selectedBlockId: firstId,
     });
   },
 
-  selectBlock: (blockId) => set({ selectedBlockId: blockId }),
+  removeBlock: (blockId) => {
+    const current = get().blocks;
+    if (!findBlockById(current, blockId)) return;
 
-  hoverBlock: (blockId) => set({ hoveredBlockId: blockId }),
+    const blocks = normalizeSortOrder(current.filter((b) => b.id !== blockId));
+    const selection = sanitizeBlockSelection(
+      blocks,
+      get().selectedBlockId,
+      get().hoveredBlockId,
+    );
+
+    set({
+      blocks,
+      ...selection,
+    });
+  },
+
+  duplicateBlock: (blockId) => {
+    const blocks = get().blocks;
+    const sourceIndex = blocks.findIndex((b) => b.id === blockId);
+    if (sourceIndex < 0) return;
+
+    const source = blocks[sourceIndex];
+    const copy: BuilderDocumentBlock = {
+      ...source,
+      id: crypto.randomUUID(),
+      propsJson: JSON.parse(JSON.stringify(source.propsJson)) as Record<string, unknown>,
+    };
+
+    const next = [...blocks];
+    next.splice(sourceIndex + 1, 0, copy);
+    set({
+      blocks: normalizeSortOrder(next),
+      selectedBlockId: copy.id,
+      hoveredBlockId: copy.id,
+    });
+  },
+
+  selectBlock: (blockId) => {
+    if (blockId === null) {
+      set({ selectedBlockId: null });
+      return;
+    }
+    const exists = findBlockById(get().blocks, blockId);
+    set({ selectedBlockId: exists ? blockId : null });
+  },
+
+  hoverBlock: (blockId) => {
+    if (blockId === null) {
+      set({ hoveredBlockId: null });
+      return;
+    }
+    const exists = findBlockById(get().blocks, blockId);
+    set({ hoveredBlockId: exists ? blockId : null });
+  },
 
   reorderBlocks: (activeId, overId) => {
     const blocks = [...get().blocks];
@@ -89,16 +199,39 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>((set, get) =
   },
 
   updateBlockProps: (blockId, patch) => {
+    if (!findBlockById(get().blocks, blockId)) return;
+
     const safe = sanitizePropsPatch(patch);
     if (Object.keys(safe).length === 0) return;
 
-    set({
-      blocks: get().blocks.map((block) =>
-        block.id === blockId
-          ? { ...block, propsJson: { ...block.propsJson, ...safe } }
-          : block,
-      ),
+    let changed = false;
+    const blocks = get().blocks.map((block) => {
+      if (block.id !== blockId) return block;
+      changed = true;
+      const merged = { ...block.propsJson, ...safe };
+      if (safe.design && typeof safe.design === 'object' && !Array.isArray(safe.design)) {
+        const prev =
+          block.propsJson.design &&
+          typeof block.propsJson.design === 'object' &&
+          !Array.isArray(block.propsJson.design)
+            ? (block.propsJson.design as Record<string, unknown>)
+            : {};
+        merged.design = { ...prev, ...(safe.design as Record<string, unknown>) };
+      }
+      if (safe.formConfig && typeof safe.formConfig === 'object' && !Array.isArray(safe.formConfig)) {
+        const prev =
+          block.propsJson.formConfig &&
+          typeof block.propsJson.formConfig === 'object' &&
+          !Array.isArray(block.propsJson.formConfig)
+            ? (block.propsJson.formConfig as Record<string, unknown>)
+            : {};
+        merged.formConfig = { ...prev, ...(safe.formConfig as Record<string, unknown>) };
+      }
+      return { ...block, propsJson: merged };
     });
+
+    if (!changed) return;
+    set({ blocks });
   },
 
   setInitialBlocks: (blocks) => {
@@ -110,11 +243,61 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>((set, get) =
     });
   },
 
+  setDeviceMode: (mode) => set({ deviceMode: mode }),
+
+  setPageTheme: (patch) =>
+    set((state) => ({
+      pageTheme: { ...state.pageTheme, ...patch },
+      themeDirty: true,
+    })),
+
+  setInitialPageTheme: (theme) =>
+    set({ pageTheme: theme, themeDirty: false }),
+
+  restoreLocalDraft: (payload) => {
+    const blocks = normalizeSortOrder([...payload.blocks]);
+    const selection = sanitizeBlockSelection(
+      blocks,
+      payload.selectedBlockId,
+      null,
+    );
+    set({
+      blocks,
+      pageTheme: payload.pageTheme,
+      themeDirty: payload.themeDirty,
+      ...selection,
+    });
+  },
+
+  buildThemeJsonPayload: () => {
+    const { pageTheme } = get();
+    return {
+      page: {
+        theme: {
+          primaryColor: pageTheme.primaryColor,
+          secondaryColor: pageTheme.secondaryColor,
+          mode: pageTheme.mode,
+          fontFamily: pageTheme.fontFamily,
+          headingScale: pageTheme.headingScale,
+          sectionSpacing: pageTheme.sectionSpacing,
+          buttonStyle: pageTheme.buttonStyle,
+        },
+        seo: {
+          title: pageTheme.seoTitle,
+          description: pageTheme.seoDescription,
+        },
+      },
+    };
+  },
+
   resetDocument: () =>
     set({
       blocks: [],
       selectedBlockId: null,
       hoveredBlockId: null,
+      deviceMode: 'desktop',
+      pageTheme: { ...DEFAULT_PAGE_THEME },
+      themeDirty: false,
     }),
 }));
 

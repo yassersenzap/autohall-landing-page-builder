@@ -4,8 +4,8 @@ import LeadsFilters, {
   type LeadsFilterValues,
 } from '../components/leads/LeadsFilters';
 import LeadsTable from '../components/leads/LeadsTable';
+import { StudioPageHeader } from '@/components/studio/StudioPageHeader';
 import { Card } from '../components/ui/Card';
-import { PageHeader } from '../components/ui/PageHeader';
 import { ApiError, logoutClient, meRequest } from '../lib/api';
 import { listCampaigns, type CampaignListItem } from '../lib/campaigns';
 import { listLandingPages, type LandingPageListItem } from '../lib/landing-pages';
@@ -22,7 +22,7 @@ function initialFilters(searchParams: URLSearchParams): LeadsFilterValues {
   return {
     search: '',
     status: '',
-    campaignId: '',
+    campaignId: searchParams.get('campaignId') ?? '',
     landingPageId: '',
     priority: '',
     assignedToUserId: '',
@@ -209,25 +209,16 @@ export default function LeadsPage() {
 
   return (
     <div className="studio-stack leads-page" data-page="leads">
-      <PageHeader
+      <StudioPageHeader
         title="Leads reçus"
-        subtitle="Soumissions issues des landing pages exportées et du formulaire public."
+        description="Soumissions issues des landing pages exportées et du formulaire public."
         backTo="/dashboard"
         backLabel="Tableau de bord"
       />
 
       {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
 
-      <Card title="Workflow suivi commercial">
-        <ol className="studio-workflow">
-          <li className="studio-workflow__item">Landing publiée</li>
-          <li className="studio-workflow__item">Leads collectés</li>
-          <li className="studio-workflow__item studio-workflow__item--active">Qualification et relances</li>
-          <li className="studio-workflow__item">Pilotage des performances</li>
-        </ol>
-      </Card>
-
-      <Card title="Filtres" padding="none">
+      <Card title="Filtres" padding="none" className="leads-filter-card">
         <LeadsFilters
         values={filters}
         campaigns={campaigns}
@@ -240,7 +231,7 @@ export default function LeadsPage() {
         />
       </Card>
 
-      <Card padding="none">
+      <Card padding="none" className="leads-results-card">
         <LeadsTable
           leads={leads}
           pagination={pagination}

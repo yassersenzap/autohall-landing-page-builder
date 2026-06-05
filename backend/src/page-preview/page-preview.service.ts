@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { buildLandingPreviewFragment } from '../landing-render/landing-document.builder';
+import { AssetRenderService } from '../page-assets/asset-render.service';
 import { PrismaService } from '../prisma/prisma.service';
 
 export type PreviewCampaign = {
@@ -64,7 +65,10 @@ export type PagePreviewData = {
 
 @Injectable()
 export class PagePreviewService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly assetRenderService: AssetRenderService,
+  ) {}
 
   async getPreview(pageVersionId: string): Promise<PagePreviewData> {
     const pageVersion = await this.prisma.pageVersion.findUnique({
@@ -91,19 +95,29 @@ export class PagePreviewService {
 
     const { landingPage, blocks, ...version } = pageVersion;
 
+    const shell = {
+      title: landingPage.title,
+      campaignName: landingPage.campaign.name,
+      brand: landingPage.campaign.brand,
+    };
+
+    const blockInputs = blocks.map((block) => ({
+      id: block.id,
+      blockType: block.blockType,
+      sortOrder: block.sortOrder,
+      propsJson: block.propsJson,
+    }));
+
+    const assetMap = await this.assetRenderService.buildAssetMapForBlocks(
+      blocks,
+      'preview',
+    );
+
     const render = buildLandingPreviewFragment({
-      shell: {
-        title: landingPage.title,
-        campaignName: landingPage.campaign.name,
-        brand: landingPage.campaign.brand,
-      },
-      blocks: blocks.map((block) => ({
-        id: block.id,
-        blockType: block.blockType,
-        sortOrder: block.sortOrder,
-        propsJson: block.propsJson,
-      })),
+      shell,
+      blocks: blockInputs,
       themeJson: version.themeJson,
+      renderContext: { mode: 'preview', assetMap },
     });
 
     return {

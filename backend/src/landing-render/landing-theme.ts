@@ -5,6 +5,9 @@ export type LandingTheme = {
   primaryColor: string;
   fontFamily: string;
   cssVariables: string;
+  sectionSpacing: 'compact' | 'normal' | 'spacious';
+  headingScale: 'compact' | 'normal' | 'large';
+  buttonStyle: 'rounded' | 'pill' | 'square';
 };
 
 const DEFAULT_PRIMARY = '#b91c1c';
@@ -67,12 +70,29 @@ export function resolveLandingTheme(
   const primaryHover = shadeHex(primaryColor, mode === 'dark' ? 24 : -18);
   const primarySoft = `${primaryColor}1f`;
 
-  const cssVariables = `--lp-primary: ${primaryColor}; --lp-primary-hover: ${primaryHover}; --lp-primary-soft: ${primarySoft}; --lp-font: ${fontFamily}, system-ui, sans-serif; --lp-display-font: ${fontFamily}, system-ui, sans-serif;`;
+  const secondaryColor = normalizeHexColor(theme.secondaryColor, '#18181b');
+  const headingScale =
+    theme.headingScale === 'compact' || theme.headingScale === 'large'
+      ? theme.headingScale
+      : 'normal';
+  const sectionSpacing =
+    theme.sectionSpacing === 'compact' || theme.sectionSpacing === 'spacious'
+      ? theme.sectionSpacing
+      : 'normal';
+  const buttonStyle =
+    theme.buttonStyle === 'rounded' || theme.buttonStyle === 'square'
+      ? theme.buttonStyle
+      : 'pill';
+
+  const cssVariables = `--lp-primary: ${primaryColor}; --lp-primary-hover: ${primaryHover}; --lp-primary-soft: ${primarySoft}; --lp-secondary: ${secondaryColor}; --lp-font: ${fontFamily}, system-ui, sans-serif; --lp-display-font: ${fontFamily}, system-ui, sans-serif; --lp-heading-scale: ${headingScale}; --lp-section-spacing: ${sectionSpacing}; --lp-button-style: ${buttonStyle};`;
 
   return {
     mode,
     primaryColor,
     fontFamily,
     cssVariables,
+    sectionSpacing,
+    headingScale,
+    buttonStyle,
   };
 }

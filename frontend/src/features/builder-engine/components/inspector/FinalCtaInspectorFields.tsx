@@ -6,6 +6,7 @@ import {
   InspectorSection,
   InspectorTextarea,
 } from './InspectorPrimitives';
+import { BlockStyleInspectorFields } from './BlockStyleInspectorFields';
 
 type FinalCtaInspectorFieldsProps = {
   blockId: string;
@@ -22,6 +23,7 @@ export function FinalCtaInspectorFields({ blockId, propsJson }: FinalCtaInspecto
           label="Titre"
           value={asPropString(propsJson.title)}
           onChange={(e) => patchString('title', e.target.value)}
+          placeholder="Ex : Prêt à passer à l’action ?"
         />
         <InspectorTextarea
           label="Sous-titre"
@@ -31,11 +33,14 @@ export function FinalCtaInspectorFields({ blockId, propsJson }: FinalCtaInspecto
         />
       </InspectorSection>
 
+      <BlockStyleInspectorFields blockId={blockId} blockType="final_cta" propsJson={propsJson} />
+
       <InspectorSection value="action" title="Appel à l'action">
         <InspectorInput
           label="Texte du bouton"
           value={asPropString(propsJson.buttonText)}
           onChange={(e) => patchString('buttonText', e.target.value)}
+          placeholder="Ex : Demander un essai"
         />
         <InspectorInput
           label="Lien du bouton"

@@ -1,5 +1,6 @@
 /**
- * Isole le rendu landing du thème Studio (dark mode, tokens shadcn, inputs globaux).
+ * Isolation thème Studio + simulation mobile canvas.
+ * Ne surcharge PAS les grilles landing : landing-page.css reste la source de vérité en mode desktop.
  */
 
 .builder-landing-preview {
@@ -7,11 +8,11 @@
   isolation: isolate;
   position: relative;
   width: 100%;
-  min-width: 0;
-  background: #fafafa;
+  min-width: 100%;
+  max-width: none;
 }
 
-/* Tokens landing forcés en clair même si html[data-studio-theme='dark'] */
+/* Tokens landing (clair) — identique à la preview publique */
 .builder-landing-preview .lp-document,
 html[data-studio-theme='dark'] .builder-landing-preview .lp-document {
   --lp-primary: #b91c1c;
@@ -38,18 +39,23 @@ html[data-studio-theme='dark'] .builder-landing-preview .lp-document {
   --lp-max-width: 72rem;
   --lp-content-width: 42rem;
 
+  width: 100%;
+  max-width: none;
+  min-width: 100%;
   color: var(--lp-text);
   background-color: var(--lp-bg);
   font-family: var(--lp-font);
   line-height: 1.6;
 }
 
-.builder-landing-preview .lp-document .lp-section {
+.builder-landing-preview .lp-page {
+  display: block;
   width: 100%;
-  max-width: var(--lp-max-width);
-  margin-inline: auto;
-  padding-inline: var(--lp-section-x);
+  min-width: 100%;
+  max-width: none;
 }
+
+/* .lp-section conserve ses règles natives (max-width + padding) via landing-page.css */
 
 .builder-landing-preview .lp-document h1,
 .builder-landing-preview .lp-document h2,
@@ -81,4 +87,102 @@ html[data-studio-theme='dark'] .builder-landing-preview .lp-document {
 
 .builder-landing-preview .lp-document .lp-btn {
   color: inherit;
+}
+
+/* Conteneurs canvas : pass-through, pas de corset flex/min-w-0 */
+.builder-sortable-block,
+.builder-canvas-block {
+  display: block;
+  width: 100%;
+  min-width: 100%;
+  max-width: none;
+}
+
+/* Typo / grilles premium hors mode canvas (le canvas utilise builder-canvas.css + @container) */
+.builder-landing-preview:not(.is-canvas-edit)[data-canvas-device='desktop'] .builder-hero-premium__title {
+  font-size: clamp(2.75rem, 5vw, 4.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+
+.builder-landing-preview:not(.is-canvas-edit)[data-canvas-device='mobile'] .builder-hero-premium__title {
+  font-size: 2.25rem;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.builder-landing-preview:not(.is-canvas-edit)[data-canvas-device='desktop'] .builder-hero-premium__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+}
+
+.builder-landing-preview:not(.is-canvas-edit)[data-canvas-device='desktop']
+  .builder-hero-premium__layout--media-left
+  > :first-child {
+  order: 2;
+}
+
+.builder-landing-preview:not(.is-canvas-edit)[data-canvas-device='desktop']
+  .builder-hero-premium__layout--media-left
+  > :last-child {
+  order: 1;
+}
+
+.builder-landing-preview:not(.is-canvas-edit)[data-canvas-device='desktop'] .builder-features-premium__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  align-items: center;
+}
+
+.builder-landing-preview:not(.is-canvas-edit)[data-canvas-device='desktop']
+  .builder-features-premium__layout--media-left {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+}
+
+/* Simulation iPhone : une colonne pour grilles landing + premium */
+.builder-landing-preview[data-canvas-device='mobile'] .builder-hero-premium__layout,
+.builder-landing-preview[data-canvas-device='mobile'] .builder-features-premium__layout,
+.builder-landing-preview[data-canvas-device='mobile'] .lp-hero__inner,
+.builder-landing-preview[data-canvas-device='mobile'] .lp-showcase,
+.builder-landing-preview[data-canvas-device='mobile'] .lp-lead-form__layout {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 1.5rem;
+}
+
+.builder-landing-preview[data-canvas-device='mobile'] .lp-hero__content,
+.builder-landing-preview[data-canvas-device='mobile'] .lp-hero__media,
+.builder-landing-preview[data-canvas-device='mobile'] .lp-showcase__media,
+.builder-landing-preview[data-canvas-device='mobile'] .lp-showcase__copy,
+.builder-landing-preview[data-canvas-device='mobile'] .builder-hero-premium__layout--media-left > *,
+.builder-landing-preview[data-canvas-device='mobile'] .builder-features-premium__layout--media-left > * {
+  order: unset !important;
+}
+
+.builder-landing-preview[data-canvas-device='mobile'] .builder-features-premium__vehicle,
+.builder-landing-preview[data-canvas-device='mobile'] .builder-hero-premium__vehicle {
+  transform: none !important;
+  max-width: 100%;
+}
+
+/* Thèmes de fond par bloc (inspecteur Design) */
+.builder-landing-preview [data-block-theme='neutral'] {
+  --lp-bg: #f4f4f5;
+  --lp-surface: #ffffff;
+  --lp-surface-muted: #e4e4e7;
+  background-color: var(--lp-bg);
+}
+
+.builder-landing-preview [data-block-theme='dark'] {
+  --lp-bg: #09090b;
+  --lp-surface: #18181b;
+  --lp-surface-elevated: #1f1f23;
+  --lp-surface-muted: #27272a;
+  --lp-text: #fafafa;
+  --lp-text-muted: #a1a1aa;
+  --lp-border: rgba(250, 250, 250, 0.12);
+  --lp-primary-soft: rgba(220, 38, 38, 0.18);
+  background-color: var(--lp-bg);
+  color: var(--lp-text);
 }

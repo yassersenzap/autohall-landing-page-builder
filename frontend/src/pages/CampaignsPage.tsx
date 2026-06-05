@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LayoutGrid, RefreshCw } from 'lucide-react';
-import { campaignsTableColumns } from '@/components/campaigns/campaigns-table-columns';
+import { createCampaignsTableColumns } from '@/components/campaigns/campaigns-table-columns';
+import { useStudioSession } from '@/hooks/useStudioSession';
 import { CreateCampaignPanel } from '@/components/campaigns/CreateCampaignPanel';
 import { StudioPageHeader } from '@/components/studio/StudioPageHeader';
 import { DataTable } from '@/components/ui/data-table';
@@ -23,6 +24,8 @@ import {
 
 export default function CampaignsPage() {
   const navigate = useNavigate();
+  const studioSession = useStudioSession();
+  const columns = createCampaignsTableColumns(studioSession);
   const [campaigns, setCampaigns] = useState<CampaignListItem[]>([]);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -64,7 +67,7 @@ export default function CampaignsPage() {
   const draftCount = campaigns.filter((c) => c.status === 'DRAFT').length;
 
   return (
-    <div className="space-y-8 font-sans">
+    <div className="studio-stack font-sans">
       <StudioPageHeader
         title="Campagnes"
         description="Gérez vos campagnes marketing, marques et landing pages associées."
@@ -104,7 +107,7 @@ export default function CampaignsPage() {
 
       {canWrite ? <CreateCampaignPanel onCreated={() => void loadData()} /> : null}
 
-      <Card>
+      <Card className="campaigns-table-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <LayoutGrid className="h-4 w-4 text-muted-foreground" />
@@ -119,7 +122,7 @@ export default function CampaignsPage() {
             <p className="py-12 text-center text-sm text-muted-foreground">Chargement…</p>
           ) : (
             <DataTable
-              columns={campaignsTableColumns}
+              columns={columns}
               data={campaigns}
               searchColumnId="name"
               searchPlaceholder="Rechercher une campagne…"

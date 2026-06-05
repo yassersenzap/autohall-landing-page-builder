@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { buildLandingDocumentHtml } from '../landing-render/landing-document.builder';
+import type { LandingRenderContext } from '../landing-render/render-asset.types';
 import { getLandingPageStylesheet } from '../landing-render/landing-styles';
 
 export type ExportBlock = {
@@ -30,6 +31,7 @@ export function buildIndexHtml(
   context: ExportPageContext,
   blocks: ExportBlock[],
   themeJson: Prisma.JsonValue | null = null,
+  renderContext?: LandingRenderContext,
 ): string {
   return buildLandingDocumentHtml({
     shell: context,
@@ -37,12 +39,13 @@ export function buildIndexHtml(
     themeJson,
     includeScripts: true,
     stylesheetHref: 'assets/style.css',
+    renderContext,
   });
 }
 
 export const STATIC_STYLE_CSS = getLandingPageStylesheet();
 
-export const STATIC_MAIN_JS = `document.addEventListener('DOMContentLoaded', function () {
+export const STATIC_LEAD_FORM_JS = `document.addEventListener('DOMContentLoaded', function () {
   console.log('[AutoHall] Landing page statique chargée');
 
   var config = window.LANDING_CONFIG || {};
@@ -82,10 +85,21 @@ export const STATIC_MAIN_JS = `document.addEventListener('DOMContentLoaded', fun
       }
 
       var fields = collectFormFields(form);
-      var fullName = fields.fullName || fields.name || '';
-      var phone = fields.phone || '';
+      var firstName = (fields.firstName || '').trim();
+      var lastName = (fields.lastName || '').trim();
+      var fullName = (fields.fullName || '').trim();
+      if (!fullName && (firstName || lastName)) {
+        fullName = (firstName + ' ' + lastName).trim();
+      }
+      var phone = (fields.phone || '').trim();
+      var consent = form.querySelector('input[name="consent"]');
 
-      if (!fullName.trim() || !phone.trim()) {
+      if (consent && !consent.checked) {
+        showFeedback(form, 'Veuillez accepter le traitement de vos données personnelles.', 'error');
+        return;
+      }
+
+      if (!fullName || !phone) {
         showFeedback(form, 'Nom et téléphone sont obligatoires.', 'error');
         return;
       }
@@ -103,6 +117,8 @@ export const STATIC_MAIN_JS = `document.addEventListener('DOMContentLoaded', fun
         phone: phone.trim(),
         email: fields.email || undefined,
         vehicleModel: fields.vehicleModel || undefined,
+        city: fields.city || undefined,
+        message: fields.message || undefined,
         sourceUrl: window.location.href,
         rawPayload: fields,
         metadata: {
@@ -150,6 +166,9 @@ export const STATIC_MAIN_JS = `document.addEventListener('DOMContentLoaded', fun
   });
 });
 `;
+
+/** @deprecated Alias — préférer STATIC_LEAD_FORM_JS pour les exports studio. */
+export const STATIC_MAIN_JS = STATIC_LEAD_FORM_JS;
 
 export function buildExportFilename(slug: string, versionNumber: number): string {
   const safeSlug = slug

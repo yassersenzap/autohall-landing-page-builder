@@ -25,6 +25,11 @@ function formatDate(value: string): string {
   });
 }
 
+function truncateText(value: string, max = 42): string {
+  if (value.length <= max) return value;
+  return `${value.slice(0, max - 1)}…`;
+}
+
 export default function LeadsTable({
   leads,
   pagination,
@@ -64,8 +69,8 @@ export default function LeadsTable({
               <th>Assigné</th>
               <th>Relance</th>
               <th>Statut</th>
-              <th>Source</th>
-              <th aria-label="Actions" />
+              <th className="leads-table__col-source">Source</th>
+              <th className="leads-table__col-actions" aria-label="Actions" />
             </tr>
           </thead>
           <tbody>
@@ -112,8 +117,8 @@ export default function LeadsTable({
                 <td>
                   <StatusBadge status={lead.status} />
                 </td>
-                <td className="leads-table__source" title={lead.sourceUrl}>
-                  {lead.sourceUrl}
+                <td className="leads-table__source leads-table__col-source" title={lead.sourceUrl}>
+                  {truncateText(lead.sourceUrl)}
                 </td>
                 <td className="leads-table__actions">
                   <Link

@@ -1,0 +1,116 @@
+/* Auto Hall Studio OS — hiérarchie typographique */
+
+.ah-page-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 2vw, 1.75rem);
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  color: var(--color-text);
+}
+
+.ah-section-title {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-soft);
+}
+
+.ah-card-title {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+}
+
+.ah-body {
+  font-size: var(--studio-text-base);
+  line-height: 1.55;
+  color: var(--color-text);
+}
+
+.ah-muted {
+  font-size: var(--studio-text-sm);
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.ah-label {
+  font-size: var(--studio-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-text-muted);
+}
+
+.ah-caption {
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  color: var(--color-text-soft);
+}
+
+.ah-table-text {
+  font-size: var(--studio-text-sm);
+  line-height: 1.45;
+  color: var(--color-text);
+}
+
+.ah-studio-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--studio-editor-text-muted);
+}
+
+/* Light — hiérarchie typographique produit */
+html[data-studio-theme='light'] .ah-page-title {
+  font-size: clamp(1.5rem, 2.2vw, 1.875rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.12;
+  color: var(--color-text);
+}
+
+html[data-studio-theme='light'] .ah-section-title {
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
+}
+
+html[data-studio-theme='light'] .ah-card-title {
+  font-size: 0.9375rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  color: var(--color-text);
+}
+
+html[data-studio-theme='light'] .ah-muted {
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+html[data-studio-theme='light'] .ah-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--color-text-secondary);
+}
+
+html[data-studio-theme='light'] .ah-caption {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+html[data-studio-theme='light'] .ui-page-header__title {
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+html[data-studio-theme='light'] .ui-page-header__subtitle {
+  color: var(--color-text-muted);
+}

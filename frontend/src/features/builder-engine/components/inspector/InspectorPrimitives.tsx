@@ -5,7 +5,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/primitives/accordion';
-import { ShadInput, ShadTextarea } from '@/components/ui/primitives';
+import { ShadInput, ShadTextarea, Label } from '@/components/ui/primitives';
 import { cn } from '@/lib/utils';
 
 const inputCompact =
@@ -62,6 +62,46 @@ export function InspectorInput({
       className={cn(inputCompact, className)}
       {...props}
     />
+  );
+}
+
+export function InspectorFieldLabel({ children }: { children: ReactNode }) {
+  return <p className="text-xs font-medium text-muted-foreground">{children}</p>;
+}
+
+export function InspectorSelect({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  const selectId = label.replace(/\s+/g, '-').toLowerCase();
+
+  return (
+    <div className="grid gap-1.5">
+      <Label htmlFor={selectId}>{label}</Label>
+      <select
+        id={selectId}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={cn(
+          inputCompact,
+          'w-full rounded-md border border-input bg-background px-3 py-1.5',
+          'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+        )}
+      >
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 }
 

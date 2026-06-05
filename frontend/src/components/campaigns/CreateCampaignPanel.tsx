@@ -49,7 +49,7 @@ export function CreateCampaignPanel({ onCreated }: CreateCampaignPanelProps) {
   }
 
   return (
-    <Card>
+    <Card className="campaign-create-card">
       <CardHeader>
         <CardTitle>Nouvelle campagne</CardTitle>
         <CardDescription>

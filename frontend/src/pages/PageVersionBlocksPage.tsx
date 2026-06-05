@@ -1,21 +1,44 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Sparkles } from 'lucide-react';
 import '@landing-styles';
 import { StudioToast } from '@/components/ui/StudioToast';
 import { useStudioToast } from '@/components/ui/use-studio-toast';
+import { DraftRestoreDialog } from '@/features/builder-engine/components/DraftRestoreDialog';
 import { BuilderEditorProvider } from '@/features/builder-engine/context/BuilderEditorContext';
+import { BuilderWorkspaceControls } from '@/features/builder-engine/components/BuilderWorkspaceControls';
 import { BuilderTriptychLayout } from '@/features/builder-engine/components/BuilderTriptychLayout';
+import { WorkspaceUiProvider } from '@/features/builder-engine/context/WorkspaceUiContext';
+import { BuilderWorkspaceLayout } from '@/features/builder-engine/components/BuilderWorkspaceLayout';
 import { apiBlocksToBuilderBlocks } from '@/features/builder-engine/lib/api-block-mapper';
+import {
+  clearLocalDraft,
+  readLocalDraft,
+  shouldOfferLocalDraftRestore,
+  writeLocalDraft,
+  type BuilderLocalDraft,
+} from '@/features/builder-engine/lib/builder-local-draft';
+import { isBuilderDocumentDirty } from '@/features/builder-engine/lib/compare-builder-document';
 import { persistBuilderDocument } from '@/features/builder-engine/lib/persist-builder-document';
+import { useBeforeUnload } from '@/features/builder-engine/lib/use-before-unload';
 import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
-import { StudioTopBar } from '@/features/editor/components/StudioTopBar';
+import {
+  StudioTopBar,
+  type BuilderSaveStatus,
+} from '@/features/editor/components/StudioTopBar';
 import { usePageEditor } from '@/features/editor/hooks/usePageEditor';
-import type { EditorDeviceMode, EditorPageBlock } from '@/features/editor/types/editor.types';
+import type { EditorPageBlock } from '@/features/editor/types/editor.types';
+import { parsePageThemeFromJson } from '@/features/builder-engine/lib/page-theme';
+import {
+  getCriticalPageReadinessIssues,
+  getPageReadinessIssues,
+} from '@/features/builder-engine/lib/page-readiness';
 import { downloadPageVersionExport } from '@/lib/page-export';
-import { publishPageVersion } from '@/lib/page-versions';
+import { fetchPageVersion, publishPageVersion, updatePageVersion } from '@/lib/page-versions';
 import { ApiError } from '@/lib/api';
 
 const LAST_DRAFT_STORAGE_KEY = 'autohall-studio-last-draft';
+const LOCAL_DRAFT_DEBOUNCE_MS = 500;
 
 type LocationState = {
   versionNumber?: number;
@@ -27,6 +50,7 @@ type LocationState = {
   campaignName?: string;
 };
 
+/** @deprecated Archivé — le builder blocs V1 n’est plus exposé. Voir `archive/builder-v1-block-editor`. */
 export default function PageVersionBlocksPage() {
   const { pageVersionId } = useParams<{ pageVersionId: string }>();
   const navigate = useNavigate();
@@ -36,14 +60,24 @@ export default function PageVersionBlocksPage() {
   const [publishing, setPublishing] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [deviceMode, setDeviceMode] = useState<EditorDeviceMode>('desktop');
+  const [saveError, setSaveError] = useState(false);
   const [versionStatus, setVersionStatus] = useState<string | undefined>(state.versionStatus);
+  const [pendingDraft, setPendingDraft] = useState<BuilderLocalDraft | null>(null);
 
   const baselineRef = useRef<EditorPageBlock[]>([]);
+  const draftPromptCheckedRef = useRef(false);
 
   const setInitialBlocks = useBuilderDocumentStore((s) => s.setInitialBlocks);
+  const setInitialPageTheme = useBuilderDocumentStore((s) => s.setInitialPageTheme);
+  const restoreLocalDraft = useBuilderDocumentStore((s) => s.restoreLocalDraft);
+  const buildThemeJsonPayload = useBuilderDocumentStore((s) => s.buildThemeJsonPayload);
+  const themeDirty = useBuilderDocumentStore((s) => s.themeDirty);
+  const pageTheme = useBuilderDocumentStore((s) => s.pageTheme);
+  const selectedBlockId = useBuilderDocumentStore((s) => s.selectedBlockId);
   const resetDocument = useBuilderDocumentStore((s) => s.resetDocument);
   const documentBlocks = useBuilderDocumentStore((s) => s.blocks);
+  const deviceMode = useBuilderDocumentStore((s) => s.deviceMode);
+  const setDeviceMode = useBuilderDocumentStore((s) => s.setDeviceMode);
 
   const { toast, showSuccess, showError, dismiss } = useStudioToast();
 
@@ -61,10 +95,9 @@ export default function PageVersionBlocksPage() {
       : { to: '/campaigns', state: undefined, label: 'Campagnes' };
 
   useEffect(() => {
-    document.documentElement.classList.add('lpb-studio-active');
     return () => {
-      document.documentElement.classList.remove('lpb-studio-active');
       resetDocument();
+      draftPromptCheckedRef.current = false;
     };
   }, [resetDocument]);
 
@@ -91,6 +124,30 @@ export default function PageVersionBlocksPage() {
 
   const canEditDocument =
     status.canWrite && versionStatus !== 'PUBLISHED' && !status.loading;
+
+  const isDocumentDirty = useMemo(() => {
+    const sorted = [...apiBlocks].sort((a, b) => a.sortOrder - b.sortOrder);
+    return isBuilderDocumentDirty(documentBlocks, sorted, themeDirty);
+  }, [apiBlocks, documentBlocks, themeDirty]);
+
+  const saveStatus: BuilderSaveStatus = isSaving
+    ? 'saving'
+    : saveError
+      ? 'error'
+      : isDocumentDirty
+        ? 'dirty'
+        : 'saved';
+
+  useBeforeUnload(canEditDocument && isDocumentDirty);
+
+  const previewState = {
+    versionNumber: state.versionNumber,
+    versionLabel: state.versionLabel,
+    landingPageId: state.landingPageId,
+    landingPageTitle: state.landingPageTitle,
+    campaignId: state.campaignId,
+    campaignName: state.campaignName,
+  };
 
   useEffect(() => {
     try {
@@ -119,34 +176,167 @@ export default function PageVersionBlocksPage() {
     }));
 
     setInitialBlocks(apiBlocksToBuilderBlocks(sorted));
-  }, [apiBlocks, setInitialBlocks, status.loading]);
 
-  async function handleSave() {
-    if (!canEditDocument) return;
+    if (!draftPromptCheckedRef.current) {
+      draftPromptCheckedRef.current = true;
+      const draft = readLocalDraft(pageVersionIdValue);
+      if (draft && shouldOfferLocalDraftRestore(draft, sorted)) {
+        setPendingDraft(draft);
+      } else if (draft) {
+        clearLocalDraft(pageVersionIdValue);
+      }
+    }
+  }, [apiBlocks, pageVersionIdValue, setInitialBlocks, status.loading]);
+
+  useEffect(() => {
+    if (!state.landingPageId || status.loading) return;
+
+    void fetchPageVersion(state.landingPageId, pageVersionIdValue)
+      .then((response) => {
+        setInitialPageTheme(parsePageThemeFromJson(response.data.themeJson));
+      })
+      .catch(() => {
+        // Thème optionnel
+      });
+  }, [
+    pageVersionIdValue,
+    setInitialPageTheme,
+    state.landingPageId,
+    status.loading,
+  ]);
+
+  useEffect(() => {
+    if (!canEditDocument || !isDocumentDirty) return;
+
+    const timer = window.setTimeout(() => {
+      writeLocalDraft({
+        version: 1,
+        pageVersionId: pageVersionIdValue,
+        updatedAt: Date.now(),
+        blocks: documentBlocks.map((block) => ({
+          ...block,
+          propsJson: { ...block.propsJson },
+        })),
+        pageTheme: { ...pageTheme },
+        themeDirty,
+        selectedBlockId,
+      });
+    }, LOCAL_DRAFT_DEBOUNCE_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [
+    canEditDocument,
+    documentBlocks,
+    isDocumentDirty,
+    pageTheme,
+    pageVersionIdValue,
+    selectedBlockId,
+    themeDirty,
+  ]);
+
+  useEffect(() => {
+    if (isDocumentDirty) {
+      setSaveError(false);
+    }
+  }, [isDocumentDirty]);
+
+  async function handleSave(): Promise<boolean> {
+    if (!canEditDocument) return false;
 
     setIsSaving(true);
+    setSaveError(false);
     try {
       await persistBuilderDocument(
         pageVersionIdValue,
         documentBlocks,
         baselineRef.current,
       );
+      if (themeDirty && state.landingPageId) {
+        await updatePageVersion(state.landingPageId, pageVersionIdValue, {
+          themeJson: buildThemeJsonPayload(),
+        });
+      }
+      clearLocalDraft(pageVersionIdValue);
       await load();
-      showSuccess('Landing sauvegardée.');
+      showSuccess('Landing enregistrée.');
+      return true;
     } catch (err) {
+      setSaveError(true);
       const message =
         err instanceof ApiError
           ? err.message
           : err instanceof Error
             ? err.message
-            : 'Échec de la sauvegarde.';
+            : 'Échec de l’enregistrement.';
       showError(message);
+      return false;
     } finally {
       setIsSaving(false);
     }
   }
 
+  function requireSavedDocument(actionLabel: string): boolean {
+    if (!isDocumentDirty) return true;
+    showError(
+      `${actionLabel} : enregistrez vos modifications pour synchroniser l’aperçu et l’export.`,
+    );
+    return false;
+  }
+
+  function handlePreview() {
+    if (!requireSavedDocument('Aperçu')) return;
+    navigate(`/page-versions/${pageVersionIdValue}/preview`, { state: previewState });
+  }
+
+  async function handleSaveAndPreview() {
+    const saved = await handleSave();
+    if (!saved) return;
+    navigate(`/page-versions/${pageVersionIdValue}/preview`, { state: previewState });
+  }
+
+  function handleRestoreDraft() {
+    if (!pendingDraft) return;
+    restoreLocalDraft({
+      blocks: pendingDraft.blocks,
+      pageTheme: pendingDraft.pageTheme,
+      themeDirty: pendingDraft.themeDirty,
+      selectedBlockId: pendingDraft.selectedBlockId,
+    });
+    setPendingDraft(null);
+    showSuccess('Brouillon local restauré. Pensez à enregistrer.');
+  }
+
+  function handleIgnoreDraft() {
+    clearLocalDraft(pageVersionIdValue);
+    setPendingDraft(null);
+  }
+
+  function handleReloadFromServer() {
+    if (isDocumentDirty) {
+      const confirmed = window.confirm(
+        'Recharger depuis le serveur ? Les modifications non enregistrées seront perdues.',
+      );
+      if (!confirmed) return;
+    }
+    clearLocalDraft(pageVersionIdValue);
+    draftPromptCheckedRef.current = false;
+    void load();
+  }
+
   async function handlePublish() {
+    if (!requireSavedDocument('Publication')) return;
+
+    const doc = useBuilderDocumentStore.getState();
+    const critical = getCriticalPageReadinessIssues(
+      getPageReadinessIssues(doc.blocks, doc.pageTheme),
+    );
+    if (critical.length > 0) {
+      showError(
+        `Publication impossible : ${critical.map((issue) => issue.message).join(' ')}`,
+      );
+      return;
+    }
+
     setPublishing(true);
     try {
       await publishPageVersion(pageVersionIdValue);
@@ -161,6 +351,18 @@ export default function PageVersionBlocksPage() {
   }
 
   async function handleExport() {
+    if (!requireSavedDocument('Export')) return;
+
+    const doc = useBuilderDocumentStore.getState();
+    const critical = getCriticalPageReadinessIssues(
+      getPageReadinessIssues(doc.blocks, doc.pageTheme),
+    );
+    if (critical.length > 0) {
+      showError(
+        `Export : contenu incomplet — ${critical.map((issue) => issue.message).join(' ')}`,
+      );
+    }
+
     setExporting(true);
     try {
       await downloadPageVersionExport(
@@ -176,53 +378,68 @@ export default function PageVersionBlocksPage() {
   }
 
   return (
-    <BuilderEditorProvider canWrite={canEditDocument}>
-      <div className="flex h-[calc(100vh-var(--studio-topbar-height,3.25rem))] min-h-0 flex-col overflow-hidden lg:h-[calc(100vh-3.25rem)]">
-        <StudioTopBar
-          campaignName={state.campaignName}
-          landingTitle={state.landingPageTitle}
-          versionLabel={versionTitle}
-          status={versionStatus}
-          canWrite={status.canWrite}
-          publishing={publishing}
-          exporting={exporting}
-          deviceMode={deviceMode}
-          previewTo={`/page-versions/${pageVersionIdValue}/preview`}
-          previewState={{
-            versionNumber: state.versionNumber,
-            versionLabel: state.versionLabel,
-            landingPageId: state.landingPageId,
-            landingPageTitle: state.landingPageTitle,
-            campaignId: state.campaignId,
-            campaignName: state.campaignName,
-          }}
-          onDeviceModeChange={setDeviceMode}
-          onRefresh={() => void load()}
-          onSave={() => void handleSave()}
-          isSaving={isSaving}
-          onPublish={() => void handlePublish()}
-          onExport={() => void handleExport()}
-          backTo={versionsBackLink.to}
-          backLabel={versionsBackLink.label}
-          backState={versionsBackLink.state}
-        />
-
-        {status.error ? (
-          <p className="shrink-0 border-b border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive">
-            {status.error}
+    <BuilderEditorProvider
+      canWrite={canEditDocument}
+      pageVersionId={pageVersionIdValue}
+      landingPageId={state.landingPageId ?? null}
+    >
+      <WorkspaceUiProvider>
+      <BuilderWorkspaceLayout
+        topbar={
+          <StudioTopBar
+            workspaceToolbar={
+              <>
+                <BuilderWorkspaceControls />
+                <Link
+                  to={`/page-versions/${pageVersionIdValue}/studio-v2`}
+                  className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/5 px-2 py-1 text-[0.65rem] font-medium text-primary hover:bg-primary/10"
+                  title="Éditeur visuel V2 (Puck) — document séparé du builder blocs"
+                >
+                  <Sparkles className="h-3 w-3" aria-hidden />
+                  Studio V2
+                </Link>
+              </>
+            }
+            campaignName={state.campaignName}
+            landingTitle={state.landingPageTitle}
+            versionLabel={versionTitle}
+            status={versionStatus}
+            canWrite={status.canWrite}
+            publishing={publishing}
+            exporting={exporting}
+            deviceMode={deviceMode}
+            saveStatus={canEditDocument ? saveStatus : 'saved'}
+            onDeviceModeChange={setDeviceMode}
+            onRefresh={handleReloadFromServer}
+            onSave={() => void handleSave()}
+            onSaveAndPreview={() => void handleSaveAndPreview()}
+            onPreview={handlePreview}
+            onPublish={() => void handlePublish()}
+            onExport={() => void handleExport()}
+            backTo={versionsBackLink.to}
+            backLabel={versionsBackLink.label}
+            backState={versionsBackLink.state}
+          />
+        }
+        banner={status.error ? status.error : undefined}
+      >
+        {status.loading ? (
+          <p className="flex h-full items-center justify-center text-sm text-muted-foreground">
+            Chargement des sections…
           </p>
-        ) : null}
+        ) : (
+          <BuilderTriptychLayout />
+        )}
+      </BuilderWorkspaceLayout>
+      </WorkspaceUiProvider>
 
-        <div className="relative min-h-0 flex-1">
-          {status.loading ? (
-            <p className="flex h-full items-center justify-center text-sm text-muted-foreground">
-              Chargement des sections…
-            </p>
-          ) : (
-            <BuilderTriptychLayout />
-          )}
-        </div>
-      </div>
+      {pendingDraft ? (
+        <DraftRestoreDialog
+          updatedAt={pendingDraft.updatedAt}
+          onRestore={handleRestoreDraft}
+          onIgnore={handleIgnoreDraft}
+        />
+      ) : null}
 
       <StudioToast toast={toast} onDismiss={dismiss} />
     </BuilderEditorProvider>

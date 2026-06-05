@@ -183,6 +183,7 @@ model PageVersion {
   createdBy   User        @relation("PageVersionCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
   blocks      PageBlock[]
   form        Form?
+  studioDocument PageVersionStudioDocument?
 
   @@unique([landingPageId, versionNumber])
   @@index([landingPageId])
@@ -208,6 +209,21 @@ model PageBlock {
   @@index([pageVersionId])
   @@index([pageVersionId, sortOrder])
   @@map("page_blocks")
+}
+
+/// Document Visual Studio V2 (Puck) — séparé du pipeline page_blocks V1.
+model PageVersionStudioDocument {
+  id            String   @id @default(uuid()) @db.Uuid
+  pageVersionId String   @unique @map("page_version_id") @db.Uuid
+  engine        String   @default("puck") @db.VarChar(40)
+  documentJson  Json     @map("document_json")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  pageVersion PageVersion @relation(fields: [pageVersionId], references: [id], onDelete: Cascade)
+
+  @@index([pageVersionId])
+  @@map("page_version_studio_documents")
 }
 
 // ---------------------------------------------------------------------------

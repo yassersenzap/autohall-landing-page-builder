@@ -1,0 +1,304 @@
+/**
+ * Canvas d’édition — document fluide, fond clair, pas de crop par scale auto.
+ */
+
+.builder-canvas-area {
+  width: 100%;
+  max-width: none;
+}
+
+.builder-canvas-viewport {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
+  background-color: #ececef;
+  background-image: radial-gradient(
+    circle at 50% 0%,
+    hsl(var(--foreground) / 0.03),
+    transparent 55%
+  );
+}
+
+.builder-canvas-stage {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
+
+.builder-canvas-scaler {
+  box-sizing: border-box;
+}
+
+.builder-canvas-frame {
+  box-sizing: border-box;
+}
+
+.builder-canvas-zoom-host {
+  box-sizing: border-box;
+}
+
+.builder-canvas-area[data-focus-mode='true'] .builder-canvas-viewport {
+  background-image: radial-gradient(
+    circle at 50% 20%,
+    hsl(var(--primary) / 0.06),
+    transparent 50%
+  );
+}
+
+.builder-canvas-device-document {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+/* Container queries : layout selon largeur du document, pas du viewport */
+.builder-landing-preview.is-canvas-edit .lp-document,
+.builder-landing-preview.is-canvas-edit .lp-page {
+  container-type: inline-size;
+  container-name: canvas-device;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.builder-landing-preview.is-canvas-edit .builder-canvas-block,
+.builder-landing-preview.is-canvas-edit .builder-sortable-block,
+.builder-landing-preview.is-canvas-edit .lp-block,
+.builder-landing-preview.is-canvas-edit .lp-section {
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.builder-landing-preview.is-canvas-edit .builder-block-chrome {
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Hero — lp-hero (renderer backend) */
+.builder-landing-preview.is-canvas-edit .lp-hero-form-campaign {
+  overflow-x: clip;
+}
+
+.builder-landing-preview.is-canvas-edit .lp-hero-form-campaign__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+@container canvas-device (min-width: 640px) {
+  .builder-landing-preview.is-canvas-edit[data-canvas-device='desktop']
+    .lp-hero-form-campaign__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2rem;
+  }
+}
+
+.builder-landing-preview.is-canvas-edit .lp-hero {
+  overflow-x: clip;
+}
+
+.builder-landing-preview.is-canvas-edit .lp-hero__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+@container canvas-device (min-width: 640px) {
+  .builder-landing-preview.is-canvas-edit[data-canvas-device='desktop']
+    .lp-hero--layout-split_image_right
+    .lp-hero__inner,
+  .builder-landing-preview.is-canvas-edit[data-canvas-device='desktop']
+    .lp-hero--layout-split_image_left
+    .lp-hero__inner {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .builder-landing-preview.is-canvas-edit[data-canvas-device='desktop']
+    .lp-hero--layout-split_image_left
+    .lp-hero__media {
+    order: -1;
+  }
+}
+
+.builder-landing-preview.is-canvas-edit .lp-hero__content,
+.builder-landing-preview.is-canvas-edit .lp-hero__media {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.builder-landing-preview.is-canvas-edit .builder-hero-premium {
+  overflow-x: clip;
+}
+
+.builder-landing-preview.is-canvas-edit .lp-showcase {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+@container canvas-device (min-width: 640px) {
+  .builder-landing-preview.is-canvas-edit[data-canvas-device='desktop'] .lp-showcase {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .builder-landing-preview.is-canvas-edit[data-canvas-device='desktop']
+    .lp-showcase--media-left
+    .lp-showcase__media {
+    order: -1;
+  }
+}
+
+.builder-landing-preview.is-canvas-edit .lp-vehicle-range__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+
+@container canvas-device (min-width: 560px) {
+  .builder-landing-preview.is-canvas-edit[data-canvas-device='desktop'] .lp-vehicle-range__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container canvas-device (min-width: 800px) {
+  .builder-landing-preview.is-canvas-edit[data-canvas-device='desktop'] .lp-vehicle-range__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.builder-landing-preview.is-canvas-edit .builder-hero-premium__title {
+  font-size: clamp(1.5rem, 4cqi, 2.75rem) !important;
+  line-height: 1.1 !important;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.builder-landing-preview.is-canvas-edit .builder-hero-premium__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  min-width: 0;
+}
+
+@container canvas-device (min-width: 640px) {
+  .builder-landing-preview.is-canvas-edit[data-canvas-device='desktop'] .builder-hero-premium__layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2rem;
+  }
+
+  .builder-landing-preview.is-canvas-edit[data-canvas-device='desktop']
+    .builder-hero-premium__layout--media-left
+    > :first-child {
+    order: 2;
+  }
+
+  .builder-landing-preview.is-canvas-edit[data-canvas-device='desktop']
+    .builder-hero-premium__layout--media-left
+    > :last-child {
+    order: 1;
+  }
+}
+
+.builder-landing-preview.is-canvas-edit .builder-hero-premium__layout > * {
+  min-width: 0;
+}
+
+.builder-landing-preview.is-canvas-edit .builder-hero-premium__vehicle {
+  max-width: 100% !important;
+  max-height: min(42vh, 360px) !important;
+  transform: none !important;
+}
+
+/* Formulaire */
+.builder-landing-preview.is-canvas-edit .lp-lead-form {
+  overflow-x: clip;
+}
+
+.builder-landing-preview.is-canvas-edit .lp-lead-form__layout {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+@container canvas-device (min-width: 720px) {
+  .builder-landing-preview.is-canvas-edit[data-canvas-device='desktop'] .lp-lead-form__layout {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr) !important;
+    gap: 2rem;
+  }
+}
+
+.builder-landing-preview.is-canvas-edit .lp-lead-form__aside,
+.builder-landing-preview.is-canvas-edit .lp-lead-form__card,
+.builder-landing-preview.is-canvas-edit .lp-lead-form__form,
+.builder-landing-preview.is-canvas-edit .lp-lead-form__grid {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.builder-landing-preview.is-canvas-edit .lp-lead-form__grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@container canvas-device (min-width: 480px) {
+  .builder-landing-preview.is-canvas-edit .lp-lead-form__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .builder-landing-preview.is-canvas-edit .lp-lead-form__field--full {
+    grid-column: 1 / -1;
+  }
+}
+
+.builder-landing-preview.is-canvas-edit .lp-lead-form__submit {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+/* Features */
+.builder-landing-preview.is-canvas-edit .builder-features-premium__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+}
+
+@container canvas-device (min-width: 640px) {
+  .builder-landing-preview.is-canvas-edit[data-canvas-device='desktop'] .builder-features-premium__layout {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  }
+}
+
+.builder-landing-preview.is-canvas-edit .builder-features-premium__vehicle {
+  max-width: 100% !important;
+  transform: none !important;
+}
+
+/* Sélection */
+.builder-sortable-block[data-selected='true'] > .builder-block-chrome {
+  box-shadow: inset 0 0 0 2px rgb(59 130 246 / 0.75);
+}
+
+.builder-block-selection-badge {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.builder-sortable-block:hover .builder-block-selection-badge,
+.builder-sortable-block[data-selected='true'] .builder-block-selection-badge {
+  opacity: 1;
+}

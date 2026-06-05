@@ -6,6 +6,7 @@ import {
   InspectorTextarea,
 } from './InspectorPrimitives';
 import { InspectorListField } from './InspectorListField';
+import { BlockStyleInspectorFields } from './BlockStyleInspectorFields';
 
 type FooterInspectorFieldsProps = {
   blockId: string;
@@ -26,6 +27,11 @@ export function FooterInspectorFields({ blockId, propsJson }: FooterInspectorFie
         />
       </InspectorSection>
 
+      <BlockStyleInspectorFields
+        blockId={blockId}
+        blockType="footer_legal"
+        propsJson={propsJson}
+      />
       <InspectorSection value="links" title="Liens">
         <InspectorListField
           label="Liens du pied de page"

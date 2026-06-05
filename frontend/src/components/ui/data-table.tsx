@@ -11,7 +11,6 @@ import {
 } from '@tanstack/react-table';
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { ShadButton } from './primitives/button';
 import {
   Table,
@@ -67,14 +66,11 @@ export function DataTable<TData, TValue>({
           placeholder={searchPlaceholder}
           value={filterValue}
           onChange={(e) => table.getColumn(searchColumnId)?.setFilterValue(e.target.value)}
-          className={cn(
-            'flex h-9 w-full max-w-sm rounded-md border border-input bg-background px-3 text-sm',
-            'placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-          )}
+          className="ah-input max-w-sm"
         />
       ) : null}
 
-      <div className="rounded-xl border border-border">
+      <div className="ah-card-pro overflow-hidden !transform-none hover:!transform-none">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

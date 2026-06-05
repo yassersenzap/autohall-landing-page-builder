@@ -22,16 +22,13 @@ const StudioThemeContext = createContext<StudioThemeContextValue | null>(null);
 
 function readStoredTheme(): StudioThemeMode {
   if (typeof window === 'undefined') {
-    return 'light';
+    return 'dark';
   }
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored === 'dark' || stored === 'light') {
     return stored;
   }
-  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    return 'dark';
-  }
-  return 'light';
+  return 'dark';
 }
 
 function applyThemeToDocument(mode: StudioThemeMode) {

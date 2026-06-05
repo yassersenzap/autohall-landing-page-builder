@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { createEditorBlock, deleteEditorBlock } from '../editor/api/editorApi';
-import type { EditorPageBlock } from './landing-block-catalog';
+import type { EditorBlockType, EditorPageBlock } from './landing-block-catalog';
 import {
   getLandingTemplate,
   type LandingTemplateId,
@@ -68,7 +68,7 @@ export function useApplyLandingTemplate(
       for (let index = 0; index < template.blocks.length; index += 1) {
         const spec = template.blocks[index];
         const response = await createEditorBlock(pageVersionId, {
-          blockType: spec.blockType,
+          blockType: spec.blockType as EditorBlockType,
           propsJson: spec.propsJson,
           sortOrder: startIndex + index + 1,
         });
