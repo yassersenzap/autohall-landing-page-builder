@@ -1,13 +1,18 @@
 import { ensurePuckIds } from './ensure-puck-ids';
 
-/** Document Puck initial — fondation Visual Studio V2. */
+/** Document initial du Landing Studio officiel. */
 export const STUDIO_V2_ENGINE = 'puck';
 
 function buildRawDefaultStudioV2Document(): Record<string, unknown> {
   return {
     root: {
       props: {
-        title: 'Auto Hall — Landing V2',
+        title: 'Auto Hall — Offre printemps',
+        themePreset: 'autohall-blue',
+        seo: {
+          title: 'Offre véhicule — Auto Hall',
+          description: 'Découvrez nos offres véhicules neufs et demandez un essai en ligne.',
+        },
       },
     },
     content: [
@@ -35,11 +40,11 @@ function buildRawDefaultStudioV2Document(): Record<string, unknown> {
                           type: 'HeroAutoHall',
                           props: {
                             eyebrow: 'Auto Hall',
-                            title: 'Votre campagne Auto Hall',
+                            title: 'Votre prochaine voiture commence ici',
                             subtitle:
-                              'Composez votre landing avec le Visual Studio V2.',
-                            ctaLabel: 'Découvrir',
-                            ctaHref: '#lead-form',
+                              'Offres exclusives, financement sur mesure et essai en concession.',
+                            ctaPrimaryLabel: 'Découvrir l’offre',
+                            ctaPrimaryHref: '#lead-form',
                             imageUrl: '',
                             imageAssetId: '',
                             alignment: 'left',
@@ -57,7 +62,7 @@ function buildRawDefaultStudioV2Document(): Record<string, unknown> {
                             showCity: true,
                             showMessage: true,
                             consentText:
-                              'J’accepte d’être recontacté par Auto Hall concernant ma demande.',
+                              'J’ai lu et j’accepte sans réserve les termes de la clause relative à la protection des données personnelles.',
                             alignment: 'left',
                             spacingPreset: 'normal',
                           },

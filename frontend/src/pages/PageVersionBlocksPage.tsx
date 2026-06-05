@@ -50,6 +50,7 @@ type LocationState = {
   campaignName?: string;
 };
 
+/** @deprecated Archivé — le builder blocs V1 n’est plus exposé. Voir `archive/builder-v1-block-editor`. */
 export default function PageVersionBlocksPage() {
   const { pageVersionId } = useParams<{ pageVersionId: string }>();
   const navigate = useNavigate();

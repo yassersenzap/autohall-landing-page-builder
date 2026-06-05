@@ -10,10 +10,10 @@ function formatStudioV2LoadError(err: unknown): string {
       return 'Session expirée. Reconnectez-vous puis réessayez.';
     }
     if (err.status === 404) {
-      return 'Version de page introuvable ou endpoint Studio V2 indisponible.';
+      return 'Version de page introuvable ou service Landing Studio indisponible.';
     }
     if (err.status >= 500) {
-      return `${err.message} — vérifiez les logs backend (migration DB, table studio V2).`;
+      return `${err.message} — vérifiez les logs backend (migration DB, document studio).`;
     }
     return err.message;
   }

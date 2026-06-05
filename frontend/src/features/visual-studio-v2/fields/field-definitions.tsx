@@ -124,16 +124,15 @@ export const IMAGE_STYLE_OBJECT_FIELDS = {
   },
 };
 
-export function createMediaField(imageUrlKey = 'imageUrl'): Field {
+export function createMediaField(_imageUrlKey = 'imageUrl'): Field {
   return {
     type: 'custom',
     label: 'Visuel',
-    render: ({ value, onChange, readOnly }) => (
+    render: ({ value, onChange }) => (
       <StudioV2MediaField
         imageAssetId={String(value ?? '')}
-        imageUrlKey={imageUrlKey}
-        readOnly={readOnly}
         onChangeAssetId={(assetId) => onChange(assetId)}
+        onChangeImageUrl={() => undefined}
       />
     ),
   };

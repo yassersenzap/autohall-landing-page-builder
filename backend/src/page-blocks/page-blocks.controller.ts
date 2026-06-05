@@ -29,6 +29,10 @@ const WRITE_ROLES = [
   UserRole.MARKETER,
 ] as const;
 
+/**
+ * @legacy Pipeline page_blocks (builder blocs V1) — conservé pour compatibilité API.
+ * Le frontend officiel utilise le Landing Studio (`studio-v2-document`).
+ */
 @Controller('api/page-versions/:pageVersionId/blocks')
 export class PageBlocksController {
   constructor(private readonly pageBlocksService: PageBlocksService) {}

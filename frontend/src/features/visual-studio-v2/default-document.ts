@@ -2,12 +2,12 @@ import type { Data } from '@puckeditor/core';
 import { DEFAULT_AUTOHALL_CONSENT_LABEL } from '@/features/builder-engine/constants/autohall-lead-form';
 import { ensurePuckIds } from './lib/ensure-puck-ids';
 
-/** Miroir backend — document Puck initial Visual Studio V2. */
+/** Miroir backend — document initial du Landing Studio. */
 export function buildDefaultStudioV2Document(): Data {
   return ensurePuckIds({
     root: {
       props: {
-        title: 'Auto Hall — Landing V2',
+        title: 'Auto Hall — Offre printemps',
         themePreset: 'autohall-blue',
         seo: {
           title: 'Auto Hall — Votre concessionnaire automobile au Maroc',
@@ -41,9 +41,9 @@ export function buildDefaultStudioV2Document(): Data {
                           type: 'HeroAutoHall',
                           props: {
                             eyebrow: 'Auto Hall',
-                            title: 'Votre campagne Auto Hall',
+                            title: 'Votre prochaine voiture commence ici',
                             subtitle:
-                              'Composez votre landing avec le Visual Studio V2.',
+                              'Offres exclusives, financement sur mesure et essai en concession.',
                             ctaPrimaryLabel: 'Découvrir',
                             ctaPrimaryHref: '#lead-form',
                             imageUrl: '',

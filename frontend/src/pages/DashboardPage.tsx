@@ -124,7 +124,7 @@ export default function DashboardPage() {
             ) : null}
             {lastDraft ? (
               <Link
-                to={`/page-versions/${lastDraft.pageVersionId}/blocks`}
+                to={`/page-versions/${lastDraft.pageVersionId}/studio`}
                 className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
               >
                 <FileEdit className="h-3.5 w-3.5" />

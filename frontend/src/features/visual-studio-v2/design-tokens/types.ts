@@ -33,3 +33,23 @@ export type StudioV2RootProps = {
   designTokens?: Partial<StudioV2DesignTokens>;
   seo?: StudioV2SeoMeta;
 };
+
+export type StudioV2Typography = {
+  titleSize?: 'sm' | 'md' | 'lg' | 'xl' | 'hero';
+  titleWeight?: 'regular' | 'medium' | 'semibold' | 'bold' | 'black';
+  lineHeight?: 'compact' | 'normal' | 'relaxed';
+  letterSpacing?: 'tight' | 'normal' | 'wide';
+  textAlign?: 'left' | 'center' | 'right';
+  textTransform?: 'normal' | 'uppercase';
+  titleColor?: string;
+  textColor?: string;
+};
+
+export type StudioV2ImageStyle = {
+  imageFit?: 'cover' | 'contain';
+  imagePosition?: 'center' | 'top' | 'bottom' | 'left' | 'right';
+  aspectRatio?: 'auto' | '16:9' | '4:3' | '1:1' | 'portrait';
+  imageRadius?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  imageShadow?: 'none' | 'soft' | 'medium' | 'strong';
+  overlayOpacity?: number;
+};

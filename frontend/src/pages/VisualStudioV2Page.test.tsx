@@ -22,16 +22,16 @@ vi.mock('@/features/visual-studio-v2/hooks/useStudioV2Permissions', () => ({
 }));
 
 vi.mock('@/features/visual-studio-v2/VisualStudioV2Editor', () => ({
-  VisualStudioV2Editor: () => <div data-testid="studio-v2-editor">Editor</div>,
+  VisualStudioV2Editor: () => <div data-testid="studio-editor">Editor</div>,
 }));
 
 const pageVersionId = '11111111-1111-1111-1111-111111111111';
 
 function renderPage() {
   return render(
-    <MemoryRouter initialEntries={[`/page-versions/${pageVersionId}/studio-v2`]}>
+    <MemoryRouter initialEntries={[`/page-versions/${pageVersionId}/studio`]}>
       <Routes>
-        <Route path="/page-versions/:pageVersionId/studio-v2" element={<VisualStudioV2Page />} />
+        <Route path="/page-versions/:pageVersionId/studio" element={<VisualStudioV2Page />} />
       </Routes>
     </MemoryRouter>,
   );
@@ -44,7 +44,7 @@ describe('VisualStudioV2Page', () => {
     fetchStudioV2Readiness.mockResolvedValue({ issues: [], canExport: true });
   });
 
-  it('shows loading then editor after successful document fetch', async () => {
+  it('shows loading then editor with official product labels', async () => {
     fetchStudioV2Document.mockResolvedValue({
       id: 'doc-1',
       pageVersionId,
@@ -56,13 +56,17 @@ describe('VisualStudioV2Page', () => {
 
     renderPage();
 
-    expect(screen.getByText(/Chargement du document V2/i)).toBeInTheDocument();
+    expect(screen.getByText(/Chargement de la landing/i)).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.getByTestId('studio-v2-editor')).toBeInTheDocument();
+      expect(screen.getByTestId('studio-editor')).toBeInTheDocument();
     });
 
-    expect(screen.queryByText(/Chargement du document V2/i)).not.toBeInTheDocument();
+    expect(screen.getByText('Auto Hall Landing Studio')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Aperçu/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Export ZIP/i })).toBeInTheDocument();
+    expect(screen.queryByText(/V2/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Builder V1/i)).not.toBeInTheDocument();
   });
 
   it('shows error screen when API fails', async () => {
@@ -71,13 +75,10 @@ describe('VisualStudioV2Page', () => {
     renderPage();
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Impossible de charger le document Studio V2/i),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Impossible de charger la landing/i)).toBeInTheDocument();
     });
 
     expect(screen.getByText('Backend indisponible')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Réessayer/i })).toBeInTheDocument();
-    expect(screen.queryByText(/Chargement du document V2/i)).not.toBeInTheDocument();
   });
 });

@@ -3,20 +3,24 @@ import { Link } from 'react-router-dom';
 import { ShadButton } from '@/components/ui/primitives';
 
 type StudioV2LoadErrorProps = {
-  pageVersionId: string;
+  backTo: string;
+  backLabel: string;
+  backState?: Record<string, unknown>;
   message: string;
   onRetry: () => void;
 };
 
 export function StudioV2LoadError({
-  pageVersionId,
+  backTo,
+  backLabel,
+  backState,
   message,
   onRetry,
 }: StudioV2LoadErrorProps) {
   return (
     <div className="visual-studio-v2-load-error">
       <h2 className="text-base font-semibold text-foreground">
-        Impossible de charger le document Studio V2
+        Impossible de charger la landing
       </h2>
       <p className="mt-2 text-sm text-muted-foreground">{message}</p>
       <div className="mt-4 flex flex-wrap gap-2">
@@ -24,10 +28,10 @@ export function StudioV2LoadError({
           <RefreshCw className="mr-1.5 h-3.5 w-3.5" aria-hidden />
           Réessayer
         </ShadButton>
-        <Link to={`/page-versions/${pageVersionId}/blocks`}>
+        <Link to={backTo} state={backState}>
           <ShadButton type="button" size="sm" variant="secondary">
             <ArrowLeft className="mr-1.5 h-3.5 w-3.5" aria-hidden />
-            Retour Builder V1
+            {backLabel}
           </ShadButton>
         </Link>
       </div>

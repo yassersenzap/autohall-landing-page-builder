@@ -7,7 +7,8 @@ import { EmptyState } from '../components/ui/EmptyState';
 import { Input } from '../components/ui/Input';
 import { PageHeader } from '../components/ui/PageHeader';
 import { StatusBadge } from '../components/ui/StatusBadge';
-import { downloadPageVersionExport } from '../lib/page-export';
+import { landingStudioPath, landingStudioPreviewPath } from '../lib/landing-studio-routes';
+import { downloadStudioV2Export } from '@/features/visual-studio-v2/api/studio-v2-preview.api';
 import {
   canManagePageVersions,
   createPageVersion,
@@ -112,10 +113,7 @@ export default function LandingPageVersionsPage() {
     setError(null);
 
     try {
-      await downloadPageVersionExport(
-        version.id,
-        `landing-v${version.versionNumber}.zip`,
-      );
+      await downloadStudioV2Export(version.id);
     } catch (err) {
       setError(
         err instanceof ApiError
@@ -186,13 +184,12 @@ export default function LandingPageVersionsPage() {
         <ol className="studio-workflow">
           <li className="studio-workflow__item">Campagne</li>
           <li className="studio-workflow__item studio-workflow__item--active">Versions</li>
-          <li className="studio-workflow__item">Modèle de landing</li>
-          <li className="studio-workflow__item">Édition des sections</li>
-          <li className="studio-workflow__item">Preview & export ZIP</li>
+          <li className="studio-workflow__item">Landing Studio</li>
+          <li className="studio-workflow__item">Aperçu & export ZIP</li>
         </ol>
         <p className="ui-page-header__subtitle" style={{ marginBottom: 0 }}>
-          Créez une version, ouvrez l’éditeur puis choisissez un modèle (essai routier, offre
-          saisonnière, SAV, lancement véhicule) sur une version vide.
+          Créez une version, ouvrez le Landing Studio puis appliquez un modèle (SAV, Ford Promo,
+          gamme thermique, HEV, capture lead).
         </p>
       </Card>
 
@@ -206,7 +203,7 @@ export default function LandingPageVersionsPage() {
             <div className="version-actions">
               <StatusBadge status={latestVersion.status} />
               <Link
-                to={`/page-versions/${latestVersion.id}/blocks`}
+                to={landingStudioPath(latestVersion.id)}
                 state={{
                   versionNumber: latestVersion.versionNumber,
                   versionLabel: latestVersion.label,
@@ -221,7 +218,7 @@ export default function LandingPageVersionsPage() {
                 Éditer
               </Link>
               <Link
-                to={`/page-versions/${latestVersion.id}/preview`}
+                to={landingStudioPreviewPath(latestVersion.id)}
                 state={{
                   versionNumber: latestVersion.versionNumber,
                   versionLabel: latestVersion.label,
@@ -232,7 +229,7 @@ export default function LandingPageVersionsPage() {
                 }}
                 className="ui-btn ui-btn--secondary ui-btn--sm"
               >
-                Preview
+                Aperçu
               </Link>
               {canWrite && latestVersion.status === 'DRAFT' ? (
                 <Button
@@ -312,7 +309,7 @@ export default function LandingPageVersionsPage() {
                     </Button>
                   ) : null}
                   <Link
-                    to={`/page-versions/${version.id}/blocks`}
+                    to={landingStudioPath(version.id)}
                     state={{
                       versionNumber: version.versionNumber,
                       versionLabel: version.label,
@@ -324,10 +321,10 @@ export default function LandingPageVersionsPage() {
                     }}
                     className="ui-btn ui-btn--secondary ui-btn--sm"
                   >
-                    Éditeur
+                    Studio
                   </Link>
                   <Link
-                    to={`/page-versions/${version.id}/preview`}
+                    to={landingStudioPreviewPath(version.id)}
                     state={{
                       versionNumber: version.versionNumber,
                       versionLabel: version.label,
@@ -338,7 +335,7 @@ export default function LandingPageVersionsPage() {
                     }}
                     className="ui-btn ui-btn--ghost ui-btn--sm"
                   >
-                    Preview
+                    Aperçu
                   </Link>
                   {canWrite && version.status === 'PUBLISHED' ? (
                     <Button

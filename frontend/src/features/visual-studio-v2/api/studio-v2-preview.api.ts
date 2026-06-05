@@ -56,7 +56,7 @@ export async function downloadStudioV2Export(pageVersionId: string): Promise<voi
     const message =
       payload && typeof payload === 'object' && 'message' in payload
         ? String((payload as { message: string }).message)
-        : 'Export V2 impossible.';
+        : 'Export impossible.';
     throw new Error(message);
   }
 

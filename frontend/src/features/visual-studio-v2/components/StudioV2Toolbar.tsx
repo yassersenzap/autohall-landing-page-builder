@@ -14,8 +14,11 @@ export type StudioV2Viewport = 'desktop' | 'mobile';
 export type StudioV2Zoom = 'fit' | '80' | '100';
 
 type StudioV2ToolbarProps = {
-  pageVersionId: string;
+  backTo: string;
+  backLabel: string;
+  backState?: Record<string, unknown>;
   pageTitle?: string;
+  versionLabel?: string;
   saveStatus: StudioV2SaveStatus;
   canWrite: boolean;
   viewport: StudioV2Viewport;
@@ -44,8 +47,11 @@ function statusLabel(status: StudioV2SaveStatus): string {
 }
 
 export function StudioV2Toolbar({
-  pageVersionId,
+  backTo,
+  backLabel,
+  backState,
   pageTitle,
+  versionLabel,
   saveStatus,
   canWrite,
   viewport,
@@ -61,16 +67,19 @@ export function StudioV2Toolbar({
     <header className="visual-studio-v2-toolbar">
       <div className="flex min-w-0 items-center gap-3">
         <Link
-          to={`/page-versions/${pageVersionId}/blocks`}
+          to={backTo}
+          state={backState}
           className="visual-studio-v2-toolbar__link inline-flex shrink-0 items-center gap-1 text-sm"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
-          Builder V1
+          {backLabel}
         </Link>
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold">Visual Studio V2</p>
-          {pageTitle ? (
-            <p className="truncate text-xs visual-studio-v2-toolbar__hint">{pageTitle}</p>
+          <p className="truncate text-sm font-semibold">Auto Hall Landing Studio</p>
+          {versionLabel || pageTitle ? (
+            <p className="truncate text-xs visual-studio-v2-toolbar__hint">
+              {[versionLabel, pageTitle].filter(Boolean).join(' — ')}
+            </p>
           ) : null}
         </div>
       </div>
@@ -127,7 +136,7 @@ export function StudioV2Toolbar({
 
         <ShadButton type="button" size="sm" variant="secondary" onClick={onPreview}>
           <Eye className="mr-1.5 h-3.5 w-3.5" aria-hidden />
-          Aperçu V2
+          Aperçu
         </ShadButton>
 
         {canWrite ? (
@@ -138,7 +147,7 @@ export function StudioV2Toolbar({
             onClick={onExport}
           >
             <Download className="mr-1.5 h-3.5 w-3.5" aria-hidden />
-            Export ZIP V2
+            Export ZIP
           </ShadButton>
         ) : null}
       </div>

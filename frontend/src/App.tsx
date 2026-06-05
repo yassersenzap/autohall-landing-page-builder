@@ -5,8 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import ProtectedFullscreenRoute from './components/ProtectedFullscreenRoute';
 import CampaignLandingPagesPage from './pages/CampaignLandingPagesPage';
 import LandingPageVersionsPage from './pages/LandingPageVersionsPage';
-import PagePreviewPage from './pages/PagePreviewPage';
-import PageVersionBlocksPage from './pages/PageVersionBlocksPage';
+import LandingStudioLegacyRedirect from './pages/LandingStudioLegacyRedirect';
 import CampaignsPage from './pages/CampaignsPage';
 import LeadDetailPage from './pages/LeadDetailPage';
 import LeadsPage from './pages/LeadsPage';
@@ -30,11 +29,7 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route element={<ProtectedFullscreenRoute />}>
             <Route
-              path="/page-versions/:pageVersionId/blocks"
-              element={<PageVersionBlocksPage />}
-            />
-            <Route
-              path="/page-versions/:pageVersionId/studio-v2"
+              path="/page-versions/:pageVersionId/studio"
               element={
                 <Suspense fallback={<StudioRouteFallback />}>
                   <VisualStudioV2Page />
@@ -42,12 +37,29 @@ export default function App() {
               }
             />
             <Route
-              path="/page-versions/:pageVersionId/studio-v2-preview"
+              path="/page-versions/:pageVersionId/studio/preview"
               element={
                 <Suspense fallback={<StudioRouteFallback />}>
                   <VisualStudioV2PreviewPage />
                 </Suspense>
               }
+            />
+            {/* Legacy aliases — redirection vers routes officielles */}
+            <Route
+              path="/page-versions/:pageVersionId/blocks"
+              element={<LandingStudioLegacyRedirect target="studio" />}
+            />
+            <Route
+              path="/page-versions/:pageVersionId/studio-v2"
+              element={<LandingStudioLegacyRedirect target="studio" />}
+            />
+            <Route
+              path="/page-versions/:pageVersionId/studio-v2-preview"
+              element={<LandingStudioLegacyRedirect target="preview" />}
+            />
+            <Route
+              path="/page-versions/:pageVersionId/preview"
+              element={<LandingStudioLegacyRedirect target="preview" />}
             />
           </Route>
           <Route element={<ProtectedRoute />}>
@@ -62,10 +74,6 @@ export default function App() {
             <Route
               path="/landing-pages/:landingPageId/versions"
               element={<LandingPageVersionsPage />}
-            />
-            <Route
-              path="/page-versions/:pageVersionId/preview"
-              element={<PagePreviewPage />}
             />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

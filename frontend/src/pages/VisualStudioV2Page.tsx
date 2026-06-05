@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { landingStudioPreviewPath } from '@/lib/landing-studio-routes';
 import type { Data } from '@puckeditor/core';
 import {
   fetchStudioV2Document,
@@ -30,9 +31,20 @@ import {
 } from '@/features/visual-studio-v2/templates/index';
 import type { StudioV2SaveStatus } from '@/features/visual-studio-v2/types';
 
+type StudioLocationState = {
+  versionNumber?: number;
+  versionLabel?: string | null;
+  landingPageId?: string;
+  landingPageTitle?: string | null;
+  campaignId?: string;
+  campaignName?: string | null;
+};
+
 export default function VisualStudioV2Page() {
   const { pageVersionId } = useParams<{ pageVersionId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const navState = (location.state as StudioLocationState | null) ?? {};
   const editorRef = useRef<VisualStudioV2EditorHandle>(null);
 
   const [loading, setLoading] = useState(true);
@@ -58,6 +70,29 @@ export default function VisualStudioV2Page() {
     const title = documentData?.root?.props?.title;
     return typeof title === 'string' ? title : undefined;
   }, [documentData]);
+
+  const backNavigation = useMemo(() => {
+    if (navState.landingPageId) {
+      return {
+        backTo: `/landing-pages/${navState.landingPageId}/versions`,
+        backLabel: 'Versions',
+        backState: {
+          landingPageTitle: navState.landingPageTitle,
+          campaignId: navState.campaignId,
+          campaignName: navState.campaignName,
+        },
+      };
+    }
+    return { backTo: '/campaigns', backLabel: 'Campagnes', backState: undefined };
+  }, [navState]);
+
+  const versionLabel = useMemo(() => {
+    if (navState.versionNumber != null) {
+      const base = `v${navState.versionNumber}`;
+      return navState.versionLabel ? `${base} — ${navState.versionLabel}` : base;
+    }
+    return navState.landingPageTitle ?? undefined;
+  }, [navState]);
 
   const refreshReadiness = useCallback(
     async (data?: Data) => {
@@ -106,7 +141,7 @@ export default function VisualStudioV2Page() {
         setLoadError(
           err instanceof Error
             ? err.message
-            : 'Impossible de charger le document Studio V2.',
+            : 'Impossible de charger la landing.',
         );
         setSaveStatus('error');
         setDocumentData(null);
@@ -178,7 +213,7 @@ export default function VisualStudioV2Page() {
       const current = editorRef.current?.getData();
       if (current) await handleSave(current);
     }
-    navigate(`/page-versions/${pageVersionId}/studio-v2-preview`);
+    navigate(landingStudioPreviewPath(pageVersionId), { state: navState });
   }, [handleSave, navigate, pageVersionId, saveStatus]);
 
   const handleExport = useCallback(async () => {
@@ -209,8 +244,11 @@ export default function VisualStudioV2Page() {
     <StudioV2Provider pageVersionId={pageVersionId} canWrite={canWrite}>
       <div className="visual-studio-v2-shell">
         <StudioV2Toolbar
-          pageVersionId={pageVersionId}
+          backTo={backNavigation.backTo}
+          backLabel={backNavigation.backLabel}
+          backState={backNavigation.backState}
           pageTitle={pageTitle}
+          versionLabel={versionLabel}
           saveStatus={saveStatus}
           canWrite={canWrite}
           viewport={viewport}
@@ -224,10 +262,12 @@ export default function VisualStudioV2Page() {
         />
 
         {loading ? (
-          <p className="visual-studio-v2-loading p-6 text-sm">Chargement du document V2…</p>
+          <p className="visual-studio-v2-loading p-6 text-sm">Chargement de la landing…</p>
         ) : loadError ? (
           <StudioV2LoadError
-            pageVersionId={pageVersionId}
+            backTo={backNavigation.backTo}
+            backLabel={backNavigation.backLabel}
+            backState={backNavigation.backState}
             message={loadError}
             onRetry={handleRetryLoad}
           />
@@ -254,8 +294,10 @@ export default function VisualStudioV2Page() {
           </div>
         ) : (
           <StudioV2LoadError
-            pageVersionId={pageVersionId}
-            message="Le document Studio V2 est vide ou invalide."
+            backTo={backNavigation.backTo}
+            backLabel={backNavigation.backLabel}
+            backState={backNavigation.backState}
+            message="La landing est vide ou invalide."
             onRetry={handleRetryLoad}
           />
         )}

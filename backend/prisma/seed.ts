@@ -14,6 +14,7 @@ import {
 } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { Pool } from 'pg';
+import { buildDefaultStudioV2Document } from '../src/studio-v2/default-document';
 
 function loadEnv(): void {
   const rootEnv = join(__dirname, '..', '..', '.env');
@@ -225,6 +226,21 @@ async function runSeed(prisma: PrismaClient): Promise<void> {
     },
   ];
 
+  const studioDocument = buildDefaultStudioV2Document() as Prisma.InputJsonValue;
+
+  await prisma.pageVersionStudioDocument.upsert({
+    where: { pageVersionId: pageVersion.id },
+    update: {
+      engine: 'puck',
+      documentJson: studioDocument,
+    },
+    create: {
+      pageVersionId: pageVersion.id,
+      engine: 'puck',
+      documentJson: studioDocument,
+    },
+  });
+
   for (const spec of demoBlocks) {
     await prisma.pageBlock.upsert({
       where: {
@@ -357,6 +373,7 @@ async function runSeed(prisma: PrismaClient): Promise<void> {
   console.log(`[seed] Admin : ${SEED_ADMIN_EMAIL} (mot de passe documenté dans prisma/seed.ts — dev uniquement)`);
   console.log(`[seed] Campagne : ${campaign.name}`);
   console.log(`[seed] Landing : /${landingPage.slug} (version ${pageVersion.versionNumber})`);
+  console.log(`[seed] Landing Studio : document prêt pour la version ${pageVersion.id}`);
 }
 
 async function main(): Promise<void> {

@@ -132,7 +132,7 @@ export const studioV2PuckConfig: Config = {
       },
     },
     defaultProps: {
-      title: 'Auto Hall — Landing V2',
+      title: 'Auto Hall — Offre printemps',
       themePreset: 'autohall-blue',
       designTokens: {},
       seo: { title: '', description: '' },
