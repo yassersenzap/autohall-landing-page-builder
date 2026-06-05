@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 import {
   Battery,
   Car,
@@ -18,7 +18,9 @@ import {
   type LeadFormConfig,
   type LeadFormFieldDef,
 } from '@/features/builder-engine/constants/autohall-lead-form';
-import { StudioV2MediaField } from '../fields/StudioV2MediaField';
+import { StudioV2MediaInspector } from '../fields/StudioV2MediaInspector';
+import { useStudioV2Actions } from '../context/StudioV2Context';
+import { buildImageElementStyle, buildImageMediaStyle } from '../lib/image-style';
 import { STUDIO_V2_BENEFIT_ICONS } from '../puck-constants';
 import type {
   BackgroundTone,
@@ -96,53 +98,99 @@ export function toneClass(tone: BackgroundTone | HeroTone): string {
 export function renderMediaField({
   value,
   onChange,
-  imageUrlKey = 'imageUrl',
-  props,
 }: {
   value: unknown;
   onChange: (value: string) => void;
-  imageUrlKey?: string;
-  props?: Record<string, unknown>;
 }) {
-  const imageUrl = String(props?.[imageUrlKey] ?? '');
   return (
-    <StudioV2MediaField
+    <StudioV2MediaInspector
       imageAssetId={String(value ?? '')}
-      imageUrl={imageUrl}
       onChangeAssetId={(assetId) => onChange(assetId)}
-      onChangeImageUrl={() => undefined}
     />
   );
 }
 
 export function renderHeroMedia(
-  imageAssetId?: string,
-  imageUrl?: string,
-  imageAlt?: string,
-  placeholder = 'Ajoutez un visuel véhicule',
+  props: Record<string, unknown>,
+  placeholder = 'Cliquez pour ajouter une image',
 ) {
+  const imageAssetId =
+    typeof props.imageAssetId === 'string' ? props.imageAssetId : undefined;
+  const imageUrl = typeof props.imageUrl === 'string' ? props.imageUrl : undefined;
+  const imageAlt = typeof props.imageAlt === 'string' ? props.imageAlt : '';
+  const mediaStyle = buildImageMediaStyle(props);
+  const imgStyle = buildImageElementStyle(props);
+
   if (imageAssetId || imageUrl) {
     return (
-      <div className="vs2-hero__media" data-asset-id={imageAssetId || undefined}>
+      <div
+        className="vs2-hero__media"
+        data-asset-id={imageAssetId || undefined}
+        style={mediaStyle}
+      >
         {imageAssetId ? (
           <AssetImage
             assetId={String(imageAssetId)}
-            alt={imageAlt ?? ''}
+            alt={imageAlt}
             className="vs2-hero__img"
             loadingClassName="vs2-hero__img"
+            style={imgStyle}
           />
         ) : imageUrl ? (
-          <img src={String(imageUrl)} alt={imageAlt ?? ''} className="vs2-hero__img" />
+          <img src={imageUrl} alt={imageAlt} className="vs2-hero__img" style={imgStyle} />
         ) : null}
       </div>
     );
   }
 
+  return <EditorImagePlaceholder label={placeholder} />;
+}
+
+function EditorImagePlaceholder({ label }: { label: string }) {
+  const actions = useStudioV2Actions();
   return (
-    <div className="vs2-hero__media vs2-hero__media--empty" aria-hidden>
-      <span className="vs2-hero__placeholder">{placeholder}</span>
+    <div className="vs2-hero__media vs2-hero__media--empty vs2-editor-placeholder">
+      <span className="vs2-hero__placeholder">{label}</span>
+      {actions?.canWrite ? (
+        <button
+          type="button"
+          className="vs2-image-add-btn"
+          onClick={() => actions.onOpenMediaPicker?.()}
+        >
+          Ajouter une image
+        </button>
+      ) : null}
     </div>
   );
+}
+
+export function renderOfferMedia(props: Record<string, unknown>) {
+  const imageAssetId =
+    typeof props.imageAssetId === 'string' ? props.imageAssetId : undefined;
+  const imageUrl = typeof props.imageUrl === 'string' ? props.imageUrl : undefined;
+  const imageAlt = typeof props.imageAlt === 'string' ? props.imageAlt : '';
+  const mediaStyle = buildImageMediaStyle(props);
+  const imgStyle = buildImageElementStyle(props);
+
+  if (imageAssetId || imageUrl) {
+    return (
+      <div className="vs2-offer__media" style={mediaStyle}>
+        {imageAssetId ? (
+          <AssetImage
+            assetId={imageAssetId}
+            alt={imageAlt}
+            className="vs2-offer__img"
+            loadingClassName="vs2-offer__img"
+            style={imgStyle}
+          />
+        ) : (
+          <img src={imageUrl} alt={imageAlt} className="vs2-offer__img" style={imgStyle} />
+        )}
+      </div>
+    );
+  }
+
+  return <EditorImagePlaceholder label="Visuel véhicule — ajoutez une image" />;
 }
 
 export function leadFormConfigFromProps(props: Record<string, unknown>): LeadFormConfig {
@@ -239,4 +287,27 @@ export function maxWidthClass(maxWidth: ContainerMaxWidth): string {
 
 export function columnGapClass(gap: ColumnGap): string {
   return `vs2-gap-${gap}`;
+}
+
+type SlotComponentProps = {
+  allow?: string[];
+  minEmptyHeight?: string;
+};
+
+export function wrapSlotZone(
+  Slot: ComponentType<SlotComponentProps>,
+  allow: readonly string[],
+  minEmptyHeight: string,
+) {
+  return (
+    <div className="vs2-slot-zone">
+      <Slot allow={[...allow]} minEmptyHeight={minEmptyHeight} />
+      <div className="vs2-slot-empty-state" aria-hidden>
+        <p className="vs2-slot-empty-state__title">Aucun bloc dans cette zone</p>
+        <p className="vs2-slot-empty-state__hint">
+          Glissez un bloc depuis le panneau gauche ou appliquez un modèle.
+        </p>
+      </div>
+    </div>
+  );
 }

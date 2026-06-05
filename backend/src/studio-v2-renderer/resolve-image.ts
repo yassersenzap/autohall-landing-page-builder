@@ -2,6 +2,29 @@ import { containsForbiddenAssetUrl } from './extract-puck-assets';
 import { escapeHtml } from './escape-html';
 import type { StudioV2RenderContext } from './types';
 
+const RADIUS_MAP: Record<string, string> = {
+  none: '0',
+  sm: '0.375rem',
+  md: '0.5rem',
+  lg: '0.75rem',
+  xl: '1rem',
+  full: '9999px',
+};
+
+const SHADOW_MAP: Record<string, string> = {
+  none: '',
+  soft: '0 8px 24px rgba(15, 23, 42, 0.1)',
+  medium: '0 16px 40px rgba(15, 23, 42, 0.14)',
+  strong: '0 24px 56px rgba(15, 23, 42, 0.2)',
+};
+
+const ASPECT_RATIO_MAP: Record<string, string> = {
+  '16:9': '16 / 9',
+  '4:3': '4 / 3',
+  '1:1': '1 / 1',
+  portrait: '3 / 4',
+};
+
 export function resolveImageSrc(
   props: Record<string, unknown>,
   ctx: StudioV2RenderContext,
@@ -22,6 +45,29 @@ export function resolveImageSrc(
   return null;
 }
 
+function buildMediaWrapperStyle(props: Record<string, unknown>): string {
+  const parts: string[] = [];
+  const aspectRatio =
+    typeof props.aspectRatio === 'string' ? props.aspectRatio : 'auto';
+  if (aspectRatio !== 'auto' && ASPECT_RATIO_MAP[aspectRatio]) {
+    parts.push(`aspect-ratio:${ASPECT_RATIO_MAP[aspectRatio]}`);
+  }
+
+  const radius =
+    typeof props.imageRadius === 'string' ? props.imageRadius : 'md';
+  if (RADIUS_MAP[radius]) {
+    parts.push(`border-radius:${RADIUS_MAP[radius]}`);
+  }
+
+  const shadow =
+    typeof props.imageShadow === 'string' ? props.imageShadow : 'none';
+  if (shadow !== 'none' && SHADOW_MAP[shadow]) {
+    parts.push(`box-shadow:${SHADOW_MAP[shadow]}`);
+  }
+
+  return parts.join(';');
+}
+
 export function renderImageTag(
   props: Record<string, unknown>,
   ctx: StudioV2RenderContext,
@@ -38,5 +84,12 @@ export function renderImageTag(
   const position =
     typeof props.imagePosition === 'string' ? props.imagePosition : 'center';
 
-  return `<img class="${className}" src="${escapeHtml(src)}" alt="${alt}" style="object-fit:${fit};object-position:${escapeHtml(position)}" loading="lazy" />`;
+  const wrapperStyle = buildMediaWrapperStyle(props);
+  const img = `<img class="${className}" src="${escapeHtml(src)}" alt="${alt}" style="object-fit:${fit};object-position:${escapeHtml(position)};width:100%;height:100%;display:block" loading="lazy" />`;
+
+  if (wrapperStyle) {
+    return `<div style="${wrapperStyle};overflow:hidden">${img}</div>`;
+  }
+
+  return img;
 }

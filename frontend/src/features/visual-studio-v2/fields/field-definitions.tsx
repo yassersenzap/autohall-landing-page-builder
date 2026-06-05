@@ -1,5 +1,5 @@
 import type { Field } from '@puckeditor/core';
-import { StudioV2MediaField } from './StudioV2MediaField';
+import { StudioV2MediaInspector } from './StudioV2MediaInspector';
 
 export const TYPOGRAPHY_OBJECT_FIELDS = {
   titleSize: {
@@ -62,6 +62,77 @@ export const TYPOGRAPHY_OBJECT_FIELDS = {
   titleColor: { type: 'text' as const, label: 'Couleur titre (optionnel)' },
   textColor: { type: 'text' as const, label: 'Couleur texte (optionnel)' },
 };
+
+/** Stored in component props but edited via StudioV2MediaInspector */
+export const HIDDEN_IMAGE_PROPS = {
+  imageAlt: { type: 'text' as const, label: 'Alt', visible: false },
+  imageUrl: { type: 'text' as const, label: 'URL', visible: false },
+  imageFit: {
+    type: 'select' as const,
+    label: 'Fit',
+    visible: false,
+    options: [
+      { label: 'cover', value: 'cover' },
+      { label: 'contain', value: 'contain' },
+    ],
+  },
+  imagePosition: {
+    type: 'select' as const,
+    label: 'Position',
+    visible: false,
+    options: [
+      { label: 'center', value: 'center' },
+      { label: 'top', value: 'top' },
+      { label: 'bottom', value: 'bottom' },
+      { label: 'left', value: 'left' },
+      { label: 'right', value: 'right' },
+    ],
+  },
+  aspectRatio: {
+    type: 'select' as const,
+    label: 'Ratio',
+    visible: false,
+    options: [
+      { label: 'auto', value: 'auto' },
+      { label: '16:9', value: '16:9' },
+      { label: '4:3', value: '4:3' },
+      { label: '1:1', value: '1:1' },
+      { label: 'portrait', value: 'portrait' },
+    ],
+  },
+  imageRadius: {
+    type: 'select' as const,
+    label: 'Radius',
+    visible: false,
+    options: [
+      { label: 'none', value: 'none' },
+      { label: 'sm', value: 'sm' },
+      { label: 'md', value: 'md' },
+      { label: 'lg', value: 'lg' },
+      { label: 'xl', value: 'xl' },
+      { label: 'full', value: 'full' },
+    ],
+  },
+  imageShadow: {
+    type: 'select' as const,
+    label: 'Shadow',
+    visible: false,
+    options: [
+      { label: 'none', value: 'none' },
+      { label: 'soft', value: 'soft' },
+      { label: 'medium', value: 'medium' },
+      { label: 'strong', value: 'strong' },
+    ],
+  },
+} as const;
+
+export const IMAGE_STYLE_DEFAULTS = {
+  imageFit: 'cover',
+  imagePosition: 'center',
+  aspectRatio: 'auto',
+  imageRadius: 'md',
+  imageShadow: 'none',
+} as const;
 
 export const IMAGE_STYLE_OBJECT_FIELDS = {
   imageFit: {
@@ -129,10 +200,9 @@ export function createMediaField(_imageUrlKey = 'imageUrl'): Field {
     type: 'custom',
     label: 'Visuel',
     render: ({ value, onChange }) => (
-      <StudioV2MediaField
+      <StudioV2MediaInspector
         imageAssetId={String(value ?? '')}
         onChangeAssetId={(assetId) => onChange(assetId)}
-        onChangeImageUrl={() => undefined}
       />
     ),
   };

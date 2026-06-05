@@ -17,8 +17,15 @@ import {
   type StudioV2Viewport,
   type StudioV2Zoom,
 } from '@/features/visual-studio-v2/components/StudioV2Toolbar';
-import { StudioV2SidePanel } from '@/features/visual-studio-v2/components/StudioV2SidePanel';
-import { StudioV2Provider } from '@/features/visual-studio-v2/context/StudioV2Context';
+import { MediaPickerModal } from '@/features/visual-studio-v2/components/MediaPickerModal';
+import { StudioV2CreativeSidebar } from '@/features/visual-studio-v2/components/StudioV2CreativeSidebar';
+import { StudioV2Provider, type StudioV2Actions } from '@/features/visual-studio-v2/context/StudioV2Context';
+import {
+  insertBlockIntoDocument,
+  insertSectionByLibraryId,
+  insertSectionsIntoDocument,
+} from '@/features/visual-studio-v2/lib/document-insert';
+import { getSectionLibraryEntry } from '@/features/visual-studio-v2/creative-engine/section-library';
 import {
   VisualStudioV2Editor,
   type VisualStudioV2EditorHandle,
@@ -59,6 +66,8 @@ export default function VisualStudioV2Page() {
   const [zoom, setZoom] = useState<StudioV2Zoom>('fit');
   const [readinessIssues, setReadinessIssues] = useState<ReadinessIssue[]>([]);
   const [canExport, setCanExport] = useState(true);
+  const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
+  const [sidebarTab, setSidebarTab] = useState<'starters' | 'sections' | undefined>(undefined);
 
   const navigateToLogin = useCallback(
     () => navigate('/login', { replace: true }),
@@ -251,22 +260,72 @@ export default function VisualStudioV2Page() {
     await refreshReadiness();
   }, [handleSave, pageVersionId, refreshReadiness, saveStatus]);
 
-  const handleApplyTemplate = useCallback((templateId: StudioV2TemplateId) => {
-    const template = STUDIO_V2_TEMPLATES.find((t) => t.id === templateId);
-    if (!template) return;
-    const next = template.build();
+  const applyDocument = useCallback((next: Data) => {
     setDocumentData(next);
     setDocumentKey((k) => k + 1);
     setSaveStatus('dirty');
     setReadinessIssues(validateStudioV2Readiness(next));
   }, []);
 
+  const handleApplyTemplate = useCallback(
+    (templateId: StudioV2TemplateId) => {
+      const template = STUDIO_V2_TEMPLATES.find((t) => t.id === templateId);
+      if (!template) return;
+      applyDocument(template.build());
+    },
+    [applyDocument],
+  );
+
+  const handleInsertSection = useCallback(
+    (sectionLibraryId: string) => {
+      const current = editorRef.current?.getData() ?? documentData;
+      if (!current) return;
+      const next = insertSectionByLibraryId(current, sectionLibraryId);
+      if (next) applyDocument(next);
+    },
+    [applyDocument, documentData],
+  );
+
+  const handleInsertSectionAfter = useCallback(
+    (sectionId?: string) => {
+      const current = editorRef.current?.getData() ?? documentData;
+      if (!current) return;
+      const entry = getSectionLibraryEntry('text-image-section');
+      if (!entry) return;
+      const next = insertSectionsIntoDocument(current, entry.build(), sectionId);
+      applyDocument(next);
+    },
+    [applyDocument, documentData],
+  );
+
+  const handleInsertBlock = useCallback(
+    (blockId: string) => {
+      const current = editorRef.current?.getData() ?? documentData;
+      if (!current) return;
+      const next = insertBlockIntoDocument(current, blockId);
+      if (next) applyDocument(next);
+    },
+    [applyDocument, documentData],
+  );
+
+  const studioActions = useMemo<StudioV2Actions>(
+    () => ({
+      canWrite,
+      onApplyStarter: (id) => handleApplyTemplate(id as StudioV2TemplateId),
+      onInsertSectionAfter: handleInsertSectionAfter,
+      onOpenMediaPicker: () => setMediaPickerOpen(true),
+      onFocusStarterTab: () => setSidebarTab('starters'),
+      onFocusSectionTab: () => setSidebarTab('sections'),
+    }),
+    [canWrite, handleApplyTemplate, handleInsertSectionAfter],
+  );
+
   if (!pageVersionId) {
     return <p className="p-6 text-sm text-muted-foreground">Identifiant de version manquant.</p>;
   }
 
   return (
-    <StudioV2Provider pageVersionId={pageVersionId} canWrite={canWrite}>
+    <StudioV2Provider pageVersionId={pageVersionId} canWrite={canWrite} actions={studioActions}>
       <div className="visual-studio-v2-shell">
         <StudioV2Toolbar
           backTo={backNavigation.backTo}
@@ -298,11 +357,23 @@ export default function VisualStudioV2Page() {
           />
         ) : documentData && savedBaseline ? (
           <div className="visual-studio-v2-workspace">
-            <StudioV2SidePanel
+            <StudioV2CreativeSidebar
               pageVersionId={pageVersionId}
               canWrite={canWrite}
+              documentData={documentData}
               readinessIssues={readinessIssues}
-              onApplyTemplate={handleApplyTemplate}
+              hasExistingContent={(documentData.content?.length ?? 0) > 0}
+              initialTab={sidebarTab}
+              onApplyStarter={handleApplyTemplate}
+              onInsertSection={handleInsertSection}
+              onInsertBlock={handleInsertBlock}
+            />
+            <MediaPickerModal
+              open={mediaPickerOpen}
+              pageVersionId={pageVersionId}
+              canWrite={canWrite}
+              onSelect={() => setMediaPickerOpen(false)}
+              onClose={() => setMediaPickerOpen(false)}
             />
             <VisualStudioV2Editor
               key={`${pageVersionId}-${documentKey}`}

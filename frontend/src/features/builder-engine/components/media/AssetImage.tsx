@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { fetchAssetBlobUrl } from '@/lib/asset-file-url';
 import { cn } from '@/lib/utils';
 
@@ -6,6 +6,7 @@ type AssetImageProps = {
   assetId: string;
   alt?: string;
   className?: string;
+  style?: CSSProperties;
   /** Classes appliquées pendant le chargement */
   loadingClassName?: string;
 };
@@ -14,6 +15,7 @@ export function AssetImage({
   assetId,
   alt = '',
   className,
+  style,
   loadingClassName,
 }: AssetImageProps) {
   const [src, setSrc] = useState<string | null>(null);
@@ -66,5 +68,5 @@ export function AssetImage({
     );
   }
 
-  return <img src={src} alt={alt} className={className} decoding="async" />;
+  return <img src={src} alt={alt} className={className} style={style} decoding="async" />;
 }

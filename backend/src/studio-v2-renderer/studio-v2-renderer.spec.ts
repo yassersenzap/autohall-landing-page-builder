@@ -83,4 +83,51 @@ describe('Studio V2 renderer', () => {
     expect(issues.some((i) => i.code === 'NO_FORM')).toBe(false);
     expect(issues.some((i) => i.code === 'HERO_NO_TITLE')).toBe(false);
   });
+
+  it('renders StepsBlock and Spacer without editor placeholders', () => {
+    const doc: PuckDocument = {
+      root: { props: { title: 'Steps' } },
+      content: [
+        {
+          type: 'StepsBlock',
+          props: {
+            id: 'StepsBlock-1',
+            title: 'Votre parcours',
+            steps: [{ title: 'Étape 1', description: 'Description' }],
+          },
+        },
+        { type: 'Spacer', props: { id: 'Spacer-1', size: 'md' } },
+      ],
+    };
+    const ctx = createRenderContext({
+      mode: 'export',
+      assetMap: {},
+      tokens: DEFAULT_DESIGN_TOKENS,
+    });
+    const html = renderPuckDocumentHtml(doc, ctx);
+    expect(html).toContain('vs2-steps');
+    expect(html).toContain('vs2-spacer');
+    expect(html).not.toContain('vs2-editor-placeholder');
+    expect(html).not.toContain('vs2-slot-empty-state');
+  });
+
+  it('omits MediaImage when no source is set', () => {
+    const doc: PuckDocument = {
+      root: { props: { title: 'Media' } },
+      content: [
+        {
+          type: 'MediaImage',
+          props: { id: 'MediaImage-1', imageAlt: 'Test' },
+        },
+      ],
+    };
+    const ctx = createRenderContext({
+      mode: 'export',
+      assetMap: {},
+      tokens: DEFAULT_DESIGN_TOKENS,
+    });
+    const html = renderPuckDocumentHtml(doc, ctx);
+    expect(html).not.toContain('vs2-editor-placeholder');
+    expect(html.trim()).toBe('');
+  });
 });

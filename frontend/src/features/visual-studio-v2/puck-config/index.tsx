@@ -1,16 +1,21 @@
 import type { ReactNode } from 'react';
 import type { Config } from '@puckeditor/core';
-import { AssetImage } from '@/features/builder-engine/components/media/AssetImage';
 import { THEME_PRESET_OPTIONS } from '../design-tokens/presets';
 import { buildTokenStyleVars, resolveDesignTokens } from '../design-tokens/presets';
 import {
-  STUDIO_V2_BLOCK_COMPONENTS,
   STUDIO_V2_COLUMN_SLOT_ALLOW,
   STUDIO_V2_CONTAINER_SLOT_ALLOW,
+  STUDIO_V2_CONVERSION_COMPONENTS,
+  STUDIO_V2_CREATIVE_ATOMIC,
+  STUDIO_V2_CREATIVE_COMPOUND,
   STUDIO_V2_LAYOUT_COMPONENTS,
-  STUDIO_V2_SECTION_COMPONENTS,
+  STUDIO_V2_MARKETING_COMPONENTS,
+  STUDIO_V2_MEDIA_COMPONENTS,
   STUDIO_V2_SECTION_SLOT_ALLOW,
 } from '../puck-constants';
+import { creativeBlockComponents } from './creative-blocks';
+import { SectionEditorChrome } from '../components/SectionEditorChrome';
+import { ctaClassName, ctaInlineStyle, heroSubtitleStyle, heroTitleStyle } from '../lib/typography-classes';
 import type {
   BackgroundTone,
   ColumnGap,
@@ -36,8 +41,11 @@ import {
   renderHeroMedia,
   renderLeadFormFields,
   renderMediaField,
+  renderOfferMedia,
   toneClass,
+  wrapSlotZone,
 } from './shared';
+import { HIDDEN_IMAGE_PROPS, IMAGE_STYLE_DEFAULTS } from '../fields/field-definitions';
 
 const DESIGN_TOKEN_FIELDS = {
   primaryColor: { type: 'text' as const, label: 'Couleur primaire' },
@@ -159,16 +167,24 @@ export const studioV2PuckConfig: Config = {
   },
   categories: {
     layout: {
-      title: 'Layout',
+      title: 'Mise en page',
       components: [...STUDIO_V2_LAYOUT_COMPONENTS],
     },
-    sections: {
-      title: 'Sections',
-      components: [...STUDIO_V2_SECTION_COMPONENTS],
+    marketing: {
+      title: 'Sections marketing',
+      components: [...STUDIO_V2_MARKETING_COMPONENTS],
     },
-    components: {
-      title: 'Composants',
-      components: [...STUDIO_V2_BLOCK_COMPONENTS],
+    conversion: {
+      title: 'Conversion',
+      components: [...STUDIO_V2_CONVERSION_COMPONENTS],
+    },
+    media: {
+      title: 'Média',
+      components: [...STUDIO_V2_MEDIA_COMPONENTS],
+    },
+    creative: {
+      title: 'Blocs créatifs',
+      components: [...STUDIO_V2_CREATIVE_ATOMIC, ...STUDIO_V2_CREATIVE_COMPOUND],
     },
   },
   components: {
@@ -177,12 +193,12 @@ export const studioV2PuckConfig: Config = {
       fields: {
         backgroundTone: {
           type: 'select',
-          label: 'Fond',
+          label: 'Couleur de fond',
           options: TONE_OPTIONS,
         },
         spacingPreset: {
           type: 'select',
-          label: 'Espacement',
+          label: 'Espacement vertical',
           options: SPACING_OPTIONS,
         },
         fullHeight: {
@@ -206,23 +222,25 @@ export const studioV2PuckConfig: Config = {
         fullHeight: false,
         anchorId: '',
       },
-      render: ({ backgroundTone, spacingPreset, fullHeight, anchorId, items: Items }) => (
-        <section
-          id={anchorId || undefined}
-          className={`vs2-section ${toneClass(backgroundTone as BackgroundTone)} ${padClass(spacingPreset as SpacingPreset)}${fullHeight ? ' vs2-section--full' : ''}`}
-        >
-          <div className="vs2-section__inner">
-            <Items allow={[...STUDIO_V2_SECTION_SLOT_ALLOW]} minEmptyHeight="128px" />
-          </div>
-        </section>
+      render: ({ backgroundTone, spacingPreset, fullHeight, anchorId, items: Items, id }) => (
+        <SectionEditorChrome sectionId={typeof id === 'string' ? id : undefined}>
+          <section
+            id={anchorId || undefined}
+            className={`vs2-section ${toneClass(backgroundTone as BackgroundTone)} ${padClass(spacingPreset as SpacingPreset)}${fullHeight ? ' vs2-section--full' : ''}`}
+          >
+            <div className="vs2-section__inner">
+              {wrapSlotZone(Items, STUDIO_V2_SECTION_SLOT_ALLOW, '128px')}
+            </div>
+          </section>
+        </SectionEditorChrome>
       ),
     },
     Container: {
-      label: 'Container',
+      label: 'Conteneur',
       fields: {
         maxWidth: {
           type: 'select',
-          label: 'Largeur max',
+          label: 'Largeur du contenu',
           options: MAX_WIDTH_OPTIONS,
         },
         alignment: {
@@ -244,12 +262,12 @@ export const studioV2PuckConfig: Config = {
         <div
           className={`vs2-container ${maxWidthClass(maxWidth as ContainerMaxWidth)} ${alignClass(alignment as ContentAlignment)}`}
         >
-          <Items allow={[...STUDIO_V2_CONTAINER_SLOT_ALLOW]} minEmptyHeight="96px" />
+          {wrapSlotZone(Items, STUDIO_V2_CONTAINER_SLOT_ALLOW, '96px')}
         </div>
       ),
     },
     Columns: {
-      label: 'Columns',
+      label: 'Colonnes',
       fields: {
         columnRatio: {
           type: 'select',
@@ -314,43 +332,28 @@ export const studioV2PuckConfig: Config = {
           className={`vs2-columns vs2-ratio-${String(columnRatio).replace('-', '_')} ${columnGapClass(columnGap as ColumnGap)} vs2-valign-${verticalAlign} ${alignClass(alignment as ContentAlignment)} ${stackOnMobile ? 'vs2-columns--stack-mobile vs2-columns--left-first' : 'vs2-columns--no-stack-mobile'}`}
         >
           <div className="vs2-columns__col">
-            <Left allow={[...STUDIO_V2_COLUMN_SLOT_ALLOW]} minEmptyHeight="96px" />
+            {wrapSlotZone(Left, STUDIO_V2_COLUMN_SLOT_ALLOW, '96px')}
           </div>
           <div className="vs2-columns__col">
-            <Right allow={[...STUDIO_V2_COLUMN_SLOT_ALLOW]} minEmptyHeight="96px" />
+            {wrapSlotZone(Right, STUDIO_V2_COLUMN_SLOT_ALLOW, '96px')}
           </div>
         </div>
       ),
     },
     HeroAutoHall: {
-      label: 'Hero Auto Hall',
+      label: 'Hero campagne',
       fields: {
-        eyebrow: { type: 'text', label: 'Sur-titre' },
-        promoBadge: { type: 'text', label: 'Badge promo' },
-        title: { type: 'text', label: 'Titre' },
-        subtitle: { type: 'textarea', label: 'Sous-titre' },
-        ctaPrimaryLabel: { type: 'text', label: 'CTA principal — label' },
-        ctaPrimaryHref: { type: 'text', label: 'CTA principal — lien' },
-        ctaSecondaryLabel: { type: 'text', label: 'CTA secondaire — label' },
-        ctaSecondaryHref: { type: 'text', label: 'CTA secondaire — lien' },
-        layout: {
-          type: 'select',
-          label: 'Disposition',
-          options: HERO_LAYOUT_OPTIONS,
-        },
-        tone: {
-          type: 'select',
-          label: 'Ton',
-          options: TONE_OPTIONS,
-        },
-        alignment: {
-          type: 'select',
-          label: 'Alignement',
-          options: ALIGN_OPTIONS,
-        },
+        eyebrow: { type: 'text', label: 'Accroche (petit texte)' },
+        promoBadge: { type: 'text', label: 'Badge promotionnel' },
+        title: { type: 'text', label: 'Titre principal' },
+        subtitle: { type: 'textarea', label: 'Texte d\'introduction' },
+        ctaPrimaryLabel: { type: 'text', label: 'Bouton principal — libellé' },
+        ctaPrimaryHref: { type: 'text', label: 'Bouton principal — destination' },
+        ctaSecondaryLabel: { type: 'text', label: 'Bouton secondaire — libellé' },
+        ctaSecondaryHref: { type: 'text', label: 'Bouton secondaire — destination' },
         showBadges: {
           type: 'radio',
-          label: 'Afficher badges',
+          label: 'Afficher les arguments clés',
           options: [
             { label: 'Oui', value: true },
             { label: 'Non', value: false },
@@ -358,19 +361,83 @@ export const studioV2PuckConfig: Config = {
         },
         badges: {
           type: 'array',
-          label: 'Badges',
+          label: 'Arguments clés',
           arrayFields: {
-            value: { type: 'text', label: 'Texte' },
+            value: { type: 'text', label: 'Argument' },
           },
-          getItemSummary: (item: { value?: string }) => item?.value || 'Badge',
+          getItemSummary: (item: { value?: string }) => item?.value || 'Argument',
         },
         imageAssetId: {
           type: 'custom',
-          label: 'Média (asset)',
+          label: 'Image',
           render: ({ value, onChange }) => renderMediaField({ value, onChange }),
         },
-        imageUrl: { type: 'text', label: 'URL image (fallback)' },
-        imageAlt: { type: 'text', label: 'Texte alternatif image' },
+        ...HIDDEN_IMAGE_PROPS,
+        layout: {
+          type: 'select',
+          label: 'Disposition visuelle',
+          options: HERO_LAYOUT_OPTIONS,
+        },
+        tone: {
+          type: 'select',
+          label: 'Ambiance couleur',
+          options: TONE_OPTIONS,
+        },
+        alignment: {
+          type: 'select',
+          label: 'Alignement du texte',
+          options: ALIGN_OPTIONS,
+        },
+        titleSize: {
+          type: 'select',
+          label: 'Taille du titre',
+          options: [
+            { label: 'S', value: 's' },
+            { label: 'M', value: 'm' },
+            { label: 'L', value: 'l' },
+            { label: 'XL', value: 'xl' },
+          ],
+        },
+        titleWeight: {
+          type: 'select',
+          label: 'Graisse du titre',
+          options: [
+            { label: 'Normal', value: 'normal' },
+            { label: 'Medium', value: 'medium' },
+            { label: 'Gras', value: 'bold' },
+            { label: 'Extra-gras', value: 'extrabold' },
+          ],
+        },
+        titleColor: { type: 'text', label: 'Couleur du titre (optionnel)' },
+        bodyColor: { type: 'text', label: 'Couleur du texte (optionnel)' },
+        ctaPrimaryVariant: {
+          type: 'select',
+          label: 'Style bouton principal',
+          options: [
+            { label: 'Primaire', value: 'primary' },
+            { label: 'Secondaire', value: 'secondary' },
+            { label: 'Contour', value: 'outline' },
+            { label: 'Lien', value: 'link' },
+          ],
+        },
+        ctaPrimarySize: {
+          type: 'select',
+          label: 'Taille bouton principal',
+          options: [
+            { label: 'S', value: 's' },
+            { label: 'M', value: 'm' },
+            { label: 'L', value: 'l' },
+          ],
+        },
+        ctaSecondaryVariant: {
+          type: 'select',
+          label: 'Style bouton secondaire',
+          options: [
+            { label: 'Secondaire', value: 'secondary' },
+            { label: 'Contour', value: 'outline' },
+            { label: 'Lien', value: 'link' },
+          ],
+        },
       },
       defaultProps: {
         eyebrow: '',
@@ -389,6 +456,12 @@ export const studioV2PuckConfig: Config = {
         imageUrl: '',
         imageAssetId: '',
         imageAlt: '',
+        ...IMAGE_STYLE_DEFAULTS,
+        titleSize: 'l',
+        titleWeight: 'bold',
+        ctaPrimaryVariant: 'primary',
+        ctaPrimarySize: 'm',
+        ctaSecondaryVariant: 'outline',
       },
       render: (props) => {
         const {
@@ -405,13 +478,14 @@ export const studioV2PuckConfig: Config = {
           layout,
           tone,
           backgroundTone,
-          imageUrl,
-          imageAssetId,
-          imageAlt,
           alignment,
           showBadges,
           badges,
+          ctaPrimaryVariant,
+          ctaPrimarySize,
+          ctaSecondaryVariant,
         } = props;
+        const heroProps = props as Record<string, unknown>;
         const primaryLabel = ctaPrimaryLabel || ctaLabel;
         const primaryHref = ctaPrimaryHref || ctaHref || '#lead-form';
         const heroTone = (tone || backgroundTone || 'brand') as HeroTone;
@@ -429,17 +503,29 @@ export const studioV2PuckConfig: Config = {
             <div className="vs2-hero__content">
               {promoBadge ? <span className="vs2-hero__badge">{promoBadge}</span> : null}
               {eyebrow ? <p className="vs2-hero__eyebrow">{eyebrow}</p> : null}
-              {title ? <h1 className="vs2-hero__title">{title}</h1> : null}
-              {subtitle ? <p className="vs2-hero__subtitle">{subtitle}</p> : null}
+              {title ? (
+                <h1 className="vs2-hero__title" style={heroTitleStyle(heroProps)}>
+                  {title}
+                </h1>
+              ) : null}
+              {subtitle ? (
+                <p className="vs2-hero__subtitle" style={heroSubtitleStyle(heroProps)}>
+                  {subtitle}
+                </p>
+              ) : null}
               <div className="vs2-hero__ctas">
                 {primaryLabel ? (
-                  <a className="vs2-hero__cta vs2-hero__cta--primary" href={primaryHref}>
+                  <a
+                    className={ctaClassName(String(ctaPrimaryVariant ?? 'primary'), String(ctaPrimarySize ?? 'm'))}
+                    style={ctaInlineStyle(String(ctaPrimarySize ?? 'm'))}
+                    href={primaryHref}
+                  >
                     {primaryLabel}
                   </a>
                 ) : null}
                 {ctaSecondaryLabel ? (
                   <a
-                    className="vs2-hero__cta vs2-hero__cta--secondary"
+                    className={ctaClassName(String(ctaSecondaryVariant ?? 'outline'), 'm')}
                     href={ctaSecondaryHref || '#'}
                   >
                     {ctaSecondaryLabel}
@@ -456,17 +542,25 @@ export const studioV2PuckConfig: Config = {
                 </div>
               ) : null}
             </div>
-            {renderHeroMedia(imageAssetId, imageUrl, imageAlt)}
+            {renderHeroMedia(props as Record<string, unknown>)}
           </div>
         );
       },
     },
     LeadFormAutoHall: {
-      label: 'Formulaire Auto Hall',
+      label: 'Formulaire lead',
       fields: {
-        title: { type: 'text', label: 'Titre' },
-        subtitle: { type: 'textarea', label: 'Sous-titre' },
-        submitText: { type: 'text', label: 'Bouton envoi' },
+        formPurpose: {
+          type: 'select',
+          label: 'Type de formulaire',
+          options: [
+            { label: 'Demande / lead', value: 'lead' },
+            { label: 'Prise de rendez-vous', value: 'appointment' },
+          ],
+        },
+        title: { type: 'text', label: 'Titre du formulaire' },
+        subtitle: { type: 'textarea', label: 'Texte d\'introduction' },
+        submitText: { type: 'text', label: 'Libellé du bouton' },
         consentText: { type: 'textarea', label: 'Texte consentement' },
         privacyNote: { type: 'text', label: 'Note champs obligatoires' },
         showCivility: {
@@ -537,6 +631,7 @@ export const studioV2PuckConfig: Config = {
         },
       },
       defaultProps: {
+        formPurpose: 'lead',
         title: 'Contactez-nous',
         subtitle: '',
         submitText: 'Envoyer votre demande',
@@ -604,19 +699,11 @@ export const studioV2PuckConfig: Config = {
     VehicleOffer: {
       label: 'Offre véhicule',
       fields: {
-        layout: {
-          type: 'select',
-          label: 'Disposition',
-          options: [
-            { label: 'Carte', value: 'card' },
-            { label: 'Split', value: 'split' },
-          ],
-        },
-        offerLabel: { type: 'text', label: 'Label offre' },
-        title: { type: 'text', label: 'Titre' },
-        subtitle: { type: 'textarea', label: 'Sous-titre' },
-        modelName: { type: 'text', label: 'Modèle' },
-        priceText: { type: 'text', label: 'Prix / mensualité' },
+        offerLabel: { type: 'text', label: 'Étiquette offre' },
+        title: { type: 'text', label: 'Titre de l\'offre' },
+        subtitle: { type: 'textarea', label: 'Description courte' },
+        modelName: { type: 'text', label: 'Nom du modèle' },
+        priceText: { type: 'text', label: 'Prix ou mensualité' },
         highlights: {
           type: 'array',
           label: 'Points forts',
@@ -625,15 +712,22 @@ export const studioV2PuckConfig: Config = {
           },
           getItemSummary: (item: { value?: string }) => item?.value || 'Point',
         },
-        ctaLabel: { type: 'text', label: 'CTA label' },
-        ctaHref: { type: 'text', label: 'CTA lien' },
+        ctaLabel: { type: 'text', label: 'Bouton — libellé' },
+        ctaHref: { type: 'text', label: 'Bouton — destination' },
         imageAssetId: {
           type: 'custom',
-          label: 'Média (asset)',
+          label: 'Image véhicule',
           render: ({ value, onChange }) => renderMediaField({ value, onChange }),
         },
-        imageUrl: { type: 'text', label: 'URL image (fallback)' },
-        imageAlt: { type: 'text', label: 'Texte alternatif' },
+        ...HIDDEN_IMAGE_PROPS,
+        layout: {
+          type: 'select',
+          label: 'Disposition',
+          options: [
+            { label: 'Carte', value: 'card' },
+            { label: 'Image + texte', value: 'split' },
+          ],
+        },
       },
       defaultProps: {
         layout: 'split',
@@ -648,6 +742,7 @@ export const studioV2PuckConfig: Config = {
         imageAssetId: '',
         imageUrl: '',
         imageAlt: '',
+        ...IMAGE_STYLE_DEFAULTS,
       },
       render: (props) => {
         const {
@@ -660,9 +755,6 @@ export const studioV2PuckConfig: Config = {
           highlights,
           ctaLabel,
           ctaHref,
-          imageAssetId,
-          imageUrl,
-          imageAlt,
         } = props;
         const highlightItems = Array.isArray(highlights)
           ? highlights
@@ -691,20 +783,7 @@ export const studioV2PuckConfig: Config = {
                 </a>
               ) : null}
             </div>
-            <div className="vs2-offer__media">
-              {imageAssetId ? (
-                <AssetImage
-                  assetId={String(imageAssetId)}
-                  alt={imageAlt ?? ''}
-                  className="vs2-offer__img"
-                  loadingClassName="vs2-offer__img"
-                />
-              ) : imageUrl ? (
-                <img src={String(imageUrl)} alt={imageAlt ?? ''} className="vs2-offer__img" />
-              ) : (
-                <div className="vs2-offer__placeholder">Visuel véhicule</div>
-              )}
-            </div>
+            {renderOfferMedia(props as Record<string, unknown>)}
           </section>
         );
       },
@@ -823,11 +902,12 @@ export const studioV2PuckConfig: Config = {
             { label: 'Cartes', value: 'cards' },
             { label: 'Liste', value: 'list' },
             { label: 'Icônes', value: 'icons' },
+            { label: 'Confiance / garanties', value: 'trust' },
           ],
         },
         items: {
           type: 'array',
-          label: 'Avantages',
+          label: 'Éléments',
           arrayFields: {
             icon: {
               type: 'select',
@@ -980,6 +1060,105 @@ export const studioV2PuckConfig: Config = {
         </section>
       ),
     },
+    Spacer: {
+      label: 'Espacement',
+      fields: {
+        size: {
+          type: 'select',
+          label: 'Hauteur',
+          options: [
+            { label: 'Petit', value: 'sm' },
+            { label: 'Moyen', value: 'md' },
+            { label: 'Grand', value: 'lg' },
+            { label: 'Très grand', value: 'xl' },
+          ],
+        },
+      },
+      defaultProps: { size: 'md' },
+      render: ({ size }) => <div className={`vs2-spacer vs2-spacer--${size ?? 'md'}`} aria-hidden />,
+    },
+    StepsBlock: {
+      label: 'Étapes / parcours',
+      fields: {
+        title: { type: 'text', label: 'Titre de la section' },
+        subtitle: { type: 'textarea', label: 'Introduction' },
+        steps: {
+          type: 'array',
+          label: 'Étapes',
+          arrayFields: {
+            title: { type: 'text', label: 'Titre de l\'étape' },
+            description: { type: 'textarea', label: 'Description' },
+          },
+          getItemSummary: (item: { title?: string }) => item?.title || 'Étape',
+          defaultItemProps: { title: 'Nouvelle étape', description: '' },
+        },
+      },
+      defaultProps: {
+        title: '',
+        subtitle: '',
+        steps: [],
+      },
+      render: ({ title, subtitle, steps }) => {
+        const stepItems = Array.isArray(steps) ? steps : [];
+        return (
+          <section className="vs2-steps">
+            {title ? <h2 className="vs2-steps__title">{title}</h2> : null}
+            {subtitle ? <p className="vs2-steps__subtitle">{subtitle}</p> : null}
+            <ol className="vs2-steps__list">
+              {stepItems.map((step, index) => {
+                const s = step as Record<string, unknown>;
+                return (
+                  <li key={String(s.title ?? index)} className="vs2-steps__item">
+                    <span className="vs2-steps__number">{index + 1}</span>
+                    <div>
+                      {s.title ? <p className="vs2-steps__item-title">{String(s.title)}</p> : null}
+                      {s.description ? (
+                        <p className="vs2-steps__item-desc">{String(s.description)}</p>
+                      ) : null}
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+        );
+      },
+    },
+    MediaImage: {
+      label: 'Image',
+      fields: {
+        imageAssetId: {
+          type: 'custom',
+          label: 'Visuel',
+          render: ({ value, onChange }) => renderMediaField({ value, onChange }),
+        },
+        ...HIDDEN_IMAGE_PROPS,
+        caption: { type: 'text', label: 'Légende (optionnel)' },
+        alignment: {
+          type: 'select',
+          label: 'Alignement',
+          options: ALIGN_OPTIONS,
+        },
+      },
+      defaultProps: {
+        imageAssetId: '',
+        imageUrl: '',
+        imageAlt: '',
+        caption: '',
+        alignment: 'center',
+        ...IMAGE_STYLE_DEFAULTS,
+      },
+      render: (props) => {
+        const { caption, alignment } = props;
+        return (
+          <figure className={`vs2-media-image ${alignClass(alignment as ContentAlignment)}`}>
+            {renderHeroMedia(props as Record<string, unknown>, 'Ajoutez une image')}
+            {caption ? <figcaption className="vs2-media-image__caption">{caption}</figcaption> : null}
+          </figure>
+        );
+      },
+    },
+    ...creativeBlockComponents,
     FooterLegal: {
       label: 'Pied de page légal',
       fields: {

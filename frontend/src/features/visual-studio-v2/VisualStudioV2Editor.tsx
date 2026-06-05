@@ -9,6 +9,7 @@ import { Puck } from '@puckeditor/core';
 import '@puckeditor/core/puck.css';
 import './styles/visual-studio-v2.css';
 import type { Data } from '@puckeditor/core';
+import { useStudioV2Actions } from './context/StudioV2Context';
 import { studioV2PuckConfig } from './puck-config/index';
 import { studioV2DocumentsEqual } from './lib/document-equals';
 import type { StudioV2Viewport, StudioV2Zoom } from './components/StudioV2Toolbar';
@@ -71,6 +72,9 @@ export const VisualStudioV2Editor = forwardRef<
     [onDirtyChange, onSave],
   );
 
+  const actions = useStudioV2Actions();
+  const isPageEmpty = (data.content?.length ?? 0) === 0;
+
   return (
     <div
       className="visual-studio-v2-editor"
@@ -78,6 +82,30 @@ export const VisualStudioV2Editor = forwardRef<
       data-viewport={viewport}
       data-zoom={zoom}
     >
+      {isPageEmpty && canWrite ? (
+        <div className="vs2-canvas-empty" role="status">
+          <p className="vs2-canvas-empty__title">Commencez votre landing page</p>
+          <p className="vs2-canvas-empty__hint">
+            Choisissez un starter ou ajoutez une section depuis le panneau gauche.
+          </p>
+          <div className="vs2-canvas-empty__actions">
+            <button
+              type="button"
+              className="vs2-canvas-empty__btn"
+              onClick={() => actions?.onFocusStarterTab?.()}
+            >
+              Choisir un starter
+            </button>
+            <button
+              type="button"
+              className="vs2-canvas-empty__btn vs2-canvas-empty__btn--secondary"
+              onClick={() => actions?.onFocusSectionTab?.()}
+            >
+              Ajouter une section
+            </button>
+          </div>
+        </div>
+      ) : null}
       <Puck
         config={studioV2PuckConfig}
         data={data}
@@ -92,6 +120,7 @@ export const VisualStudioV2Editor = forwardRef<
         }}
         overrides={{
           header: () => <></>,
+          outline: () => <></>,
         }}
         iframe={{ enabled: false }}
         height="100%"

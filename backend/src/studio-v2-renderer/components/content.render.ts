@@ -206,6 +206,54 @@ export function renderFooterLegal(props: Record<string, unknown>): string {
   return `<footer class="vs2-footer">${brand}${legal}${links}</footer>`;
 }
 
+export function renderSpacer(props: Record<string, unknown>): string {
+  const size = typeof props.size === 'string' ? props.size : 'md';
+  return `<div class="vs2-spacer vs2-spacer--${escapeHtml(size)}" aria-hidden="true"></div>`;
+}
+
+export function renderStepsBlock(props: Record<string, unknown>): string {
+  const title =
+    typeof props.title === 'string' && props.title.trim()
+      ? `<h2 class="vs2-steps__title">${escapeHtml(props.title.trim())}</h2>`
+      : '';
+  const subtitle =
+    typeof props.subtitle === 'string' && props.subtitle.trim()
+      ? `<p class="vs2-steps__subtitle">${escapeHtml(props.subtitle.trim())}</p>`
+      : '';
+
+  const steps = Array.isArray(props.steps) ? props.steps : [];
+  const items = steps
+    .filter((item): item is Record<string, unknown> => item !== null && typeof item === 'object')
+    .map((step, index) => {
+      const stepTitle =
+        typeof step.title === 'string' && step.title.trim()
+          ? `<p class="vs2-steps__item-title">${escapeHtml(step.title.trim())}</p>`
+          : '';
+      const desc =
+        typeof step.description === 'string' && step.description.trim()
+          ? `<p class="vs2-steps__item-desc">${escapeHtml(step.description.trim())}</p>`
+          : '';
+      return `<li class="vs2-steps__item"><span class="vs2-steps__number">${index + 1}</span><div>${stepTitle}${desc}</div></li>`;
+    })
+    .join('');
+
+  return `<section class="vs2-steps">${title}${subtitle}<ol class="vs2-steps__list">${items}</ol></section>`;
+}
+
+export function renderMediaImage(
+  props: Record<string, unknown>,
+  ctx: StudioV2RenderContext,
+): string {
+  const align = props.alignment === 'center' ? 'center' : 'left';
+  const img = renderImageTag(props, ctx, 'vs2-media-image__img');
+  const caption =
+    typeof props.caption === 'string' && props.caption.trim()
+      ? `<figcaption class="vs2-media-image__caption">${escapeHtml(props.caption.trim())}</figcaption>`
+      : '';
+  if (!img && !caption) return '';
+  return `<figure class="vs2-media-image vs2-align-${align}">${img}${caption}</figure>`;
+}
+
 export function renderSlotChildren(
   props: Record<string, unknown>,
   slotKey: string,

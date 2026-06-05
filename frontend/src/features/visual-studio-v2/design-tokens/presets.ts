@@ -24,6 +24,7 @@ export const THEME_PRESET_OPTIONS: { label: string; value: StudioV2ThemePresetId
   { label: 'SAV Rouge', value: 'sav-red' },
   { label: 'Gamme HEV Vert', value: 'gamme-hev-green' },
   { label: 'Premium Sombre', value: 'premium-dark' },
+  { label: 'Racing / Sport', value: 'racing-sport' },
 ];
 
 export const THEME_PRESETS: Record<StudioV2ThemePresetId, Partial<StudioV2DesignTokens>> = {
@@ -49,9 +50,9 @@ export const THEME_PRESETS: Record<StudioV2ThemePresetId, Partial<StudioV2Design
     primaryColor: '#b91c1c',
     secondaryColor: '#7f1d1d',
     accentColor: '#dc2626',
-    backgroundColor: '#fff5f5',
+    backgroundColor: '#fff8f8',
     textColor: '#1f2937',
-    headingColor: '#991b1b',
+    headingColor: '#7f1d1d',
   },
   'gamme-hev-green': {
     primaryColor: '#047857',
@@ -70,6 +71,18 @@ export const THEME_PRESETS: Record<StudioV2ThemePresetId, Partial<StudioV2Design
     headingColor: '#f8fafc',
     cardRadius: 'round',
     shadowStyle: 'elevated',
+  },
+  'racing-sport': {
+    primaryColor: '#0a0a0a',
+    secondaryColor: '#1a1a2e',
+    accentColor: '#ff3d00',
+    backgroundColor: '#050508',
+    textColor: '#f1f5f9',
+    headingColor: '#ffffff',
+    buttonRadius: 'square',
+    shadowStyle: 'elevated',
+    headingScale: 'large',
+    sectionSpacing: 'hero',
   },
 };
 
