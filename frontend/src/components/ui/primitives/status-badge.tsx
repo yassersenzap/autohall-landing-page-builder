@@ -24,8 +24,19 @@ const STATUS_STYLES: Record<string, string> = {
   CONTACTED: 'border-amber-500/20 bg-amber-500/10 text-amber-400',
   QUALIFIED: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400',
   REJECTED: 'border-slate-500/20 bg-slate-500/10 text-slate-400',
+};
+
+const LEAD_STATUS_OVERRIDES: Record<string, string> = {
   ARCHIVED: 'border-slate-500/20 bg-slate-500/10 text-slate-400',
 };
+
+function resolveStyle(status: string, kind: StatusKind): string {
+  const key = status.toUpperCase();
+  if (kind === 'lead' && LEAD_STATUS_OVERRIDES[key]) {
+    return LEAD_STATUS_OVERRIDES[key];
+  }
+  return STATUS_STYLES[key] ?? 'border-border bg-muted/60 text-muted-foreground';
+}
 
 function resolveLabel(status: string, kind: StatusKind): string {
   const upper = status.toUpperCase();
@@ -41,8 +52,7 @@ type StatusBadgeProps = {
 };
 
 export function StatusBadge({ status, kind = 'campaign', label, className }: StatusBadgeProps) {
-  const key = status.toUpperCase();
-  const style = STATUS_STYLES[key] ?? 'border-border bg-muted/60 text-muted-foreground';
+  const style = resolveStyle(status, kind);
   const display = label ?? resolveLabel(status, kind);
 
   return (
