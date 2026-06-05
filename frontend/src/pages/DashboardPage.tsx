@@ -24,7 +24,7 @@ import { getPreviewRoute, getStudioRoute } from '@/lib/landing-studio-routes';
 import { getLeadDashboardKpis, type LeadDashboardKpis } from '@/lib/lead-dashboard';
 import { canViewLeads } from '@/lib/leads';
 import { studioNavState } from '@/lib/studio-session';
-import { downloadStudioV2Export } from '@/features/visual-studio-v2/api/studio-v2-preview.api';
+import { downloadLandingExport } from '@/lib/landing-export.api';
 
 export default function DashboardPage() {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -78,7 +78,7 @@ export default function DashboardPage() {
     setExporting(true);
     setExportError(null);
     try {
-      await downloadStudioV2Export(session.pageVersionId);
+      await downloadLandingExport(session.pageVersionId);
     } catch (err) {
       setExportError(
         err instanceof Error ? err.message : 'Impossible d’exporter la version.',

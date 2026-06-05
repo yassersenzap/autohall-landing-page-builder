@@ -15,6 +15,7 @@ import {
   buildExportFilename,
   buildIndexHtml,
   buildLandingConfigJs,
+  deriveApiBaseUrl,
   STATIC_LEAD_FORM_JS,
   STATIC_MAIN_JS,
   STATIC_STYLE_CSS,
@@ -73,6 +74,7 @@ export class PageExportService {
 
     const landingConfigJs = buildLandingConfigJs({
       leadEndpoint,
+      apiBaseUrl: deriveApiBaseUrl(leadEndpoint),
       campaignId: landingPage.campaignId,
       landingPageId: landingPage.id,
       pageVersionId: pageVersion.id,

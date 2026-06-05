@@ -17,11 +17,21 @@ export type ExportPageContext = {
 
 export type ExportLandingConfig = {
   leadEndpoint: string;
+  /** Base URL API absolue — fallback si leadEndpoint est relatif. */
+  apiBaseUrl: string;
   campaignId: string;
   landingPageId: string;
   pageVersionId: string;
   landingSlug: string;
 };
+
+export function deriveApiBaseUrl(leadEndpoint: string): string {
+  const normalized = leadEndpoint.replace(/\/$/, '');
+  if (normalized.endsWith('/api/public/leads')) {
+    return normalized.slice(0, -'/api/public/leads'.length) || 'http://localhost:3000';
+  }
+  return normalized.replace(/\/api\/.*$/, '') || 'http://localhost:3000';
+}
 
 export function buildLandingConfigJs(config: ExportLandingConfig): string {
   return `window.LANDING_CONFIG = ${JSON.stringify(config)};\n`;
@@ -45,11 +55,36 @@ export function buildIndexHtml(
 
 export const STATIC_STYLE_CSS = getLandingPageStylesheet();
 
+/** Panneau de confirmation injecté dans le formulaire après soumission réussie. */
+export const LEAD_FORM_SUCCESS_HTML = `
+    <div class="flex flex-col items-center justify-center text-center p-8 bg-white/5 backdrop-blur-sm rounded-2xl border border-neutral-200 dark:border-neutral-800 w-full animate-in fade-in duration-500">
+      <svg class="w-16 h-16 text-blue-600 dark:text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <h3 class="text-2xl font-bold text-neutral-900 dark:text-white mb-2">Demande envoyée avec succès</h3>
+      <p class="text-neutral-500 dark:text-neutral-400">Un conseiller Auto Hall vous contactera dans les plus brefs délais.</p>
+    </div>
+  `.trim();
+
 export const STATIC_LEAD_FORM_JS = `document.addEventListener('DOMContentLoaded', function () {
   console.log('[AutoHall] Landing page statique chargée');
 
   var config = window.LANDING_CONFIG || {};
   var leadForms = document.querySelectorAll('form.lp-lead-form');
+
+  function resolveLeadEndpoint(cfg) {
+    var endpoint = (cfg && cfg.leadEndpoint) || '';
+    if (!endpoint) return '';
+    if (/^https?:\\/\\//i.test(endpoint)) return endpoint;
+    var base = ((cfg && cfg.apiBaseUrl) || 'http://localhost:3000').replace(/\\/$/, '');
+    return base + (endpoint.charAt(0) === '/' ? endpoint : '/' + endpoint);
+  }
+
+  function resolveSourceUrl() {
+    var currentUrl = window.location.href || '';
+    if (currentUrl.indexOf('file://') === 0) {
+      return 'http://offline-test.autohall.local';
+    }
+    return currentUrl || 'http://offline-test.autohall.local';
+  }
 
   function showFeedback(form, message, type) {
     var node = form.querySelector('.lp-lead-form__feedback');
@@ -59,6 +94,12 @@ export const STATIC_LEAD_FORM_JS = `document.addEventListener('DOMContentLoaded'
     }
     node.textContent = message;
     node.className = 'lp-lead-form__feedback is-' + type;
+  }
+
+  function showSuccessState(form) {
+    form.innerHTML = ${JSON.stringify(LEAD_FORM_SUCCESS_HTML)};
+    form.setAttribute('role', 'status');
+    form.setAttribute('aria-live', 'polite');
   }
 
   function collectFormFields(form) {
@@ -84,6 +125,7 @@ export const STATIC_LEAD_FORM_JS = `document.addEventListener('DOMContentLoaded'
         return;
       }
 
+      var leadEndpoint = resolveLeadEndpoint(config);
       var fields = collectFormFields(form);
       var firstName = (fields.firstName || '').trim();
       var lastName = (fields.lastName || '').trim();
@@ -119,7 +161,7 @@ export const STATIC_LEAD_FORM_JS = `document.addEventListener('DOMContentLoaded'
         vehicleModel: fields.vehicleModel || undefined,
         city: fields.city || undefined,
         message: fields.message || undefined,
-        sourceUrl: window.location.href,
+        sourceUrl: resolveSourceUrl(),
         rawPayload: fields,
         metadata: {
           userAgent: navigator.userAgent,
@@ -127,7 +169,7 @@ export const STATIC_LEAD_FORM_JS = `document.addEventListener('DOMContentLoaded'
         },
       };
 
-      fetch(config.leadEndpoint, {
+      fetch(leadEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -144,13 +186,7 @@ export const STATIC_LEAD_FORM_JS = `document.addEventListener('DOMContentLoaded'
               'Impossible d’envoyer votre demande.';
             throw new Error(errMsg);
           }
-          showFeedback(
-            form,
-            (result.payload && result.payload.message) ||
-              'Votre demande a bien été enregistrée. Un conseiller Auto Hall vous contactera.',
-            'success',
-          );
-          form.reset();
+          showSuccessState(form);
         })
         .catch(function (err) {
           showFeedback(

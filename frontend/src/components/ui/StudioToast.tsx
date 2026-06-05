@@ -14,7 +14,7 @@ export function StudioToast({ toast, onDismiss }: StudioToastProps) {
     <div
       role="status"
       className={cn(
-        'fixed bottom-4 right-4 z-[100] flex max-w-sm items-start gap-2 rounded-lg border px-4 py-3 text-sm shadow-lg',
+        'fixed bottom-4 right-4 z-100 flex max-w-sm items-start gap-2 rounded-lg border px-4 py-3 text-sm shadow-lg',
         toast.type === 'success'
           ? 'border-emerald-500/30 bg-emerald-950 text-emerald-50'
           : 'border-destructive/40 bg-destructive/95 text-destructive-foreground',

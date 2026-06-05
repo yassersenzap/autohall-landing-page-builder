@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest';
 import appSource from './App.tsx?raw';
 
 describe('App routes', () => {
-  it('exposes Landing Studio as the official editor route', () => {
+  it('exposes Studio V3 as the official editor route', () => {
     const source = appSource;
 
     expect(source).toContain('/page-versions/:pageVersionId/studio');
     expect(source).toContain('/page-versions/:pageVersionId/studio/preview');
-    expect(source).toContain('VisualStudioV2Page');
+    expect(source).toContain('BuilderV3Page');
     expect(source).toContain('lazy');
   });
 

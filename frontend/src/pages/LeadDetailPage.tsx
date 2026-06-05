@@ -1,10 +1,19 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import {
+  Calendar,
+  Car,
+  Globe,
+  Mail,
+  Megaphone,
+  Phone,
+  Tag,
+  User,
+} from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import LeadActivityHistory from '../components/leads/LeadActivityHistory';
 import LeadFollowUpForm from '../components/leads/LeadFollowUpForm';
 import LeadStatusForm from '../components/leads/LeadStatusForm';
 import { Card } from '../components/ui/Card';
-import { PageHeader } from '../components/ui/PageHeader';
 import { PriorityBadge } from '../components/ui/PriorityBadge';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { ApiError, logoutClient, meRequest } from '../lib/api';
@@ -23,6 +32,27 @@ import {
 
 function formatDate(value: string): string {
   return new Date(value).toLocaleString('fr-FR');
+}
+
+type MetaFieldProps = {
+  icon: ReactNode;
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+};
+
+function MetaField({ icon, label, children, className }: MetaFieldProps) {
+  return (
+    <div className={className}>
+      <dt className="mb-1.5 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-neutral-500">
+        <span className="text-neutral-600" aria-hidden>
+          {icon}
+        </span>
+        {label}
+      </dt>
+      <dd className="text-base font-medium text-neutral-100">{children}</dd>
+    </div>
+  );
 }
 
 export default function LeadDetailPage() {
@@ -192,7 +222,7 @@ export default function LeadDetailPage() {
   }
 
   if (loading) {
-    return <p className="ui-page-header__subtitle">Chargement du lead…</p>;
+    return <p className="text-neutral-500">Chargement du lead…</p>;
   }
 
   if (role && !canViewLeads(role)) {
@@ -211,107 +241,101 @@ export default function LeadDetailPage() {
   if (!lead) {
     return (
       <div className="studio-stack">
-        <PageHeader title="Détail du lead" backTo="/leads" backLabel="Retour à la liste" />
+        <Link to="/leads" className="mb-4 inline-flex text-sm text-neutral-500 hover:text-neutral-300">
+          ← Retour à la liste
+        </Link>
         {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
-        {!error ? <p className="ui-page-header__subtitle">Lead introuvable.</p> : null}
+        {!error ? <p className="text-neutral-500">Lead introuvable.</p> : null}
       </div>
     );
   }
 
   return (
     <div className="studio-stack lead-detail-page">
-      <PageHeader
-        title={lead.fullName}
-        subtitle={`Lead reçu le ${formatDate(lead.createdAt)}`}
-        backTo="/leads"
-        backLabel="Retour à la liste"
-        actions={
-          <>
-            <StatusBadge status={lead.status} />
-            <PriorityBadge priority={lead.priority} />
-          </>
-        }
-      />
+      <header className="mb-8">
+        <Link
+          to="/leads"
+          className="mb-4 inline-flex text-sm font-medium text-neutral-500 transition-colors hover:text-neutral-300"
+        >
+          ← Retour à la liste
+        </Link>
+        <h1 className="mb-2 text-4xl font-bold tracking-tight text-neutral-100">
+          {lead.fullName}
+        </h1>
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <StatusBadge status={lead.status} />
+          <PriorityBadge priority={lead.priority} />
+        </div>
+        <p className="text-sm text-neutral-500">
+          Lead reçu le {formatDate(lead.createdAt)}
+        </p>
+      </header>
 
       {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
-      {success ? <p className="ui-alert ui-alert--success">{success}</p> : null}
+      {success ? (
+        <p className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+          {success}
+        </p>
+      ) : null}
       {followUpSuccess ? (
-        <p className="ui-alert ui-alert--success">{followUpSuccess}</p>
+        <p className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+          {followUpSuccess}
+        </p>
       ) : null}
 
       <Card title="Informations">
-        <dl className="lead-detail-meta">
-          <div className="lead-detail-meta__item">
-            <dt className="lead-detail-meta__label">Téléphone</dt>
-            <dd className="lead-detail-meta__value">{lead.phone}</dd>
-          </div>
-          <div className="lead-detail-meta__item">
-            <dt className="lead-detail-meta__label">Email</dt>
-            <dd className="lead-detail-meta__value">{lead.email ?? '—'}</dd>
-          </div>
-          <div className="lead-detail-meta__item">
-            <dt className="lead-detail-meta__label">Campagne</dt>
-            <dd className="lead-detail-meta__value">{lead.campaignName}</dd>
-          </div>
-          <div className="lead-detail-meta__item">
-            <dt className="lead-detail-meta__label">Landing page</dt>
-            <dd className="lead-detail-meta__value">
-              {lead.landingPageTitle} (/{lead.landingPageSlug})
-            </dd>
-          </div>
-          <div className="lead-detail-meta__item">
-            <dt className="lead-detail-meta__label">Marque / modèle</dt>
-            <dd className="lead-detail-meta__value">
-              {[lead.brand, lead.model].filter(Boolean).join(' · ') || '—'}
-            </dd>
-          </div>
-          <div className="lead-detail-meta__item">
-            <dt className="lead-detail-meta__label">Assigné à</dt>
-            <dd className="lead-detail-meta__value">
-              {lead.assignedTo?.fullName ?? 'Non assigné'}
-            </dd>
-          </div>
-          <div className="lead-detail-meta__item">
-            <dt className="lead-detail-meta__label">Prochaine relance</dt>
-            <dd
-              className={[
-                'lead-detail-meta__value',
-                lead.isFollowUpOverdue ? 'leads-table__overdue' : '',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-            >
+        <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <MetaField icon={<Phone className="h-3.5 w-3.5" />} label="Téléphone">
+            {lead.phone}
+          </MetaField>
+          <MetaField icon={<Mail className="h-3.5 w-3.5" />} label="Email">
+            {lead.email ?? '—'}
+          </MetaField>
+          <MetaField icon={<Megaphone className="h-3.5 w-3.5" />} label="Campagne">
+            {lead.campaignName}
+          </MetaField>
+          <MetaField icon={<Globe className="h-3.5 w-3.5" />} label="Landing page">
+            {lead.landingPageTitle} (/{lead.landingPageSlug})
+          </MetaField>
+          <MetaField icon={<Car className="h-3.5 w-3.5" />} label="Marque / modèle">
+            {[lead.brand, lead.model].filter(Boolean).join(' · ') || '—'}
+          </MetaField>
+          <MetaField icon={<User className="h-3.5 w-3.5" />} label="Assigné à">
+            {lead.assignedTo?.fullName ?? 'Non assigné'}
+          </MetaField>
+          <MetaField icon={<Calendar className="h-3.5 w-3.5" />} label="Prochaine relance">
+            <span className={lead.isFollowUpOverdue ? 'text-amber-400' : undefined}>
               {formatLeadDate(lead.nextFollowUpAt)}
               {lead.isFollowUpOverdue ? ' · En retard' : ''}
-            </dd>
-          </div>
-          <div className="lead-detail-meta__item">
-            <dt className="lead-detail-meta__label">Type de demande</dt>
-            <dd className="lead-detail-meta__value">{lead.requestType}</dd>
-          </div>
-          <div className="lead-detail-meta__item">
-            <dt className="lead-detail-meta__label">Source</dt>
-            <dd className="lead-detail-meta__value">
-              <a href={lead.sourceUrl} target="_blank" rel="noreferrer" className="ui-link">
-                {lead.sourceUrl}
-              </a>
-            </dd>
-          </div>
-          <div className="lead-detail-meta__item">
-            <dt className="lead-detail-meta__label">Dernière mise à jour</dt>
-            <dd className="lead-detail-meta__value">{formatDate(lead.updatedAt)}</dd>
-          </div>
+            </span>
+          </MetaField>
+          <MetaField icon={<Tag className="h-3.5 w-3.5" />} label="Type de demande">
+            {lead.requestType}
+          </MetaField>
+          <MetaField icon={<Globe className="h-3.5 w-3.5" />} label="Source">
+            <a
+              href={lead.sourceUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="break-all text-blue-400 underline-offset-2 hover:underline"
+            >
+              {lead.sourceUrl}
+            </a>
+          </MetaField>
+          <MetaField icon={<Calendar className="h-3.5 w-3.5" />} label="Dernière mise à jour">
+            {formatDate(lead.updatedAt)}
+          </MetaField>
         </dl>
       </Card>
 
       <Card title="Message client">
-        <p className="lead-detail__text">
+        <p className="text-base leading-relaxed text-neutral-300">
           {lead.message?.trim() ? lead.message : 'Aucun message laissé.'}
         </p>
       </Card>
 
       <Card title="Commentaire interne">
-        <p className="lead-detail__text">
+        <p className="text-base leading-relaxed text-neutral-300">
           {lead.internalComment?.trim()
             ? lead.internalComment
             : 'Aucun commentaire interne.'}

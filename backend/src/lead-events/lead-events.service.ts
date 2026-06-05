@@ -688,4 +688,10 @@ export class LeadEventsService {
       })),
     };
   }
+
+  /** Supprime tous les leads (table lead_events uniquement — cascade sur l'historique). */
+  async purgeAllLeads(): Promise<{ deletedCount: number }> {
+    const result = await this.prisma.leadEvent.deleteMany({});
+    return { deletedCount: result.count };
+  }
 }

@@ -108,6 +108,22 @@ export async function meRequest() {
   return apiRequest<AuthUser>('/api/auth/me');
 }
 
+export async function forgotPasswordRequest(payload: { email: string }) {
+  return apiRequest<null>('/api/auth/forgot-password', {
+    method: 'POST',
+    body: payload,
+    auth: false,
+  });
+}
+
+export async function resetPasswordRequest(payload: { token: string; password: string }) {
+  return apiRequest<null>('/api/auth/reset-password', {
+    method: 'POST',
+    body: payload,
+    auth: false,
+  });
+}
+
 export function logoutClient(): void {
   clearAccessToken();
 }

@@ -1,31 +1,25 @@
 import { STATUS_LABELS } from '../../lib/lead-dashboard';
-import { Badge } from './Badge';
-
-const STATUS_VARIANT: Record<
-  string,
-  'default' | 'primary' | 'success' | 'warning' | 'danger'
-> = {
-  active: 'success',
-  published: 'success',
-  draft: 'default',
-  archived: 'danger',
-  ready: 'primary',
-  exported: 'warning',
-  contacted: 'primary',
-  qualified: 'success',
-  rejected: 'danger',
-};
+import {
+  LEAD_BADGE_BASE,
+  LEAD_STATUS_BADGE_STYLES,
+} from '@/lib/lead-badge-styles';
+import { cn } from '@/lib/utils';
 
 type StatusBadgeProps = {
   status: string;
   label?: string;
+  className?: string;
 };
 
-export function StatusBadge({ status, label }: StatusBadgeProps) {
-  const key = status.toLowerCase().replace(/_/g, '-');
-  const variant = STATUS_VARIANT[key] ?? 'default';
+export function StatusBadge({ status, label, className }: StatusBadgeProps) {
+  const key = status.toUpperCase().replace(/-/g, '_');
+  const style =
+    LEAD_STATUS_BADGE_STYLES[key] ??
+    'bg-slate-500/10 text-slate-400 border-slate-500/20';
   const display =
-    label ?? STATUS_LABELS[status] ?? STATUS_LABELS[status.toUpperCase()] ?? status;
+    label ?? STATUS_LABELS[key] ?? STATUS_LABELS[status] ?? status;
 
-  return <Badge variant={variant}>{display}</Badge>;
+  return (
+    <span className={cn(LEAD_BADGE_BASE, style, className)}>{display}</span>
+  );
 }

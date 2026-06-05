@@ -12,7 +12,7 @@ export default function HomePage() {
         <ThemeToggle />
       </div>
 
-      <div className="relative z-[1] w-full max-w-xl text-center">
+      <div className="relative z-1 w-full max-w-xl text-center">
         <span className="ah-glass mb-7 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
           <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[var(--color-primary)] text-white">
             <PenLine className="h-3 w-3" aria-hidden />

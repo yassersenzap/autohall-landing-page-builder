@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -60,6 +61,18 @@ export class LeadEventsController {
       success: true,
       data,
       message: 'Assignable users retrieved successfully',
+    };
+  }
+
+  @Roles(UserRole.ADMIN)
+  @Delete('purge-all')
+  async purgeAll() {
+    const data = await this.leadEventsService.purgeAllLeads();
+
+    return {
+      success: true,
+      data,
+      message: 'All test leads purged successfully',
     };
   }
 

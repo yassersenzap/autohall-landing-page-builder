@@ -19,10 +19,12 @@ const STATUS_STYLES: Record<string, string> = {
   READY: 'border-sky-500/30 bg-sky-500/10 text-sky-700 dark:text-sky-400',
   EXPORTED: 'border-violet-500/30 bg-violet-500/10 text-violet-700 dark:text-violet-400',
   // Leads
-  RECEIVED: 'border-sky-500/30 bg-sky-500/10 text-sky-700 dark:text-sky-400',
-  CONTACTED: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
-  QUALIFIED: 'border-emerald-600/30 bg-emerald-600/10 text-emerald-800 dark:text-emerald-300',
-  REJECTED: 'border-destructive/30 bg-destructive/10 text-destructive',
+  RECEIVED: 'border-blue-500/20 bg-blue-500/10 text-blue-400',
+  NEW: 'border-blue-500/20 bg-blue-500/10 text-blue-400',
+  CONTACTED: 'border-amber-500/20 bg-amber-500/10 text-amber-400',
+  QUALIFIED: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400',
+  REJECTED: 'border-slate-500/20 bg-slate-500/10 text-slate-400',
+  ARCHIVED: 'border-slate-500/20 bg-slate-500/10 text-slate-400',
 };
 
 function resolveLabel(status: string, kind: StatusKind): string {

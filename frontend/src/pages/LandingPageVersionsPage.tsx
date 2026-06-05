@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/primitives';
 import { StatusBadge } from '@/components/ui/primitives/status-badge';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { downloadStudioV2Export } from '@/features/visual-studio-v2/api/studio-v2-preview.api';
+import { downloadLandingExport } from '@/lib/landing-export.api';
 import { ApiError, logoutClient, meRequest } from '@/lib/api';
 import { getPreviewRoute, getStudioRoute } from '@/lib/landing-studio-routes';
 import {
@@ -131,7 +131,7 @@ export default function LandingPageVersionsPage() {
     setExportingId(version.id);
     setError(null);
     try {
-      await downloadStudioV2Export(version.id);
+      await downloadLandingExport(version.id);
     } catch (err) {
       setError(
         err instanceof ApiError ? err.message : 'Impossible d’exporter la version.',

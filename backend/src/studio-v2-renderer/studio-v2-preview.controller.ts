@@ -1,13 +1,19 @@
 import {
+  Body,
   Controller,
   Get,
   Header,
+  HttpStatus,
+  InternalServerErrorException,
   Param,
   ParseUUIDPipe,
+  Post,
   StreamableFile,
 } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
 import { Roles } from '../common/decorators/roles.decorator';
+import { BuilderV3ExportService } from './builder-v3-export.service';
+import { ExportBuilderV3DocumentDto } from './dto/export-builder-v3-document.dto';
 import { StudioV2ExportService } from './studio-v2-export.service';
 import { StudioV2RendererService } from './studio-v2-renderer.service';
 
@@ -29,6 +35,7 @@ export class StudioV2PreviewController {
   constructor(
     private readonly rendererService: StudioV2RendererService,
     private readonly exportService: StudioV2ExportService,
+    private readonly builderV3ExportService: BuilderV3ExportService,
   ) {}
 
   @Roles(...READ_ROLES)
@@ -62,5 +69,43 @@ export class StudioV2PreviewController {
       type: result.mimeType,
       disposition: `attachment; filename="${result.filename}"`,
     });
+  }
+
+  @Roles(...EXPORT_ROLES)
+  @Post('studio-v3-export')
+  async exportBuilderV3Zip(
+    @Param('pageVersionId', ParseUUIDPipe) pageVersionId: string,
+    @Body() dto: ExportBuilderV3DocumentDto,
+  ): Promise<StreamableFile> {
+    try {
+      const result = await this.builderV3ExportService.exportZip(pageVersionId, dto);
+
+      return new StreamableFile(result.buffer, {
+        type: 'application/zip',
+        disposition: `attachment; filename="${result.filename}"`,
+      });
+    } catch (error) {
+      console.error(
+        `[StudioV2PreviewController] studio-v3-export failed pageVersionId=${pageVersionId}`,
+        error,
+      );
+
+      if (
+        error &&
+        typeof error === 'object' &&
+        'getStatus' in error &&
+        typeof (error as { getStatus: () => number }).getStatus === 'function'
+      ) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException({
+        success: false,
+        message:
+          error instanceof Error ? error.message : 'Export V3 impossible.',
+        code: 'BUILDER_V3_EXPORT_FAILED',
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
   }
 }
