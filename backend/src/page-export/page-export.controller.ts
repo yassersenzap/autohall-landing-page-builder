@@ -15,6 +15,10 @@ const EXPORT_ROLES = [
   UserRole.MARKETER,
 ] as const;
 
+/**
+ * @legacy Export du pipeline page_blocks V1.
+ * Le Studio officiel utilise `/api/page-versions/:id/studio-v2-export`.
+ */
 @Controller('api/page-versions/:pageVersionId')
 export class PageExportController {
   constructor(private readonly pageExportService: PageExportService) {}

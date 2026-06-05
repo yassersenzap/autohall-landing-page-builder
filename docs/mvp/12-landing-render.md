@@ -30,8 +30,8 @@ PageVersion (themeJson + blocs)
 | Thème (`themeJson`) | `backend/src/landing-render/landing-theme.ts` |
 | Document HTML export | `backend/src/landing-render/landing-document.builder.ts` |
 | Orchestration export | `backend/src/page-export/static-export.builder.ts` |
-| API preview | `backend/src/page-preview/page-preview.service.ts` |
-| UI preview | `frontend/src/pages/PagePreviewPage.tsx` (import `@landing-styles`) |
+| API preview V1 | `backend/src/page-preview/page-preview.service.ts` (legacy compat) |
+| UI preview actuelle | `/page-versions/:id/studio/preview` |
 
 ## Types de blocs supportés
 

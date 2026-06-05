@@ -1,6 +1,10 @@
 # Checklist démo V1 — Auto Hall LP Builder
 
-Parcours officiel : **builder blocs** (éditeur sections + modèles V1).
+> Statut : document historique. Le Builder V1 est conserve dans la branche
+> `archive/builder-v1-block-editor` pour le rapport PFE. Le parcours officiel
+> actuel est le Landing Studio : `/page-versions/:id/studio`.
+
+Ancien parcours V1 : **builder blocs** (éditeur sections + modèles V1).
 
 ## Prérequis
 
@@ -40,7 +44,7 @@ Variables utiles :
 4. **Campagnes** — ouvrir **Campagne démo — Offre printemps**
 5. **Landing seed** — ouvrir **Landing démo — Offre printemps**
 6. **Versions** — ouvrir **v1 — Version initiale**
-7. **Builder** — accès direct `/page-versions/:id/blocks` (pas d’écran intermédiaire)
+7. **Builder V1** — accès direct `/page-versions/:id/blocks` sur la branche d'archive uniquement
 8. **Modèle** — panneau gauche → **Modèles** → **Essai véhicule** → **Appliquer le modèle** → confirmer
 9. **Hero** — inspecteur : titre, sous-titre, CTA, thème clair/sombre, position image
 10. **Image** — onglet **Médias** → upload → sélectionner dans le Hero

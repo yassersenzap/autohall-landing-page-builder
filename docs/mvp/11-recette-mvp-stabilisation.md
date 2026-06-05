@@ -204,13 +204,13 @@ Campagnes, landings, versions, blocs, preview : GET (+ écriture selon route, vo
 | 3 | Ouvrir landing pages de la campagne | Liste + création slug unique |
 | 4 | Ouvrir versions de la landing | Version 1 `DRAFT` (seed) |
 
-### S3 — Blocs + Preview
+### S3 — Studio + Preview
 
 | Étape | Action | Résultat attendu |
 |-------|--------|------------------|
-| 1 | `/page-versions/:id/blocks` — ajouter bloc `text` | Bloc listé, `sortOrder` cohérent |
-| 2 | Ajouter bloc `lead_form` (template JSON UI) | Bloc créé |
-| 3 | `/page-versions/:id/preview` | Hero + texte + formulaire visibles |
+| 1 | `/page-versions/:id/studio` — ouvrir le Landing Studio | Document chargé sans erreur |
+| 2 | Vérifier la présence d'un formulaire lead dans le document | Readiness compatible export |
+| 3 | `/page-versions/:id/studio/preview` | Hero + texte + formulaire visibles |
 
 ### S4 — Publication + Export
 
@@ -266,8 +266,10 @@ Campagnes, landings, versions, blocs, preview : GET (+ écriture selon route, vo
 | `/campaigns` | Campagnes |
 | `/campaigns/:campaignId/landing-pages` | Landings |
 | `/landing-pages/:landingPageId/versions` | Versions + Publier + Export |
-| `/page-versions/:pageVersionId/blocks` | Blocs (JSON) |
-| `/page-versions/:pageVersionId/preview` | Aperçu |
+| `/page-versions/:pageVersionId/studio` | Landing Studio officiel |
+| `/page-versions/:pageVersionId/studio/preview` | Aperçu Studio officiel |
+| `/page-versions/:pageVersionId/blocks` | Legacy : redirection vers le Studio |
+| `/page-versions/:pageVersionId/preview` | Legacy : redirection vers l'aperçu Studio |
 | `/leads` | Liste leads + filtres |
 | `/leads/:id` | Détail + suivi + historique |
 
@@ -277,5 +279,5 @@ Campagnes, landings, versions, blocs, preview : GET (+ écriture selon route, vo
 
 - Détail API : [`backend/README.md`](../../backend/README.md)
 - Docker : [`docker/README.md`](../../docker/README.md)
-- Checklist avant démo : [`CHECKLIST-DEMO.md`](./CHECKLIST-DEMO.md)
+- Checklist V1 historique : [`../demo/V1-DEMO-CHECKLIST.md`](../demo/V1-DEMO-CHECKLIST.md)
 - Stratégie tests long terme (partiellement obsolète sur sync) : [`10-strategie-tests-recette-mvp.md`](./10-strategie-tests-recette-mvp.md)

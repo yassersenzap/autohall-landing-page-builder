@@ -10,6 +10,10 @@ const READ_ROLES = [
   UserRole.VIEWER,
 ] as const;
 
+/**
+ * @legacy Preview du pipeline page_blocks V1.
+ * Le Studio officiel utilise `/api/page-versions/:id/studio-v2-preview`.
+ */
 @Controller('api/page-versions/:pageVersionId')
 export class PagePreviewController {
   constructor(private readonly pagePreviewService: PagePreviewService) {}

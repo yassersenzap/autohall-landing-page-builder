@@ -1,94 +1,88 @@
-# AutoHall LP Builder
+# Auto Hall Landing Studio
 
-Plateforme interne de génération de landing pages pour **Auto Hall**. Le builder reste privé et est destiné à être hébergé sur l’infrastructure locale du groupe ; les pages produites sont exportées en **site statique** puis déployées sur **cPanel** (sous-domaines, hébergement mutualisé classique).
+Plateforme interne de creation, preview, export et suivi de landing pages pour Auto Hall.
 
----
+Le projet est organise autour d'un Studio prive utilise par les equipes internes. Les landing pages produites sont exportees en ZIP statique et peuvent ensuite etre deployees hors du builder, par exemple sur cPanel. Les formulaires exportes envoient les leads vers l'API publique du backend.
 
-## Objectif du projet
+## Etat actuel
 
-Fournir un outil maîtrisé pour :
+- Landing Studio officiel : `/page-versions/:pageVersionId/studio`
+- Preview Studio officielle : `/page-versions/:pageVersionId/studio/preview`
+- Backend : NestJS, Prisma, PostgreSQL
+- Frontend : React, Vite, TypeScript
+- Export : ZIP statique genere cote backend
+- Leads : collecte publique, consultation interne, statuts, relances et KPI
+- Builder V1 : archive historique conservee sur la branche `archive/builder-v1-block-editor`
 
-- concevoir des landing pages à partir de blocs simples ;
-- prévisualiser le rendu ;
-- exporter un **ZIP statique** compatible avec un déploiement cPanel ;
-- collecter les **leads** via une API sécurisée, avec persistance et traçabilité côté serveur.
+La branche `archive/builder-v1-block-editor` sert uniquement de reference PFE pour l'ancien builder blocs. Elle ne doit pas etre mergee dans `main`.
 
----
+## Architecture
 
-## Architecture cible (vision)
+| Zone | Role |
+| --- | --- |
+| `frontend/` | Application React privee : dashboard, campagnes, leads, Landing Studio, preview Studio. |
+| `backend/` | API NestJS : auth, campagnes, landings, versions, documents Studio, preview/export, assets, leads. |
+| `backend/prisma/` | Schema Prisma, migrations et seed local. |
+| `docs/` | Notes de cadrage, architecture et documents PFE utiles. |
+| `docker/` | Support local PostgreSQL et pgAdmin. |
 
-| Couche | Rôle |
-|--------|------|
-| **Frontend** | Interface du builder (React), édition, prévisualisation, déclenchement d’export. |
-| **Backend** | API et logique métier (NestJS), authentification, persistance, génération d’export. |
-| **Base de données** | Données de campagnes, pages, blocs, événements leads (PostgreSQL). |
-| **Stockage fichiers** | Emplacements configurables pour exports ZIP et médias (chemins serveur). |
-| **Conteneurs** | **Docker Compose** pour PostgreSQL local (pgAdmin optionnel) ; conteneurisation backend/frontend prévue plus tard. |
+Le Studio prive et les landing pages exportees sont separes :
 
-Les landing **publiques** ne sont pas servies par le builder : elles sont des fichiers statiques déployés depuis le ZIP sur cPanel.
+- le Studio manipule un document de page versionne dans l'application privee ;
+- la preview/export Studio utilisent un renderer backend dedie ;
+- le ZIP exporte ne contient pas l'application React ;
+- les leads publics passent par l'API backend, pas par une connexion directe a PostgreSQL.
 
----
+Voir aussi : [`docs/architecture/current-architecture.md`](docs/architecture/current-architecture.md).
 
-## Rôle du dossier `docs/`
+## Routes principales
 
-| Dossier | Contenu |
-|---------|---------|
-| **`docs/context/`** | Contexte métier et produit Auto Hall (vision, contraintes, vocabulaire). |
-| **`docs/mvp/`** | Spécifications du MVP : périmètre, backlog, modèle de données, contrats API, blocs, export ZIP, workflow leads, sécurité, plan d’implémentation, stratégie de tests. |
+### Frontend prive
 
-Ces documents sont la **référence** avant et pendant le développement.
+- `/login`
+- `/dashboard`
+- `/campaigns`
+- `/campaigns/:campaignId/landing-pages`
+- `/landing-pages/:landingPageId/versions`
+- `/page-versions/:pageVersionId/studio`
+- `/page-versions/:pageVersionId/studio/preview`
+- `/leads`
+- `/leads/:id`
 
----
+### Routes legacy conservees
 
-## Stack cible
+Ces routes existent pour rediriger proprement les anciens liens vers le Studio officiel :
 
-- **Frontend :** React (build type Vite attendu pour le builder).
-- **Backend :** NestJS.
-- **Base de données :** PostgreSQL avec **Prisma 7** (client intégré au backend ; modèles métier et migrations à venir).
-- **Ops :** Docker Compose pour PostgreSQL en local ; backend et frontend lancés sur la machine hôte pour l’instant.
-- **Livrable pages :** export **ZIP statique**, compatible déploiement **cPanel**.
+- `/page-versions/:pageVersionId/blocks` -> `/page-versions/:pageVersionId/studio`
+- `/page-versions/:pageVersionId/studio-v2` -> `/page-versions/:pageVersionId/studio`
+- `/page-versions/:pageVersionId/preview` -> `/page-versions/:pageVersionId/studio/preview`
+- `/page-versions/:pageVersionId/studio-v2-preview` -> `/page-versions/:pageVersionId/studio/preview`
 
----
+## Installation locale
 
-## Structure technique initiale
+### 1. Variables d'environnement
 
-| Dossier | Rôle |
-|---------|------|
-| **`docs/context/`** | Document de contexte projet (vision, contraintes, vocabulaire Auto Hall). |
-| **`docs/mvp/`** | Documents de cadrage MVP (périmètre, données, API, export, sécurité, plan). |
-| **`backend/`** | API NestJS, Prisma 7, health checks (`/health`, `/health/db`) ; logique métier à venir. |
-| **`frontend/`** | Interface React / Vite / TypeScript (page d’accueil minimale pour l’instant). |
-| **`docker/`** | Documentation et ressources Docker (PostgreSQL local, pgAdmin optionnel). |
+```bash
+cp .env.example .env
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
 
----
+Adapter au minimum `DATABASE_URL`, les secrets JWT et les URLs publiques selon l'environnement local.
 
-## Workflow MVP (résumé)
+### 2. Base PostgreSQL
 
-1. Création d’une campagne et d’une landing associée.
-2. Composition de la page avec des blocs (modèle décrit dans la doc MVP).
-3. Configuration du formulaire et prévisualisation.
-4. Export ZIP prêt pour cPanel.
-5. Déploiement sur sous-domaine (hors scope du dépôt : procédure Auto Hall / hébergeur).
-6. Soumission visiteur → API publique sécurisée → stockage des événements leads (détails dans `docs/mvp/`).
+```bash
+docker compose up -d
+```
 
-Pour le détail fonctionnel et technique, se référer aux fichiers numérotés dans `docs/mvp/`.
+pgAdmin peut etre lance avec le profil dedie si necessaire :
 
----
+```bash
+docker compose --profile pgadmin up -d
+```
 
-## Démarrage PostgreSQL local
-
-1. Copier les variables d’environnement : `cp .env.example .env` (ne pas versionner `.env`).
-2. Ajuster les mots de passe dans `.env` (`POSTGRES_PASSWORD`, `PGADMIN_DEFAULT_PASSWORD`, `DATABASE_URL`).
-3. Démarrer PostgreSQL : `docker compose up -d`
-4. *(Optionnel)* Démarrer pgAdmin : `docker compose --profile pgadmin up -d` → http://localhost:5050
-
-Commandes détaillées, connexion pgAdmin et dépannage : voir [`docker/README.md`](docker/README.md).
-
----
-
-## Démarrage backend (local)
-
-Depuis `backend/` (PostgreSQL doit être démarré via Docker et `DATABASE_URL` configuré dans le `.env` à la racine ou dans `backend/.env`) :
+### 3. Backend
 
 ```bash
 cd backend
@@ -99,18 +93,14 @@ npm run db:seed
 npm run start:dev
 ```
 
-Vérification rapide :
+Verification :
 
 ```bash
 curl http://localhost:3000/health
 curl http://localhost:3000/health/db
 ```
 
-Détails (variables, Prisma CLI, build) : voir [`backend/README.md`](backend/README.md).
-
----
-
-## Démarrage frontend (local)
+### 4. Frontend
 
 ```bash
 cd frontend
@@ -118,36 +108,33 @@ npm install
 npm run dev
 ```
 
-Interface builder : **http://localhost:5173** (API : `VITE_API_BASE_URL`, défaut `http://localhost:3000`).
+Par defaut, Vite expose l'application sur `http://localhost:5173` et le frontend appelle `http://localhost:3000` si `VITE_API_BASE_URL` n'est pas surcharge.
 
----
+## Qualite
 
-## Recette et validation MVP
+Frontend :
 
-- **Recette opérationnelle (scénarios, routes, limites)** : [`docs/mvp/11-recette-mvp-stabilisation.md`](docs/mvp/11-recette-mvp-stabilisation.md)
-- **Checklist avant démo** : [`docs/mvp/CHECKLIST-DEMO.md`](docs/mvp/CHECKLIST-DEMO.md)
+```bash
+cd frontend
+npm run build
+npm run test -- --run
+```
 
----
+Backend :
 
-## Règle de démarrage du développement
+```bash
+cd backend
+npx prisma generate
+npm run build
+npm run test
+```
 
-**Ne pas commencer le code applicatif** (backend, frontend, schéma DB exécutable, etc.) sans avoir pris en compte et respecté les documents sous **`docs/mvp/`** (périmètre, données, API, export, sécurité, plan). En cas de divergence, mettre à jour la documentation en premier ou documenter une décision explicite.
+Ces commandes doivent rester vertes avant de proposer une integration dans `main`.
 
----
+## Notes de maintenance
 
-## État actuel du projet (MVP stabilisé)
-
-### Fonctionnel
-
-- **Docker** : PostgreSQL 16 (+ pgAdmin optionnel).
-- **Backend NestJS + Prisma 7** : auth JWT/RBAC, campagnes, landings, versions, blocs, preview, publish, export ZIP, leads publics et internes (liste, détail, statut, suivi, historique, KPI dashboard).
-- **Frontend React / Vite** : parcours builder + espace leads + tableau de bord KPI.
-- **Seed** : admin, campagne/landing démo, lead exemple (`backend/prisma/seed.ts`).
-
-### Limites connues (hors prochaine phase)
-
-- Éditeur de blocs en **JSON** (pas de canvas / drag-and-drop).
-- Tables `simulated_*`, `export_jobs`, `audit_logs`, assets — schéma présent, **non branchées**.
-- Seed : version démo en `DRAFT` sans bloc `lead_form` — publier et ajouter le formulaire pour la démo export.
-
-Voir la recette : [`docs/mvp/11-recette-mvp-stabilisation.md`](docs/mvp/11-recette-mvp-stabilisation.md).
+- Ne pas remettre le Builder V1 comme editeur officiel.
+- Ne pas merger `archive/builder-v1-block-editor` dans `main`.
+- Garder les routes legacy tant que des liens historiques peuvent exister.
+- Ne pas versionner `dist/`, `output/`, `.env`, exports ZIP, logs, caches, stockage local ou fichiers generes.
+- Ne pas mettre de secret dans un export ZIP.

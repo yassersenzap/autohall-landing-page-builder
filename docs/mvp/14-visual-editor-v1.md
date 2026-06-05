@@ -1,5 +1,10 @@
 # Visual Editor V1
 
+> Statut : document historique. Le Builder V1 n'est plus l'editeur officiel.
+> La reference de code complete est conservee sur la branche
+> `archive/builder-v1-block-editor`. Le Studio officiel actuel est
+> `/page-versions/:id/studio`.
+
 ## Objectif
 
 Introduire un éditeur visuel de blocs orienté studio SaaS (inspiration Framer/Figma) sans casser le moteur de rendu backend existant (`landing-render`).
@@ -29,7 +34,7 @@ frontend/src/features/editor/
 
 ### Principes
 
-- **Pages légères** : `PageVersionBlocksPage` orchestre, la logique est dans les hooks `features/editor`.
+- **Pages légères** : dans la V1 archivee, `PageVersionBlocksPage` orchestrait la logique placee dans les hooks `features/editor`.
 - **API isolée** : tous les appels blocs passent par `editorApi.ts`.
 - **UI réutilisable** : `components/ui/*` conservé pour le design system studio.
 - **Source unique rendu landing** : aucun rendu de landing dupliqué côté React.
@@ -61,7 +66,7 @@ frontend/src/features/editor/
 
 ## Tests manuels recommandés
 
-1. Ouvrir `/page-versions/:id/blocks`.
+1. Ouvrir `/page-versions/:id/blocks` sur la branche d'archive V1.
 2. Ajouter un bloc depuis la bibliothèque.
 3. Sélectionner un bloc et modifier ses propriétés.
 4. Réordonner (drag-and-drop + flèches).
