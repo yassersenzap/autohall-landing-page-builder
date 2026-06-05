@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { LeadAvatar } from './LeadAvatar';
 import { Button } from '../ui/Button';
 import { PriorityBadge } from '../ui/PriorityBadge';
 import { StatusBadge } from '../ui/StatusBadge';
@@ -78,11 +79,18 @@ export default function LeadsTable({
               <tr key={lead.id}>
                 <td className="leads-table__date">{formatDate(lead.createdAt)}</td>
                 <td>
-                  <span className="leads-table__name">{lead.fullName}</span>
-                  <span className="leads-table__contact-line">{lead.phone}</span>
-                  {lead.email ? (
-                    <span className="leads-table__contact-line">{lead.email}</span>
-                  ) : null}
+                  <div className="flex items-center gap-3">
+                    <LeadAvatar name={lead.fullName} />
+                    <div className="min-w-0">
+                      <span className="block font-medium text-neutral-100">
+                        {lead.fullName}
+                      </span>
+                      <span className="block text-sm text-neutral-500">{lead.phone}</span>
+                      {lead.email ? (
+                        <span className="block text-sm text-neutral-500">{lead.email}</span>
+                      ) : null}
+                    </div>
+                  </div>
                 </td>
                 <td>
                   <span className="leads-table__cell-primary">{lead.campaignName}</span>
@@ -106,12 +114,14 @@ export default function LeadsTable({
                 <td>{lead.assignedToName ?? '—'}</td>
                 <td
                   className={
-                    lead.isFollowUpOverdue ? 'leads-table__overdue' : undefined
+                    lead.isFollowUpOverdue ? 'text-amber-400 font-medium' : undefined
                   }
                 >
                   {formatLeadDate(lead.nextFollowUpAt)}
                   {lead.isFollowUpOverdue ? (
-                    <span className="leads-table__overdue-badge">En retard</span>
+                    <span className="ml-1.5 inline-flex items-center rounded-md border border-amber-500/20 bg-amber-500/10 px-1.5 py-0.5 text-xs font-semibold text-amber-400">
+                      En retard
+                    </span>
                   ) : null}
                 </td>
                 <td>

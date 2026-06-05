@@ -1,5 +1,5 @@
 import type { EditorPageBlock } from '@/features/editor/types/editor.types';
-import type { PageThemeDraft } from '../store/builder-document.store';
+import type { PageSettingsDraft, PageThemeDraft } from '../store/builder-document.store';
 import type { BuilderDocumentBlock } from '../types';
 import { isBuilderDocumentDirty } from './compare-builder-document';
 
@@ -11,6 +11,7 @@ export type BuilderLocalDraft = {
   updatedAt: number;
   blocks: BuilderDocumentBlock[];
   pageTheme: PageThemeDraft;
+  pageSettings?: PageSettingsDraft;
   themeDirty: boolean;
   selectedBlockId: string | null;
 };

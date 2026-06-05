@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { STATUS_LABELS } from '../../lib/lead-dashboard';
 import { LEAD_STATUSES } from '../../lib/leads';
+import { CRM_FIELD_CLASS, CRM_SUBMIT_BTN_CLASS } from '@/lib/lead-badge-styles';
 import { Button } from '../ui/Button';
 import { Select } from '../ui/Select';
 
@@ -34,6 +35,7 @@ export default function LeadStatusForm({
         value={status}
         onChange={(e) => setStatus(e.target.value)}
         disabled={submitting}
+        className={CRM_FIELD_CLASS}
       >
         {LEAD_STATUSES.map((value) => (
           <option key={value} value={value}>
@@ -44,7 +46,7 @@ export default function LeadStatusForm({
       <label className="ui-field">
         <span className="ui-field__label">Commentaire interne</span>
         <textarea
-          className="ui-textarea"
+          className={`ui-textarea ${CRM_FIELD_CLASS}`}
           rows={4}
           placeholder="Notes visibles uniquement en interne"
           value={internalComment}
@@ -52,7 +54,7 @@ export default function LeadStatusForm({
           disabled={submitting}
         />
       </label>
-      <Button type="submit" disabled={submitting}>
+      <Button type="submit" disabled={submitting} className={CRM_SUBMIT_BTN_CLASS}>
         {submitting ? 'Enregistrement…' : 'Enregistrer le statut'}
       </Button>
     </form>

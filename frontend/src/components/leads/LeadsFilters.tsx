@@ -7,6 +7,7 @@ import { STATUS_LABELS } from '../../lib/lead-dashboard';
 import type { CampaignListItem } from '../../lib/campaigns';
 import type { LandingPageListItem } from '../../lib/landing-pages';
 import type { AssignableUser } from '../../lib/leads';
+import { CRM_FILTER_APPLY_BTN_CLASS } from '@/lib/lead-badge-styles';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
@@ -138,7 +139,12 @@ export default function LeadsFilters({
         </label>
       </div>
       <div className="ui-filter-panel__footer">
-        <Button type="button" onClick={onApply} disabled={loading}>
+        <Button
+          type="button"
+          onClick={onApply}
+          disabled={loading}
+          className={CRM_FILTER_APPLY_BTN_CLASS}
+        >
           Appliquer les filtres
         </Button>
         <Button type="button" variant="secondary" onClick={onRefresh} disabled={loading}>

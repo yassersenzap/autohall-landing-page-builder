@@ -6,6 +6,7 @@ import {
   type AssignableUser,
   type LeadEventDetail,
 } from '../../lib/leads';
+import { CRM_FIELD_CLASS, CRM_SUBMIT_BTN_CLASS } from '@/lib/lead-badge-styles';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
@@ -53,6 +54,7 @@ export default function LeadFollowUpForm({
         value={priority}
         onChange={(e) => setPriority(e.target.value)}
         disabled={submitting}
+        className={CRM_FIELD_CLASS}
       >
         {LEAD_PRIORITIES.map((value) => (
           <option key={value} value={value}>
@@ -65,6 +67,7 @@ export default function LeadFollowUpForm({
         value={assignedToUserId}
         onChange={(e) => setAssignedToUserId(e.target.value)}
         disabled={submitting}
+        className={CRM_FIELD_CLASS}
       >
         <option value="">Non assigné</option>
         {assignableUsers.map((user) => (
@@ -79,6 +82,7 @@ export default function LeadFollowUpForm({
         value={nextFollowUpAt}
         onChange={(e) => setNextFollowUpAt(e.target.value)}
         disabled={submitting}
+        className={CRM_FIELD_CLASS}
       />
       {lead.lastContactAt ? (
         <p className="lead-detail__text">
@@ -86,7 +90,7 @@ export default function LeadFollowUpForm({
           {new Date(lead.lastContactAt).toLocaleString('fr-FR')}
         </p>
       ) : null}
-      <Button type="submit" disabled={submitting}>
+      <Button type="submit" disabled={submitting} className={CRM_SUBMIT_BTN_CLASS}>
         {submitting ? 'Enregistrement…' : 'Enregistrer le suivi'}
       </Button>
     </form>

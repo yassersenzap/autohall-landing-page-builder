@@ -216,6 +216,24 @@ export function canViewLeads(role: string): boolean {
   return role === 'ADMIN' || role === 'SI_DIGITAL' || role === 'MARKETER';
 }
 
+export function canPurgeLeads(role: string): boolean {
+  return role === 'ADMIN';
+}
+
+export type PurgeLeadsResponse = {
+  success: true;
+  data: { deletedCount: number };
+  message: string;
+};
+
+export async function purgeAllLeads(): Promise<PurgeLeadsResponse> {
+  const response = await apiRequest<{ deletedCount: number }>(
+    '/api/lead-events/purge-all',
+    { method: 'DELETE' },
+  );
+  return response as PurgeLeadsResponse;
+}
+
 export async function getAssignableUsers(): Promise<AssignableUsersResponse> {
   const response = await apiRequest<AssignableUser[]>(
     '/api/lead-events/assignable-users',

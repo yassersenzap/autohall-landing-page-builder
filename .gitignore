@@ -4,9 +4,12 @@
 
 # Dependencies
 node_modules/
+**/node_modules/
 
 # Environment and secrets (never commit real .env files)
 .env
+.env.local
+.env.*.local
 .env.*
 !.env.example
 !**/.env.example
@@ -28,6 +31,8 @@ out/
 .nuxt/
 .vite/
 vite.config.ts.timestamp-*
+**/dist/
+**/build/
 
 # NestJS / TypeScript
 *.tsbuildinfo
@@ -65,7 +70,7 @@ $RECYCLE.BIN/
 .cursor/
 .ai-local/
 
-# Local storage (exports, uploads, assets générés)
+# Local storage, exports, uploads, assets temporaires
 storage/
 uploads/
 exports/
@@ -74,11 +79,28 @@ output/
 *.tar
 *.tar.gz
 
+# Builder — artefacts locaux (uploads blob, brouillons exportés)
+.autohall-builder/
+.builder-cache/
+**/public/uploads/
+**/tmp/assets/
+
+# Package manager caches
+.npm/
+.yarn/
+.pnp.*
+.turbo/
+.cache/
+.parcel-cache/
+
 # Temporary files
 tmp/
 temp/
 *.tmp
 *.temp
-.cache/
 .playwright-cli/
 docs-private/
+
+# Playwright / browser automation artefacts
+playwright/.cache/
+.playwright/

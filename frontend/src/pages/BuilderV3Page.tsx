@@ -1,0 +1,147 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { StudioLayout } from '@/features/builder-v3/layout/StudioLayout';
+import { StudioTopBar, type StudioV3SaveStatus } from '@/features/builder-v3/layout/StudioTopBar';
+import { PageSettingsSheet } from '@/features/builder-v3/panels/PageSettingsSheet';
+import { exportBuilderV3Zip } from '@/features/builder-v3/lib/export-builder-v3';
+import { saveBuilderDocumentDesign } from '@/features/builder-v3/lib/save-builder-v3';
+import { StudioToast } from '@/components/ui/StudioToast';
+import { useStudioToast } from '@/components/ui/use-studio-toast';
+import {
+  hydrateBuilderDocumentStore,
+  useBuilderDocumentStore,
+} from '@/features/builder-engine/store/builder-document.store';
+import { getPreviewRoute } from '@/lib/landing-studio-routes';
+
+export default function BuilderV3Page() {
+  const { pageVersionId } = useParams<{ pageVersionId: string }>();
+  const navigate = useNavigate();
+  const { toast, showSuccess, showError, dismiss } = useStudioToast();
+  const [saveStatus, setSaveStatus] = useState<StudioV3SaveStatus>('saved');
+  const [documentHydrated, setDocumentHydrated] = useState(false);
+  const [pageSettingsOpen, setPageSettingsOpen] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
+  const skipDirtyRef = useRef(true);
+
+  const deviceMode = useBuilderDocumentStore((s) => s.deviceMode);
+  const setDeviceMode = useBuilderDocumentStore((s) => s.setDeviceMode);
+
+  useEffect(() => {
+    if (!pageVersionId) return;
+
+    let cancelled = false;
+    skipDirtyRef.current = true;
+    setDocumentHydrated(false);
+
+    void hydrateBuilderDocumentStore(pageVersionId).then(() => {
+      if (cancelled) return;
+      setDocumentHydrated(true);
+      setSaveStatus('saved');
+      window.setTimeout(() => {
+        skipDirtyRef.current = false;
+      }, 0);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [pageVersionId]);
+
+  useEffect(() => {
+    if (!documentHydrated) return;
+
+    const unsub = useBuilderDocumentStore.subscribe((state, prev) => {
+      if (skipDirtyRef.current) return;
+      if (
+        state.blocks !== prev.blocks ||
+        state.pageTheme !== prev.pageTheme ||
+        state.pageSettings !== prev.pageSettings ||
+        state.themeDirty !== prev.themeDirty
+      ) {
+        setSaveStatus('dirty');
+      }
+    });
+
+    return unsub;
+  }, [documentHydrated]);
+
+  const handleSave = useCallback(async () => {
+    if (!pageVersionId) return;
+    setSaveStatus('saving');
+    try {
+      await saveBuilderDocumentDesign(pageVersionId);
+      setSaveStatus('saved');
+      showSuccess('Design sauvegardé avec succès');
+    } catch {
+      setSaveStatus('dirty');
+      showError('Échec de la sauvegarde. Réessayez.');
+    }
+  }, [pageVersionId, showError, showSuccess]);
+
+  const handlePreview = useCallback(async () => {
+    if (!pageVersionId) return;
+    if (saveStatus === 'dirty') {
+      try {
+        await saveBuilderDocumentDesign(pageVersionId);
+        setSaveStatus('saved');
+      } catch {
+        showError('Sauvegarde locale requise avant l’aperçu.');
+        return;
+      }
+    }
+    navigate(getPreviewRoute(pageVersionId));
+  }, [navigate, pageVersionId, saveStatus, showError]);
+
+  const handleExport = useCallback(async () => {
+    if (!pageVersionId) return;
+    setExportLoading(true);
+    try {
+      if (saveStatus === 'dirty') {
+        await saveBuilderDocumentDesign(pageVersionId);
+        setSaveStatus('saved');
+      }
+      await exportBuilderV3Zip(pageVersionId);
+      showSuccess('Export ZIP téléchargé');
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Export ZIP impossible.');
+    } finally {
+      setExportLoading(false);
+    }
+  }, [pageVersionId, saveStatus, showError, showSuccess]);
+
+  const subtitle = pageVersionId
+    ? `Version ${pageVersionId.slice(0, 8)}…`
+    : undefined;
+
+  if (!documentHydrated) {
+    return (
+      <div className="flex h-screen flex-col items-center justify-center gap-2 bg-neutral-950 text-neutral-400">
+        <p className="text-sm">Restauration du design depuis le cache local…</p>
+        <p className="text-xs text-neutral-600">Ne pas rafraîchir — hydratation en cours</p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <StudioLayout
+        documentHydrated={documentHydrated}
+        header={
+          <StudioTopBar
+            subtitle={subtitle}
+            deviceMode={deviceMode}
+            saveStatus={saveStatus}
+            onDeviceModeChange={setDeviceMode}
+            onSave={() => void handleSave()}
+            onPreview={() => void handlePreview()}
+            onExport={() => void handleExport()}
+            exportLoading={exportLoading}
+            onOpenPageSettings={() => setPageSettingsOpen(true)}
+          />
+        }
+      />
+      <PageSettingsSheet open={pageSettingsOpen} onOpenChange={setPageSettingsOpen} />
+      <StudioToast toast={toast} onDismiss={dismiss} />
+    </>
+  );
+}

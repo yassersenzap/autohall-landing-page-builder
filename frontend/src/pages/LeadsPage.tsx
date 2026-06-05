@@ -13,6 +13,7 @@ import {
   canViewLeads,
   getAssignableUsers,
   listLeadEvents,
+  purgeAllLeads,
   type AssignableUser,
   type LeadEventListItem,
   type LeadsPagination,
@@ -54,6 +55,8 @@ export default function LeadsPage() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [purging, setPurging] = useState(false);
+  const [purgeMessage, setPurgeMessage] = useState<string | null>(null);
 
   const loadLeads = useCallback(
     async (
@@ -194,6 +197,38 @@ export default function LeadsPage() {
     void loadLeads(nextPage, appliedFilters, role);
   }
 
+  async function handlePurgeAllLeads() {
+    const confirmed = window.confirm(
+      'Supprimer TOUS les leads de test ? Cette action est irréversible.',
+    );
+    if (!confirmed) return;
+
+    const confirmedAgain = window.confirm(
+      'Dernière confirmation : toutes les soumissions leads seront définitivement effacées.',
+    );
+    if (!confirmedAgain) return;
+
+    setPurging(true);
+    setPurgeMessage(null);
+    setError(null);
+
+    try {
+      const response = await purgeAllLeads();
+      setPurgeMessage(
+        `${response.data.deletedCount} lead(s) supprimé(s) avec succès.`,
+      );
+      await loadLeads(1, appliedFilters, role);
+    } catch (err) {
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : 'Impossible de purger les leads de test.',
+      );
+    } finally {
+      setPurging(false);
+    }
+  }
+
   if (role && !canViewLeads(role)) {
     return (
       <div className="ds-page-stack">
@@ -217,6 +252,11 @@ export default function LeadsPage() {
       />
 
       {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
+      {purgeMessage ? (
+        <p className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+          {purgeMessage}
+        </p>
+      ) : null}
 
       <Card title="Filtres" padding="none" className="leads-filter-card">
         <LeadsFilters
@@ -239,6 +279,23 @@ export default function LeadsPage() {
           onPageChange={handlePageChange}
         />
       </Card>
+
+      {role === 'ADMIN' ? (
+        <div className="flex flex-col items-start gap-2 rounded-xl border border-neutral-800 bg-neutral-900/40 px-5 py-4">
+          <p className="text-sm text-neutral-500">
+            Zone admin — nettoyage avant livraison (supprime uniquement les leads, pas les
+            campagnes ni les comptes).
+          </p>
+          <button
+            type="button"
+            onClick={() => void handlePurgeAllLeads()}
+            disabled={purging || loading}
+            className="rounded-md border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-300 transition-colors hover:border-neutral-600 hover:bg-neutral-700 hover:text-neutral-100 disabled:opacity-50"
+          >
+            {purging ? 'Purge en cours…' : 'Purger les leads de test'}
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -6,6 +6,8 @@ export function parsePageThemeFromJson(themeJson: unknown): PageThemeDraft {
     secondaryColor: '#18181b',
     mode: 'dark',
     fontFamily: 'Inter',
+    headingFont: 'Inter',
+    bodyFont: 'Roboto',
     headingScale: 'normal',
     sectionSpacing: 'normal',
     buttonStyle: 'pill',
@@ -54,6 +56,14 @@ export function parsePageThemeFromJson(themeJson: unknown): PageThemeDraft {
     mode: theme.mode === 'light' || theme.appearance === 'light' ? 'light' : 'dark',
     fontFamily:
       typeof theme.fontFamily === 'string' ? theme.fontFamily : defaults.fontFamily,
+    headingFont:
+      typeof theme.headingFont === 'string'
+        ? theme.headingFont
+        : typeof theme.fontFamily === 'string'
+          ? theme.fontFamily
+          : defaults.headingFont,
+    bodyFont:
+      typeof theme.bodyFont === 'string' ? theme.bodyFont : defaults.bodyFont,
     headingScale,
     sectionSpacing,
     buttonStyle,

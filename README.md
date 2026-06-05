@@ -1,140 +1,66 @@
 # Auto Hall Landing Studio
 
-Plateforme interne de creation, preview, export et suivi de landing pages pour Auto Hall.
+Plateforme interne de création, preview, export et suivi de landing pages pour Auto Hall.
 
-Le projet est organise autour d'un Studio prive utilise par les equipes internes. Les landing pages produites sont exportees en ZIP statique et peuvent ensuite etre deployees hors du builder, par exemple sur cPanel. Les formulaires exportes envoient les leads vers l'API publique du backend.
-
-## Etat actuel
-
-- Landing Studio officiel : `/page-versions/:pageVersionId/studio`
-- Preview Studio officielle : `/page-versions/:pageVersionId/studio/preview`
-- Backend : NestJS, Prisma, PostgreSQL
-- Frontend : React, Vite, TypeScript
-- Export : ZIP statique genere cote backend
-- Leads : collecte publique, consultation interne, statuts, relances et KPI
-- Builder V1 : archive historique conservee sur la branche `archive/builder-v1-block-editor`
-
-La branche `archive/builder-v1-block-editor` sert uniquement de reference PFE pour l'ancien builder blocs. Elle ne doit pas etre mergee dans `main`.
-
-## Architecture
-
-| Zone | Role |
+| Composant | Stack |
 | --- | --- |
-| `frontend/` | Application React privee : dashboard, campagnes, leads, Landing Studio, preview Studio. |
-| `backend/` | API NestJS : auth, campagnes, landings, versions, documents Studio, preview/export, assets, leads. |
-| `backend/prisma/` | Schema Prisma, migrations et seed local. |
-| `docs/` | Notes de cadrage, architecture et documents PFE utiles. |
-| `docker/` | Support local PostgreSQL et pgAdmin. |
+| Frontend | React 19, Vite 8, TypeScript, Zustand, Tailwind CSS 4 |
+| Backend | NestJS, Prisma, PostgreSQL |
+| Export | ZIP statique (renderer backend) |
 
-Le Studio prive et les landing pages exportees sont separes :
+## Éditeur officiel
 
-- le Studio manipule un document de page versionne dans l'application privee ;
-- la preview/export Studio utilisent un renderer backend dedie ;
-- le ZIP exporte ne contient pas l'application React ;
-- les leads publics passent par l'API backend, pas par une connexion directe a PostgreSQL.
+**Builder V3** — routes :
 
-Voir aussi : [`docs/architecture/current-architecture.md`](docs/architecture/current-architecture.md).
+- Studio : `/page-versions/:pageVersionId/studio`
+- Preview : `/page-versions/:pageVersionId/studio/preview`
 
-## Routes principales
+Documentation technique frontend (architecture iframe, registry blocs, state flow) : [`frontend/README.md`](frontend/README.md).
 
-### Frontend prive
+Les routes legacy (`/blocks`, `/studio-v2`, `/preview`) redirigent vers ces URLs via `LandingStudioLegacyRedirect`.
 
-- `/login`
-- `/dashboard`
-- `/campaigns`
-- `/campaigns/:campaignId/landing-pages`
-- `/landing-pages/:landingPageId/versions`
-- `/page-versions/:pageVersionId/studio`
-- `/page-versions/:pageVersionId/studio/preview`
-- `/leads`
-- `/leads/:id`
+## Structure du dépôt
 
-### Routes legacy conservees
+| Répertoire | Rôle |
+| --- | --- |
+| `frontend/` | Application React — dashboard, campagnes, leads, Builder V3 |
+| `backend/` | API NestJS — auth, campagnes, versions, preview/export, leads |
+| `backend/prisma/` | Schéma, migrations, seed |
+| `docs/` | Architecture et cadrage |
+| `docker/` | PostgreSQL et pgAdmin locaux |
 
-Ces routes existent pour rediriger proprement les anciens liens vers le Studio officiel :
-
-- `/page-versions/:pageVersionId/blocks` -> `/page-versions/:pageVersionId/studio`
-- `/page-versions/:pageVersionId/studio-v2` -> `/page-versions/:pageVersionId/studio`
-- `/page-versions/:pageVersionId/preview` -> `/page-versions/:pageVersionId/studio/preview`
-- `/page-versions/:pageVersionId/studio-v2-preview` -> `/page-versions/:pageVersionId/studio/preview`
+Le code archivé V1/V2 (`frontend/src/_archive`) a été retiré du dépôt. L'export ZIP passe par `frontend/src/lib/landing-export.api.ts` (appels backend depuis le dashboard).
 
 ## Installation locale
-
-### 1. Variables d'environnement
 
 ```bash
 cp .env.example .env
 cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
-```
 
-Adapter au minimum `DATABASE_URL`, les secrets JWT et les URLs publiques selon l'environnement local.
-
-### 2. Base PostgreSQL
-
-```bash
 docker compose up -d
+
+cd backend && npm install && npx prisma generate && npx prisma migrate deploy && npm run db:seed && npm run start:dev
+
+cd frontend && npm install && npm run dev
 ```
 
-pgAdmin peut etre lance avec le profil dedie si necessaire :
-
-```bash
-docker compose --profile pgadmin up -d
-```
-
-### 3. Backend
-
-```bash
-cd backend
-npm install
-npx prisma generate
-npx prisma migrate deploy
-npm run db:seed
-npm run start:dev
-```
-
-Verification :
+Vérifications :
 
 ```bash
 curl http://localhost:3000/health
-curl http://localhost:3000/health/db
+# Frontend : http://localhost:5173
 ```
 
-### 4. Frontend
+## Qualité (CI locale)
 
 ```bash
-cd frontend
-npm install
-npm run dev
+cd frontend && npm run build && npm run test
+cd backend && npm run build && npm run test
 ```
 
-Par defaut, Vite expose l'application sur `http://localhost:5173` et le frontend appelle `http://localhost:3000` si `VITE_API_BASE_URL` n'est pas surcharge.
+## Sécurité dépôt
 
-## Qualite
+Ne pas versionner : `node_modules/`, `dist/`, `.env`, exports ZIP, caches, clés API. Voir [`.gitignore`](.gitignore).
 
-Frontend :
-
-```bash
-cd frontend
-npm run build
-npm run test -- --run
-```
-
-Backend :
-
-```bash
-cd backend
-npx prisma generate
-npm run build
-npm run test
-```
-
-Ces commandes doivent rester vertes avant de proposer une integration dans `main`.
-
-## Notes de maintenance
-
-- Ne pas remettre le Builder V1 comme editeur officiel.
-- Ne pas merger `archive/builder-v1-block-editor` dans `main`.
-- Garder les routes legacy tant que des liens historiques peuvent exister.
-- Ne pas versionner `dist/`, `output/`, `.env`, exports ZIP, logs, caches, stockage local ou fichiers generes.
-- Ne pas mettre de secret dans un export ZIP.
+Documentation architecture globale : [`docs/architecture/current-architecture.md`](docs/architecture/current-architecture.md).

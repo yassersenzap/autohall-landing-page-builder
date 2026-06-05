@@ -21,8 +21,8 @@ vi.mock('@/lib/page-versions', () => ({
   publishPageVersion: vi.fn(),
 }));
 
-vi.mock('@/features/visual-studio-v2/api/studio-v2-preview.api', () => ({
-  downloadStudioV2Export: vi.fn(),
+vi.mock('@/lib/landing-export.api', () => ({
+  downloadLandingExport: vi.fn(),
 }));
 
 const landingPageId = '33333333-3333-3333-3333-333333333333';

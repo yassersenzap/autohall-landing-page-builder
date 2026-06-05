@@ -6,7 +6,18 @@ import {
   isDeliverableBlockType,
 } from './block-registry';
 
+/** Types stables exposés via getActivePaletteBlocks (store.addBlock). */
 const DELIVERABLE_TYPES = [
+  'promo_autohall',
+  'vehicle_features',
+  'gallery',
+  'rich_text',
+  'media_only',
+  'spacer_divider',
+  'video_embed',
+  'cta_band',
+  'pricing_trim',
+  'testimonials',
   'hero_campaign',
   'hero_form_campaign',
   'lead_form',

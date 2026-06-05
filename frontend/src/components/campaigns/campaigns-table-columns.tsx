@@ -8,7 +8,7 @@ import type { StudioSession } from '@/lib/studio-session';
 import { studioNavState } from '@/lib/studio-session';
 import { cn } from '@/lib/utils';
 import type { CampaignListItem } from '@/lib/campaigns';
-import { downloadStudioV2Export } from '@/features/visual-studio-v2/api/studio-v2-preview.api';
+import { downloadLandingExport } from '@/lib/landing-export.api';
 
 function optionalCount(source: CampaignListItem, key: 'landingPagesCount' | 'versionsCount'): number | null {
   const value = (source as Record<string, unknown>)[key];
@@ -133,7 +133,7 @@ export function createCampaignsTableColumns(
                   className="h-8"
                   title="Export ZIP"
                   aria-label="Export ZIP"
-                  onClick={() => void downloadStudioV2Export(studioSession!.pageVersionId)}
+                  onClick={() => void downloadLandingExport(studioSession!.pageVersionId)}
                 >
                   <Download className="h-3.5 w-3.5" />
                 </ShadButton>

@@ -102,6 +102,23 @@ describe('builder-document.store removeBlock', () => {
     expect(useBuilderDocumentStore.getState().selectedBlockId).toBeNull();
   });
 
+  it('moveBlockUp and moveBlockDown reorder blocks', () => {
+    useBuilderDocumentStore.getState().setInitialBlocks([hero('hero-1'), form('form-1')]);
+    useBuilderDocumentStore.getState().selectBlock('form-1');
+
+    useBuilderDocumentStore.getState().moveBlockUp('form-1');
+    expect(useBuilderDocumentStore.getState().blocks[0]?.id).toBe('form-1');
+
+    useBuilderDocumentStore.getState().moveBlockDown('form-1');
+    expect(useBuilderDocumentStore.getState().blocks[1]?.id).toBe('form-1');
+  });
+
+  it('deleteBlock removes block like removeBlock', () => {
+    useBuilderDocumentStore.getState().setInitialBlocks([hero('hero-1')]);
+    useBuilderDocumentStore.getState().deleteBlock('hero-1');
+    expect(useBuilderDocumentStore.getState().blocks).toHaveLength(0);
+  });
+
   it('restoreLocalDraft reapplies blocks and marks theme dirty', () => {
     useBuilderDocumentStore.getState().setInitialBlocks([hero('server-hero')]);
 
@@ -112,6 +129,8 @@ describe('builder-document.store removeBlock', () => {
         secondaryColor: '#18181b',
         mode: 'light',
         fontFamily: 'Inter',
+        headingFont: 'Inter',
+        bodyFont: 'Roboto',
         headingScale: 'normal',
         sectionSpacing: 'normal',
         buttonStyle: 'pill',

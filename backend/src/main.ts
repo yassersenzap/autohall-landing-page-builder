@@ -48,7 +48,12 @@ async function bootstrap(): Promise<void> {
       origin: string | undefined,
       callback: (err: Error | null, allow?: boolean) => void,
     ) => {
-      if (!origin || isDevelopment || corsOrigins.includes(origin)) {
+      if (
+        !origin ||
+        origin === 'null' ||
+        isDevelopment ||
+        corsOrigins.includes(origin)
+      ) {
         callback(null, true);
         return;
       }

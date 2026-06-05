@@ -13,6 +13,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import {
   buildExportFilename,
   buildLandingConfigJs,
+  deriveApiBaseUrl,
   STATIC_LEAD_FORM_JS,
 } from '../page-export/static-export.builder';
 import { StudioV2DocumentService } from '../studio-v2/studio-v2-document.service';
@@ -92,6 +93,7 @@ export class StudioV2ExportService {
     const leadEndpoint = this.resolvePublicLeadEndpoint();
     const landingConfigJs = buildLandingConfigJs({
       leadEndpoint,
+      apiBaseUrl: deriveApiBaseUrl(leadEndpoint),
       campaignId: pageVersion.landingPage.campaignId,
       landingPageId: pageVersion.landingPage.id,
       pageVersionId: pageVersion.id,

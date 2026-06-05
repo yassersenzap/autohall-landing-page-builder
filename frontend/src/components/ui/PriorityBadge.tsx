@@ -1,28 +1,25 @@
 import { PRIORITY_LABELS } from '../../lib/leads';
-import { Badge } from './Badge';
-
-const PRIORITY_VARIANT: Record<
-  string,
-  'default' | 'primary' | 'success' | 'warning' | 'danger'
-> = {
-  low: 'default',
-  normal: 'primary',
-  high: 'warning',
-  urgent: 'danger',
-};
+import {
+  LEAD_BADGE_BASE,
+  LEAD_PRIORITY_BADGE_STYLES,
+} from '@/lib/lead-badge-styles';
+import { cn } from '@/lib/utils';
 
 type PriorityBadgeProps = {
   priority: string;
   label?: string;
+  className?: string;
 };
 
-export function PriorityBadge({ priority, label }: PriorityBadgeProps) {
-  const key = priority.toLowerCase();
-  const variant = PRIORITY_VARIANT[key] ?? 'default';
+export function PriorityBadge({ priority, label, className }: PriorityBadgeProps) {
+  const key = priority.toUpperCase();
+  const style =
+    LEAD_PRIORITY_BADGE_STYLES[key] ??
+    'bg-slate-500/10 text-slate-400 border-slate-500/20';
 
   return (
-    <Badge variant={variant}>
-      {label ?? PRIORITY_LABELS[priority] ?? priority}
-    </Badge>
+    <span className={cn(LEAD_BADGE_BASE, style, className)}>
+      {label ?? PRIORITY_LABELS[key] ?? priority}
+    </span>
   );
 }
