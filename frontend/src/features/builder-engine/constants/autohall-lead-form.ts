@@ -7,25 +7,29 @@ export const AUTOHALL_CITIES = [
   'Marrakech',
   'Tanger',
   'Agadir',
+  'Dakhla',
+  'El Jadida',
+  'Errachidia',
   'Fès',
+  'Kénitra',
+  'Karia',
   'Meknès',
   'Oujda',
   'Nador',
-  'Salé',
-  'Settat',
-  'Kénitra',
+  'Rommani',
   'Safi',
-  'El Jadida',
+  'Settat',
+  'Salé',
   'Tétouan',
   'Béni Mellal',
-  'Khouribga',
-  'Dakhla',
-  'Errachidia',
   'Berkane',
   'Al Hoceima',
   'Tiznit',
   'Taroudant',
+  'Khouribga',
+  'Tifelt',
   'Mohammedia',
+  'Ait Melloul',
 ] as const;
 
 export type LeadFormFieldDef = {
@@ -58,7 +62,7 @@ export const DEFAULT_AUTOHALL_FORM_CONFIG: LeadFormConfig = {
 };
 
 export const DEFAULT_AUTOHALL_CONSENT_LABEL =
-  'J’ai lu et j’accepte le traitement de mes données personnelles conformément à la politique Auto Hall.';
+  'J’ai lu et j’accepte sans réserve les termes de la clause relative à la protection des données personnelles.';
 
 export const DEFAULT_AUTOHALL_REQUIRED_NOTE = '* Champs obligatoires.';
 
@@ -91,11 +95,11 @@ export function buildAutoHallLeadFormFields(
     fields.push({ name: 'fullName', label: 'Nom complet', type: 'text', required: true, fullWidth: true });
   }
 
-  fields.push({ name: 'phone', label: 'Téléphone', type: 'tel', required: true });
-
   if (config.showEmail) {
     fields.push({ name: 'email', label: 'Email', type: 'email', required: false });
   }
+
+  fields.push({ name: 'phone', label: 'Téléphone', type: 'tel', required: true });
 
   if (config.showCity) {
     fields.push({

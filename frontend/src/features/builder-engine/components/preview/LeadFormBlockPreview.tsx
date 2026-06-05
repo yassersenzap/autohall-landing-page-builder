@@ -14,7 +14,7 @@ export function LeadFormBlockPreview({ propsJson }: LeadFormBlockPreviewProps) {
   const inlineStyle = buildCanvasInlineStyle(design);
   const title = asPropString(propsJson.title);
   const subtitle = asPropString(propsJson.subtitle);
-  const submitText = asPropString(propsJson.submitText) || 'Envoyer ma demande';
+  const submitText = asPropString(propsJson.submitText) || 'Envoyer votre demande';
   const privacyNote = asPropString(propsJson.privacyNote);
   const consentLabel = asPropString(propsJson.consentLabel);
   const requiredNote = asPropString(propsJson.requiredFieldsNote) || '* Champs obligatoires.';

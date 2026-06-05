@@ -55,10 +55,10 @@ export function SectionsTab() {
       <section className="mb-4">
         <p className="mb-2 flex items-center gap-1.5 px-0.5 text-xs font-semibold text-foreground">
           <Sparkles className="h-3.5 w-3.5 text-primary" aria-hidden />
-          Modèles de page V1
+          Modèles de page
         </p>
         <p className="mb-2 px-0.5 text-[0.65rem] leading-relaxed text-muted-foreground">
-          Applique une structure complète prête pour la démo. Remplace les sections existantes.
+          Structures campagne prêtes à personnaliser. Remplace les sections existantes.
         </p>
         <ul className="space-y-2">
           {LANDING_TEMPLATES.map((template) => (

@@ -65,7 +65,7 @@ export function renderLeadFormConsentHtml(props: Record<string, unknown>): strin
   const label =
     typeof props.consentLabel === 'string' && props.consentLabel.trim()
       ? props.consentLabel.trim()
-      : 'J’accepte le traitement de mes données personnelles conformément à la politique Auto Hall.';
+      : 'J’ai lu et j’accepte sans réserve les termes de la clause relative à la protection des données personnelles.';
 
   return `
         <label class="lp-lead-form__field lp-lead-form__field--consent lp-lead-form__field--full">

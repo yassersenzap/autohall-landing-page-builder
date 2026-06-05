@@ -14,6 +14,7 @@ import { BenefitsInspectorFields } from './BenefitsInspectorFields';
 import { OfferInspectorFields } from './OfferInspectorFields';
 import { FinancingInspectorFields } from './FinancingInspectorFields';
 import { VehicleRangeInspectorFields } from './VehicleRangeInspectorFields';
+import { HeroFormCampaignInspectorFields } from './HeroFormCampaignInspectorFields';
 import { getRegistryEntry } from '../../registry/block-registry';
 import { isBackendSupportedBlockType } from '../../registry/backend-block-types';
 
@@ -53,7 +54,10 @@ export function BlockInspectorForm({ block }: BlockInspectorFormProps) {
 
   switch (type) {
     case 'hero':
+    case 'hero_campaign':
       return <HeroInspectorFields {...common} />;
+    case 'hero_form_campaign':
+      return <HeroFormCampaignInspectorFields {...common} />;
     case 'lead_form':
       return <FormInspectorFields {...common} />;
     case 'trust_bar':
@@ -73,6 +77,7 @@ export function BlockInspectorForm({ block }: BlockInspectorFormProps) {
     case 'benefits':
       return <BenefitsInspectorFields {...common} />;
     case 'offer_highlights':
+    case 'vehicle_offer':
       return <OfferInspectorFields {...common} />;
     case 'financing':
       return <FinancingInspectorFields {...common} />;

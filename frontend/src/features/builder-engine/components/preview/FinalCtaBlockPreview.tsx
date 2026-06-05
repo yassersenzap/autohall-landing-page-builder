@@ -1,4 +1,10 @@
 import { asPropString } from '../../lib/block-props';
+import {
+  buildButtonClasses,
+  buildCanvasInlineStyle,
+  buildCanvasSectionClass,
+  getDesignFromProps,
+} from '../../lib/block-style';
 import { CanvasEmptyHint } from './CanvasEmptyHint';
 
 type FinalCtaBlockPreviewProps = {
@@ -6,35 +12,34 @@ type FinalCtaBlockPreviewProps = {
 };
 
 export function FinalCtaBlockPreview({ propsJson }: FinalCtaBlockPreviewProps) {
+  const design = getDesignFromProps('final_cta', propsJson);
+  const sectionClass = buildCanvasSectionClass('final_cta', 'lp-final-cta', propsJson);
+  const inlineStyle = buildCanvasInlineStyle(design);
+  const btnClass = buildButtonClasses(design);
+
   const title = asPropString(propsJson.title);
   const subtitle = asPropString(propsJson.subtitle);
   const buttonText = asPropString(propsJson.buttonText);
   const buttonTarget = asPropString(propsJson.buttonTarget) || '#lead-form';
 
   return (
-    <section className="lp-block lp-final-cta">
+    <section className={sectionClass} style={inlineStyle}>
       <div className="lp-section">
         <div className="lp-final-cta__panel">
           {title ? (
             <h2 className="lp-final-cta__title">{title}</h2>
           ) : (
-            <CanvasEmptyHint className="text-zinc-500">Titre du CTA à renseigner</CanvasEmptyHint>
+            <CanvasEmptyHint className="lp-final-cta__title">Titre du CTA à renseigner</CanvasEmptyHint>
           )}
           {subtitle ? (
             <p className="lp-final-cta__subtitle">{subtitle}</p>
-          ) : (
-            <CanvasEmptyHint className="mt-2 text-zinc-400">
-              Texte d’accompagnement à renseigner
-            </CanvasEmptyHint>
-          )}
+          ) : null}
           {buttonText ? (
-            <span className="lp-btn lp-btn--primary lp-btn--lg" data-href={buttonTarget}>
+            <span className={btnClass} data-href={buttonTarget}>
               {buttonText}
             </span>
           ) : (
-            <CanvasEmptyHint className="mt-3 text-zinc-400">
-              Texte du bouton à renseigner
-            </CanvasEmptyHint>
+            <CanvasEmptyHint className="mt-3">Texte du bouton à renseigner</CanvasEmptyHint>
           )}
         </div>
       </div>

@@ -227,7 +227,7 @@ export function CanvasArea() {
                           variant="secondary"
                           size="sm"
                           disabled={!canWrite}
-                          onClick={() => addBlock('hero')}
+                          onClick={() => addBlock('hero_campaign')}
                         >
                           <Plus className="h-4 w-4" />
                           Ajouter un Hero

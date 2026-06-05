@@ -13,6 +13,7 @@ import { BenefitsBlockPreview } from './preview/BenefitsBlockPreview';
 import { OfferBlockPreview } from './preview/OfferBlockPreview';
 import { FinancingBlockPreview } from './preview/FinancingBlockPreview';
 import { VehicleRangeBlockPreview } from './preview/VehicleRangeBlockPreview';
+import { HeroFormCampaignBlockPreview } from './preview/HeroFormCampaignBlockPreview';
 
 type CanvasBlockRendererProps = {
   blockId: string;
@@ -25,7 +26,10 @@ function renderBlockContent(
 ): ReactNode {
   switch (type) {
     case 'hero':
+    case 'hero_campaign':
       return <HeroBlockPreview propsJson={propsJson} />;
+    case 'hero_form_campaign':
+      return <HeroFormCampaignBlockPreview propsJson={propsJson} />;
     case 'lead_form':
       return <LeadFormBlockPreview propsJson={propsJson} />;
     case 'trust_bar':
@@ -43,6 +47,7 @@ function renderBlockContent(
     case 'benefits':
       return <BenefitsBlockPreview propsJson={propsJson} />;
     case 'offer_highlights':
+    case 'vehicle_offer':
       return <OfferBlockPreview propsJson={propsJson} />;
     case 'financing':
       return <FinancingBlockPreview propsJson={propsJson} />;

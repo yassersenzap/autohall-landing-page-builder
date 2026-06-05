@@ -45,7 +45,7 @@ describe('getPageReadinessIssues', () => {
 
   it('blocks when lead form is missing', () => {
     const issues = getPageReadinessIssues(
-      [{ type: 'hero', propsJson: { title: 'T', buttonText: 'Go' } }],
+      [{ type: 'hero_campaign', propsJson: { title: 'T', buttonText: 'Go' } }],
       { seoTitle: 'T', seoDescription: 'D' },
     );
     expect(issues.some((i) => i.code === 'lead-form-missing' && i.severity === 'critical')).toBe(
@@ -54,30 +54,46 @@ describe('getPageReadinessIssues', () => {
     expect(getPageReadinessStatus(issues)).toBe('blocked');
   });
 
-  it('detects missing SEO fields as critical', () => {
+  it('hero_form_campaign satisfies form requirement', () => {
+    const issues = getPageReadinessIssues(
+      [
+        {
+          type: 'hero_form_campaign',
+          propsJson: {
+            title: 'Campagne',
+            form: {
+              submitText: 'Envoyer',
+              consentLabel: 'J’accepte.',
+              formConfig: { showConsent: true },
+            },
+          },
+        },
+      ],
+      { seoTitle: 'T', seoDescription: 'D' },
+    );
+    expect(issues.some((i) => i.code === 'lead-form-missing')).toBe(false);
+  });
+
+  it('detects missing SEO fields as warnings', () => {
     const issues = getPageReadinessIssues(
       [
         {
           type: 'hero',
           propsJson: { title: 'T', buttonText: 'Go', imageAssetId: 'asset-1', alt: 'x' },
         },
-        { type: 'lead_form', propsJson: { submitText: 'Envoyer' } },
+        {
+          type: 'lead_form',
+          propsJson: {
+            submitText: 'Envoyer',
+            consentLabel: 'J’accepte.',
+            formConfig: { showConsent: true },
+          },
+        },
       ],
       { seoTitle: '', seoDescription: '' },
     );
-    expect(issues.some((i) => i.code === 'seo-title')).toBe(true);
-    expect(getCriticalPageReadinessIssues(issues).length).toBeGreaterThan(0);
-  });
-
-  it('detects image block without media as critical', () => {
-    const issues = getPageReadinessIssues(
-      [
-        { type: 'image', propsJson: { imageUrl: '', imageAssetId: '' } },
-        { type: 'lead_form', propsJson: { submitText: 'Envoyer' } },
-      ],
-      { seoTitle: 'T', seoDescription: 'D' },
-    );
-    expect(issues.some((i) => i.code.startsWith('image-block'))).toBe(true);
+    expect(issues.some((i) => i.code === 'seo-title' && i.severity === 'warning')).toBe(true);
+    expect(getCriticalPageReadinessIssues(issues).length).toBe(0);
   });
 
   it('detects lead form without submit button text', () => {

@@ -1,6 +1,14 @@
+import {
+  buildHeroCampaignDefaults,
+  buildHeroFormCampaignDefaults,
+  buildVehicleOfferDefaults,
+} from '../builder-engine/constants/campaign-block-defaults';
 import { DEFAULT_LEAD_FORM_PROPS } from '../../lib/lead-form-block';
 
 export const EDITOR_BLOCK_TYPES = [
+  'hero_campaign',
+  'hero_form_campaign',
+  'vehicle_offer',
   'hero',
   'trust_bar',
   'text',
@@ -200,6 +208,9 @@ export const DEFAULT_EDITOR_BLOCK_PROPS: Record<
   EditorBlockType,
   Record<string, unknown>
 > = {
+  hero_campaign: buildHeroCampaignDefaults('promo_image_right'),
+  hero_form_campaign: buildHeroFormCampaignDefaults('sav_light_form'),
+  vehicle_offer: buildVehicleOfferDefaults('image_right_offer_left'),
   hero: {
     eyebrow: 'Offre Auto Hall',
     title: 'Votre prochaine voiture, en toute sérénité',

@@ -1,5 +1,8 @@
 /** Types de blocs réellement rendus par landing-render (preview + export). */
 export const BACKEND_SUPPORTED_BLOCK_TYPES = new Set([
+  'hero_campaign',
+  'hero_form_campaign',
+  'vehicle_offer',
   'hero',
   'lead_form',
   'trust_bar',

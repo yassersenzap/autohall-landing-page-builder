@@ -33,14 +33,16 @@ function propsOf(block: PageReadinessBlock): Record<string, unknown> {
   return {};
 }
 
-function hasHeroImage(props: Record<string, unknown>): boolean {
-  const assetId = asPropString(props.imageAssetId).trim();
-  const url = asPropString(props.imageUrl).trim();
-  return Boolean(assetId || url);
+function formPropsFromBlock(props: Record<string, unknown>): Record<string, unknown> {
+  const form = props.form;
+  if (form && typeof form === 'object' && !Array.isArray(form)) {
+    return form as Record<string, unknown>;
+  }
+  return props;
 }
 
-function hasImageBlockMedia(props: Record<string, unknown>): boolean {
-  return hasHeroImage(props);
+function hasHeroImage(props: Record<string, unknown>): boolean {
+  return Boolean(asPropString(props.imageAssetId).trim() || asPropString(props.imageUrl).trim());
 }
 
 function parseFaqItems(props: Record<string, unknown>): { question: string; answer: string }[] {
@@ -55,10 +57,10 @@ function parseFaqItems(props: Record<string, unknown>): { question: string; answ
     .filter((item) => item.question && item.answer);
 }
 
-/**
- * Contrôles qualité avant publication — ne modifie pas propsJson.
- * Seuls les points critiques bloquent la publication.
- */
+function isHeroType(type: string): boolean {
+  return type === 'hero' || type === 'hero_campaign';
+}
+
 export function getPageReadinessIssues(
   blocks: PageReadinessBlock[],
   theme: PageReadinessTheme = {},
@@ -67,25 +69,16 @@ export function getPageReadinessIssues(
   const seoTitle = (theme.seoTitle ?? '').trim();
   const seoDescription = (theme.seoDescription ?? '').trim();
 
-  const heroBlocks = blocks.filter((b) => b.type === 'hero');
+  const heroBlocks = blocks.filter((b) => isHeroType(b.type));
   for (const [index, block] of heroBlocks.entries()) {
     const props = propsOf(block);
     const label = heroBlocks.length > 1 ? ` (hero ${index + 1})` : '';
-    const bid = block.id;
     if (!asPropString(props.title).trim()) {
       issues.push({
         code: `hero-title-${index}`,
         severity: 'critical',
         message: `Hero${label} : titre principal manquant.`,
-        blockId: bid,
-      });
-    }
-    if (!asPropString(props.buttonText).trim()) {
-      issues.push({
-        code: `hero-cta-${index}`,
-        severity: 'critical',
-        message: `Hero${label} : CTA principal vide.`,
-        blockId: bid,
+        blockId: block.id,
       });
     }
     const design = normalizeBlockDesign('hero', props);
@@ -95,8 +88,8 @@ export function getPageReadinessIssues(
       issues.push({
         code: `hero-image-${index}`,
         severity: 'warning',
-        message: `Hero${label} : aucune image — ajoutez une image véhicule dans le Hero.`,
-        blockId: bid,
+        message: `Hero${label} : image manquante.`,
+        blockId: block.id,
       });
     }
     if (hasHeroImage(props) && !asPropString(props.alt).trim()) {
@@ -104,12 +97,45 @@ export function getPageReadinessIssues(
         code: `hero-alt-${index}`,
         severity: 'warning',
         message: `Hero${label} : texte alternatif image manquant.`,
-        blockId: bid,
+        blockId: block.id,
       });
     }
   }
 
-  const hasLeadForm = blocks.some((b) => b.type === 'lead_form');
+  for (const [index, block] of blocks.entries()) {
+    if (block.type !== 'hero_form_campaign') continue;
+    const props = propsOf(block);
+    const fp = formPropsFromBlock(props);
+    if (!asPropString(props.title).trim()) {
+      issues.push({
+        code: `hero-form-title-${index}`,
+        severity: 'critical',
+        message: 'Hero + Formulaire : titre manquant.',
+        blockId: block.id,
+      });
+    }
+    if (!asPropString(fp.submitText).trim()) {
+      issues.push({
+        code: `hero-form-submit-${index}`,
+        severity: 'critical',
+        message: 'Hero + Formulaire : texte du bouton d’envoi manquant.',
+        blockId: block.id,
+      });
+    }
+    const formConfig = fp.formConfig as Record<string, unknown> | undefined;
+    if (formConfig?.showConsent !== false && !asPropString(fp.consentLabel).trim()) {
+      issues.push({
+        code: `hero-form-consent-${index}`,
+        severity: 'critical',
+        message: 'Hero + Formulaire : consentement manquant.',
+        blockId: block.id,
+      });
+    }
+  }
+
+  const hasLeadForm =
+    blocks.some((b) => b.type === 'lead_form') ||
+    blocks.some((b) => b.type === 'hero_form_campaign');
   if (!hasLeadForm) {
     issues.push({
       code: 'lead-form-missing',
@@ -130,9 +156,7 @@ export function getPageReadinessIssues(
       });
     }
     const formConfig = props.formConfig as Record<string, unknown> | undefined;
-    const showConsent = formConfig?.showConsent !== false;
-    const consentLabel = asPropString(props.consentLabel).trim();
-    if (showConsent && !consentLabel) {
+    if (formConfig?.showConsent !== false && !asPropString(props.consentLabel).trim()) {
       issues.push({
         code: `lead-form-consent-${index}`,
         severity: 'critical',
@@ -148,54 +172,29 @@ export function getPageReadinessIssues(
     if (!asPropString(props.buttonText).trim()) {
       issues.push({
         code: `final-cta-button-${index}`,
-        severity: 'warning',
-        message: 'Bloc CTA final : texte du bouton manquant.',
+        severity: 'critical',
+        message: 'CTA final : texte du bouton manquant.',
         blockId: block.id,
       });
     }
   }
 
   for (const [index, block] of blocks.entries()) {
-    if (block.type !== 'image') continue;
+    if (block.type !== 'vehicle_range') continue;
     const props = propsOf(block);
-    if (!hasImageBlockMedia(props)) {
+    const vehicles = Array.isArray(props.vehicles) ? props.vehicles : [];
+    const named = vehicles.filter(
+      (v) =>
+        v &&
+        typeof v === 'object' &&
+        typeof (v as Record<string, unknown>).name === 'string' &&
+        String((v as Record<string, unknown>).name).trim(),
+    );
+    if (named.length === 0) {
       issues.push({
-        code: `image-block-${index}`,
+        code: `vehicle-range-empty-${index}`,
         severity: 'critical',
-        message: 'Bloc image : aucun média sélectionné.',
-        blockId: block.id,
-      });
-    } else if (!asPropString(props.alt).trim()) {
-      issues.push({
-        code: `image-alt-${index}`,
-        severity: 'warning',
-        message: 'Bloc image : texte alternatif manquant.',
-        blockId: block.id,
-      });
-    }
-  }
-
-  for (const block of blocks) {
-    if (block.type !== 'text') continue;
-    const props = propsOf(block);
-    if (!asPropString(props.heading).trim() && !asPropString(props.content).trim()) {
-      issues.push({
-        code: `text-empty-${block.id ?? 'x'}`,
-        severity: 'warning',
-        message: 'Section texte vide.',
-        blockId: block.id,
-      });
-    }
-  }
-
-  for (const block of blocks) {
-    if (block.type !== 'footer_legal') continue;
-    const props = propsOf(block);
-    if (!asPropString(props.legalText).trim()) {
-      issues.push({
-        code: `footer-empty-${block.id ?? 'x'}`,
-        severity: 'warning',
-        message: 'Pied de page : mentions légales vides.',
+        message: 'Gamme véhicules : ajoutez au moins un modèle.',
         blockId: block.id,
       });
     }
@@ -203,8 +202,7 @@ export function getPageReadinessIssues(
 
   for (const block of blocks) {
     if (block.type !== 'faq') continue;
-    const props = propsOf(block);
-    if (parseFaqItems(props).length === 0) {
+    if (parseFaqItems(propsOf(block)).length === 0) {
       issues.push({
         code: `faq-empty-${block.id ?? 'x'}`,
         severity: 'warning',
@@ -222,25 +220,17 @@ export function getPageReadinessIssues(
     });
   }
 
-  if (!blocks.some((b) => b.type === 'benefits') && !blocks.some((b) => b.type === 'trust_bar')) {
-    issues.push({
-      code: 'reassurance-missing',
-      severity: 'warning',
-      message: 'Ajoutez au moins une section de réassurance (avantages ou bandeau confiance).',
-    });
-  }
-
   if (!seoTitle) {
     issues.push({
       code: 'seo-title',
-      severity: 'critical',
+      severity: 'warning',
       message: 'Titre SEO manquant (réglages page).',
     });
   }
   if (!seoDescription) {
     issues.push({
       code: 'seo-description',
-      severity: 'critical',
+      severity: 'warning',
       message: 'Description SEO manquante (réglages page).',
     });
   }

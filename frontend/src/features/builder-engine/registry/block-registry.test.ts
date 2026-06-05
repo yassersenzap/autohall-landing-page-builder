@@ -1,27 +1,44 @@
 import { describe, expect, it } from 'vitest';
 import { isBackendSupportedBlockType } from './backend-block-types';
-import { getActivePaletteBlocks, getRegistryEntry } from './block-registry';
+import {
+  getActivePaletteBlocks,
+  getRegistryEntry,
+  isDeliverableBlockType,
+} from './block-registry';
 
-describe('block-registry', () => {
-  it('active palette blocks are backend-supported', () => {
-    for (const block of getActivePaletteBlocks()) {
-      expect(isBackendSupportedBlockType(block.type)).toBe(true);
-      expect(block.availability).toBe('stable');
+const DELIVERABLE_TYPES = [
+  'hero_campaign',
+  'hero_form_campaign',
+  'lead_form',
+  'vehicle_offer',
+  'vehicle_range',
+  'benefits',
+  'trust_bar',
+  'faq',
+  'final_cta',
+  'footer_legal',
+];
+
+describe('block-registry deliverable palette', () => {
+  it('active palette exposes only deliverable campaign blocks', () => {
+    const activeTypes = getActivePaletteBlocks().map((b) => b.type).sort();
+    expect(activeTypes).toEqual([...DELIVERABLE_TYPES].sort());
+  });
+
+  it('deliverable blocks are backend-supported and stable', () => {
+    for (const type of DELIVERABLE_TYPES) {
+      expect(isDeliverableBlockType(type)).toBe(true);
+      expect(isBackendSupportedBlockType(type)).toBe(true);
+      expect(getRegistryEntry(type)?.availability).toBe('stable');
     }
   });
 
-  it('includes hero and lead_form as stable', () => {
-    expect(getRegistryEntry('hero')?.availability).toBe('stable');
-    expect(getRegistryEntry('lead_form')?.availability).toBe('stable');
-  });
-
-  it('hides incomplete campaign blocks from palette', () => {
-    expect(getRegistryEntry('offer_highlights')?.availability).toBe('disabled');
-    expect(getRegistryEntry('vehicle_range')?.availability).toBe('disabled');
-    expect(getRegistryEntry('financing')?.availability).toBe('disabled');
+  it('hides non-campaign blocks from palette', () => {
     const activeTypes = getActivePaletteBlocks().map((b) => b.type);
-    expect(activeTypes).not.toContain('vehicle_range');
+    expect(activeTypes).not.toContain('layout_section');
+    expect(activeTypes).not.toContain('text');
+    expect(activeTypes).not.toContain('image');
     expect(activeTypes).not.toContain('financing');
-    expect(activeTypes).not.toContain('offer_highlights');
+    expect(activeTypes).not.toContain('features');
   });
 });

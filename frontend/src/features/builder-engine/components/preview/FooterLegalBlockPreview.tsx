@@ -1,4 +1,5 @@
 import { asPropString } from '../../lib/block-props';
+import { buildCanvasInlineStyle, buildCanvasSectionClass, getDesignFromProps } from '../../lib/block-style';
 import { parseFooterLinks } from '../../lib/list-props';
 import { CanvasEmptyHint } from './CanvasEmptyHint';
 
@@ -7,16 +8,19 @@ type FooterLegalBlockPreviewProps = {
 };
 
 export function FooterLegalBlockPreview({ propsJson }: FooterLegalBlockPreviewProps) {
+  const design = getDesignFromProps('footer_legal', propsJson);
+  const sectionClass = buildCanvasSectionClass('footer_legal', 'lp-footer-legal', propsJson);
+  const inlineStyle = buildCanvasInlineStyle(design);
   const legalText = asPropString(propsJson.legalText);
   const links = parseFooterLinks(propsJson);
 
   return (
-    <section className="lp-block lp-footer-legal">
+    <section className={sectionClass} style={inlineStyle}>
       <div className="lp-section">
         {legalText ? (
           <p className="lp-footer-legal__text">{legalText}</p>
         ) : (
-          <CanvasEmptyHint className="lp-footer-legal__text text-zinc-400">
+          <CanvasEmptyHint className="lp-footer-legal__text">
             Renseignez les mentions légales
           </CanvasEmptyHint>
         )}

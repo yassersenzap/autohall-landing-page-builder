@@ -34,7 +34,9 @@ export function VehicleRangeBlockPreview({ propsJson }: VehicleRangeBlockPreview
                         className="lp-vehicle-card__img"
                       />
                     ) : (
-                      <div className="lp-vehicle-card__placeholder">Visuel modèle</div>
+                      <div className="lp-vehicle-card__placeholder">
+                        <CanvasEmptyHint size="sm">Visuel modèle</CanvasEmptyHint>
+                      </div>
                     )}
                   </div>
                   <div className="lp-vehicle-card__body">

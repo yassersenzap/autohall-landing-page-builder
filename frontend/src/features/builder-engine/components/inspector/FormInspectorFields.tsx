@@ -1,4 +1,5 @@
 import { asPropString } from '../../lib/block-props';
+import { extractDesignRaw, FORM_LAYOUT_OPTIONS } from '../../lib/block-style';
 import { useBlockPropsPatch } from '../../lib/use-block-props-patch';
 import {
   DEFAULT_AUTOHALL_CONSENT_LABEL,
@@ -15,9 +16,17 @@ import {
   InspectorTextarea,
 } from './InspectorPrimitives';
 
+type FormPatchApi = {
+  patchString: (key: string, value: string) => void;
+  patchProps: (patch: Record<string, unknown>) => void;
+  patchDesign: (partial: Record<string, unknown>) => void;
+};
+
 type FormInspectorFieldsProps = {
   blockId: string;
   propsJson: Record<string, unknown>;
+  /** Patch vers props.form (hero_form_campaign) au lieu du bloc racine. */
+  onPatch?: FormPatchApi;
 };
 
 function readFormConfig(propsJson: Record<string, unknown>): LeadFormConfig {
@@ -28,9 +37,12 @@ function readFormConfig(propsJson: Record<string, unknown>): LeadFormConfig {
   return { ...DEFAULT_AUTOHALL_FORM_CONFIG, ...raw };
 }
 
-export function FormInspectorFields({ blockId, propsJson }: FormInspectorFieldsProps) {
-  const { patchString, patchProps } = useBlockPropsPatch(blockId);
+export function FormInspectorFields({ blockId, propsJson, onPatch }: FormInspectorFieldsProps) {
+  const storePatch = useBlockPropsPatch(blockId);
+  const { patchString, patchProps, patchDesign } = onPatch ?? storePatch;
   const config = readFormConfig(propsJson);
+  const design = extractDesignRaw(propsJson);
+  const layoutVariant = asPropString(design.layoutVariant) || 'card_right';
 
   function patchFormConfig(patch: Partial<LeadFormConfig>) {
     const next = { ...config, ...patch };
@@ -128,6 +140,15 @@ export function FormInspectorFields({ blockId, propsJson }: FormInspectorFieldsP
           label="Mention champs obligatoires"
           value={asPropString(propsJson.requiredFieldsNote) || DEFAULT_AUTOHALL_REQUIRED_NOTE}
           onChange={(e) => patchString('requiredFieldsNote', e.target.value)}
+        />
+      </InspectorSection>
+
+      <InspectorSection value="layout" title="Mise en page">
+        <InspectorSelect
+          label="Disposition"
+          value={layoutVariant}
+          options={[...FORM_LAYOUT_OPTIONS]}
+          onChange={(value) => patchDesign({ layoutVariant: value })}
         />
       </InspectorSection>
 

@@ -1,4 +1,7 @@
 export const ALLOWED_BLOCK_TYPES = [
+  'hero_campaign',
+  'hero_form_campaign',
+  'vehicle_offer',
   'hero',
   'trust_bar',
   'text',

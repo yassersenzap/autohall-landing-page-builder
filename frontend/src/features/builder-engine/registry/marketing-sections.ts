@@ -6,24 +6,24 @@ export type MarketingSectionTemplate = {
   blockTypes: string[];
 };
 
-/** Sections rapides V1 — complément aux modèles de page complets. */
+/** Sections rapides — complément aux modèles de page complets. */
 export const MARKETING_SECTIONS: MarketingSectionTemplate[] = [
   {
     id: 'test-drive',
     label: 'Essai véhicule',
     description: 'Hero, formulaire, confiance et mentions légales.',
-    blockTypes: ['hero', 'lead_form', 'trust_bar', 'footer_legal'],
+    blockTypes: ['hero_campaign', 'lead_form', 'trust_bar', 'footer_legal'],
   },
   {
     id: 'vehicle-offer',
     label: 'Offre véhicule',
-    description: 'Hero, caractéristiques, CTA et formulaire.',
-    blockTypes: ['hero', 'features', 'final_cta', 'lead_form'],
+    description: 'Hero, offre véhicule, CTA et formulaire.',
+    blockTypes: ['hero_campaign', 'vehicle_offer', 'final_cta', 'lead_form'],
   },
   {
     id: 'sav-service',
     label: 'SAV & services',
-    description: 'Hero, texte, formulaire et mentions légales.',
-    blockTypes: ['hero', 'text', 'lead_form', 'footer_legal'],
+    description: 'Hero + formulaire, avantages et mentions légales.',
+    blockTypes: ['hero_form_campaign', 'benefits', 'footer_legal'],
   },
 ];

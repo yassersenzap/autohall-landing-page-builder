@@ -1,3 +1,5 @@
+import { sanitizeBlockDesignProps } from './block-design-props';
+
 /**
  * Nettoie les patches avant fusion dans propsJson.
  * Limite aux scalaires et listes d'objets plats — prêt pour validation Zod côté store/API.
@@ -5,7 +7,6 @@
 const MAX_STRING_LENGTH = 8_000;
 const MAX_ARRAY_ITEMS = 12;
 const MAX_OBJECT_KEYS = 8;
-const MAX_DESIGN_KEYS = 24;
 
 function trimString(value: string, maxLen: number): string {
   if (value.length <= maxLen) return value;
@@ -72,25 +73,7 @@ function sanitizeFormConfigObject(value: Record<string, unknown>): Record<string
 }
 
 function sanitizeDesignObject(value: Record<string, unknown>): Record<string, unknown> {
-  const out: Record<string, unknown> = {};
-  let keyCount = 0;
-
-  for (const [key, raw] of Object.entries(value)) {
-    if (keyCount >= MAX_DESIGN_KEYS) break;
-    if (typeof key !== 'string' || key.length === 0 || key.length > 48) continue;
-
-    if (typeof raw === 'string') {
-      const trimmed = trimString(raw, 120);
-      if (trimmed.toLowerCase().startsWith('data:')) continue;
-      out[key] = trimmed;
-      keyCount += 1;
-    } else if (typeof raw === 'boolean') {
-      out[key] = raw;
-      keyCount += 1;
-    }
-  }
-
-  return out;
+  return sanitizeBlockDesignProps(value);
 }
 
 export function sanitizePropsPatch(

@@ -1,5 +1,6 @@
 import { asPropString } from '../../lib/block-props';
 import { CanvasEmptyHint } from './CanvasEmptyHint';
+import { SectionHeading } from './SectionHeading';
 
 type FaqItem = { question: string; answer: string };
 
@@ -11,7 +12,7 @@ function parseFaqItems(propsJson: Record<string, unknown>): FaqItem[] {
       question: typeof item.question === 'string' ? item.question : '',
       answer: typeof item.answer === 'string' ? item.answer : '',
     }))
-    .filter((item) => item.question || item.answer);
+    .filter((item) => item.question.trim() || item.answer.trim());
 }
 
 type FaqBlockPreviewProps = {
@@ -24,29 +25,21 @@ export function FaqBlockPreview({ propsJson }: FaqBlockPreviewProps) {
   const items = parseFaqItems(propsJson);
 
   return (
-    <section className="px-6 py-10">
-      <div className="mx-auto max-w-2xl">
-        {heading ? <h2 className="text-xl font-semibold text-zinc-900">{heading}</h2> : null}
-        {subtitle ? <p className="mt-1 text-sm text-zinc-600">{subtitle}</p> : null}
-        <ul className="mt-4 space-y-3">
+    <section className="lp-block lp-faq">
+      <div className="lp-section lp-section--narrow">
+        <SectionHeading heading={heading} subtitle={subtitle} />
+        <div className="lp-faq__list">
           {items.length > 0 ? (
             items.map((item, i) => (
-              <li
-                key={i}
-                className="rounded-lg border border-zinc-200 bg-white px-4 py-3"
-              >
-                <p className="text-sm font-medium text-zinc-900">{item.question}</p>
-                <p className="mt-1 text-sm text-zinc-600">{item.answer}</p>
-              </li>
+              <details key={i} className="lp-faq__item" open={i === 0}>
+                <summary className="lp-faq__question">{item.question}</summary>
+                <p className="lp-faq__answer">{item.answer}</p>
+              </details>
             ))
           ) : (
-            <li>
-              <CanvasEmptyHint className="text-zinc-400">
-                Ajoutez vos questions fréquentes
-              </CanvasEmptyHint>
-            </li>
+            <CanvasEmptyHint>Ajoutez vos questions fréquentes</CanvasEmptyHint>
           )}
-        </ul>
+        </div>
       </div>
     </section>
   );

@@ -2,6 +2,7 @@ import { asPropString } from '../../lib/block-props';
 import { parseListItems } from '../../lib/list-props';
 import { HeroBlockImage } from '../media/HeroBlockImage';
 import { SectionHeading } from './SectionHeading';
+import { CanvasEmptyHint } from './CanvasEmptyHint';
 
 type OfferBlockPreviewProps = { propsJson: Record<string, unknown> };
 
@@ -28,7 +29,9 @@ export function OfferBlockPreview({ propsJson }: OfferBlockPreviewProps) {
                 className="lp-vehicle-offer__img"
               />
             ) : (
-              <div className="lp-vehicle-offer__media--placeholder">Visuel véhicule</div>
+              <div className="lp-vehicle-offer__media--placeholder">
+                <CanvasEmptyHint>Visuel véhicule</CanvasEmptyHint>
+              </div>
             )}
           </div>
           <div className="lp-vehicle-offer__body">

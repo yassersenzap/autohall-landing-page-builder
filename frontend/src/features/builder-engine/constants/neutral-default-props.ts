@@ -19,7 +19,16 @@ import {
   buildAutoHallLeadFormFields,
 } from './autohall-lead-form';
 
+import {
+  buildHeroCampaignDefaults,
+  buildHeroFormCampaignDefaults,
+  buildVehicleOfferDefaults,
+} from './campaign-block-defaults';
+
 export const BUILDER_NEUTRAL_DEFAULT_PROPS: Record<string, Record<string, unknown>> = {
+  hero_campaign: buildHeroCampaignDefaults('promo_image_right'),
+  hero_form_campaign: buildHeroFormCampaignDefaults('sav_light_form'),
+  vehicle_offer: buildVehicleOfferDefaults('image_right_offer_left'),
   hero: {
     eyebrow: '',
     title: '',
@@ -38,7 +47,7 @@ export const BUILDER_NEUTRAL_DEFAULT_PROPS: Record<string, Record<string, unknow
   lead_form: {
     title: '',
     subtitle: '',
-    submitText: 'Envoyer ma demande',
+    submitText: 'Envoyer votre demande',
     privacyNote:
       'Conformément à la loi 09-08, vous disposez d’un droit d’accès et de rectification de vos données.',
     consentLabel: DEFAULT_AUTOHALL_CONSENT_LABEL,

@@ -13,6 +13,7 @@ import {
   renderLeadFormFieldsHtml,
   renderLeadFormRequiredNoteHtml,
 } from './lead-form-fields.render';
+import { renderHeroFormCampaignHtml } from './hero-form-campaign.render';
 
 export type RenderBlockInput = {
   blockType: string;
@@ -199,7 +200,7 @@ function renderLeadFormHtml(props: Record<string, unknown>): string {
 
   const title = propString(props, 'title');
   const subtitle = propString(props, 'subtitle');
-  const submitText = propString(props, 'submitText') ?? 'Envoyer ma demande';
+  const submitText = propString(props, 'submitText') ?? 'Envoyer votre demande';
   const privacyNote = propString(props, 'privacyNote', 'legalNote');
   const reassurance = parseStringList(props, 'reassurance');
 
@@ -288,7 +289,7 @@ function renderHeroHtml(
     !hideMedia && !isBgLayout
       ? imageSrc
         ? `<div class="lp-hero__media"><img class="${imgClass}" src="${escapeHtml(imageSrc)}" alt="${escapeHtml(imageAlt)}" loading="eager" decoding="async" /></div>`
-        : `<div class="lp-hero__media lp-hero__media--placeholder" aria-hidden="true"><span>Visuel véhicule — ajoutez une photo</span></div>`
+        : `<div class="lp-hero__media lp-hero__media--placeholder" aria-hidden="true"></div>`
       : '';
 
   const campaignType = propString(props, 'campaignType');
@@ -406,7 +407,7 @@ function renderOfferHighlightsHtml(
 
     const mediaHtml = imageSrc
       ? `<div class="lp-vehicle-offer__media"><img class="lp-vehicle-offer__img" src="${escapeHtml(imageSrc)}" alt="${escapeHtml(imageAlt)}" loading="lazy" decoding="async" /></div>`
-      : `<div class="lp-vehicle-offer__media lp-vehicle-offer__media--placeholder" aria-hidden="true"><span>Visuel véhicule</span></div>`;
+      : `<div class="lp-vehicle-offer__media lp-vehicle-offer__media--placeholder" aria-hidden="true"></div>`;
 
     return `
     <section class="lp-block lp-vehicle-offer" id="offer">
@@ -491,7 +492,7 @@ function renderVehicleRangeHtml(
     .map((vehicle) => {
       const mediaHtml = vehicle.imageSrc
         ? `<img class="lp-vehicle-card__img" src="${escapeHtml(vehicle.imageSrc)}" alt="${escapeHtml(vehicle.imageAlt)}" loading="lazy" decoding="async" />`
-        : `<div class="lp-vehicle-card__placeholder" aria-hidden="true">Visuel modèle</div>`;
+        : `<div class="lp-vehicle-card__placeholder" aria-hidden="true"></div>`;
       const tagHtml = vehicle.tag
         ? `<span class="lp-vehicle-card__tag">${escapeHtml(vehicle.tag)}</span>`
         : '';
@@ -549,7 +550,7 @@ function renderFeaturesShowcaseHtml(
 
   const mediaHtml = imageSrc
     ? `<div class="lp-showcase__media"><img class="${imgClass}" src="${escapeHtml(imageSrc)}" alt="${escapeHtml(imageAlt)}" loading="lazy" decoding="async" /></div>`
-    : `<div class="lp-showcase__media lp-showcase__media--placeholder" aria-hidden="true"><span>Aucune image sélectionnée</span></div>`;
+    : `<div class="lp-showcase__media lp-showcase__media--placeholder" aria-hidden="true"></div>`;
 
   const copyHtml = `
           <div class="lp-showcase__copy">
@@ -780,8 +781,12 @@ export function renderBlockHtml(
   const props = propsAsRecord(block.propsJson);
   const type = block.blockType.toLowerCase();
 
-  if (type === 'hero') {
+  if (type === 'hero' || type === 'hero_campaign') {
     return renderHeroHtml(props, context);
+  }
+
+  if (type === 'hero_form_campaign') {
+    return renderHeroFormCampaignHtml(props, context);
   }
 
   if (type === 'trust_bar') {
@@ -861,7 +866,7 @@ export function renderBlockHtml(
     return renderBenefitsHtml(props);
   }
 
-  if (type === 'offer_highlights') {
+  if (type === 'offer_highlights' || type === 'vehicle_offer') {
     return renderOfferHighlightsHtml(props, context);
   }
 

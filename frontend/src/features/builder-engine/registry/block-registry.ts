@@ -16,22 +16,55 @@ export type BlockRegistryEntry = BuilderPaletteItem & {
   icon: string;
 };
 
+/** Blocs campagne Auto Hall — palette utilisateur uniquement. */
 export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
   {
-    type: 'hero',
-    label: 'Hero',
-    description: 'Bannière principale, visuel et accroche.',
+    type: 'hero_campaign',
+    label: 'Hero Campaign',
+    description: 'Bannière campagne — promo, SAV, gamme ou capture lead.',
     category: 'hero',
     availability: 'stable',
     icon: 'H',
   },
   {
+    type: 'hero_form_campaign',
+    label: 'Hero + Formulaire',
+    description: 'Section campagne avec contenu et formulaire côte à côte.',
+    category: 'hero',
+    availability: 'stable',
+    icon: '⊞',
+  },
+  {
     type: 'lead_form',
-    label: 'Formulaire',
-    description: 'Collecte de demandes et leads.',
+    label: 'Formulaire Auto Hall',
+    description: 'Collecte leads conforme campagnes Auto Hall.',
     category: 'conversion',
     availability: 'stable',
     icon: 'F',
+  },
+  {
+    type: 'vehicle_offer',
+    label: 'Offre véhicule',
+    description: 'Modèle, prix et points clés de l’offre.',
+    category: 'content',
+    availability: 'stable',
+    icon: '★',
+  },
+  {
+    type: 'vehicle_range',
+    label: 'Gamme véhicules',
+    description: 'Grille de modèles thermique / HEV.',
+    category: 'content',
+    availability: 'stable',
+    icon: '▦',
+  },
+  {
+    type: 'benefits',
+    label: 'Avantages',
+    description: 'Cartes avantages campagne ou SAV.',
+    category: 'trust',
+    availability: 'stable',
+    icon: '✓',
   },
   {
     type: 'trust_bar',
@@ -40,30 +73,6 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     category: 'trust',
     availability: 'stable',
     icon: '+',
-  },
-  {
-    type: 'features',
-    label: 'Caractéristiques',
-    description: 'Points forts véhicule ou offre.',
-    category: 'content',
-    availability: 'stable',
-    icon: '⚙',
-  },
-  {
-    type: 'text',
-    label: 'Section texte',
-    description: 'Paragraphe éditorial.',
-    category: 'content',
-    availability: 'stable',
-    icon: 'T',
-  },
-  {
-    type: 'image',
-    label: 'Section image',
-    description: 'Visuel pleine largeur.',
-    category: 'content',
-    availability: 'stable',
-    icon: 'M',
   },
   {
     type: 'faq',
@@ -83,40 +92,57 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
   },
   {
     type: 'footer_legal',
-    label: 'Pied de page',
+    label: 'Footer légal',
     description: 'Mentions légales.',
     category: 'footer',
     availability: 'stable',
     icon: '§',
   },
+  /** Legacy — hors palette, rendu conservé pour pages existantes. */
+  {
+    type: 'hero',
+    label: 'Hero (legacy)',
+    description: 'Ancien bloc hero.',
+    category: 'hero',
+    availability: 'disabled',
+    icon: 'H',
+  },
   {
     type: 'offer_highlights',
-    label: 'Offre véhicule',
-    description: 'Modèle, prix et points clés de l’offre.',
+    label: 'Offre (legacy)',
+    description: 'Ancien bloc offre.',
     category: 'content',
     availability: 'disabled',
     icon: '★',
   },
   {
-    type: 'vehicle_range',
-    label: 'Gamme véhicules',
-    description: 'Grille de modèles thermique / HEV.',
+    type: 'features',
+    label: 'Caractéristiques',
+    description: 'Hors palette campagne.',
     category: 'content',
     availability: 'disabled',
-    icon: '▦',
+    icon: '⚙',
   },
   {
-    type: 'benefits',
-    label: 'Avantages',
-    description: 'Cartes avantages campagne ou SAV.',
-    category: 'trust',
-    availability: 'stable',
-    icon: '✓',
+    type: 'text',
+    label: 'Section texte',
+    description: 'Hors palette campagne.',
+    category: 'content',
+    availability: 'disabled',
+    icon: 'T',
+  },
+  {
+    type: 'image',
+    label: 'Section image',
+    description: 'Hors palette campagne.',
+    category: 'content',
+    availability: 'disabled',
+    icon: 'M',
   },
   {
     type: 'financing',
     label: 'Financement',
-    description: 'Conditions financement et reprise.',
+    description: 'Non livré.',
     category: 'conversion',
     availability: 'disabled',
     icon: '€',
@@ -140,4 +166,9 @@ export function getDisabledPaletteBlocks(): BlockRegistryEntry[] {
       entry.availability === 'disabled' ||
       !isBackendSupportedBlockType(entry.type),
   );
+}
+
+export function isDeliverableBlockType(type: string): boolean {
+  const entry = getRegistryEntry(type);
+  return Boolean(entry && entry.availability === 'stable' && isBackendSupportedBlockType(type));
 }

@@ -29,7 +29,8 @@ describe('premium landing export', () => {
     });
     expect(html).toContain('lp-hero--bg-light');
     expect(html).toContain('lp-hero--layout-split_image_right');
-    expect(html).toContain('Visuel véhicule');
+    expect(html).toContain('lp-hero__media--placeholder');
+    expect(html).not.toContain('Visuel véhicule');
   });
 
   it('lead form renders premium card layout', () => {

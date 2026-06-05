@@ -5,6 +5,7 @@ import {
   FileText,
   FormInput,
   Image,
+  LayoutGrid,
   LayoutTemplate,
   Megaphone,
   MousePointerClick,
@@ -18,6 +19,9 @@ import {
 import type { EditorBlockType } from '../types/editor.types';
 
 const BLOCK_ICON_MAP: Record<EditorBlockType, LucideIcon> = {
+  hero_campaign: Car,
+  hero_form_campaign: LayoutGrid,
+  vehicle_offer: Star,
   hero: Car,
   trust_bar: Shield,
   text: FileText,

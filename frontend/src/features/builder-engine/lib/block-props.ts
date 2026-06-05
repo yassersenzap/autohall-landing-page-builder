@@ -28,7 +28,7 @@ export function parseLeadFormProps(propsJson: Record<string, unknown>): LeadForm
   return {
     title: asPropString(propsJson.title),
     subtitle: asPropString(propsJson.subtitle),
-    submitText: asPropString(propsJson.submitText) || 'Envoyer ma demande',
+    submitText: asPropString(propsJson.submitText) || 'Envoyer votre demande',
     privacyNote: asPropString(propsJson.privacyNote),
     reassurance,
     fields: resolveLeadFormFieldsFromProps(propsJson),

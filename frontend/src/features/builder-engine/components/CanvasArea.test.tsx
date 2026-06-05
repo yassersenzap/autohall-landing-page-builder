@@ -131,6 +131,6 @@ describe('CanvasArea empty state', () => {
 
     await user.click(screen.getByRole('button', { name: /Ajouter un Hero/i }));
     expect(useBuilderDocumentStore.getState().blocks).toHaveLength(1);
-    expect(useBuilderDocumentStore.getState().blocks[0]?.type).toBe('hero');
+    expect(useBuilderDocumentStore.getState().blocks[0]?.type).toBe('hero_campaign');
   });
 });

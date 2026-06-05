@@ -105,11 +105,11 @@ export function buildLeadFormFieldSpecs(props: Record<string, unknown>): LeadFor
     fields.push({ name: 'fullName', label: 'Nom complet', type: 'text', required: true, fullWidth: true });
   }
 
-  fields.push({ name: 'phone', label: 'Téléphone', type: 'tel', required: true });
-
   if (config.showEmail) {
     fields.push({ name: 'email', label: 'Email', type: 'email', required: false });
   }
+
+  fields.push({ name: 'phone', label: 'Téléphone', type: 'tel', required: true });
 
   if (config.showCity) {
     fields.push({

@@ -1,151 +1,133 @@
-import { cn } from '@/lib/utils';
-import {
-  parseBackgroundTheme,
-  parseImageAlignment,
-  type BlockBackgroundTheme,
-} from '../../lib/block-design-props';
 import { asPropString } from '../../lib/block-props';
+import {
+  buildCanvasInlineStyle,
+  buildCanvasSectionClass,
+  buildMediaImgClasses,
+  getDesignFromProps,
+} from '../../lib/block-style';
 import { parseListItems } from '../../lib/list-props';
 import { HeroBlockImage } from '../media/HeroBlockImage';
 import { CanvasEmptyHint } from './CanvasEmptyHint';
+import { SectionHeading } from './SectionHeading';
 
 type FeaturesBlockPreviewProps = {
   propsJson: Record<string, unknown>;
 };
 
-function featuresSurface(theme: BlockBackgroundTheme) {
-  if (theme === 'light') {
-    return {
-      section: 'bg-zinc-50 text-zinc-900',
-      subtitle: 'text-zinc-600',
-      spec: 'border-zinc-200 bg-white',
-      specText: 'text-zinc-500',
-    };
-  }
-  if (theme === 'neutral') {
-    return {
-      section: 'bg-zinc-800 text-white',
-      subtitle: 'text-zinc-300',
-      spec: 'border-white/10 bg-white/5',
-      specText: 'text-zinc-400',
-    };
-  }
-  return {
-    section: 'bg-zinc-950 text-white',
-    subtitle: 'text-zinc-400',
-    spec: 'border-white/10 bg-white/5',
-    specText: 'text-zinc-400',
-  };
-}
-
 export function FeaturesBlockPreview({ propsJson }: FeaturesBlockPreviewProps) {
+  const design = getDesignFromProps('features', propsJson);
+  const isShowcase = design.layoutVariant === 'showcase';
+  const sectionBase = isShowcase ? 'lp-features lp-features--showcase' : 'lp-features';
+  const sectionClass = buildCanvasSectionClass('features', sectionBase, propsJson);
+  const inlineStyle = buildCanvasInlineStyle(design);
+  const imgClass = buildMediaImgClasses('lp-showcase', design);
+
   const heading = asPropString(propsJson.heading);
   const subtitle = asPropString(propsJson.subtitle);
   const modelName = asPropString(propsJson.modelName);
   const modelTagline = asPropString(propsJson.modelTagline);
-  const imageUrl = asPropString(propsJson.imageUrl);
-  const imageAlt = asPropString(propsJson.alt);
   const imageAssetId = asPropString(propsJson.imageAssetId);
-  const hasFeatureImage = Boolean(imageUrl || imageAssetId);
+  const imageUrl = asPropString(propsJson.imageUrl);
+  const hasImage = Boolean(imageAssetId || imageUrl);
   const items = parseListItems(propsJson, 'items');
-  const alignment = parseImageAlignment(propsJson.imageAlignment);
-  const theme = parseBackgroundTheme(propsJson.backgroundTheme);
-  const surface = featuresSurface(theme);
-  const imageFirst = alignment === 'left';
 
-  const mediaColumn = (
-    <div className="relative flex items-center justify-center overflow-visible">
-      {hasFeatureImage ? (
-        <div className="relative w-full overflow-visible">
-          <div
-            className="absolute -inset-6 rounded-[2rem] bg-gradient-to-tr from-red-500/15 via-transparent to-white/5 blur-2xl"
-            aria-hidden
-          />
-          <HeroBlockImage
-            imageAssetId={imageAssetId}
-            imageUrl={imageUrl}
-            alt={imageAlt || ' '}
-            className="builder-features-premium__vehicle relative mx-auto aspect-[16/10] w-full max-w-xl rounded-2xl object-cover shadow-2xl lg:max-w-none lg:translate-x-4 lg:scale-105"
-          />
-        </div>
-      ) : (
-        <div className="flex aspect-[16/10] w-full max-w-xl flex-col items-center justify-center gap-1 rounded-2xl border border-dashed border-white/20 bg-white/5 px-4 text-center">
-          <CanvasEmptyHint className="text-white/50">Aucune image sélectionnée</CanvasEmptyHint>
-        </div>
-      )}
-    </div>
-  );
+  const gridClass =
+    design.layoutVariant === 'compact_row'
+      ? 'lp-features__row'
+      : design.layoutVariant === 'icon_list'
+        ? 'lp-features__icon-grid'
+        : 'lp-features__grid';
 
-  const copyColumn = (
-    <div className="flex flex-col justify-center px-0">
-      {modelName ? (
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-red-500">{modelName}</p>
-      ) : null}
-      {modelTagline ? (
-        <p className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">{modelTagline}</p>
-      ) : null}
-      {items.some((item) => item.title.trim() || item.description.trim()) ? (
-        <ul className="mt-6 grid gap-3">
-          {items.map((item, index) => {
-            if (!item.title.trim() && !item.description.trim()) return null;
-            return (
-              <li key={`${item.title}-${index}`} className={cn('rounded-xl border p-4', surface.spec)}>
-                {item.title.trim() ? (
-                  <strong className="text-sm font-semibold">{item.title}</strong>
-                ) : (
-                  <CanvasEmptyHint size="sm">Titre de l’avantage</CanvasEmptyHint>
-                )}
-                {item.description.trim() ? (
-                  <p className={cn('mt-1 text-sm', surface.specText)}>{item.description}</p>
-                ) : (
-                  <CanvasEmptyHint size="sm" className={cn('mt-1', surface.specText)}>
-                    Description à renseigner
-                  </CanvasEmptyHint>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+  if (isShowcase) {
+    const media = !hasImage ? (
+      <div className="lp-showcase__media lp-showcase__media--placeholder" aria-hidden>
+        <CanvasEmptyHint>Aucune image sélectionnée</CanvasEmptyHint>
+      </div>
+    ) : (
+      <div className="lp-showcase__media">
+        <HeroBlockImage
+          imageAssetId={imageAssetId}
+          imageUrl={imageUrl}
+          alt={asPropString(propsJson.alt)}
+          className={imgClass}
+        />
+      </div>
+    );
+
+    const copy = (
+      <div className="lp-showcase__copy">
+        {modelName ? <p className="lp-showcase__model">{modelName}</p> : null}
+        {modelTagline ? <p className="lp-showcase__tagline">{modelTagline}</p> : null}
+        {items.length > 0 ? (
+          <ul className="lp-showcase__specs">
+            {items.map((item, index) =>
+              item.title.trim() || item.description.trim() ? (
+                <li key={index} className="lp-showcase__spec">
+                  {item.title.trim() ? (
+                    <strong className="lp-showcase__spec-title">{item.title}</strong>
+                  ) : null}
+                  {item.description.trim() ? (
+                    <span className="lp-showcase__spec-text">{item.description}</span>
+                  ) : null}
+                </li>
+              ) : null,
+            )}
+          </ul>
+        ) : (
+          <CanvasEmptyHint>Ajoutez vos points forts</CanvasEmptyHint>
+        )}
+      </div>
+    );
+
+    const inner =
+      design.mediaPosition === 'left' ? (
+        <>
+          {media}
+          {copy}
+        </>
       ) : (
-        <CanvasEmptyHint className={cn('mt-6', surface.specText)}>
-          Ajoutez vos avantages depuis le panneau de droite
-        </CanvasEmptyHint>
-      )}
-    </div>
-  );
+        <>
+          {copy}
+          {media}
+        </>
+      );
+
+    return (
+      <section className={sectionClass} id="model" style={inlineStyle}>
+        <div className="lp-section">
+          <SectionHeading heading={heading} subtitle={subtitle} />
+          <div className={`lp-showcase lp-showcase--media-${design.mediaPosition}`}>{inner}</div>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section
-      className={cn(
-        'builder-features-premium relative w-full overflow-visible py-14 sm:py-16 lg:py-20',
-        surface.section,
-      )}
-    >
-      <div className="mx-auto w-full max-w-3xl px-0 text-center sm:max-w-4xl">
-        {heading ? (
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">{heading}</h2>
-        ) : null}
-        {subtitle ? (
-          <p className={cn('mt-3 text-base sm:text-lg', surface.subtitle)}>{subtitle}</p>
-        ) : null}
-      </div>
-
-      <div
-        className={cn(
-          'builder-features-premium__layout relative mx-auto mt-10 grid w-full max-w-6xl gap-10 lg:mt-12 lg:gap-14',
-          imageFirst && 'builder-features-premium__layout--media-left',
-        )}
-      >
-        {imageFirst ? (
-          <>
-            {mediaColumn}
-            {copyColumn}
-          </>
+    <section className={sectionClass} style={inlineStyle}>
+      <div className="lp-section">
+        <SectionHeading heading={heading} subtitle={subtitle} />
+        {items.some((i) => i.title.trim() || i.description.trim()) ? (
+          <div className={gridClass}>
+            {items.map((item, index) =>
+              item.title.trim() || item.description.trim() ? (
+                <article key={index} className="lp-feature-card">
+                  <span className="lp-feature-card__index" aria-hidden>
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  {item.title.trim() ? (
+                    <h3 className="lp-feature-card__title">{item.title}</h3>
+                  ) : (
+                    <CanvasEmptyHint className="lp-feature-card__title">Titre</CanvasEmptyHint>
+                  )}
+                  {item.description.trim() ? (
+                    <p className="lp-feature-card__text">{item.description}</p>
+                  ) : null}
+                </article>
+              ) : null,
+            )}
+          </div>
         ) : (
-          <>
-            {copyColumn}
-            {mediaColumn}
-          </>
+          <CanvasEmptyHint>Ajoutez vos caractéristiques</CanvasEmptyHint>
         )}
       </div>
     </section>

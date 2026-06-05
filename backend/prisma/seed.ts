@@ -178,7 +178,7 @@ async function runSeed(prisma: PrismaClient): Promise<void> {
         subtitle: 'Un conseiller vous recontacte.',
         submitText: 'Envoyer votre demande',
         consentLabel:
-          'J’ai lu et j’accepte le traitement de mes données personnelles conformément à la politique Auto Hall.',
+          'J’ai lu et j’accepte sans réserve les termes de la clause relative à la protection des données personnelles.',
         requiredFieldsNote: '* Champs obligatoires.',
         formConfig: {
           showCivility: true,
@@ -193,8 +193,8 @@ async function runSeed(prisma: PrismaClient): Promise<void> {
           { name: 'civility', label: 'Civilité', type: 'select', required: false },
           { name: 'lastName', label: 'Nom', type: 'text', required: true },
           { name: 'firstName', label: 'Prénom', type: 'text', required: true },
-          { name: 'phone', label: 'Téléphone', type: 'tel', required: true },
           { name: 'email', label: 'Email', type: 'email', required: false },
+          { name: 'phone', label: 'Téléphone', type: 'tel', required: true },
           { name: 'city', label: 'Ville', type: 'select', required: true },
           { name: 'vehicleModel', label: 'Modèle souhaité', type: 'text', required: false },
         ],
