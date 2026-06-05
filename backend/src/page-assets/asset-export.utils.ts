@@ -53,3 +53,32 @@ export function extractUsedAssetIdsFromBlocks(
 
   return [...ids];
 }
+
+/** Extrait les imageAssetId d'un document Puck Studio V2. */
+export function extractUsedAssetIdsFromPuckDocument(
+  document: Record<string, unknown>,
+): string[] {
+  const ids = new Set<string>();
+
+  function walk(value: unknown): void {
+    if (value === null || value === undefined) return;
+    if (Array.isArray(value)) {
+      for (const item of value) walk(item);
+      return;
+    }
+    if (typeof value !== 'object') return;
+
+    const record = value as Record<string, unknown>;
+    const assetId = record.imageAssetId;
+    if (typeof assetId === 'string' && assetId.trim()) {
+      ids.add(assetId.trim());
+    }
+    for (const nested of Object.values(record)) {
+      if (nested !== null && typeof nested === 'object') walk(nested);
+    }
+  }
+
+  walk(document.content);
+  walk(document.root);
+  return [...ids];
+}

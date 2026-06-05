@@ -13,6 +13,8 @@ import { PageBlocksModule } from './page-blocks/page-blocks.module';
 import { PageExportModule } from './page-export/page-export.module';
 import { PagePreviewModule } from './page-preview/page-preview.module';
 import { PageVersionsModule } from './page-versions/page-versions.module';
+import { StudioV2DocumentModule } from './studio-v2/studio-v2-document.module';
+import { StudioV2RendererModule } from './studio-v2-renderer/studio-v2-renderer.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
@@ -26,6 +28,8 @@ import { PrismaModule } from './prisma/prisma.module';
     CampaignsModule,
     LandingPagesModule,
     PageVersionsModule,
+    StudioV2DocumentModule,
+    StudioV2RendererModule,
     PageBlocksModule,
     PageAssetsModule,
     PagePreviewModule,

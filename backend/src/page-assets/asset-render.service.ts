@@ -8,6 +8,7 @@ import type { RenderAssetMap } from '../landing-render/render-asset.types';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   extractUsedAssetIdsFromBlocks,
+  extractUsedAssetIdsFromPuckDocument,
   resolveAssetPublicPath,
 } from './asset-export.utils';
 
@@ -55,6 +56,41 @@ export class AssetRenderService {
       map[asset.id] = {
         previewUrl: buildPublicAssetFileUrl(previewBase, asset.id),
         exportPath,
+        storagePath: asset.storagePath,
+        storedName: asset.storedName,
+        mimeType: asset.mimeType,
+        absolutePath,
+      };
+    }
+
+    return map;
+  }
+
+  async buildAssetMapForPuckDocument(
+    document: Record<string, unknown>,
+    mode: 'preview' | 'export',
+  ): Promise<RenderAssetMap> {
+    const assetIds = extractUsedAssetIdsFromPuckDocument(document);
+    if (assetIds.length === 0) return {};
+
+    const assets = await this.prisma.landingPageAsset.findMany({
+      where: { id: { in: assetIds } },
+    });
+
+    const storageRoot = this.resolveStorageRoot();
+    const previewBase = mode === 'preview' ? this.resolvePublicApiBase() : '';
+    const map: RenderAssetMap = {};
+
+    for (const asset of assets) {
+      const absolutePath = path.join(storageRoot, asset.storagePath);
+      const exists = await access(absolutePath)
+        .then(() => true)
+        .catch(() => false);
+      if (!exists) continue;
+
+      map[asset.id] = {
+        previewUrl: buildPublicAssetFileUrl(previewBase, asset.id),
+        exportPath: asset.publicPath ?? resolveAssetPublicPath(asset.storedName),
         storagePath: asset.storagePath,
         storedName: asset.storedName,
         mimeType: asset.mimeType,

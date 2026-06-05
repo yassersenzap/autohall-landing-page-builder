@@ -30,6 +30,7 @@ type RequestOptions = {
   method?: string;
   body?: unknown;
   auth?: boolean;
+  signal?: AbortSignal;
 };
 
 export async function apiRequest<T>(
@@ -51,6 +52,7 @@ export async function apiRequest<T>(
     method: options.method ?? 'GET',
     headers,
     body: options.body ? JSON.stringify(options.body) : undefined,
+    signal: options.signal,
   });
 
   const payload = (await response.json().catch(() => null)) as

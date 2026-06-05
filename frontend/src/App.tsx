@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { StudioThemeProvider } from './context/StudioThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -12,6 +13,14 @@ import LeadsPage from './pages/LeadsPage';
 import DashboardPage from './pages/DashboardPage';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
+
+const VisualStudioV2Page = lazy(() => import('./pages/VisualStudioV2Page'));
+const VisualStudioV2PreviewPage = lazy(() => import('./pages/VisualStudioV2PreviewPage'));
+
+function StudioRouteFallback() {
+  return <p className="p-6 text-sm text-muted-foreground">Chargement du studio…</p>;
+}
+
 export default function App() {
   return (
     <StudioThemeProvider>
@@ -23,6 +32,22 @@ export default function App() {
             <Route
               path="/page-versions/:pageVersionId/blocks"
               element={<PageVersionBlocksPage />}
+            />
+            <Route
+              path="/page-versions/:pageVersionId/studio-v2"
+              element={
+                <Suspense fallback={<StudioRouteFallback />}>
+                  <VisualStudioV2Page />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/page-versions/:pageVersionId/studio-v2-preview"
+              element={
+                <Suspense fallback={<StudioRouteFallback />}>
+                  <VisualStudioV2PreviewPage />
+                </Suspense>
+              }
             />
           </Route>
           <Route element={<ProtectedRoute />}>

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Sparkles } from 'lucide-react';
 import '@landing-styles';
 import { StudioToast } from '@/components/ui/StudioToast';
 import { useStudioToast } from '@/components/ui/use-studio-toast';
@@ -385,7 +386,19 @@ export default function PageVersionBlocksPage() {
       <BuilderWorkspaceLayout
         topbar={
           <StudioTopBar
-            workspaceToolbar={<BuilderWorkspaceControls />}
+            workspaceToolbar={
+              <>
+                <BuilderWorkspaceControls />
+                <Link
+                  to={`/page-versions/${pageVersionIdValue}/studio-v2`}
+                  className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/5 px-2 py-1 text-[0.65rem] font-medium text-primary hover:bg-primary/10"
+                  title="Éditeur visuel V2 (Puck) — document séparé du builder blocs"
+                >
+                  <Sparkles className="h-3 w-3" aria-hidden />
+                  Studio V2
+                </Link>
+              </>
+            }
             campaignName={state.campaignName}
             landingTitle={state.landingPageTitle}
             versionLabel={versionTitle}
