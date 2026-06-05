@@ -1,6 +1,8 @@
 @import '@fontsource-variable/inter';
 @import './styles/tailwind.css';
 @import './styles/studio-tokens.css';
+@import './styles/studio-typography.css';
+@import './styles/studio-effects.css';
 @import './styles/studio-components.css';
 @import './styles/studio-layout.css';
 @import './styles/studio-pages.css';

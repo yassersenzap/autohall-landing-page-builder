@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { landingStudioPreviewPath } from '@/lib/landing-studio-routes';
+import { getPreviewRoute } from '@/lib/landing-studio-routes';
+import { persistStudioSessionFromVersion } from '@/lib/studio-session';
 import type { Data } from '@puckeditor/core';
 import {
   fetchStudioV2Document,
@@ -157,6 +158,19 @@ export default function VisualStudioV2Page() {
   }, [pageVersionId, loadAttempt]);
 
   useEffect(() => {
+    if (!pageVersionId || navState.versionNumber == null) return;
+    persistStudioSessionFromVersion({
+      pageVersionId,
+      versionNumber: navState.versionNumber,
+      versionLabel: navState.versionLabel,
+      landingPageId: navState.landingPageId,
+      landingPageTitle: navState.landingPageTitle,
+      campaignId: navState.campaignId,
+      campaignName: navState.campaignName,
+    });
+  }, [navState, pageVersionId]);
+
+  useEffect(() => {
     if (!pageVersionId || loading || !documentData) return;
 
     void fetchStudioV2Readiness(pageVersionId)
@@ -192,6 +206,17 @@ export default function VisualStudioV2Page() {
         setSavedBaseline(normalized);
         setDocumentData(normalized);
         setSaveStatus('saved');
+        if (navState.versionNumber != null) {
+          persistStudioSessionFromVersion({
+            pageVersionId,
+            versionNumber: navState.versionNumber,
+            versionLabel: navState.versionLabel,
+            landingPageId: navState.landingPageId,
+            landingPageTitle: navState.landingPageTitle,
+            campaignId: navState.campaignId,
+            campaignName: navState.campaignName,
+          });
+        }
         await refreshReadiness(normalized);
       } catch {
         setSaveStatus('error');
@@ -213,7 +238,7 @@ export default function VisualStudioV2Page() {
       const current = editorRef.current?.getData();
       if (current) await handleSave(current);
     }
-    navigate(landingStudioPreviewPath(pageVersionId), { state: navState });
+    navigate(getPreviewRoute(pageVersionId), { state: navState });
   }, [handleSave, navigate, pageVersionId, saveStatus]);
 
   const handleExport = useCallback(async () => {

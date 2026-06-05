@@ -1,8 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FileEdit, LayoutGrid, Users } from 'lucide-react';
+import {
+  Download,
+  Eye,
+  LayoutGrid,
+  PenLine,
+  Plus,
+  Users,
+} from 'lucide-react';
 import { LeadDashboardMetrics } from '@/components/dashboard/LeadDashboardMetrics';
 import { StudioPageHeader } from '@/components/studio/StudioPageHeader';
+import { ActionBar, QuickActionCard } from '@/components/ui/app';
 import {
   Card,
   CardContent,
@@ -10,17 +18,14 @@ import {
   ShadButton,
   buttonVariants,
 } from '@/components/ui/primitives';
+import { useStudioSession } from '@/hooks/useStudioSession';
 import { cn } from '@/lib/utils';
 import { ApiError, meRequest, type AuthUser } from '@/lib/api';
+import { getPreviewRoute, getStudioRoute } from '@/lib/landing-studio-routes';
 import { getLeadDashboardKpis, type LeadDashboardKpis } from '@/lib/lead-dashboard';
 import { canViewLeads } from '@/lib/leads';
-
-const LAST_DRAFT_STORAGE_KEY = 'autohall-studio-last-draft';
-
-type LastDraftRef = {
-  pageVersionId: string;
-  label: string;
-};
+import { studioNavState } from '@/lib/studio-session';
+import { downloadStudioV2Export } from '@/features/visual-studio-v2/api/studio-v2-preview.api';
 
 export default function DashboardPage() {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -28,23 +33,8 @@ export default function DashboardPage() {
   const [kpisError, setKpisError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [lastDraft, setLastDraft] = useState<LastDraftRef | null>(null);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LAST_DRAFT_STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as Partial<LastDraftRef>;
-      if (parsed.pageVersionId && parsed.label) {
-        setLastDraft({
-          pageVersionId: parsed.pageVersionId,
-          label: parsed.label,
-        });
-      }
-    } catch {
-      setLastDraft(null);
-    }
-  }, []);
+  const [exporting, setExporting] = useState(false);
+  const session = useStudioSession();
 
   useEffect(() => {
     let cancelled = false;
@@ -83,10 +73,22 @@ export default function DashboardPage() {
     };
   }, []);
 
+  async function handleExportLatest() {
+    if (!session) return;
+    setExporting(true);
+    try {
+      await downloadStudioV2Export(session.pageVersionId);
+    } catch {
+      // export errors surfaced by API layer
+    } finally {
+      setExporting(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-[12rem] items-center justify-center text-sm text-muted-foreground">
-        Chargement du tableau de bord…
+        Chargement du centre de commande…
       </div>
     );
   }
@@ -100,49 +102,114 @@ export default function DashboardPage() {
   }
 
   const showLeads = user && canViewLeads(user.role);
+  const studioState = session ? studioNavState(session) : undefined;
 
   return (
     <div className="space-y-8 font-sans">
       <StudioPageHeader
-        title="Tableau de bord"
+        title="Centre de commande"
         description={
           user
-            ? `Bienvenue, ${user.fullName} — vue d’ensemble des campagnes et des leads.`
-            : 'Vue d’ensemble des campagnes et des leads.'
+            ? `Bienvenue, ${user.fullName} — production de landing pages Auto Hall.`
+            : 'Production de landing pages Auto Hall.'
         }
         actions={
-          <>
-            <Link to="/campaigns" className={cn(buttonVariants({ variant: 'default', size: 'sm' }))}>
+          <ActionBar>
+            {session ? (
+              <Link
+                to={getStudioRoute(session.pageVersionId)}
+                state={studioState}
+                className={cn(buttonVariants({ variant: 'default', size: 'sm' }))}
+              >
+                <PenLine className="h-3.5 w-3.5" />
+                Ouvrir le Studio
+              </Link>
+            ) : (
+              <ShadButton variant="default" size="sm" disabled>
+                <PenLine className="h-3.5 w-3.5" />
+                Ouvrir le Studio
+              </ShadButton>
+            )}
+            <Link to="/campaigns" className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }))}>
               <LayoutGrid className="h-3.5 w-3.5" />
               Campagnes
             </Link>
-            {showLeads ? (
-              <Link to="/leads" className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }))}>
-                <Users className="h-3.5 w-3.5" />
-                Leads
-              </Link>
-            ) : null}
-            {lastDraft ? (
-              <Link
-                to={`/page-versions/${lastDraft.pageVersionId}/studio`}
-                className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
-              >
-                <FileEdit className="h-3.5 w-3.5" />
-                {lastDraft.label}
-              </Link>
-            ) : (
-              <ShadButton variant="outline" size="sm" disabled>
-                <FileEdit className="h-3.5 w-3.5" />
-                Aucun brouillon
-              </ShadButton>
-            )}
-          </>
+          </ActionBar>
         }
       />
 
+      <section aria-label="Actions rapides">
+        <h2 className="ah-section-title mb-3">Actions rapides</h2>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <QuickActionCard
+            title="Ouvrir le Studio"
+            description={session ? session.label : 'Ouvrez une version pour activer le Studio.'}
+            icon={PenLine}
+            href={session ? getStudioRoute(session.pageVersionId) : undefined}
+            variant="primary"
+            disabled={!session}
+            disabledHint="Créez une campagne, une landing et une version pour démarrer."
+          />
+          <QuickActionCard
+            title="Créer une campagne"
+            description="Lancez une nouvelle campagne marketing et ses landing pages."
+            icon={Plus}
+            href="/campaigns"
+          />
+          <QuickActionCard
+            title="Voir les campagnes"
+            description="Accédez aux landings, versions et actions de production."
+            icon={LayoutGrid}
+            href="/campaigns"
+          />
+          {session ? (
+            <QuickActionCard
+              title="Aperçu de la dernière version"
+              description={`Prévisualiser ${session.label}`}
+              icon={Eye}
+              href={getPreviewRoute(session.pageVersionId)}
+            />
+          ) : (
+            <QuickActionCard
+              title="Aperçu"
+              description="Disponible après ouverture d’une version dans le Studio."
+              icon={Eye}
+              disabled
+              disabledHint="Aucune version récente en session."
+            />
+          )}
+          {session ? (
+            <QuickActionCard
+              title="Export ZIP"
+              description="Télécharger le package de la dernière version."
+              icon={Download}
+              onClick={() => void handleExportLatest()}
+              disabled={exporting}
+              disabledHint={exporting ? 'Export en cours…' : undefined}
+            />
+          ) : (
+            <QuickActionCard
+              title="Export ZIP"
+              description="Disponible pour une version publiée ou prête."
+              icon={Download}
+              disabled
+              disabledHint="Ouvrez le Studio sur une version pour exporter."
+            />
+          )}
+          {showLeads ? (
+            <QuickActionCard
+              title="Voir les leads"
+              description="Suivi des demandes et conversions landing."
+              icon={Users}
+              href="/leads"
+            />
+          ) : null}
+        </div>
+      </section>
+
       {!showLeads ? (
         <div className="grid gap-3 sm:grid-cols-3">
-          <MetricCard label="Espace" value="Studio" hint="Connecté au builder" />
+          <MetricCard label="Produit" value="Landing Studio" hint="Éditeur officiel" />
           <Link to="/campaigns" className="block transition-opacity hover:opacity-90">
             <MetricCard label="Campagnes" value="→" hint="Gérer les landings" trend="positive" />
           </Link>

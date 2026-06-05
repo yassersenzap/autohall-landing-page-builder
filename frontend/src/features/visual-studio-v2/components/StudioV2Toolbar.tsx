@@ -1,13 +1,14 @@
 import {
   ArrowLeft,
+  Check,
   Download,
   Eye,
+  Loader2,
   Monitor,
   Save,
   Smartphone,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { ShadButton } from '@/components/ui/primitives';
 import type { StudioV2SaveStatus } from '../types';
 
 export type StudioV2Viewport = 'desktop' | 'mobile';
@@ -31,19 +32,27 @@ type StudioV2ToolbarProps = {
   exportDisabled?: boolean;
 };
 
-function statusLabel(status: StudioV2SaveStatus): string {
-  switch (status) {
-    case 'loading':
-      return 'Chargement…';
-    case 'saving':
-      return 'Enregistrement…';
-    case 'dirty':
-      return 'Modifications non enregistrées';
-    case 'error':
-      return 'Erreur';
-    default:
-      return 'Enregistré';
+function SaveStatusPill({ status }: { status: StudioV2SaveStatus }) {
+  if (status === 'loading' || status === 'saving') {
+    return (
+      <span className="ah-status-dirty">
+        <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
+        {status === 'saving' ? 'Enregistrement…' : 'Chargement…'}
+      </span>
+    );
   }
+  if (status === 'dirty') {
+    return <span className="ah-status-dirty">Modifications non enregistrées</span>;
+  }
+  if (status === 'error') {
+    return <span className="ah-status-dirty">Erreur</span>;
+  }
+  return (
+    <span className="ah-status-saved">
+      <Check className="h-3 w-3" aria-hidden />
+      Enregistré
+    </span>
+  );
 }
 
 export function StudioV2Toolbar({
@@ -64,20 +73,22 @@ export function StudioV2Toolbar({
   exportDisabled,
 }: StudioV2ToolbarProps) {
   return (
-    <header className="visual-studio-v2-toolbar">
+    <header className="visual-studio-v2-toolbar ah-glass">
       <div className="flex min-w-0 items-center gap-3">
         <Link
           to={backTo}
           state={backState}
-          className="visual-studio-v2-toolbar__link inline-flex shrink-0 items-center gap-1 text-sm"
+          className="ah-editor-btn visual-studio-v2-toolbar__link !gap-1.5"
         >
-          <ArrowLeft className="h-4 w-4" aria-hidden />
+          <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
           {backLabel}
         </Link>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold">Auto Hall Landing Studio</p>
+        <div className="min-w-0 border-l border-[var(--studio-editor-border)] pl-3">
+          <p className="truncate text-sm font-semibold tracking-tight text-[var(--studio-editor-text)]">
+            Auto Hall Landing Studio
+          </p>
           {versionLabel || pageTitle ? (
-            <p className="truncate text-xs visual-studio-v2-toolbar__hint">
+            <p className="truncate text-xs text-[var(--studio-editor-text-soft)]">
               {[versionLabel, pageTitle].filter(Boolean).join(' — ')}
             </p>
           ) : null}
@@ -88,7 +99,7 @@ export function StudioV2Toolbar({
         <div className="visual-studio-v2-toolbar__group" role="group" aria-label="Appareil">
           <button
             type="button"
-            className={`visual-studio-v2-toolbar__chip ${viewport === 'desktop' ? 'is-active' : ''}`}
+            className={`visual-studio-v2-toolbar__chip ah-editor-btn !rounded-none !border-0 ${viewport === 'desktop' ? 'ah-editor-btn--active' : ''}`}
             onClick={() => onViewportChange('desktop')}
             title="Desktop"
           >
@@ -96,7 +107,7 @@ export function StudioV2Toolbar({
           </button>
           <button
             type="button"
-            className={`visual-studio-v2-toolbar__chip ${viewport === 'mobile' ? 'is-active' : ''}`}
+            className={`visual-studio-v2-toolbar__chip ah-editor-btn !rounded-none !border-0 ${viewport === 'mobile' ? 'ah-editor-btn--active' : ''}`}
             onClick={() => onViewportChange('mobile')}
             title="Mobile"
           >
@@ -105,7 +116,7 @@ export function StudioV2Toolbar({
         </div>
 
         <select
-          className="visual-studio-v2-toolbar__select"
+          className="visual-studio-v2-toolbar__select ah-input !min-h-[1.875rem] !w-auto !py-0 !text-xs"
           value={zoom}
           onChange={(e) => onZoomChange(e.target.value as StudioV2Zoom)}
           aria-label="Zoom canvas"
@@ -115,40 +126,35 @@ export function StudioV2Toolbar({
           <option value="100">100%</option>
         </select>
 
-        <span
-          className={`text-xs ${saveStatus === 'dirty' ? 'visual-studio-v2-toolbar__dirty' : 'visual-studio-v2-toolbar__hint'}`}
-        >
-          {statusLabel(saveStatus)}
-        </span>
+        <SaveStatusPill status={saveStatus} />
 
         {canWrite ? (
-          <ShadButton
+          <button
             type="button"
-            size="sm"
-            variant="secondary"
+            className="ah-editor-btn"
             disabled={saveStatus === 'saving' || saveStatus === 'loading'}
             onClick={onSave}
           >
-            <Save className="mr-1.5 h-3.5 w-3.5" aria-hidden />
+            <Save className="h-3.5 w-3.5" aria-hidden />
             Enregistrer
-          </ShadButton>
+          </button>
         ) : null}
 
-        <ShadButton type="button" size="sm" variant="secondary" onClick={onPreview}>
-          <Eye className="mr-1.5 h-3.5 w-3.5" aria-hidden />
+        <button type="button" className="ah-editor-btn ah-editor-btn--primary" onClick={onPreview}>
+          <Eye className="h-3.5 w-3.5" aria-hidden />
           Aperçu
-        </ShadButton>
+        </button>
 
         {canWrite ? (
-          <ShadButton
+          <button
             type="button"
-            size="sm"
+            className="ah-editor-btn ah-editor-btn--cta"
             disabled={exportDisabled || saveStatus === 'saving'}
             onClick={onExport}
           >
-            <Download className="mr-1.5 h-3.5 w-3.5" aria-hidden />
+            <Download className="h-3.5 w-3.5" aria-hidden />
             Export ZIP
-          </ShadButton>
+          </button>
         ) : null}
       </div>
     </header>

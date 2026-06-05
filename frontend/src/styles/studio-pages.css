@@ -340,6 +340,12 @@
 
 .leads-table-scroll {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+
+.leads-page {
+  overflow-x: hidden;
 }
 
 .ui-card .leads-table-scroll {
@@ -391,10 +397,45 @@
 }
 
 .leads-table__source {
-  max-width: 12rem;
+  max-width: 10rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: var(--studio-text-xs);
+  color: var(--color-text-soft);
+}
+
+.leads-table__name {
+  display: block;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.leads-table__contact-line {
+  display: block;
+  font-size: var(--studio-text-xs);
+  color: var(--color-text-muted);
+}
+
+.leads-table__cell-primary {
+  display: block;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+@media (max-width: 1100px) {
+  .leads-table__col-source {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .leads-table th:nth-child(4),
+  .leads-table td:nth-child(4),
+  .leads-table th:nth-child(6),
+  .leads-table td:nth-child(6) {
+    display: none;
+  }
 }
 
 .lead-detail__meta {

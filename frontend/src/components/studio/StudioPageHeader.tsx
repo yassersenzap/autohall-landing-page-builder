@@ -7,6 +7,7 @@ type StudioPageHeaderProps = {
   title: string;
   description?: string;
   backTo?: string;
+  backState?: unknown;
   backLabel?: string;
   actions?: ReactNode;
   className?: string;
@@ -16,6 +17,7 @@ export function StudioPageHeader({
   title,
   description,
   backTo,
+  backState,
   backLabel = 'Retour',
   actions,
   className,
@@ -26,16 +28,15 @@ export function StudioPageHeader({
         {backTo ? (
           <Link
             to={backTo}
+            state={backState}
             className="mb-2 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             {backLabel}
           </Link>
         ) : null}
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
-        {description ? (
-          <p className="max-w-2xl text-sm text-muted-foreground">{description}</p>
-        ) : null}
+        <h1 className="ah-page-title">{title}</h1>
+        {description ? <p className="ah-muted mt-1 max-w-2xl">{description}</p> : null}
       </div>
       {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
     </div>

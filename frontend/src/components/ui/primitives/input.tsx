@@ -12,12 +12,7 @@ export function ShadInput({ className, label, hint, id, ...props }: ShadInputPro
   const field = (
     <input
       id={inputId}
-      className={cn(
-        'flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors',
-        'placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-        'disabled:cursor-not-allowed disabled:opacity-50',
-        className,
-      )}
+      className={cn('ah-input', className)}
       {...props}
     />
   );
@@ -26,9 +21,11 @@ export function ShadInput({ className, label, hint, id, ...props }: ShadInputPro
 
   return (
     <div className="grid gap-1.5">
-      <Label htmlFor={inputId}>{label}</Label>
+      <Label htmlFor={inputId} className="ah-label">
+        {label}
+      </Label>
       {field}
-      {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
+      {hint ? <p className="ah-caption">{hint}</p> : null}
     </div>
   );
 }
