@@ -17,17 +17,32 @@ function isPuckNode(value: unknown): value is PuckNode {
   );
 }
 
-function walkNode(node: PuckNode, counter: { value: number }): void {
-  if (!node.props.id || typeof node.props.id !== 'string') {
-    counter.value += 1;
-    node.props.id = `${node.type}-${counter.value}`;
+function walkNode(
+  node: PuckNode,
+  counter: { value: number },
+  seenIds: Set<string>,
+): void {
+  const existingId =
+    typeof node.props.id === 'string' && node.props.id.trim()
+      ? node.props.id.trim()
+      : null;
+
+  if (!existingId || seenIds.has(existingId)) {
+    let nextId: string;
+    do {
+      counter.value += 1;
+      nextId = `${node.type}-${counter.value}`;
+    } while (seenIds.has(nextId));
+    node.props.id = nextId;
   }
+
+  seenIds.add(String(node.props.id));
 
   for (const value of Object.values(node.props)) {
     if (!Array.isArray(value)) continue;
     for (const child of value) {
       if (isPuckNode(child)) {
-        walkNode(child, counter);
+        walkNode(child, counter, seenIds);
       }
     }
   }
@@ -37,10 +52,11 @@ function walkNode(node: PuckNode, counter: { value: number }): void {
 export function ensurePuckIds(data: Data): Data {
   const clone = JSON.parse(JSON.stringify(data)) as Data;
   const counter = { value: 0 };
+  const seenIds = new Set<string>();
 
   for (const item of clone.content ?? []) {
     if (isPuckNode(item)) {
-      walkNode(item, counter);
+      walkNode(item, counter, seenIds);
     }
   }
 

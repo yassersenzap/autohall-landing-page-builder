@@ -111,6 +111,9 @@ export function StudioV2CreativeSidebar({
           >
             <Icon className="h-3.5 w-3.5" aria-hidden />
             <span className="vs2-sidepanel-tab-label">{label}</span>
+            {id === 'readiness' && critical.length > 0 ? (
+              <span className="vs2-sidepanel-tab-alert" aria-hidden />
+            ) : null}
           </button>
         ))}
       </div>

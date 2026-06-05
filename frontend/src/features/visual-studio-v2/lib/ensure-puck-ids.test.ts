@@ -50,6 +50,27 @@ describe('ensurePuckIds', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
+  it('reassigns duplicate puck ids', () => {
+    const raw = {
+      root: { props: { title: 'Test' } },
+      content: [
+        {
+          type: 'ParagraphBlock',
+          props: { id: 'ParagraphBlock-1', text: 'A' },
+        },
+        {
+          type: 'ParagraphBlock',
+          props: { id: 'ParagraphBlock-1', text: 'B' },
+        },
+      ],
+    };
+
+    const withIds = ensurePuckIds(raw);
+    const ids = collectIds(withIds);
+    expect(ids.length).toBe(2);
+    expect(new Set(ids).size).toBe(2);
+  });
+
   it('default document ships with puck ids', () => {
     const doc = buildDefaultStudioV2Document();
     const ids = collectIds(doc);

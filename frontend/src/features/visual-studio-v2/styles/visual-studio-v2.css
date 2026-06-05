@@ -1774,6 +1774,21 @@ html[data-studio-theme='light'] .visual-studio-v2-toolbar {
   font-size: 0.625rem;
 }
 
+.vs2-sidepanel-tab-alert {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: var(--color-danger, #dc2626);
+  box-shadow: 0 0 0 1px var(--studio-editor-panel);
+}
+
+.visual-studio-v2-sidepanel__tabs button {
+  position: relative;
+}
+
 .vs2-sidepanel-filters {
   display: flex;
   flex-wrap: wrap;

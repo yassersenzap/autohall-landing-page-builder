@@ -32,6 +32,7 @@ type StudioV2ToolbarProps = {
   onPreview: () => void;
   onExport: () => void;
   exportDisabled?: boolean;
+  exportDisabledReason?: string;
 };
 
 function SaveStatusPill({ status }: { status: StudioV2SaveStatus }) {
@@ -74,6 +75,7 @@ export function StudioV2Toolbar({
   onPreview,
   onExport,
   exportDisabled,
+  exportDisabledReason,
 }: StudioV2ToolbarProps) {
   return (
     <header className="visual-studio-v2-toolbar ds-studio-topbar">
@@ -159,6 +161,16 @@ export function StudioV2Toolbar({
             type="button"
             className="ds-toolbar-btn ds-toolbar-btn--cta"
             disabled={exportDisabled || saveStatus === 'saving'}
+            title={
+              exportDisabled && exportDisabledReason
+                ? exportDisabledReason
+                : 'Télécharger le package ZIP'
+            }
+            aria-label={
+              exportDisabled && exportDisabledReason
+                ? `Export ZIP indisponible : ${exportDisabledReason}`
+                : 'Export ZIP'
+            }
             onClick={onExport}
           >
             <Download className="h-3.5 w-3.5" aria-hidden />

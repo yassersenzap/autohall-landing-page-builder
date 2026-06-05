@@ -33,6 +33,7 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
   const session = useStudioSession();
 
   useEffect(() => {
@@ -75,10 +76,13 @@ export default function DashboardPage() {
   async function handleExportLatest() {
     if (!session) return;
     setExporting(true);
+    setExportError(null);
     try {
       await downloadStudioV2Export(session.pageVersionId);
-    } catch {
-      // export errors surfaced by API layer
+    } catch (err) {
+      setExportError(
+        err instanceof Error ? err.message : 'Impossible d’exporter la version.',
+      );
     } finally {
       setExporting(false);
     }
@@ -244,6 +248,12 @@ export default function DashboardPage() {
       {kpisError ? (
         <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {kpisError}
+        </p>
+      ) : null}
+
+      {exportError ? (
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          {exportError}
         </p>
       ) : null}
 

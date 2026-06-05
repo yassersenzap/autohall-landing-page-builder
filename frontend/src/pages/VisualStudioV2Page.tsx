@@ -12,6 +12,8 @@ import {
   fetchStudioV2Readiness,
 } from '@/features/visual-studio-v2/api/studio-v2-preview.api';
 import { StudioV2LoadError } from '@/features/visual-studio-v2/components/StudioV2LoadError';
+import { StudioToast } from '@/components/ui/StudioToast';
+import { useStudioToast } from '@/components/ui/use-studio-toast';
 import {
   StudioV2Toolbar,
   type StudioV2Viewport,
@@ -54,6 +56,7 @@ export default function VisualStudioV2Page() {
   const location = useLocation();
   const navState = (location.state as StudioLocationState | null) ?? {};
   const editorRef = useRef<VisualStudioV2EditorHandle>(null);
+  const { toast, showError, showSuccess, dismiss } = useStudioToast();
 
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -67,7 +70,9 @@ export default function VisualStudioV2Page() {
   const [readinessIssues, setReadinessIssues] = useState<ReadinessIssue[]>([]);
   const [canExport, setCanExport] = useState(true);
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
-  const [sidebarTab, setSidebarTab] = useState<'starters' | 'sections' | undefined>(undefined);
+  const [sidebarTab, setSidebarTab] = useState<
+    'starters' | 'sections' | 'blocks' | 'media' | 'structure' | 'readiness' | undefined
+  >(undefined);
 
   const navigateToLogin = useCallback(
     () => navigate('/login', { replace: true }),
@@ -103,6 +108,15 @@ export default function VisualStudioV2Page() {
     }
     return navState.landingPageTitle ?? undefined;
   }, [navState]);
+
+  const exportDisabledReason = useMemo(() => {
+    if (canExport) return undefined;
+    const firstCritical = readinessIssues.find((issue) => issue.level === 'critical');
+    return (
+      firstCritical?.message ??
+      'Checklist incomplète — consultez l’onglet Checklist dans le panneau gauche.'
+    );
+  }, [canExport, readinessIssues]);
 
   const refreshReadiness = useCallback(
     async (data?: Data) => {
@@ -186,10 +200,16 @@ export default function VisualStudioV2Page() {
       .then((remote) => {
         setReadinessIssues(remote.issues);
         setCanExport(remote.canExport);
+        if (remote.issues.some((issue) => issue.level === 'critical')) {
+          setSidebarTab('readiness');
+        }
       })
       .catch(() => {
         const local = validateStudioV2Readiness(documentData);
         setCanExport(!local.some((i) => i.level === 'critical'));
+        if (local.some((issue) => issue.level === 'critical')) {
+          setSidebarTab('readiness');
+        }
       });
   }, [pageVersionId, loading, documentData]);
 
@@ -256,9 +276,16 @@ export default function VisualStudioV2Page() {
       const current = editorRef.current?.getData();
       if (current) await handleSave(current);
     }
-    await downloadStudioV2Export(pageVersionId);
-    await refreshReadiness();
-  }, [handleSave, pageVersionId, refreshReadiness, saveStatus]);
+    try {
+      await downloadStudioV2Export(pageVersionId);
+      showSuccess('Export ZIP téléchargé.');
+      await refreshReadiness();
+    } catch (err) {
+      showError(
+        err instanceof Error ? err.message : 'Impossible d’exporter la landing.',
+      );
+    }
+  }, [handleSave, pageVersionId, refreshReadiness, saveStatus, showError, showSuccess]);
 
   const applyDocument = useCallback((next: Data) => {
     setDocumentData(next);
@@ -343,6 +370,7 @@ export default function VisualStudioV2Page() {
           onPreview={() => void handlePreview()}
           onExport={() => void handleExport()}
           exportDisabled={!canExport}
+          exportDisabledReason={exportDisabledReason}
         />
 
         {loading ? (
@@ -398,6 +426,7 @@ export default function VisualStudioV2Page() {
           />
         )}
       </div>
+      <StudioToast toast={toast} onDismiss={dismiss} />
     </StudioV2Provider>
   );
 }
