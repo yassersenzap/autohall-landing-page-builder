@@ -13,6 +13,13 @@ import { CTABandBlockPreview } from './CTABandBlockPreview';
 import { PricingTrimBlockPreview } from './PricingTrimBlockPreview';
 import { FAQBlockPreview } from './FAQBlockPreview';
 import { TestimonialBlockPreview } from './TestimonialBlockPreview';
+import {
+  BenefitsBlockPreview,
+  FinalCtaBlockPreview,
+  TrustBarBlockPreview,
+  VehicleOfferBlockPreview,
+  VehicleRangeBlockPreview,
+} from './MarketingBlockPreviews';
 
 type IframeBlockRendererProps = {
   block: BuilderDocumentBlock;
@@ -49,6 +56,16 @@ export function IframeBlockRenderer({ block }: IframeBlockRendererProps) {
       return <HeroBlockPreview propsJson={block.propsJson} />;
     case 'lead_form':
       return <LeadFormBlockPreview propsJson={block.propsJson} />;
+    case 'vehicle_offer':
+      return <VehicleOfferBlockPreview propsJson={block.propsJson} />;
+    case 'vehicle_range':
+      return <VehicleRangeBlockPreview propsJson={block.propsJson} />;
+    case 'benefits':
+      return <BenefitsBlockPreview propsJson={block.propsJson} />;
+    case 'trust_bar':
+      return <TrustBarBlockPreview propsJson={block.propsJson} />;
+    case 'final_cta':
+      return <FinalCtaBlockPreview propsJson={block.propsJson} />;
     default:
       return (
         <section className="lp-section" style={{ padding: '2rem', background: '#f8fafc' }}>

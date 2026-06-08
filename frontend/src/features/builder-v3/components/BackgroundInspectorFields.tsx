@@ -1,5 +1,6 @@
 import { Label } from '@/components/ui/primitives';
-import { MediaUploader } from './MediaUploader';
+import { MediaFieldControl } from './MediaFieldControl';
+import { mediaValueFromProps } from './media-field-utils';
 
 type BackgroundInspectorFieldsProps = {
   blockId: string;
@@ -63,9 +64,16 @@ export function BackgroundInspectorFields({
         </div>
       ) : (
         <div className="space-y-1.5">
-          <MediaUploader
-            value={String(propsJson.imageUrl ?? '')}
-            onChange={(url) => onPatch(blockId, { imageUrl: url })}
+          <MediaFieldControl
+            label="Image de fond"
+            value={mediaValueFromProps(propsJson)}
+            onChange={(next) =>
+              onPatch(blockId, {
+                imageAssetId: next.imageAssetId ?? '',
+                imageUrl: next.imageUrl ?? '',
+                alt: next.alt ?? '',
+              })
+            }
           />
           <p className="text-xs text-neutral-500">
             Photo véhicule haute définition — JPG ou PNG recommandé.

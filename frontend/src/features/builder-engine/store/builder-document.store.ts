@@ -132,6 +132,7 @@ type BuilderDocumentState = {
     selectedBlockId: string | null;
   }) => void;
   buildThemeJsonPayload: () => Record<string, unknown>;
+  applyPageStarter: (blockTypes: string[], mode?: 'replace' | 'append') => void;
   resetDocument: () => void;
 };
 
@@ -400,6 +401,35 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
             },
           },
         };
+      },
+
+      applyPageStarter: (blockTypes, mode = 'append') => {
+        const activeTypes = new Set(getActivePaletteBlocks().map((b) => b.type));
+        const starterBlocks = blockTypes
+          .filter((type) => activeTypes.has(type))
+          .map((type, index) => createBlockFromType(type, index));
+
+        if (starterBlocks.length === 0) return;
+
+        if (mode === 'replace') {
+          set({
+            blocks: normalizeSortOrder(starterBlocks),
+            selectedBlockId: starterBlocks[0]?.id ?? null,
+          });
+          return;
+        }
+
+        const blocks = [...get().blocks];
+        let insertAt = blocks.length;
+        for (const newBlock of starterBlocks) {
+          blocks.splice(insertAt, 0, newBlock);
+          insertAt += 1;
+        }
+
+        set({
+          blocks: normalizeSortOrder(blocks),
+          selectedBlockId: starterBlocks[0]?.id ?? null,
+        });
       },
 
       resetDocument: () =>
