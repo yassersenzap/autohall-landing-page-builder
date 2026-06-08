@@ -18,8 +18,14 @@ import {
 import { BackgroundInspectorFields } from '../components/BackgroundInspectorFields';
 import { ProFormDesignFields } from '../components/ProFormDesignFields';
 import { FieldHint } from '../components/BlockInspectorPanel.shared';
+import { MediaFieldControl } from '../components/MediaFieldControl';
 import { MediaUploader } from '../components/MediaUploader';
+import { mediaValueFromProps, patchMediaProps } from '../components/media-field-utils';
 import { TextAlignmentField } from '../components/TextAlignmentField';
+import {
+  isMarketingInspectorBlock,
+  MarketingBlockInspectorFields,
+} from './MarketingBlockInspectorFields';
 import { SECTION_PADDING_OPTIONS } from '../constants/block-layout';
 import {
   MEDIA_ASPECT_RATIO_OPTIONS,
@@ -117,6 +123,7 @@ export function BlockInspectorPanel({
   const isPricingTrim = block.type === 'pricing_trim';
   const isFAQ = block.type === 'faq';
   const isTestimonials = block.type === 'testimonials';
+  const isMarketingBlock = isMarketingInspectorBlock(block.type);
   const supportsBackground = isPromo || isHero;
   const heroBgActive =
     isHero &&
@@ -281,10 +288,10 @@ export function BlockInspectorPanel({
 
                 {(isHero || isPromo) && (
                   <div className="space-y-1.5">
-                    <MediaUploader
+                    <MediaFieldControl
                       label="Visuel média (split / vignette)"
-                      value={asPropString(block.propsJson.imageUrl)}
-                      onChange={(url) => patch({ imageUrl: url })}
+                      value={mediaValueFromProps(block.propsJson)}
+                      onChange={(next) => patchMediaProps(patch, next)}
                     />
                     <FieldHint>
                       {isPromo
@@ -292,6 +299,10 @@ export function BlockInspectorPanel({
                         : 'Image véhicule ou lifestyle pour la zone média de la bannière.'}
                     </FieldHint>
                   </div>
+                )}
+
+                {isMarketingBlock && (
+                  <MarketingBlockInspectorFields block={block} patch={patch} />
                 )}
 
                 {isPromo && (
@@ -428,10 +439,10 @@ export function BlockInspectorPanel({
                 )}
 
                 {isMediaOnly && (
-                  <MediaUploader
+                  <MediaFieldControl
                     label="Image HD"
-                    value={asPropString(block.propsJson.imageUrl)}
-                    onChange={(url) => patch({ imageUrl: url })}
+                    value={mediaValueFromProps(block.propsJson)}
+                    onChange={(next) => patchMediaProps(patch, next)}
                   />
                 )}
 
