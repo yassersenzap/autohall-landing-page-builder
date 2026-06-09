@@ -14,6 +14,12 @@ import {
   renderLeadFormRequiredNoteHtml,
 } from './lead-form-fields.render';
 import { renderHeroFormCampaignHtml } from './hero-form-campaign.render';
+import { renderPromoAutohallHtml } from './promo-autohall.render';
+import {
+  buildPremiumCtaClass,
+  buildPremiumSectionClasses,
+  normalizePremiumDesign,
+} from './premium-block-design';
 
 export type RenderBlockInput = {
   blockType: string;
@@ -240,7 +246,7 @@ function renderLeadFormHtml(props: Record<string, unknown>): string {
             ${reassuranceHtml}
           </aside>
           <div class="lp-lead-form__card">
-            <form class="lp-lead-form__form" action="#" method="post" novalidate>
+            <form class="lp-lead-form lp-lead-form__form" action="#" method="post" novalidate>
               ${requiredNoteHtml}
               <div class="lp-lead-form__grid">${fieldsHtml}</div>
               ${consentHtml}
@@ -399,6 +405,10 @@ function renderOfferHighlightsHtml(
   props: Record<string, unknown>,
   context?: LandingRenderContext,
 ): string {
+  const premiumDesign = normalizePremiumDesign(props);
+  const sectionClass = buildPremiumSectionClasses('lp-vehicle-offer', premiumDesign);
+  const ctaClass = buildPremiumCtaClass(premiumDesign, 'lp-btn lp-btn--lg');
+
   const modelName = propString(props, 'modelName', 'model');
   const tagline = propString(props, 'tagline', 'modelTagline');
   const priceLabel = propString(props, 'priceLabel') ?? 'À partir de';
@@ -407,13 +417,14 @@ function renderOfferHighlightsHtml(
   const buttonText = propString(props, 'buttonText', 'ctaLabel');
   const buttonTarget =
     propString(props, 'buttonTarget', 'ctaTarget') ?? '#lead-form';
+  const legalNote = propString(props, 'legalNote');
   const imageSrc = resolveHeroImageSrc(props, context);
   const imageAlt = propString(props, 'alt') ?? '';
   const heading = propString(props, 'heading', 'title');
   const subtitle = propString(props, 'subtitle');
   const items = parseListItems(props, 'highlights', 'items');
 
-  if (modelName || imageSrc || priceValue || monthlyValue) {
+  if (modelName || imageSrc || priceValue || monthlyValue || heading) {
     const highlightsHtml = items
       .map(
         (item) =>
@@ -427,25 +438,39 @@ function renderOfferHighlightsHtml(
     const monthlyHtml = monthlyValue
       ? `<p class="lp-vehicle-offer__monthly">${escapeHtml(monthlyValue)}</p>`
       : '';
+    const subtitleHtml = subtitle
+      ? `<p class="lp-vehicle-offer__subtitle">${escapeHtml(subtitle)}</p>`
+      : '';
+    const legalHtml = legalNote
+      ? `<p class="lp-vehicle-offer__legal">${escapeHtml(legalNote)}</p>`
+      : '';
 
     const mediaHtml = imageSrc
       ? `<div class="lp-vehicle-offer__media"><img class="lp-vehicle-offer__img" src="${escapeHtml(imageSrc)}" alt="${escapeHtml(imageAlt)}" loading="lazy" decoding="async" /></div>`
       : `<div class="lp-vehicle-offer__media lp-vehicle-offer__media--placeholder" aria-hidden="true"></div>`;
 
-    return `
-    <section class="lp-block lp-vehicle-offer" id="offer">
-      <div class="lp-section">
-        ${heading || subtitle ? `<div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>` : ''}
-        <div class="lp-vehicle-offer__panel">
-          ${mediaHtml}
+    const bodyHtml = `
           <div class="lp-vehicle-offer__body">
             ${modelName ? `<p class="lp-vehicle-offer__model">${escapeHtml(modelName)}</p>` : ''}
-            ${tagline ? `<p class="lp-vehicle-offer__tagline">${escapeHtml(tagline)}</p>` : ''}
+            ${heading ? `<p class="lp-vehicle-offer__tagline">${escapeHtml(heading)}</p>` : tagline ? `<p class="lp-vehicle-offer__tagline">${escapeHtml(tagline)}</p>` : ''}
+            ${subtitleHtml}
             ${priceHtml}
             ${monthlyHtml}
             ${highlightsHtml ? `<ul class="lp-vehicle-offer__highlights">${highlightsHtml}</ul>` : ''}
-            ${buttonText ? `<div class="lp-vehicle-offer__cta">${renderBtn(buttonTarget, buttonText, 'primary', 'lg')}</div>` : ''}
-          </div>
+            ${buttonText ? `<div class="lp-vehicle-offer__cta"><a class="${ctaClass}" href="${escapeHtml(buttonTarget)}">${escapeHtml(buttonText)}</a></div>` : ''}
+            ${legalHtml}
+          </div>`;
+
+    const panelInner =
+      premiumDesign.mediaPosition === 'right'
+        ? `${bodyHtml}${mediaHtml}`
+        : `${mediaHtml}${bodyHtml}`;
+
+    return `
+    <section class="lp-block ${sectionClass}" id="offer">
+      <div class="lp-section">
+        <div class="lp-vehicle-offer__panel">
+          ${panelInner}
         </div>
       </div>
     </section>`;
@@ -834,6 +859,10 @@ export function renderBlockHtml(
 
   if (type === 'hero_form_campaign') {
     return renderHeroFormCampaignHtml(props, context);
+  }
+
+  if (type === 'promo_autohall') {
+    return renderPromoAutohallHtml(props, context);
   }
 
   if (type === 'trust_bar') {

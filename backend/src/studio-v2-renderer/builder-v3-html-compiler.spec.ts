@@ -3,7 +3,7 @@ import { BuilderV3HtmlCompilerService } from './builder-v3-html-compiler.service
 describe('BuilderV3HtmlCompilerService', () => {
   const compiler = new BuilderV3HtmlCompilerService();
 
-  it('produces HTML5 document with Tailwind CDN and primary color', () => {
+  it('produces HTML5 document with landing CSS and primary color tokens', () => {
     const html = compiler.compile({
       pageTitle: 'Promo Ford',
       metaDescription: 'Offre exclusive Auto Hall',
@@ -33,11 +33,12 @@ describe('BuilderV3HtmlCompilerService', () => {
     });
 
     expect(html).toContain('<!DOCTYPE html>');
-    expect(html).toContain('cdn.tailwindcss.com');
-    expect(html).toContain('--primary: #b91c1c');
+    expect(html).toContain('assets/style.css');
+    expect(html).toContain('lp-document');
+    expect(html).toContain('--lp-primary: #b91c1c');
     expect(html).toContain('Promo Ford');
     expect(html).toContain('Offre exclusive Auto Hall');
-    expect(html).toContain('form class="lp-lead-form');
+    expect(html).toContain('lp-lead-form__layout');
     expect(html).toContain('js/lead-form.js');
   });
 });

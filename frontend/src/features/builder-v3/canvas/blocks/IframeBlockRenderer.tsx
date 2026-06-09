@@ -1,5 +1,6 @@
 import type { BuilderDocumentBlock } from '@/features/builder-engine/types';
 import { HeroBlockPreview } from './HeroBlockPreview';
+import { HeroFormCampaignBlockPreview } from './HeroFormCampaignBlockPreview';
 import { LeadFormBlockPreview } from './LeadFormBlockPreview';
 import { PromoAutoHallBlockPreview } from './PromoAutoHallBlockPreview';
 import { VehicleFeaturesBlockPreview } from './VehicleFeaturesBlockPreview';
@@ -52,8 +53,9 @@ export function IframeBlockRenderer({ block }: IframeBlockRendererProps) {
     case 'testimonials':
       return <TestimonialBlockPreview propsJson={block.propsJson} />;
     case 'hero_campaign':
-    case 'hero_form_campaign':
       return <HeroBlockPreview propsJson={block.propsJson} />;
+    case 'hero_form_campaign':
+      return <HeroFormCampaignBlockPreview propsJson={block.propsJson} />;
     case 'lead_form':
       return <LeadFormBlockPreview propsJson={block.propsJson} />;
     case 'vehicle_offer':
