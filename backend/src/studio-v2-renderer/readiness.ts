@@ -35,7 +35,9 @@ function countBlocks(nodes: PuckNode[]): number {
   return count;
 }
 
-export function validateStudioV2Readiness(document: PuckDocument): ReadinessIssue[] {
+export function validateStudioV2Readiness(
+  document: PuckDocument,
+): ReadinessIssue[] {
   const issues: ReadinessIssue[] = [];
   const content = document.content ?? [];
   const rootProps = document.root?.props;
@@ -49,7 +51,11 @@ export function validateStudioV2Readiness(document: PuckDocument): ReadinessIssu
   }
 
   if (content.length === 0) {
-    issues.push({ level: 'critical', code: 'EMPTY_PAGE', message: 'Aucun bloc sur la page.' });
+    issues.push({
+      level: 'critical',
+      code: 'EMPTY_PAGE',
+      message: 'Aucun bloc sur la page.',
+    });
     return issues;
   }
 
@@ -58,7 +64,8 @@ export function validateStudioV2Readiness(document: PuckDocument): ReadinessIssu
     issues.push({
       level: 'warning',
       code: 'PAGE_TOO_SHORT',
-      message: 'Landing courte — ajoutez au moins 3 blocs pour une page crédible.',
+      message:
+        'Landing courte — ajoutez au moins 3 blocs pour une page crédible.',
     });
   }
 
@@ -67,7 +74,9 @@ export function validateStudioV2Readiness(document: PuckDocument): ReadinessIssu
   let hasCta = false;
 
   walkNodes(content, (node) => {
-    if (!(ALLOWED_STUDIO_V2_COMPONENTS as readonly string[]).includes(node.type)) {
+    if (
+      !(ALLOWED_STUDIO_V2_COMPONENTS as readonly string[]).includes(node.type)
+    ) {
       issues.push({
         level: 'critical',
         code: 'UNKNOWN_COMPONENT',
@@ -166,7 +175,10 @@ export function validateStudioV2Readiness(document: PuckDocument): ReadinessIssu
         (v) =>
           v &&
           typeof v === 'object' &&
-          !((v as Record<string, unknown>).imageAssetId || (v as Record<string, unknown>).imageUrl),
+          !(
+            (v as Record<string, unknown>).imageAssetId ||
+            (v as Record<string, unknown>).imageUrl
+          ),
       );
       if (missing) {
         issues.push({

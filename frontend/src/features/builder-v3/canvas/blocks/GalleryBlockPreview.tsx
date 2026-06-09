@@ -1,14 +1,23 @@
 import { asPropString } from '@/features/builder-engine/lib/block-props';
+import { assetPublicFileUrl } from '@/lib/page-assets-api';
 import { cn } from '@/lib/utils';
 
 type GalleryImage = {
   url?: string;
   alt?: string;
+  imageAssetId?: string;
 };
 
 type GalleryBlockPreviewProps = {
   propsJson: Record<string, unknown>;
 };
+
+function resolveGalleryImageSrc(image: GalleryImage): string {
+  if (image.imageAssetId) {
+    return assetPublicFileUrl(image.imageAssetId);
+  }
+  return image.url ?? '';
+}
 
 export function GalleryBlockPreview({ propsJson }: GalleryBlockPreviewProps) {
   const heading = asPropString(propsJson.heading);
@@ -34,16 +43,16 @@ export function GalleryBlockPreview({ propsJson }: GalleryBlockPreviewProps) {
 
       <div className="relative z-10 grid grid-cols-1 gap-1 sm:grid-cols-3">
         {images.map((image, index) => {
-          const url = image.url ?? '';
+          const src = resolveGalleryImageSrc(image);
           const alt = image.alt || `Visuel ${index + 1}`;
           return (
             <div
               key={`gallery-${index}`}
               className="group relative aspect-[4/3] overflow-hidden sm:aspect-[3/4]"
             >
-              {url ? (
+              {src ? (
                 <img
-                  src={url}
+                  src={src}
                   alt={alt}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />

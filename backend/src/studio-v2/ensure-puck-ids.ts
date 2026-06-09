@@ -49,7 +49,10 @@ function walkNode(
 export function ensurePuckIds(
   documentJson: Record<string, unknown>,
 ): Record<string, unknown> {
-  const clone = JSON.parse(JSON.stringify(documentJson)) as Record<string, unknown>;
+  const clone = JSON.parse(JSON.stringify(documentJson)) as Record<
+    string,
+    unknown
+  >;
   const counter = { value: 0 };
   const seenIds = new Set<string>();
   const content = clone.content;

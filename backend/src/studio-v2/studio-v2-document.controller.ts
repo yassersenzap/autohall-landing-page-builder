@@ -26,11 +26,15 @@ const WRITE_ROLES = [
 
 @Controller('api/page-versions/:pageVersionId/studio-v2-document')
 export class StudioV2DocumentController {
-  constructor(private readonly studioV2DocumentService: StudioV2DocumentService) {}
+  constructor(
+    private readonly studioV2DocumentService: StudioV2DocumentService,
+  ) {}
 
   @Roles(...READ_ROLES)
   @Get()
-  async getDocument(@Param('pageVersionId', ParseUUIDPipe) pageVersionId: string) {
+  async getDocument(
+    @Param('pageVersionId', ParseUUIDPipe) pageVersionId: string,
+  ) {
     const data = await this.studioV2DocumentService.getOrCreate(pageVersionId);
     return {
       success: true,

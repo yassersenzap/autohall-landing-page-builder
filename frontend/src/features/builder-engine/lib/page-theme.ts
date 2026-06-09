@@ -1,4 +1,43 @@
-import type { PageThemeDraft } from '../store/builder-document.store';
+import type { PageSettingsDraft, PageThemeDraft } from '../store/builder-document.store';
+
+export function parsePageSettingsFromJson(themeJson: unknown): PageSettingsDraft {
+  const theme = parsePageThemeFromJson(themeJson);
+  const defaults: PageSettingsDraft = {
+    metaTitle: theme.seoTitle,
+    metaDescription: theme.seoDescription,
+    ogImageUrl: '',
+    faviconUrl: '',
+  };
+
+  if (!themeJson || typeof themeJson !== 'object' || Array.isArray(themeJson)) {
+    return defaults;
+  }
+
+  const root = themeJson as Record<string, unknown>;
+  const page =
+    root.page && typeof root.page === 'object' && !Array.isArray(root.page)
+      ? (root.page as Record<string, unknown>)
+      : root;
+  const seo =
+    page.seo && typeof page.seo === 'object' && !Array.isArray(page.seo)
+      ? (page.seo as Record<string, unknown>)
+      : {};
+
+  return {
+    metaTitle:
+      typeof seo.title === 'string' && seo.title.trim()
+        ? seo.title
+        : defaults.metaTitle,
+    metaDescription:
+      typeof seo.description === 'string' && seo.description.trim()
+        ? seo.description
+        : defaults.metaDescription,
+    ogImageUrl: typeof seo.ogImageUrl === 'string' ? seo.ogImageUrl : '',
+    faviconUrl: typeof seo.faviconUrl === 'string' ? seo.faviconUrl : '',
+    ogImageAssetId: typeof seo.ogImageAssetId === 'string' ? seo.ogImageAssetId : '',
+    faviconAssetId: typeof seo.faviconAssetId === 'string' ? seo.faviconAssetId : '',
+  };
+}
 
 export function parsePageThemeFromJson(themeJson: unknown): PageThemeDraft {
   const defaults: PageThemeDraft = {

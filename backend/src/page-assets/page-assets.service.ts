@@ -76,10 +76,7 @@ export class PageAssetsService {
     const assetId = randomUUID();
     const storedName = buildStoredFilename(extension, assetId);
 
-    const relativeDir = path.posix.join(
-      'page-versions',
-      pageVersionId,
-    );
+    const relativeDir = path.posix.join('page-versions', pageVersionId);
     const relativeFilePath = path.posix.join(relativeDir, storedName);
     const absoluteDir = path.join(this.resolveStorageRoot(), relativeDir);
     const absoluteFilePath = path.join(absoluteDir, storedName);

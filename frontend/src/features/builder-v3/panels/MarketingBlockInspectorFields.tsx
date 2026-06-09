@@ -175,6 +175,25 @@ export function MarketingBlockInspectorFields({ block, patch }: MarketingBlockIn
                 <option value="PHEV">PHEV</option>
                 <option value="Électrique">Électrique</option>
               </select>
+              <MediaFieldControl
+                label={`Visuel modèle ${index + 1}`}
+                value={mediaValueFromProps(vehicle)}
+                onChange={(next) => {
+                  writeListItem(
+                    propsJson,
+                    'vehicles',
+                    index,
+                    {
+                      ...vehicle,
+                      imageAssetId: next.imageAssetId ?? '',
+                      imageUrl: next.imageUrl ?? '',
+                      alt: next.alt ?? '',
+                      objectFit: next.objectFit ?? 'cover',
+                    },
+                    patch,
+                  );
+                }}
+              />
             </div>
           );
         })}

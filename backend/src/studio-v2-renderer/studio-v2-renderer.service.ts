@@ -34,7 +34,8 @@ export class StudioV2RendererService {
   ) {}
 
   async getDocument(pageVersionId: string): Promise<PuckDocument> {
-    const record = await this.studioV2DocumentService.getOrCreate(pageVersionId);
+    const record =
+      await this.studioV2DocumentService.getOrCreate(pageVersionId);
     return record.documentJson as PuckDocument;
   }
 
@@ -43,7 +44,7 @@ export class StudioV2RendererService {
     mode: 'preview' | 'export',
   ): Promise<StudioV2AssetMap> {
     const map = await this.assetRenderService.buildAssetMapForPuckDocument(
-      document as Record<string, unknown>,
+      document,
       mode,
     );
     return toStudioV2AssetMap(map);

@@ -19,7 +19,6 @@ import { BackgroundInspectorFields } from '../components/BackgroundInspectorFiel
 import { ProFormDesignFields } from '../components/ProFormDesignFields';
 import { FieldHint } from '../components/BlockInspectorPanel.shared';
 import { MediaFieldControl } from '../components/MediaFieldControl';
-import { MediaUploader } from '../components/MediaUploader';
 import { mediaValueFromProps, patchMediaProps } from '../components/media-field-utils';
 import { TextAlignmentField } from '../components/TextAlignmentField';
 import {
@@ -373,17 +372,35 @@ export function BlockInspectorPanel({
                     </div>
                     {[0, 1, 2].map((index) => {
                       const images = Array.isArray(block.propsJson.images)
-                        ? [...(block.propsJson.images as Array<{ url?: string; alt?: string }>)]
+                        ? [
+                            ...(block.propsJson.images as Array<{
+                              url?: string;
+                              alt?: string;
+                              imageAssetId?: string;
+                              objectFit?: 'cover' | 'contain';
+                            }>),
+                          ]
                         : [];
                       while (images.length < 3) images.push({ url: '', alt: '' });
                       const image = images[index] ?? { url: '', alt: '' };
                       return (
-                        <MediaUploader
+                        <MediaFieldControl
                           key={`gallery-${index}`}
                           label={`Image ${index + 1}`}
-                          value={image.url ?? ''}
-                          onChange={(url) => {
-                            images[index] = { ...image, url };
+                          value={{
+                            imageAssetId: image.imageAssetId,
+                            imageUrl: image.url ?? '',
+                            alt: image.alt,
+                            objectFit: 'cover',
+                          }}
+                          onChange={(next) => {
+                            images[index] = {
+                              ...image,
+                              url: next.imageAssetId ? '' : (next.imageUrl ?? ''),
+                              imageAssetId: next.imageAssetId,
+                              alt: next.alt,
+                              objectFit: next.objectFit ?? 'cover',
+                            };
                             patch({ images });
                           }}
                         />
@@ -440,7 +457,7 @@ export function BlockInspectorPanel({
 
                 {isMediaOnly && (
                   <MediaFieldControl
-                    label="Image HD"
+                    label="Importer une image"
                     value={mediaValueFromProps(block.propsJson)}
                     onChange={(next) => patchMediaProps(patch, next)}
                   />

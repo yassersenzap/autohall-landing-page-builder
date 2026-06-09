@@ -6,11 +6,13 @@ import type { BuilderDocumentBlock } from '../types';
 const deleteEditorBlock = vi.fn();
 const updateEditorBlock = vi.fn();
 const createEditorBlock = vi.fn();
+const fetchEditorBlocks = vi.fn();
 
 vi.mock('@/features/editor/api/editorApi', () => ({
   deleteEditorBlock: (...args: unknown[]) => deleteEditorBlock(...args),
   updateEditorBlock: (...args: unknown[]) => updateEditorBlock(...args),
   createEditorBlock: (...args: unknown[]) => createEditorBlock(...args),
+  fetchEditorBlocks: (...args: unknown[]) => fetchEditorBlocks(...args),
 }));
 
 describe('persistBuilderDocument deletions', () => {
@@ -18,9 +20,11 @@ describe('persistBuilderDocument deletions', () => {
     deleteEditorBlock.mockReset();
     updateEditorBlock.mockReset();
     createEditorBlock.mockReset();
+    fetchEditorBlocks.mockReset();
     deleteEditorBlock.mockResolvedValue(undefined);
     updateEditorBlock.mockResolvedValue(undefined);
     createEditorBlock.mockResolvedValue(undefined);
+    fetchEditorBlocks.mockResolvedValue({ data: [] });
   });
 
   it('calls delete API for blocks removed from the document', async () => {
@@ -29,7 +33,7 @@ describe('persistBuilderDocument deletions', () => {
         id: 'hero-1',
         pageVersionId: 'v1',
         blockKey: 'hero',
-        blockType: 'hero',
+        blockType: 'hero_campaign',
         sortOrder: 1,
         propsJson: { title: 'Hero' },
         createdAt: '',
@@ -67,14 +71,15 @@ describe('persistBuilderDocument deletions', () => {
       sortOrder: 1,
     });
     expect(createEditorBlock).not.toHaveBeenCalled();
+    expect(fetchEditorBlocks).toHaveBeenCalledWith('version-1');
   });
 
-  it('does not call delete API for blocks never saved', async () => {
+  it('creates new blocks with stable blockKey from client id', async () => {
     const baseline: EditorPageBlock[] = [];
     const current: BuilderDocumentBlock[] = [
       {
-        id: 'local-hero',
-        type: 'hero',
+        id: '550E8400-E29B-41D4-A716-446655440000',
+        type: 'hero_campaign',
         label: 'Hero',
         sortOrder: 0,
         propsJson: { title: 'Hero' },
@@ -83,7 +88,31 @@ describe('persistBuilderDocument deletions', () => {
 
     await persistBuilderDocument('version-1', current, baseline);
 
-    expect(deleteEditorBlock).not.toHaveBeenCalled();
-    expect(createEditorBlock).toHaveBeenCalledTimes(1);
+    expect(createEditorBlock).toHaveBeenCalledWith('version-1', {
+      blockType: 'hero_campaign',
+      propsJson: { title: 'Hero' },
+      sortOrder: 1,
+      blockKey: '550e8400-e29b-41d4-a716-446655440000',
+    });
+  });
+
+  it('rejects blob URLs before hitting the API', async () => {
+    await expect(
+      persistBuilderDocument(
+        'version-1',
+        [
+          {
+            id: 'local-hero',
+            type: 'hero_campaign',
+            label: 'Hero',
+            sortOrder: 0,
+            propsJson: { imageUrl: 'blob:http://localhost/abc' },
+          },
+        ],
+        [],
+      ),
+    ).rejects.toThrow(/Médias non enregistrés/);
+
+    expect(createEditorBlock).not.toHaveBeenCalled();
   });
 });

@@ -138,7 +138,9 @@ export class CampaignsService {
         ? this.parseDate(dto.startDate)
         : existing.startDate;
     const endDate =
-      dto.endDate !== undefined ? this.parseDate(dto.endDate) : existing.endDate;
+      dto.endDate !== undefined
+        ? this.parseDate(dto.endDate)
+        : existing.endDate;
 
     this.validateDateRange(
       startDate?.toISOString().slice(0, 10),
@@ -156,8 +158,12 @@ export class CampaignsService {
           dto.description === undefined
             ? undefined
             : dto.description?.trim() || null,
-        startDate: dto.startDate !== undefined ? this.parseDate(dto.startDate) : undefined,
-        endDate: dto.endDate !== undefined ? this.parseDate(dto.endDate) : undefined,
+        startDate:
+          dto.startDate !== undefined
+            ? this.parseDate(dto.startDate)
+            : undefined,
+        endDate:
+          dto.endDate !== undefined ? this.parseDate(dto.endDate) : undefined,
         status: dto.status,
       },
     });

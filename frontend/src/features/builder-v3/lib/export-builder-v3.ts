@@ -1,5 +1,13 @@
 import { getAccessToken } from '@/lib/auth-storage';
 import {
+  assertNoBlobUrlsInDocument,
+  BlobUrlValidationError,
+} from '@/features/builder-engine/lib/blob-url-guard';
+import {
+  assertExportReady,
+  ExportReadinessError,
+} from '@/features/builder-engine/lib/export-readiness-guard';
+import {
   forcePersistBuilderDocument,
   useBuilderDocumentStore,
 } from '@/features/builder-engine/store/builder-document.store';
@@ -22,10 +30,20 @@ function formatExportError(payload: unknown): string {
 
 /** Persiste le document V3 puis télécharge le ZIP généré côté serveur. */
 export async function exportBuilderV3Zip(pageVersionId: string): Promise<void> {
+  const state = useBuilderDocumentStore.getState();
+  assertNoBlobUrlsInDocument({
+    blocks: state.blocks,
+    pageSettings: state.pageSettings,
+  });
+  assertExportReady({
+    blocks: state.blocks,
+    pageSettings: state.pageSettings,
+  });
+
   forcePersistBuilderDocument();
   await saveBuilderDocumentDesign(pageVersionId);
 
-  const state = useBuilderDocumentStore.getState();
+  const freshState = useBuilderDocumentStore.getState();
   const token = getAccessToken();
 
   const response = await fetch(exportUrl(pageVersionId), {
@@ -35,9 +53,9 @@ export async function exportBuilderV3Zip(pageVersionId: string): Promise<void> {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify({
-      blocks: state.blocks,
-      pageTheme: state.pageTheme,
-      pageSettings: state.pageSettings,
+      blocks: freshState.blocks,
+      pageTheme: freshState.pageTheme,
+      pageSettings: freshState.pageSettings,
     }),
   });
 
@@ -57,3 +75,5 @@ export async function exportBuilderV3Zip(pageVersionId: string): Promise<void> {
   anchor.click();
   URL.revokeObjectURL(url);
 }
+
+export { BlobUrlValidationError, ExportReadinessError };

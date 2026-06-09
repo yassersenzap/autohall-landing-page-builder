@@ -1,6 +1,12 @@
 import { renderBlockHtml } from './block-renderer';
-import { buildPublicAssetFileUrl, resolveHeroImageSrc } from './render-asset.resolve';
-import type { LandingRenderContext, RenderAssetMap } from './render-asset.types';
+import {
+  buildPublicAssetFileUrl,
+  resolveHeroImageSrc,
+} from './render-asset.resolve';
+import type {
+  LandingRenderContext,
+  RenderAssetMap,
+} from './render-asset.types';
 
 const ASSET_ID = '11111111-1111-1111-1111-111111111111';
 
@@ -14,7 +20,8 @@ function buildContext(
 describe('render-asset.resolve', () => {
   const assetMap: RenderAssetMap = {
     [ASSET_ID]: {
-      previewUrl: 'http://api.example.com/api/public/assets/11111111-1111-1111-1111-111111111111/file',
+      previewUrl:
+        'http://api.example.com/api/public/assets/11111111-1111-1111-1111-111111111111/file',
       exportPath: 'assets/images/hero-test.webp',
       storagePath: 'page-versions/x/hero-test.webp',
       storedName: 'hero-test.webp',
@@ -66,7 +73,8 @@ describe('render-asset.resolve', () => {
 describe('renderBlockHtml hero', () => {
   const assetMap: RenderAssetMap = {
     [ASSET_ID]: {
-      previewUrl: 'http://localhost:3000/api/public/assets/11111111-1111-1111-1111-111111111111/file',
+      previewUrl:
+        'http://localhost:3000/api/public/assets/11111111-1111-1111-1111-111111111111/file',
       exportPath: 'assets/images/hero.webp',
       storagePath: 'page-versions/pv/hero.webp',
       storedName: 'hero.webp',

@@ -84,4 +84,5 @@ export const ALLOWED_STUDIO_V2_COMPONENTS = [
   'FinancingHighlightBlock',
 ] as const;
 
-export type AllowedStudioV2Component = (typeof ALLOWED_STUDIO_V2_COMPONENTS)[number];
+export type AllowedStudioV2Component =
+  (typeof ALLOWED_STUDIO_V2_COMPONENTS)[number];

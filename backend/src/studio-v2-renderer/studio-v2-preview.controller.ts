@@ -41,14 +41,18 @@ export class StudioV2PreviewController {
   @Roles(...READ_ROLES)
   @Get('studio-v2-preview')
   @Header('Content-Type', 'text/html; charset=utf-8')
-  async getPreview(@Param('pageVersionId', ParseUUIDPipe) pageVersionId: string) {
+  async getPreview(
+    @Param('pageVersionId', ParseUUIDPipe) pageVersionId: string,
+  ) {
     const result = await this.rendererService.renderPreviewHtml(pageVersionId);
     return result.html;
   }
 
   @Roles(...READ_ROLES)
   @Get('studio-v2-readiness')
-  async getReadiness(@Param('pageVersionId', ParseUUIDPipe) pageVersionId: string) {
+  async getReadiness(
+    @Param('pageVersionId', ParseUUIDPipe) pageVersionId: string,
+  ) {
     const document = await this.rendererService.getDocument(pageVersionId);
     const result = this.rendererService.validateReadiness(document);
     return {
@@ -78,7 +82,10 @@ export class StudioV2PreviewController {
     @Body() dto: ExportBuilderV3DocumentDto,
   ): Promise<StreamableFile> {
     try {
-      const result = await this.builderV3ExportService.exportZip(pageVersionId, dto);
+      const result = await this.builderV3ExportService.exportZip(
+        pageVersionId,
+        dto,
+      );
 
       return new StreamableFile(result.buffer, {
         type: 'application/zip',

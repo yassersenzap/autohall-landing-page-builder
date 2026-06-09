@@ -41,7 +41,9 @@ describe('premium landing export', () => {
         title: 'Contact',
         submitText: 'Envoyer',
         design: { layoutVariant: 'card_right' },
-        fields: [{ name: 'fullName', label: 'Nom', type: 'text', required: true }],
+        fields: [
+          { name: 'fullName', label: 'Nom', type: 'text', required: true },
+        ],
       },
     });
     expect(html).toContain('lp-lead-form__card');

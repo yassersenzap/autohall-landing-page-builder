@@ -8,10 +8,11 @@ import {
 } from '@/components/ui/primitives';
 import { cn } from '@/lib/utils';
 import {
+  getBuilderPersistPageVersionId,
   useBuilderDocumentStore,
   type PageSettingsDraft,
 } from '@/features/builder-engine/store/builder-document.store';
-import { MediaUploader } from '../components/MediaUploader';
+import { MediaFieldControl } from '../components/MediaFieldControl';
 import { FieldHint } from '../components/BlockInspectorPanel.shared';
 
 const META_TITLE_MAX = 60;
@@ -46,6 +47,9 @@ type PageSettingsFieldsProps = {
 };
 
 export function PageSettingsFields({ settings, onChange }: PageSettingsFieldsProps) {
+  const pageVersionId = getBuilderPersistPageVersionId();
+  const canUseAssetLibrary = Boolean(pageVersionId);
+
   return (
     <div className="space-y-5">
       <div className="space-y-1.5">
@@ -85,21 +89,49 @@ export function PageSettingsFields({ settings, onChange }: PageSettingsFieldsPro
         </FieldHint>
       </div>
 
-      <MediaUploader
+      <MediaFieldControl
         label="Image de partage (Open Graph)"
-        value={settings.ogImageUrl}
-        onChange={(url) => onChange({ ogImageUrl: url })}
+        allowBlobFallback={false}
+        value={{
+          imageAssetId: settings.ogImageAssetId,
+          imageUrl: settings.ogImageUrl,
+          alt: 'Image de partage Open Graph',
+          objectFit: 'cover',
+        }}
+        onChange={(next) =>
+          onChange({
+            ogImageAssetId: next.imageAssetId ?? '',
+            ogImageUrl: next.imageAssetId ? '' : (next.imageUrl ?? ''),
+          })
+        }
       />
       <FieldHint>
-        Visuel affiché sur WhatsApp, LinkedIn et Facebook — format paysage 1200×630 px recommandé.
+        {`Visuel affiché sur WhatsApp, LinkedIn et Facebook — format paysage 1200×630 px recommandé.${
+          !canUseAssetLibrary
+            ? ' Chargez la page pour accéder à la bibliothèque médias.'
+            : ' Sélectionnez un visuel depuis la bibliothèque ou importez via l’API campagne.'
+        }`}
       </FieldHint>
 
-      <MediaUploader
+      <MediaFieldControl
         label="Favicon (optionnel)"
-        value={settings.faviconUrl}
-        onChange={(url) => onChange({ faviconUrl: url })}
+        allowBlobFallback={false}
+        value={{
+          imageAssetId: settings.faviconAssetId,
+          imageUrl: settings.faviconUrl,
+          alt: 'Favicon',
+          objectFit: 'contain',
+        }}
+        onChange={(next) =>
+          onChange({
+            faviconAssetId: next.imageAssetId ?? '',
+            faviconUrl: next.imageAssetId ? '' : (next.imageUrl ?? ''),
+          })
+        }
       />
-      <FieldHint>Icône de l&apos;onglet navigateur — carré 32×32 ou 64×64 px.</FieldHint>
+      <FieldHint>
+        Icône de l&apos;onglet navigateur — carré 32×32 ou 64×64 px. Import bibliothèque uniquement.
+      </FieldHint>
     </div>
   );
 }

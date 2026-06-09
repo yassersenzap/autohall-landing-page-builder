@@ -100,3 +100,19 @@ export async function updatePageVersion(
     { method: 'PATCH', body: payload },
   );
 }
+
+/** Builder V3 — fetch version metadata + theme without preview/render pipeline. */
+export async function fetchPageVersionById(pageVersionId: string) {
+  return apiRequest<PageVersionDetail>(`/api/page-versions/${pageVersionId}`);
+}
+
+/** Builder V3 — persist theme/pageSettings via pageVersionId only. */
+export async function updatePageVersionById(
+  pageVersionId: string,
+  payload: { themeJson?: Record<string, unknown>; label?: string },
+) {
+  return apiRequest<PageVersionDetail>(`/api/page-versions/${pageVersionId}`, {
+    method: 'PATCH',
+    body: payload,
+  });
+}

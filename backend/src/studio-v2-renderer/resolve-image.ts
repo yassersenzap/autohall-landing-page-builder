@@ -37,8 +37,13 @@ export function resolveImageSrc(
       : ctx.assetMap[assetId].previewUrl;
   }
 
-  const imageUrl = typeof props.imageUrl === 'string' ? props.imageUrl.trim() : '';
-  if (imageUrl && !containsForbiddenAssetUrl(imageUrl) && /^https?:\/\//i.test(imageUrl)) {
+  const imageUrl =
+    typeof props.imageUrl === 'string' ? props.imageUrl.trim() : '';
+  if (
+    imageUrl &&
+    !containsForbiddenAssetUrl(imageUrl) &&
+    /^https?:\/\//i.test(imageUrl)
+  ) {
     return imageUrl;
   }
 

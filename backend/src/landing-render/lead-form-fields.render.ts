@@ -57,7 +57,9 @@ export function renderLeadFormFieldsHtml(
     .join('');
 }
 
-export function renderLeadFormConsentHtml(props: Record<string, unknown>): string {
+export function renderLeadFormConsentHtml(
+  props: Record<string, unknown>,
+): string {
   const config = props.formConfig as Record<string, unknown> | undefined;
   const showConsent = config?.showConsent !== false;
   if (!showConsent) return '';
@@ -74,9 +76,12 @@ export function renderLeadFormConsentHtml(props: Record<string, unknown>): strin
         </label>`;
 }
 
-export function renderLeadFormRequiredNoteHtml(props: Record<string, unknown>): string {
+export function renderLeadFormRequiredNoteHtml(
+  props: Record<string, unknown>,
+): string {
   const note =
-    typeof props.requiredFieldsNote === 'string' && props.requiredFieldsNote.trim()
+    typeof props.requiredFieldsNote === 'string' &&
+    props.requiredFieldsNote.trim()
       ? props.requiredFieldsNote.trim()
       : '* Champs obligatoires.';
   return `<p class="lp-lead-form__required-note">${escapeHtml(note)}</p>`;

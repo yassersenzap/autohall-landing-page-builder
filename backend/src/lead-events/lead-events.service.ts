@@ -231,7 +231,9 @@ export class LeadEventsService {
     return toLeadEventDetail(lead);
   }
 
-  async findStatusHistory(leadEventId: string): Promise<LeadStatusHistoryItem[]> {
+  async findStatusHistory(
+    leadEventId: string,
+  ): Promise<LeadStatusHistoryItem[]> {
     await this.ensureLeadExists(leadEventId);
 
     const rows = await this.prisma.leadStatusHistory.findMany({
@@ -404,9 +406,7 @@ export class LeadEventsService {
     }
 
     if (dto.nextFollowUpAt !== undefined) {
-      const nextDate = dto.nextFollowUpAt
-        ? new Date(dto.nextFollowUpAt)
-        : null;
+      const nextDate = dto.nextFollowUpAt ? new Date(dto.nextFollowUpAt) : null;
 
       if (nextDate && Number.isNaN(nextDate.getTime())) {
         throw new BadRequestException({
@@ -419,9 +419,7 @@ export class LeadEventsService {
       const previousLabel = formatFollowUpDate(existing.nextFollowUpAt);
       const nextLabel = formatFollowUpDate(nextDate);
 
-      if (
-        existing.nextFollowUpAt?.toISOString() !== nextDate?.toISOString()
-      ) {
+      if (existing.nextFollowUpAt?.toISOString() !== nextDate?.toISOString()) {
         changes.push(`Prochaine relance : ${previousLabel} → ${nextLabel}`);
       }
 
@@ -471,28 +469,26 @@ export class LeadEventsService {
     }
   }
 
-  private toListItem(
-    item: {
-      id: string;
-      campaignId: string;
-      landingPageId: string;
-      fullName: string;
-      phone: string;
-      email: string | null;
-      brand: string | null;
-      model: string | null;
-      requestType: LeadRequestType;
-      status: LeadEventStatus;
-      priority: LeadPriority;
-      assignedToUserId: string | null;
-      nextFollowUpAt: Date | null;
-      sourceUrl: string;
-      createdAt: Date;
-      campaign: { name: string };
-      landingPage: { title: string; slug: string };
-      assignedTo: { id: string; fullName: string } | null;
-    },
-  ): LeadEventListItem {
+  private toListItem(item: {
+    id: string;
+    campaignId: string;
+    landingPageId: string;
+    fullName: string;
+    phone: string;
+    email: string | null;
+    brand: string | null;
+    model: string | null;
+    requestType: LeadRequestType;
+    status: LeadEventStatus;
+    priority: LeadPriority;
+    assignedToUserId: string | null;
+    nextFollowUpAt: Date | null;
+    sourceUrl: string;
+    createdAt: Date;
+    campaign: { name: string };
+    landingPage: { title: string; slug: string };
+    assignedTo: { id: string; fullName: string } | null;
+  }): LeadEventListItem {
     return {
       id: item.id,
       campaignId: item.campaignId,

@@ -36,8 +36,7 @@ export class AssetRenderService {
     });
 
     const storageRoot = this.resolveStorageRoot();
-    const previewBase =
-      mode === 'preview' ? this.resolvePublicApiBase() : '';
+    const previewBase = mode === 'preview' ? this.resolvePublicApiBase() : '';
     const map: RenderAssetMap = {};
 
     for (const asset of assets) {
@@ -56,6 +55,44 @@ export class AssetRenderService {
       map[asset.id] = {
         previewUrl: buildPublicAssetFileUrl(previewBase, asset.id),
         exportPath,
+        storagePath: asset.storagePath,
+        storedName: asset.storedName,
+        mimeType: asset.mimeType,
+        absolutePath,
+      };
+    }
+
+    return map;
+  }
+
+  async buildAssetMapForAssetIds(
+    assetIds: string[],
+    mode: 'preview' | 'export',
+  ): Promise<RenderAssetMap> {
+    const uniqueIds = [...new Set(assetIds.filter((id) => id.trim()))];
+    if (uniqueIds.length === 0) {
+      return {};
+    }
+
+    const assets = await this.prisma.landingPageAsset.findMany({
+      where: { id: { in: uniqueIds } },
+    });
+
+    const storageRoot = this.resolveStorageRoot();
+    const previewBase = mode === 'preview' ? this.resolvePublicApiBase() : '';
+    const map: RenderAssetMap = {};
+
+    for (const asset of assets) {
+      const absolutePath = path.join(storageRoot, asset.storagePath);
+      const exists = await access(absolutePath)
+        .then(() => true)
+        .catch(() => false);
+      if (!exists) continue;
+
+      map[asset.id] = {
+        previewUrl: buildPublicAssetFileUrl(previewBase, asset.id),
+        exportPath:
+          asset.publicPath ?? resolveAssetPublicPath(asset.storedName),
         storagePath: asset.storagePath,
         storedName: asset.storedName,
         mimeType: asset.mimeType,
@@ -90,7 +127,8 @@ export class AssetRenderService {
 
       map[asset.id] = {
         previewUrl: buildPublicAssetFileUrl(previewBase, asset.id),
-        exportPath: asset.publicPath ?? resolveAssetPublicPath(asset.storedName),
+        exportPath:
+          asset.publicPath ?? resolveAssetPublicPath(asset.storedName),
         storagePath: asset.storagePath,
         storedName: asset.storedName,
         mimeType: asset.mimeType,

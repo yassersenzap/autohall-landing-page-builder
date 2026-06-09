@@ -107,11 +107,7 @@ export class LeadEventsController {
     @Body() dto: UpdateLeadFollowUpDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    const data = await this.leadEventsService.updateFollowUp(
-      id,
-      dto,
-      user.id,
-    );
+    const data = await this.leadEventsService.updateFollowUp(id, dto, user.id);
 
     return {
       success: true,
@@ -127,11 +123,7 @@ export class LeadEventsController {
     @Body() dto: UpdateLeadStatusDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    const data = await this.leadEventsService.updateStatus(
-      id,
-      dto,
-      user.id,
-    );
+    const data = await this.leadEventsService.updateStatus(id, dto, user.id);
 
     return {
       success: true,

@@ -3,6 +3,8 @@ import {
   buildLeadFormFieldSpecs,
   type LeadFormFieldSpec,
 } from '../landing-render/lead-form-fields.builder';
+import { resolveHeroImageSrc } from '../landing-render/render-asset.resolve';
+import type { LandingRenderContext } from '../landing-render/render-asset.types';
 
 export type BuilderV3CompileBlock = {
   type: string;
@@ -18,6 +20,8 @@ export type BuilderV3CompileInput = {
   headingFont: string;
   bodyFont: string;
   blocks: BuilderV3CompileBlock[];
+  renderContext?: LandingRenderContext;
+  pageSettings?: Record<string, unknown>;
 };
 
 function escapeHtml(value: string): string {
@@ -31,6 +35,17 @@ function escapeHtml(value: string): string {
 
 function asString(value: unknown, fallback = ''): string {
   return typeof value === 'string' && value.trim() ? value.trim() : fallback;
+}
+
+function resolveObjectFitClass(objectFit: unknown): string {
+  return objectFit === 'contain' ? 'object-contain' : 'object-cover';
+}
+
+function resolveImageSrc(
+  props: Record<string, unknown>,
+  context?: LandingRenderContext,
+): string {
+  return resolveHeroImageSrc(props, context) ?? '';
 }
 
 function renderLeadFieldHtml(field: LeadFormFieldSpec): string {
@@ -68,9 +83,14 @@ function renderLeadFormInner(props: Record<string, unknown>): string {
     props.consentLabel,
     'J’accepte le traitement de mes données personnelles.',
   );
-  const requiredNote = asString(props.requiredFieldsNote, '* Champs obligatoires.');
+  const requiredNote = asString(
+    props.requiredFieldsNote,
+    '* Champs obligatoires.',
+  );
   const formConfig =
-    props.formConfig && typeof props.formConfig === 'object' && !Array.isArray(props.formConfig)
+    props.formConfig &&
+    typeof props.formConfig === 'object' &&
+    !Array.isArray(props.formConfig)
       ? (props.formConfig as Record<string, unknown>)
       : {};
   const showConsent = formConfig.showConsent !== false;
@@ -96,12 +116,38 @@ function renderLeadFormInner(props: Record<string, unknown>): string {
 @Injectable()
 export class BuilderV3HtmlCompilerService {
   compile(input: BuilderV3CompileInput): string {
+    const context = input.renderContext;
     const sorted = [...input.blocks].sort(
       (a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0),
     );
-    const body = sorted.map((block) => this.compileBlock(block)).join('\n');
+    const body = sorted
+      .map((block) => this.compileBlock(block, context))
+      .join('\n');
     const title = escapeHtml(input.pageTitle || 'Landing Auto Hall');
-    const description = escapeHtml(input.metaDescription || 'Campagne Auto Hall');
+    const description = escapeHtml(
+      input.metaDescription || 'Campagne Auto Hall',
+    );
+    const pageSettings = input.pageSettings ?? {};
+    const ogImageSrc = resolveImageSrc(
+      {
+        imageAssetId: pageSettings.ogImageAssetId,
+        imageUrl: pageSettings.ogImageUrl,
+      },
+      context,
+    );
+    const faviconSrc = resolveImageSrc(
+      {
+        imageAssetId: pageSettings.faviconAssetId,
+        imageUrl: pageSettings.faviconUrl,
+      },
+      context,
+    );
+    const ogImageTag = ogImageSrc
+      ? `\n  <meta property="og:image" content="${escapeHtml(ogImageSrc)}" />`
+      : '';
+    const faviconTag = faviconSrc
+      ? `\n  <link rel="icon" href="${escapeHtml(faviconSrc)}" />`
+      : '';
 
     return `<!DOCTYPE html>
 <html lang="fr">
@@ -109,7 +155,7 @@ export class BuilderV3HtmlCompilerService {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${title}</title>
-  <meta name="description" content="${description}" />
+  <meta name="description" content="${description}" />${ogImageTag}${faviconTag}
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root {
@@ -134,16 +180,19 @@ ${body}
 </html>`;
   }
 
-  private compileBlock(block: BuilderV3CompileBlock): string {
+  private compileBlock(
+    block: BuilderV3CompileBlock,
+    context?: LandingRenderContext,
+  ): string {
     const props = block.propsJson ?? {};
     switch (block.type) {
       case 'promo_autohall':
-        return this.compilePromoAutoHall(props);
+        return this.compilePromoAutoHall(props, context);
       case 'lead_form':
         return this.compileLeadForm(props);
       case 'hero_campaign':
       case 'hero_form_campaign':
-        return this.compileHero(props);
+        return this.compileHero(props, context);
       case 'cta_band':
         return this.compileCtaBand(props);
       case 'footer_legal':
@@ -159,19 +208,32 @@ ${body}
       case 'rich_text':
         return this.compileRichText(props);
       case 'media_only':
-        return this.compileMediaOnly(props);
+        return this.compileMediaOnly(props, context);
       case 'gallery':
-        return this.compileGallery(props);
+        return this.compileGallery(props, context);
       case 'video_embed':
         return this.compileVideoEmbed(props);
       case 'spacer_divider':
         return this.compileSpacer(props);
+      case 'vehicle_offer':
+        return this.compileVehicleOffer(props, context);
+      case 'vehicle_range':
+        return this.compileVehicleRange(props, context);
+      case 'benefits':
+        return this.compileBenefits(props);
+      case 'trust_bar':
+        return this.compileTrustBar(props);
+      case 'final_cta':
+        return this.compileFinalCta(props, context);
       default:
         return `<section class="px-6 py-12 text-center text-sm text-neutral-500">Bloc ${escapeHtml(block.type)}</section>`;
     }
   }
 
-  private compilePromoAutoHall(props: Record<string, unknown>): string {
+  private compilePromoAutoHall(
+    props: Record<string, unknown>,
+    context?: LandingRenderContext,
+  ): string {
     const title = asString(props.title, 'Votre prochaine aventure');
     const subtitle = asString(
       props.subtitle,
@@ -179,9 +241,9 @@ ${body}
     );
     const formTitle = asString(props.formTitle, 'Demandez votre offre');
     const formSubtitle = asString(props.formSubtitle);
-    const imageUrl = asString(props.imageUrl);
-    const bgStyle = imageUrl
-      ? `background-image:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),url('${escapeHtml(imageUrl)}');background-size:cover;background-position:center;`
+    const imageSrc = resolveImageSrc(props, context);
+    const bgStyle = imageSrc
+      ? `background-image:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),url('${escapeHtml(imageSrc)}');background-size:cover;background-position:center;`
       : 'background:linear-gradient(135deg,#1e293b,#0f172a);';
 
     return `
@@ -226,14 +288,19 @@ ${body}
     </section>`;
   }
 
-  private compileHero(props: Record<string, unknown>): string {
+  private compileHero(
+    props: Record<string, unknown>,
+    context?: LandingRenderContext,
+  ): string {
     const title = asString(props.title, 'Titre principal');
     const subtitle = asString(props.subtitle);
     const buttonText = asString(props.buttonText);
     const buttonTarget = asString(props.buttonTarget, '#lead-form');
     const secondaryText = asString(props.secondaryButtonText);
     const secondaryTarget = asString(props.secondaryButtonTarget, '#offer');
-    const imageUrl = asString(props.imageUrl);
+    const imageSrc = resolveImageSrc(props, context);
+    const imageAlt = asString(props.alt, asString(props.imageAlt, title));
+    const fitClass = resolveObjectFitClass(props.objectFit);
 
     const actions: string[] = [];
     if (buttonText) {
@@ -255,7 +322,7 @@ ${body}
           ${subtitle ? `<p class="text-lg text-neutral-600">${escapeHtml(subtitle)}</p>` : ''}
           ${actions.length ? `<div class="flex flex-wrap gap-3">${actions.join('')}</div>` : ''}
         </div>
-        ${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="" class="w-full rounded-2xl object-cover shadow-lg" />` : ''}
+        ${imageSrc ? `<img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(imageAlt)}" class="w-full rounded-2xl shadow-lg ${fitClass}" />` : ''}
       </div>
     </section>`;
   }
@@ -289,7 +356,10 @@ ${body}
     const heading = asString(props.heading, 'Questions fréquentes');
     const items = Array.isArray(props.items) ? props.items : [];
     const itemsHtml = items
-      .filter((item): item is Record<string, unknown> => item !== null && typeof item === 'object')
+      .filter(
+        (item): item is Record<string, unknown> =>
+          item !== null && typeof item === 'object',
+      )
       .map(
         (item) => `
         <details class="rounded-lg border border-neutral-200 bg-white p-4">
@@ -312,7 +382,10 @@ ${body}
     const heading = asString(props.heading, 'Ils nous font confiance');
     const quotes = Array.isArray(props.quotes) ? props.quotes : [];
     const cards = quotes
-      .filter((q): q is Record<string, unknown> => q !== null && typeof q === 'object')
+      .filter(
+        (q): q is Record<string, unknown> =>
+          q !== null && typeof q === 'object',
+      )
       .map(
         (q) => `
         <blockquote class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
@@ -335,7 +408,10 @@ ${body}
     const heading = asString(props.heading, 'Finitions & financement');
     const trims = (Array.isArray(props.trims) ? props.trims : []).slice(0, 3);
     const cards = trims
-      .filter((t): t is Record<string, unknown> => t !== null && typeof t === 'object')
+      .filter(
+        (t): t is Record<string, unknown> =>
+          t !== null && typeof t === 'object',
+      )
       .map((trim, index) => {
         const featured = Boolean(trim.featured);
         const btnClass = featured
@@ -362,10 +438,16 @@ ${body}
   }
 
   private compileVehicleFeatures(props: Record<string, unknown>): string {
-    const heading = asString(props.heading, asString(props.title, 'Caractéristiques'));
+    const heading = asString(
+      props.heading,
+      asString(props.title, 'Caractéristiques'),
+    );
     const items = Array.isArray(props.items) ? props.items : [];
     const list = items
-      .filter((i): i is Record<string, unknown> => i !== null && typeof i === 'object')
+      .filter(
+        (i): i is Record<string, unknown> =>
+          i !== null && typeof i === 'object',
+      )
       .map(
         (item) => `
         <li class="rounded-xl border border-neutral-200 bg-white p-4">
@@ -396,24 +478,38 @@ ${body}
     </section>`;
   }
 
-  private compileMediaOnly(props: Record<string, unknown>): string {
-    const imageUrl = asString(props.imageUrl);
-    const alt = asString(props.alt, 'Visuel Auto Hall');
-    if (!imageUrl) return '';
+  private compileMediaOnly(
+    props: Record<string, unknown>,
+    context?: LandingRenderContext,
+  ): string {
+    const imageSrc = resolveImageSrc(props, context);
+    const alt = asString(props.alt, asString(props.imageAlt, 'Visuel Auto Hall'));
+    const fitClass = resolveObjectFitClass(props.objectFit);
+    if (!imageSrc) return '';
     return `
     <section class="px-6 py-8">
-      <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(alt)}" class="mx-auto max-w-5xl rounded-2xl shadow-lg" />
+      <img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(alt)}" class="mx-auto max-w-5xl rounded-2xl shadow-lg ${fitClass}" />
     </section>`;
   }
 
-  private compileGallery(props: Record<string, unknown>): string {
+  private compileGallery(
+    props: Record<string, unknown>,
+    context?: LandingRenderContext,
+  ): string {
     const images = Array.isArray(props.images) ? props.images : [];
     const cells = images
-      .filter((img): img is Record<string, unknown> => img !== null && typeof img === 'object')
-      .map(
-        (img) =>
-          `<img src="${escapeHtml(asString(img.url, asString(img.imageUrl)))}" alt="" class="h-48 w-full rounded-xl object-cover" />`,
+      .filter(
+        (img): img is Record<string, unknown> =>
+          img !== null && typeof img === 'object',
       )
+      .map((img) => {
+        const src = resolveImageSrc(img, context);
+        if (!src) return '';
+        const alt = asString(img.alt, 'Visuel galerie');
+        const fitClass = resolveObjectFitClass(img.objectFit);
+        return `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" class="h-48 w-full rounded-xl ${fitClass}" />`;
+      })
+      .filter(Boolean)
       .join('');
     return `
     <section class="px-6 py-12">
@@ -424,9 +520,12 @@ ${body}
   private compileVideoEmbed(props: Record<string, unknown>): string {
     const videoUrl = asString(props.videoUrl);
     if (!videoUrl) return '';
-    const embed = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')
-      ? videoUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')
-      : videoUrl;
+    const embed =
+      videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')
+        ? videoUrl
+            .replace('watch?v=', 'embed/')
+            .replace('youtu.be/', 'youtube.com/embed/')
+        : videoUrl;
     return `
     <section class="px-6 py-12">
       <div class="mx-auto aspect-video max-w-4xl overflow-hidden rounded-2xl shadow-lg">
@@ -437,7 +536,157 @@ ${body}
 
   private compileSpacer(props: Record<string, unknown>): string {
     const hauteur = asString(props.hauteur, 'M');
-    const heightMap: Record<string, string> = { S: '2rem', M: '4rem', L: '6rem', XL: '8rem' };
+    const heightMap: Record<string, string> = {
+      S: '2rem',
+      M: '4rem',
+      L: '6rem',
+      XL: '8rem',
+    };
     return `<div style="height:${heightMap[hauteur] ?? '4rem'}"></div>`;
+  }
+
+  private compileVehicleOffer(
+    props: Record<string, unknown>,
+    context?: LandingRenderContext,
+  ): string {
+    const modelName = asString(props.modelName);
+    const heading = asString(props.heading, modelName);
+    const subtitle = asString(props.subtitle);
+    const priceLabel = asString(props.priceLabel, 'À partir de');
+    const priceValue = asString(props.priceValue);
+    const buttonText = asString(props.buttonText, 'Demander une offre');
+    const imageSrc = resolveImageSrc(props, context);
+    const imageAlt = asString(props.alt, modelName || heading);
+    const fitClass = resolveObjectFitClass(props.objectFit);
+
+    return `
+    <section class="px-6 py-16">
+      <div class="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 lg:grid-cols-2">
+        <div class="space-y-4">
+          ${heading ? `<h2 class="text-3xl font-bold text-neutral-900">${escapeHtml(heading)}</h2>` : ''}
+          ${subtitle ? `<p class="text-neutral-600">${escapeHtml(subtitle)}</p>` : ''}
+          ${priceValue ? `<p class="text-lg"><span class="text-neutral-500">${escapeHtml(priceLabel)}</span> <strong class="text-2xl">${escapeHtml(priceValue)}</strong></p>` : ''}
+          <a href="#lead-form" class="inline-flex items-center justify-center rounded-xl px-6 py-3 text-sm font-semibold text-white" style="background:var(--primary)">${escapeHtml(buttonText)}</a>
+        </div>
+        ${imageSrc ? `<img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(imageAlt)}" class="w-full rounded-2xl shadow-lg ${fitClass}" />` : ''}
+      </div>
+    </section>`;
+  }
+
+  private compileVehicleRange(
+    props: Record<string, unknown>,
+    context?: LandingRenderContext,
+  ): string {
+    const heading = asString(props.heading);
+    const subtitle = asString(props.subtitle);
+    const vehicles = Array.isArray(props.vehicles) ? props.vehicles : [];
+    const cards = vehicles
+      .filter(
+        (v): v is Record<string, unknown> =>
+          v !== null && typeof v === 'object',
+      )
+      .map((vehicle) => {
+        const name = asString(vehicle.name);
+        if (!name) return '';
+        const energy = asString(vehicle.energy);
+        const imageSrc = resolveImageSrc(vehicle, context);
+        const imageAlt = asString(vehicle.alt, name);
+        const fitClass = resolveObjectFitClass(vehicle.objectFit);
+        const mediaHtml = imageSrc
+          ? `<img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(imageAlt)}" class="h-40 w-full rounded-t-xl ${fitClass}" />`
+          : `<div class="h-40 w-full rounded-t-xl bg-neutral-200"></div>`;
+        return `
+        <article class="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
+          ${mediaHtml}
+          <div class="space-y-2 p-4">
+            <h3 class="font-semibold text-neutral-900">${escapeHtml(name)}</h3>
+            ${energy ? `<p class="text-xs text-neutral-500">${escapeHtml(energy)}</p>` : ''}
+          </div>
+        </article>`;
+      })
+      .filter(Boolean)
+      .join('');
+
+    return `
+    <section class="bg-neutral-50 px-6 py-16">
+      <div class="mx-auto max-w-6xl space-y-8">
+        ${heading ? `<h2 class="text-center text-3xl font-bold text-neutral-900">${escapeHtml(heading)}</h2>` : ''}
+        ${subtitle ? `<p class="text-center text-neutral-600">${escapeHtml(subtitle)}</p>` : ''}
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-3">${cards}</div>
+      </div>
+    </section>`;
+  }
+
+  private compileBenefits(props: Record<string, unknown>): string {
+    const heading = asString(props.heading);
+    const items = Array.isArray(props.items) ? props.items : [];
+    const cards = items
+      .filter(
+        (i): i is Record<string, unknown> =>
+          i !== null && typeof i === 'object',
+      )
+      .map(
+        (item) => `
+        <article class="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+          <h3 class="font-semibold text-neutral-900">${escapeHtml(asString(item.title))}</h3>
+          <p class="mt-2 text-sm text-neutral-600">${escapeHtml(asString(item.description))}</p>
+        </article>`,
+      )
+      .join('');
+
+    return `
+    <section class="px-6 py-16">
+      <div class="mx-auto max-w-6xl space-y-8">
+        ${heading ? `<h2 class="text-center text-3xl font-bold text-neutral-900">${escapeHtml(heading)}</h2>` : ''}
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">${cards}</div>
+      </div>
+    </section>`;
+  }
+
+  private compileTrustBar(props: Record<string, unknown>): string {
+    const metrics = Array.isArray(props.metrics) ? props.metrics : [];
+    const cells = metrics
+      .filter(
+        (m): m is Record<string, unknown> =>
+          m !== null && typeof m === 'object',
+      )
+      .filter((m) => asString(m.value) || asString(m.label))
+      .map(
+        (metric) => `
+        <div class="text-center">
+          <p class="text-2xl font-bold text-neutral-900">${escapeHtml(asString(metric.value))}</p>
+          <p class="text-xs text-neutral-500">${escapeHtml(asString(metric.label))}</p>
+        </div>`,
+      )
+      .join('');
+    if (!cells) return '';
+
+    return `
+    <section class="border-y border-neutral-200 bg-white px-6 py-8">
+      <div class="mx-auto grid max-w-5xl grid-cols-2 gap-6 md:grid-cols-4">${cells}</div>
+    </section>`;
+  }
+
+  private compileFinalCta(
+    props: Record<string, unknown>,
+    context?: LandingRenderContext,
+  ): string {
+    const title = asString(props.title);
+    const subtitle = asString(props.subtitle);
+    const buttonText = asString(props.buttonText, 'Contactez-nous');
+    const buttonTarget = asString(props.buttonTarget, '#lead-form');
+    const bgImageSrc = resolveImageSrc(props, context);
+    const bgStyle = bgImageSrc
+      ? `background-image:linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,.6)),url('${escapeHtml(bgImageSrc)}');background-size:cover;background-position:center;`
+      : 'background:var(--primary)';
+
+    return `
+    <section class="px-6 py-16 text-white" style="${bgStyle}">
+      <div class="mx-auto max-w-3xl space-y-4 text-center">
+        ${title ? `<h2 class="text-3xl font-bold">${escapeHtml(title)}</h2>` : ''}
+        ${subtitle ? `<p class="text-white/90">${escapeHtml(subtitle)}</p>` : ''}
+        <a href="${escapeHtml(buttonTarget)}" class="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold shadow-lg" style="color:var(--primary)">${escapeHtml(buttonText)}</a>
+      </div>
+    </section>`;
   }
 }

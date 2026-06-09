@@ -40,8 +40,7 @@ async function bootstrap(): Promise<void> {
     configService.get<string>('CORS_ALLOWED_ORIGINS'),
   );
 
-  const isDevelopment =
-    configService.get<string>('NODE_ENV') !== 'production';
+  const isDevelopment = configService.get<string>('NODE_ENV') !== 'production';
 
   app.enableCors({
     origin: (

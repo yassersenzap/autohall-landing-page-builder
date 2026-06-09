@@ -88,7 +88,29 @@ export class PageVersionsService {
   }
 
   async findOne(landingPageId: string, id: string): Promise<PageVersionDetail> {
-    const pageVersion = await this.findPageVersionForLandingPage(landingPageId, id);
+    const pageVersion = await this.findPageVersionForLandingPage(
+      landingPageId,
+      id,
+    );
+    return this.toDetail(pageVersion);
+  }
+
+  async findOneById(id: string): Promise<PageVersionDetail> {
+    const pageVersion = await this.prisma.pageVersion.findUnique({
+      where: { id },
+      include: {
+        createdBy: { select: { id: true, fullName: true } },
+      },
+    });
+
+    if (!pageVersion) {
+      throw new NotFoundException({
+        success: false,
+        message: 'Page version not found',
+        code: 'PAGE_VERSION_NOT_FOUND',
+      });
+    }
+
     return this.toDetail(pageVersion);
   }
 
@@ -131,6 +153,30 @@ export class PageVersionsService {
     });
 
     return this.toListItem(pageVersion);
+  }
+
+  async updateById(
+    id: string,
+    dto: UpdatePageVersionDto,
+  ): Promise<PageVersionDetail> {
+    await this.findOneById(id);
+
+    const pageVersion = await this.prisma.pageVersion.update({
+      where: { id },
+      data: {
+        label: dto.label === undefined ? undefined : dto.label?.trim() || null,
+        status: dto.status,
+        themeJson:
+          dto.themeJson === undefined
+            ? undefined
+            : (dto.themeJson as Prisma.InputJsonValue),
+      },
+      include: {
+        createdBy: { select: { id: true, fullName: true } },
+      },
+    });
+
+    return this.toDetail(pageVersion);
   }
 
   async publish(pageVersionId: string): Promise<PublishedPageVersionResult> {

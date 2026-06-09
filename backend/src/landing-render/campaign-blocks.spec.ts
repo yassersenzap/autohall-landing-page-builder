@@ -24,7 +24,10 @@ describe('Auto Hall campaign render', () => {
 
   it('detects missing consent label', () => {
     expect(
-      leadFormHasConsent({ formConfig: { showConsent: true }, consentLabel: '' }),
+      leadFormHasConsent({
+        formConfig: { showConsent: true },
+        consentLabel: '',
+      }),
     ).toBe(false);
   });
 
@@ -49,7 +52,14 @@ describe('Auto Hall campaign render', () => {
       sortOrder: 2,
       propsJson: {
         heading: 'Gamme',
-        vehicles: [{ name: 'Modèle HEV', energy: 'HEV', tag: 'Nouveauté', ctaText: 'Découvrir' }],
+        vehicles: [
+          {
+            name: 'Modèle HEV',
+            energy: 'HEV',
+            tag: 'Nouveauté',
+            ctaText: 'Découvrir',
+          },
+        ],
       },
     });
     expect(html).toContain('lp-vehicle-range');
@@ -59,7 +69,8 @@ describe('Auto Hall campaign render', () => {
   it('renders full vehicle offer page with asset and lead form', () => {
     const assetMap: RenderAssetMap = {
       'asset-hero-1': {
-        previewUrl: 'https://api.example.com/api/public/assets/asset-hero-1/file',
+        previewUrl:
+          'https://api.example.com/api/public/assets/asset-hero-1/file',
         exportPath: 'assets/images/hero-demo.webp',
         storagePath: 'hero-demo.webp',
         storedName: 'hero-demo.webp',
@@ -69,7 +80,11 @@ describe('Auto Hall campaign render', () => {
     };
 
     const html = buildLandingDocumentHtml({
-      shell: { title: 'Offre véhicule', campaignName: 'Campagne démo', brand: 'Auto Hall' },
+      shell: {
+        title: 'Offre véhicule',
+        campaignName: 'Campagne démo',
+        brand: 'Auto Hall',
+      },
       themeJson: {
         page: {
           seo: { title: 'Offre véhicule', description: 'Description SEO' },
@@ -96,7 +111,11 @@ describe('Auto Hall campaign render', () => {
             title: 'Contact',
             submitText: 'Envoyer',
             consentLabel: 'J’accepte le traitement de mes données.',
-            formConfig: { showConsent: true, showCity: true, useSplitName: true },
+            formConfig: {
+              showConsent: true,
+              showCity: true,
+              useSplitName: true,
+            },
           },
         },
       ],
