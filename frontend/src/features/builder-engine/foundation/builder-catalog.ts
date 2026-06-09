@@ -59,9 +59,9 @@ const BLOCK_ICONS: Record<string, LucideIcon> = {
 const SIDEBAR_LABELS: Record<string, string> = {
   promo_autohall: 'Hero acquisition (split + lead)',
   hero_campaign: 'Bannière campagne',
-  hero_form_campaign: 'Bannière + formulaire',
+  hero_form_campaign: 'Section hero + formulaire lead',
   lead_form: 'Formulaire de capture',
-  vehicle_offer: 'Fiche offre véhicule',
+  vehicle_offer: 'Section offre véhicule complète',
   vehicle_features: 'Caractéristiques véhicule',
   vehicle_range: 'Gamme véhicules',
   gallery: 'Galerie photos',

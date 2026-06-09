@@ -1,5 +1,5 @@
 import type { RenderAssetMap } from '../landing-render/render-asset.types';
-import { STATIC_LEAD_FORM_JS } from '../page-export/static-export.builder';
+import { STATIC_LEAD_FORM_JS, STATIC_STYLE_CSS } from '../page-export/static-export.builder';
 
 export type BuilderV3ZipTextEntry = {
   kind: 'text';
@@ -22,6 +22,7 @@ export function buildBuilderV3ZipEntries(input: {
 }): BuilderV3ZipEntry[] {
   const entries: BuilderV3ZipEntry[] = [
     { kind: 'text', path: 'index.html', content: input.indexHtml },
+    { kind: 'text', path: 'assets/style.css', content: STATIC_STYLE_CSS },
     {
       kind: 'text',
       path: 'js/landing-config.js',

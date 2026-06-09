@@ -109,7 +109,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
   {
     type: 'hero_form_campaign',
     label: 'Hero + Formulaire',
-    description: 'Section campagne avec contenu et formulaire côte à côte.',
+    description: 'Section complète : message campagne + formulaire lead côte à côte.',
     category: 'hero',
     availability: 'stable',
     icon: '⊞',
@@ -125,7 +125,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
   {
     type: 'vehicle_offer',
     label: 'Offre véhicule',
-    description: 'Modèle, prix et points clés de l’offre.',
+    description: 'Section complète : visuel, prix, points clés et CTA pour une offre véhicule.',
     category: 'content',
     availability: 'stable',
     icon: '★',

@@ -8,7 +8,6 @@ import {
   buildAutoHallLeadFormFields,
 } from './autohall-lead-form';
 import {
-  DEFAULT_CTA_DESIGN,
   DEFAULT_FORM_DESIGN,
   DEFAULT_HERO_DESIGN,
 } from './default-block-design';
@@ -119,28 +118,43 @@ function heroFormDesign(variant: HeroFormCampaignVariant): Record<string, unknow
   }
 }
 
+const DEFAULT_PREMIUM_DESIGN = {
+  variant: 'split-form',
+  tone: 'light',
+  mediaPosition: 'right',
+  density: 'comfortable',
+  imageShape: 'rounded-card',
+  ctaStyle: 'primary',
+} as const;
+
 export function buildHeroFormCampaignDefaults(
-  variant: HeroFormCampaignVariant = 'sav_light_form',
+  variant: HeroFormCampaignVariant = 'text_left_form_right',
   overrides: Record<string, unknown> = {},
 ): Record<string, unknown> {
-  const isSav = variant === 'sav_light_form';
   return {
     layoutVariant: variant,
-    campaignType: isSav ? 'sav' : 'promo',
-    eyebrow: isSav ? 'Service Auto Hall' : '',
-    title: '',
-    subtitle: '',
-    promoBadge: '',
+    campaignType: 'promo',
+    eyebrow: 'Auto Hall',
+    title: 'Réservez votre essai en concession',
+    subtitle:
+      'Découvrez nos offres du moment et bénéficiez de l’accompagnement de nos conseillers.',
+    promoBadge: 'Offre du moment',
     buttonText: '',
     buttonTarget: '#lead-form',
     imageAssetId: '',
     imageUrl: '',
-    alt: '',
-    design: heroFormDesign(variant),
+    alt: 'Véhicule en promotion Auto Hall',
+    legalNote: 'Offre soumise à conditions. Photos non contractuelles.',
+    trustItems: [
+      'Un conseiller Auto Hall vous accompagne sous 24h',
+      'Essai en concession sans engagement',
+      'Financements adaptés à votre projet',
+    ],
+    design: { ...DEFAULT_PREMIUM_DESIGN, ...heroFormDesign(variant) },
     form: {
-      title: isSav ? 'Demande SAV' : 'Contactez-nous',
-      subtitle: '',
-      submitText: 'Envoyer votre demande',
+      title: 'Demandez votre offre personnalisée',
+      subtitle: 'Un conseiller vous recontacte sous 24 h ouvrées.',
+      submitText: 'Envoyer ma demande',
       privacyNote:
         'Conformément à la loi 09-08, vous disposez d’un droit d’accès et de rectification de vos données.',
       consentLabel: DEFAULT_AUTOHALL_CONSENT_LABEL,
@@ -159,19 +173,36 @@ export function buildVehicleOfferDefaults(
 ): Record<string, unknown> {
   return {
     layoutVariant: variant,
-    modelName: '',
-    heading: '',
-    subtitle: '',
+    modelName: 'Nouveau modèle',
+    heading: 'Découvrez nos offres du moment',
+    subtitle: 'Performance, confort et technologies au service de votre mobilité.',
     priceLabel: 'À partir de',
-    priceValue: '',
-    buttonText: '',
+    priceValue: '299 900 DH',
+    monthlyValue: 'ou 3 499 DH / mois',
+    buttonText: 'Demander une offre',
     buttonTarget: '#lead-form',
-    legalNote: '',
+    legalNote: 'Offre soumise à conditions. Photos non contractuelles.',
     imageAssetId: '',
     imageUrl: '',
-    alt: '',
-    highlights: [],
-    design: { ...DEFAULT_CTA_DESIGN },
+    alt: 'Véhicule en promotion Auto Hall',
+    highlights: [
+      {
+        title: 'Garantie constructeur',
+        description: 'Tranquillité sur le long terme.',
+      },
+      {
+        title: 'Financement sur mesure',
+        description: 'Solutions adaptées à votre budget.',
+      },
+      {
+        title: 'Essai en concession',
+        description: 'Réservez votre créneau en ligne.',
+      },
+    ],
+    design: {
+      ...DEFAULT_PREMIUM_DESIGN,
+      mediaPosition: 'left',
+    },
     ...overrides,
   };
 }
@@ -244,7 +275,7 @@ export function buildGalleryDefaults(
 export const CAMPAIGN_BLOCK_NEUTRAL_DEFAULTS: Record<string, Record<string, unknown>> = {
   promo_autohall: buildPromoAutoHallDefaults(),
   hero_campaign: buildHeroCampaignDefaults('promo_image_right'),
-  hero_form_campaign: buildHeroFormCampaignDefaults('sav_light_form'),
+  hero_form_campaign: buildHeroFormCampaignDefaults('text_left_form_right'),
   vehicle_offer: buildVehicleOfferDefaults('image_right_offer_left'),
   vehicle_features: buildVehicleFeaturesDefaults(),
   gallery: buildGalleryDefaults(),

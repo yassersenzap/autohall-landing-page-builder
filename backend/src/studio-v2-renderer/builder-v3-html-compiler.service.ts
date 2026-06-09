@@ -1,10 +1,27 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import {
   buildLeadFormFieldSpecs,
   type LeadFormFieldSpec,
 } from '../landing-render/lead-form-fields.builder';
+import { renderBlockHtml } from '../landing-render/block-renderer';
 import { resolveHeroImageSrc } from '../landing-render/render-asset.resolve';
 import type { LandingRenderContext } from '../landing-render/render-asset.types';
+
+const LANDING_RENDER_BLOCK_TYPES = new Set([
+  'hero_form_campaign',
+  'promo_autohall',
+  'vehicle_offer',
+  'lead_form',
+  'final_cta',
+  'hero_campaign',
+  'trust_bar',
+  'benefits',
+  'faq',
+  'testimonials',
+  'footer_legal',
+  'vehicle_range',
+]);
 
 export type BuilderV3CompileBlock = {
   type: string;
@@ -156,24 +173,26 @@ export class BuilderV3HtmlCompilerService {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${title}</title>
   <meta name="description" content="${description}" />${ogImageTag}${faviconTag}
+  <link rel="stylesheet" href="assets/style.css" />
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root {
+      --lp-primary: ${escapeHtml(input.primaryColor)};
+      --lp-primary-hover: ${escapeHtml(input.primaryColor)};
+      --lp-display-font: "${escapeHtml(input.headingFont)}", system-ui, sans-serif;
+      --lp-font: "${escapeHtml(input.bodyFont)}", system-ui, sans-serif;
       --primary: ${escapeHtml(input.primaryColor)};
-      --primary-hover: ${escapeHtml(input.primaryColor)};
-      --font-heading: "${escapeHtml(input.headingFont)}", system-ui, sans-serif;
-      --font-body: "${escapeHtml(input.bodyFont)}", system-ui, sans-serif;
+      --font-heading: var(--lp-display-font);
+      --font-body: var(--lp-font);
     }
-    body { font-family: var(--font-body); color: #171717; background: #fff; }
-    h1, h2, h3 { font-family: var(--font-heading); }
-    .lp-lead-form__feedback.is-success { color: #15803d; }
-    .lp-lead-form__feedback.is-error { color: #b91c1c; }
   </style>
 </head>
 <body class="min-h-screen antialiased">
-  <main class="w-full">
+  <article class="lp-document" style="--lp-primary:${escapeHtml(input.primaryColor)};--lp-display-font:var(--font-heading);--lp-font:var(--font-body);">
+  <main class="lp-page w-full">
 ${body}
   </main>
+  </article>
   <script src="js/landing-config.js"></script>
   <script src="js/lead-form.js"></script>
 </body>
@@ -184,6 +203,17 @@ ${body}
     block: BuilderV3CompileBlock,
     context?: LandingRenderContext,
   ): string {
+    if (LANDING_RENDER_BLOCK_TYPES.has(block.type)) {
+      return renderBlockHtml(
+        {
+          blockType: block.type,
+          sortOrder: block.sortOrder ?? 0,
+          propsJson: block.propsJson as Prisma.JsonValue,
+        },
+        context,
+      );
+    }
+
     const props = block.propsJson ?? {};
     switch (block.type) {
       case 'promo_autohall':
