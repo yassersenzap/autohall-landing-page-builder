@@ -58,13 +58,14 @@ export type EditorPageBlock = {
 };
 
 export type EditorCreateBlockPayload = {
-  blockType: EditorBlockType;
+  blockType: EditorBlockType | string;
   propsJson: Record<string, unknown>;
   sortOrder?: number;
+  blockKey?: string;
 };
 
 export type EditorUpdateBlockPayload = {
-  blockType?: EditorBlockType;
+  blockType?: EditorBlockType | string;
   sortOrder?: number;
   propsJson?: Record<string, unknown>;
 };

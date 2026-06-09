@@ -1,7 +1,17 @@
 export const ALLOWED_BLOCK_TYPES = [
+  'promo_autohall',
   'hero_campaign',
   'hero_form_campaign',
   'vehicle_offer',
+  'vehicle_features',
+  'vehicle_range',
+  'gallery',
+  'rich_text',
+  'media_only',
+  'spacer_divider',
+  'video_embed',
+  'cta_band',
+  'pricing_trim',
   'hero',
   'trust_bar',
   'text',
@@ -17,7 +27,6 @@ export const ALLOWED_BLOCK_TYPES = [
   'faq',
   'final_cta',
   'footer_legal',
-  'vehicle_range',
 ] as const;
 
 export type AllowedBlockType = (typeof ALLOWED_BLOCK_TYPES)[number];

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
+import { assetPublicFileUrl } from '@/lib/page-assets-api';
 import { getDefaultBlockProps } from '../constants/default-block-props';
 import { getRegistryEntry } from '../registry/block-registry';
 import { getActivePaletteBlocks } from '../registry/block-registry';
@@ -73,14 +74,18 @@ export type PageSettingsDraft = {
   metaTitle: string;
   metaDescription: string;
   ogImageUrl: string;
+  ogImageAssetId?: string;
   faviconUrl: string;
+  faviconAssetId?: string;
 };
 
 export const DEFAULT_PAGE_SETTINGS: PageSettingsDraft = {
   metaTitle: '',
   metaDescription: '',
   ogImageUrl: '',
+  ogImageAssetId: '',
   faviconUrl: '',
+  faviconAssetId: '',
 };
 
 const DEFAULT_PAGE_THEME: PageThemeDraft = {
@@ -96,6 +101,14 @@ const DEFAULT_PAGE_THEME: PageThemeDraft = {
   seoTitle: '',
   seoDescription: '',
 };
+
+function resolvePersistedMediaUrl(assetId?: string, url?: string): string {
+  const normalizedAssetId = assetId?.trim();
+  if (normalizedAssetId) {
+    return assetPublicFileUrl(normalizedAssetId);
+  }
+  return url?.trim() ?? '';
+}
 
 type BuilderDocumentState = {
   blocks: BuilderDocumentBlock[];
@@ -130,6 +143,11 @@ type BuilderDocumentState = {
     pageSettings?: PageSettingsDraft;
     themeDirty: boolean;
     selectedBlockId: string | null;
+  }) => void;
+  applyServerSnapshot: (payload: {
+    blocks: BuilderDocumentBlock[];
+    pageTheme: PageThemeDraft;
+    pageSettings: PageSettingsDraft;
   }) => void;
   buildThemeJsonPayload: () => Record<string, unknown>;
   applyPageStarter: (blockTypes: string[], mode?: 'replace' | 'append') => void;
@@ -378,6 +396,18 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
         });
       },
 
+      applyServerSnapshot: (payload) => {
+        const blocks = normalizeSortOrder([...payload.blocks]);
+        const selection = sanitizeBlockSelection(blocks, get().selectedBlockId, null);
+        set({
+          blocks,
+          pageTheme: payload.pageTheme,
+          pageSettings: payload.pageSettings,
+          themeDirty: false,
+          ...selection,
+        });
+      },
+
       buildThemeJsonPayload: () => {
         const { pageTheme, pageSettings } = get();
         return {
@@ -396,8 +426,16 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
             seo: {
               title: pageSettings.metaTitle || pageTheme.seoTitle,
               description: pageSettings.metaDescription || pageTheme.seoDescription,
-              ogImageUrl: pageSettings.ogImageUrl,
-              faviconUrl: pageSettings.faviconUrl,
+              ogImageUrl: resolvePersistedMediaUrl(
+                pageSettings.ogImageAssetId,
+                pageSettings.ogImageUrl,
+              ),
+              faviconUrl: resolvePersistedMediaUrl(
+                pageSettings.faviconAssetId,
+                pageSettings.faviconUrl,
+              ),
+              ogImageAssetId: pageSettings.ogImageAssetId ?? '',
+              faviconAssetId: pageSettings.faviconAssetId ?? '',
             },
           },
         };
@@ -491,10 +529,39 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
   ),
 );
 
-/** Hydratation forcée au montage — lie la clé pageVersionId puis restaure localStorage. */
+/** Hydratation au montage — serveur prioritaire, draft local en fallback. */
 export async function hydrateBuilderDocumentStore(pageVersionId: string): Promise<void> {
   setBuilderPersistPageVersionId(pageVersionId);
-  await useBuilderDocumentStore.persist.rehydrate();
+
+  const { loadBuilderDocumentFromApi } = await import('../lib/load-builder-document');
+  const loaded = await loadBuilderDocumentFromApi(pageVersionId);
+  const store = useBuilderDocumentStore.getState();
+
+  if (loaded.source === 'server') {
+    store.applyServerSnapshot({
+      blocks: loaded.blocks,
+      pageTheme: loaded.pageTheme,
+      pageSettings: loaded.pageSettings,
+    });
+  } else if (loaded.source === 'localDraft') {
+    store.restoreLocalDraft({
+      blocks: loaded.blocks,
+      pageTheme: loaded.pageTheme,
+      pageSettings: loaded.pageSettings,
+      themeDirty: true,
+      selectedBlockId: null,
+    });
+  } else if (loaded.blocks.length > 0) {
+    store.setInitialBlocks(loaded.blocks);
+    store.setInitialPageTheme(loaded.pageTheme);
+    store.setInitialPageSettings(loaded.pageSettings);
+  } else {
+    await useBuilderDocumentStore.persist.rehydrate();
+    store.setInitialPageTheme(loaded.pageTheme);
+    store.setInitialPageSettings(loaded.pageSettings);
+  }
+
+  forcePersistBuilderDocument();
 }
 
 /** Écrit immédiatement l'état courant dans localStorage (double sécurité au clic Sauvegarder). */

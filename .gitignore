@@ -99,7 +99,9 @@ temp/
 *.tmp
 *.temp
 .playwright-cli/
+# Local / AI-private docs (keep docs/architecture, docs/mvp, etc. versionable)
 docs-private/
+docs/ai-handoff/
 
 # Playwright / browser automation artefacts
 playwright/.cache/

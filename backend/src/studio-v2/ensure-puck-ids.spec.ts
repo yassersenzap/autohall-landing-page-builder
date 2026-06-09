@@ -16,7 +16,9 @@ describe('ensurePuckIds', () => {
       ],
     });
 
-    const section = (withIds.content as Array<{ props: { id?: string; items: unknown[] } }>)[0];
+    const section = (
+      withIds.content as Array<{ props: { id?: string; items: unknown[] } }>
+    )[0];
     expect(section.props.id).toBeTruthy();
     const hero = section.props.items[0] as { props: { id?: string } };
     expect(hero.props.id).toBeTruthy();

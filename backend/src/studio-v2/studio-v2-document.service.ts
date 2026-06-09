@@ -85,7 +85,11 @@ export class StudioV2DocumentService {
   }
 
   private assertValidDocumentJson(documentJson: Record<string, unknown>): void {
-    if (!documentJson || typeof documentJson !== 'object' || Array.isArray(documentJson)) {
+    if (
+      !documentJson ||
+      typeof documentJson !== 'object' ||
+      Array.isArray(documentJson)
+    ) {
       throw new BadRequestException('documentJson must be a JSON object.');
     }
     if (!('content' in documentJson) || !Array.isArray(documentJson.content)) {
@@ -109,7 +113,9 @@ export class StudioV2DocumentService {
     if (error instanceof Error) {
       return error;
     }
-    return new InternalServerErrorException('Studio V2 document persistence failed.');
+    return new InternalServerErrorException(
+      'Studio V2 document persistence failed.',
+    );
   }
 
   private async ensurePageVersionExists(pageVersionId: string): Promise<void> {

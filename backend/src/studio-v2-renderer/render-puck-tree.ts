@@ -65,9 +65,13 @@ export function createRenderContext(
 
     switch (node.type) {
       case 'Section':
-        return renderSection(props, (p) => renderSlotChildren(p, 'items', ctx.renderNode));
+        return renderSection(props, (p) =>
+          renderSlotChildren(p, 'items', ctx.renderNode),
+        );
       case 'Container':
-        return renderContainer(props, (p) => renderSlotChildren(p, 'items', ctx.renderNode));
+        return renderContainer(props, (p) =>
+          renderSlotChildren(p, 'items', ctx.renderNode),
+        );
       case 'Columns':
         return renderColumns(props, (p) => '', ctx);
       case 'Spacer':

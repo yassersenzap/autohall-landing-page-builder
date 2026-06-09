@@ -1,6 +1,8 @@
 import type { PuckDocument } from './types';
 
-export function extractUsedAssetIdsFromPuckDocument(document: PuckDocument): string[] {
+export function extractUsedAssetIdsFromPuckDocument(
+  document: PuckDocument,
+): string[] {
   const ids = new Set<string>();
 
   function walk(value: unknown): void {

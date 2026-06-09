@@ -6,7 +6,9 @@ import {
 import { escapeHtml } from '../escape-html';
 import type { StudioV2RenderContext } from '../types';
 
-function mapV2PropsToLeadFormProps(props: Record<string, unknown>): Record<string, unknown> {
+function mapV2PropsToLeadFormProps(
+  props: Record<string, unknown>,
+): Record<string, unknown> {
   const splitFullName = props.splitFullName !== false;
   return {
     title: props.title,

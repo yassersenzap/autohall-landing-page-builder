@@ -83,7 +83,9 @@ export class AuthService {
     };
   }
 
-  async validateJwtPayload(payload: JwtPayload): Promise<AuthenticatedUser | null> {
+  async validateJwtPayload(
+    payload: JwtPayload,
+  ): Promise<AuthenticatedUser | null> {
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
     });
@@ -136,9 +138,9 @@ export class AuthService {
     let payload: JwtPayload & { purpose?: string };
 
     try {
-      payload = await this.jwtService.verifyAsync<JwtPayload & { purpose?: string }>(
-        dto.token,
-      );
+      payload = await this.jwtService.verifyAsync<
+        JwtPayload & { purpose?: string }
+      >(dto.token);
     } catch {
       throw new BadRequestException({
         success: false,
@@ -155,7 +157,9 @@ export class AuthService {
       });
     }
 
-    const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
+    const user = await this.prisma.user.findUnique({
+      where: { id: payload.sub },
+    });
 
     if (!user || !user.isActive) {
       throw new BadRequestException({

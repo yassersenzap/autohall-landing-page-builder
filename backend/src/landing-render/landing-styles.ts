@@ -55,9 +55,7 @@ export function resolveLandingPageStylesheetPath(): string {
   }
 
   const tried = candidates.map((p) => `  - ${p}`).join('\n');
-  throw new Error(
-    `landing-page.css introuvable. Chemins testés :\n${tried}`,
-  );
+  throw new Error(`landing-page.css introuvable. Chemins testés :\n${tried}`);
 }
 
 export function getLandingPageStylesheet(): string {

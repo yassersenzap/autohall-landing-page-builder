@@ -26,7 +26,9 @@ type HistoryRow = {
   changedBy: { fullName: string } | null;
 };
 
-export function toLeadStatusHistoryItem(row: HistoryRow): LeadStatusHistoryItem {
+export function toLeadStatusHistoryItem(
+  row: HistoryRow,
+): LeadStatusHistoryItem {
   return {
     id: row.id,
     leadEventId: row.leadEventId,

@@ -57,7 +57,9 @@ export class AssetsController {
   @Roles(...WRITE_ROLES)
   @Delete(':assetId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('assetId', ParseUUIDPipe) assetId: string): Promise<void> {
+  async remove(
+    @Param('assetId', ParseUUIDPipe) assetId: string,
+  ): Promise<void> {
     await this.pageAssetsService.deleteAsset(assetId);
   }
 }

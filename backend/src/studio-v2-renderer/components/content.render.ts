@@ -42,7 +42,9 @@ export function renderVehicleOffer(
       : '';
   const highlights = Array.isArray(props.highlights)
     ? `<ul class="vs2-offer__highlights">${props.highlights
-        .filter((h): h is string => typeof h === 'string' && h.trim().length > 0)
+        .filter(
+          (h): h is string => typeof h === 'string' && h.trim().length > 0,
+        )
         .map((h) => `<li>${escapeHtml(h.trim())}</li>`)
         .join('')}</ul>`
     : '';
@@ -59,8 +61,10 @@ export function renderVehicleRange(
   props: Record<string, unknown>,
   ctx: StudioV2RenderContext,
 ): string {
-  const columns = props.columns === 2 || props.columns === 4 ? props.columns : 3;
-  const cardStyle = typeof props.cardStyle === 'string' ? props.cardStyle : 'clean';
+  const columns =
+    props.columns === 2 || props.columns === 4 ? props.columns : 3;
+  const cardStyle =
+    typeof props.cardStyle === 'string' ? props.cardStyle : 'clean';
   const title =
     typeof props.title === 'string' && props.title.trim()
       ? `<h2 class="vs2-range__title">${escapeHtml(props.title.trim())}</h2>`
@@ -72,7 +76,9 @@ export function renderVehicleRange(
 
   const vehicles = Array.isArray(props.vehicles) ? props.vehicles : [];
   const cards = vehicles
-    .filter((v): v is Record<string, unknown> => v !== null && typeof v === 'object')
+    .filter(
+      (v): v is Record<string, unknown> => v !== null && typeof v === 'object',
+    )
     .map((vehicle) => {
       const name =
         typeof vehicle.name === 'string' && vehicle.name.trim()
@@ -115,7 +121,10 @@ export function renderBenefits(props: Record<string, unknown>): string {
 
   const items = Array.isArray(props.items) ? props.items : [];
   const cards = items
-    .filter((item): item is Record<string, unknown> => item !== null && typeof item === 'object')
+    .filter(
+      (item): item is Record<string, unknown> =>
+        item !== null && typeof item === 'object',
+    )
     .map((item) => {
       const iconRaw = typeof item.icon === 'string' ? item.icon : 'check';
       const icon = BENEFIT_ICONS.has(iconRaw) ? iconRaw : 'check';
@@ -143,7 +152,10 @@ export function renderFaq(props: Record<string, unknown>): string {
   const openFirst = props.defaultOpenFirst === true;
 
   const entries = items
-    .filter((item): item is Record<string, unknown> => item !== null && typeof item === 'object')
+    .filter(
+      (item): item is Record<string, unknown> =>
+        item !== null && typeof item === 'object',
+    )
     .map((item, index) => {
       const question =
         typeof item.question === 'string' && item.question.trim()
@@ -192,10 +204,15 @@ export function renderFooterLegal(props: Record<string, unknown>): string {
       : '';
   const links = Array.isArray(props.links)
     ? `<nav class="vs2-footer__links">${props.links
-        .filter((l): l is Record<string, unknown> => l !== null && typeof l === 'object')
+        .filter(
+          (l): l is Record<string, unknown> =>
+            l !== null && typeof l === 'object',
+        )
         .map((link) => {
           const label =
-            typeof link.label === 'string' && link.label.trim() ? link.label.trim() : '';
+            typeof link.label === 'string' && link.label.trim()
+              ? link.label.trim()
+              : '';
           const href = typeof link.href === 'string' ? link.href : '#';
           if (!label) return '';
           return `<a href="${safeHref(href)}">${escapeHtml(label)}</a>`;
@@ -223,7 +240,10 @@ export function renderStepsBlock(props: Record<string, unknown>): string {
 
   const steps = Array.isArray(props.steps) ? props.steps : [];
   const items = steps
-    .filter((item): item is Record<string, unknown> => item !== null && typeof item === 'object')
+    .filter(
+      (item): item is Record<string, unknown> =>
+        item !== null && typeof item === 'object',
+    )
     .map((step, index) => {
       const stepTitle =
         typeof step.title === 'string' && step.title.trim()
@@ -264,7 +284,10 @@ export function renderSlotChildren(
   return slot
     .filter(
       (node): node is PuckNode =>
-        node !== null && typeof node === 'object' && 'type' in node && 'props' in node,
+        node !== null &&
+        typeof node === 'object' &&
+        'type' in node &&
+        'props' in node,
     )
     .map((node) => renderNode(node))
     .join('');

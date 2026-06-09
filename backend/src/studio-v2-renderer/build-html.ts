@@ -1,8 +1,15 @@
 import { buildTokenCss, resolveDesignTokens } from './design-tokens';
 import { escapeHtml } from './escape-html';
-import { createRenderContext, renderPuckDocumentHtml } from './render-puck-tree';
+import {
+  createRenderContext,
+  renderPuckDocumentHtml,
+} from './render-puck-tree';
 import { STUDIO_V2_LANDING_CSS } from './studio-v2-landing.css';
-import type { PuckDocument, StudioV2AssetMap, StudioV2RenderMode } from './types';
+import type {
+  PuckDocument,
+  StudioV2AssetMap,
+  StudioV2RenderMode,
+} from './types';
 
 export type BuildStudioV2HtmlInput = {
   document: PuckDocument;
@@ -14,7 +21,7 @@ export type BuildStudioV2HtmlInput = {
 };
 
 export function buildStudioV2Html(input: BuildStudioV2HtmlInput): string {
-  const tokens = resolveDesignTokens(input.document.root?.props as Record<string, unknown>);
+  const tokens = resolveDesignTokens(input.document.root?.props);
   const tokenCss = buildTokenCss(tokens);
   const ctx = createRenderContext({
     mode: input.mode,
@@ -33,10 +40,9 @@ export function buildStudioV2Html(input: BuildStudioV2HtmlInput): string {
       ? `<meta name="description" content="${escapeHtml(seo.description.trim())}" />`
       : '';
 
-  const stylesheet =
-    input.stylesheetHref
-      ? `<link rel="stylesheet" href="${escapeHtml(input.stylesheetHref)}" />`
-      : `<style>${tokenCss}\n${STUDIO_V2_LANDING_CSS}</style>`;
+  const stylesheet = input.stylesheetHref
+    ? `<link rel="stylesheet" href="${escapeHtml(input.stylesheetHref)}" />`
+    : `<style>${tokenCss}\n${STUDIO_V2_LANDING_CSS}</style>`;
 
   const scripts = input.includeScripts
     ? `<script src="js/landing-config.js"></script><script src="js/lead-form.js"></script>`
@@ -59,6 +65,6 @@ export function buildStudioV2Html(input: BuildStudioV2HtmlInput): string {
 }
 
 export function buildStudioV2ExportStyleCss(document: PuckDocument): string {
-  const tokens = resolveDesignTokens(document.root?.props as Record<string, unknown>);
+  const tokens = resolveDesignTokens(document.root?.props);
   return `${buildTokenCss(tokens)}\n${STUDIO_V2_LANDING_CSS}`;
 }

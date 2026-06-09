@@ -77,7 +77,10 @@ export function isFollowUpOverdue(
   if (!nextFollowUpAt) {
     return false;
   }
-  if (status === LeadEventStatus.ARCHIVED || status === LeadEventStatus.REJECTED) {
+  if (
+    status === LeadEventStatus.ARCHIVED ||
+    status === LeadEventStatus.REJECTED
+  ) {
     return false;
   }
   return nextFollowUpAt.getTime() < Date.now();
@@ -96,7 +99,9 @@ export function toLeadAssigneeSummary(
   };
 }
 
-export function toLeadEventDetail(item: LeadEventWithRelations): LeadEventDetail {
+export function toLeadEventDetail(
+  item: LeadEventWithRelations,
+): LeadEventDetail {
   return {
     id: item.id,
     campaignId: item.campaignId,

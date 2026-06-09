@@ -6,7 +6,8 @@ export function renderHeroAutoHall(
   props: Record<string, unknown>,
   ctx: StudioV2RenderContext,
 ): string {
-  const layout = typeof props.layout === 'string' ? props.layout : 'split_right';
+  const layout =
+    typeof props.layout === 'string' ? props.layout : 'split_right';
   const tone = typeof props.tone === 'string' ? props.tone : 'brand';
   const align = props.alignment === 'center' ? 'center' : 'left';
 
@@ -35,15 +36,21 @@ export function renderHeroAutoHall(
         : '';
 
   const ctaSecondary =
-    typeof props.ctaSecondaryLabel === 'string' && props.ctaSecondaryLabel.trim()
+    typeof props.ctaSecondaryLabel === 'string' &&
+    props.ctaSecondaryLabel.trim()
       ? `<a class="vs2-hero__cta vs2-hero__cta--secondary" href="${safeHref(String(props.ctaSecondaryHref ?? '#'))}">${escapeHtml(props.ctaSecondaryLabel.trim())}</a>`
       : '';
 
   const badges =
     props.showBadges && Array.isArray(props.badges)
       ? `<div class="vs2-hero__badges">${props.badges
-          .filter((b): b is string => typeof b === 'string' && b.trim().length > 0)
-          .map((b) => `<span class="vs2-hero__badge-item">${escapeHtml(b.trim())}</span>`)
+          .filter(
+            (b): b is string => typeof b === 'string' && b.trim().length > 0,
+          )
+          .map(
+            (b) =>
+              `<span class="vs2-hero__badge-item">${escapeHtml(b.trim())}</span>`,
+          )
           .join('')}</div>`
       : '';
 

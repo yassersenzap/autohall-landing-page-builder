@@ -1,8 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
-import {
-  extractExtension,
-  validateUploadFile,
-} from './asset-upload.policy';
+import { extractExtension, validateUploadFile } from './asset-upload.policy';
 
 describe('asset-upload.policy', () => {
   const maxBytes = 5_242_880;

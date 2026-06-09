@@ -14,7 +14,9 @@ const DEFAULT_PRIMARY = '#b91c1c';
 const DEFAULT_FONT =
   "'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
 
-function readThemeObject(themeJson: Prisma.JsonValue | null): Record<string, unknown> {
+function readThemeObject(
+  themeJson: Prisma.JsonValue | null,
+): Record<string, unknown> {
   if (!themeJson || typeof themeJson !== 'object' || Array.isArray(themeJson)) {
     return {};
   }

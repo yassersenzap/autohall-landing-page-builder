@@ -1,7 +1,11 @@
 import { describe, expect, it } from '@jest/globals';
 import { buildDefaultStudioV2Document } from '../studio-v2/default-document';
 import { buildStudioV2Html } from './build-html';
-import { createRenderContext, renderPuckDocumentHtml, UnknownStudioV2ComponentError } from './render-puck-tree';
+import {
+  createRenderContext,
+  renderPuckDocumentHtml,
+  UnknownStudioV2ComponentError,
+} from './render-puck-tree';
 import { validateStudioV2Readiness } from './readiness';
 import { DEFAULT_DESIGN_TOKENS } from './design-tokens';
 import type { PuckDocument } from './types';

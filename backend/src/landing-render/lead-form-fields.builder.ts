@@ -31,7 +31,9 @@ const DEFAULT_FORM_CONFIG: LeadFormConfig = {
 
 function readFormConfig(props: Record<string, unknown>): LeadFormConfig {
   const raw =
-    props.formConfig && typeof props.formConfig === 'object' && !Array.isArray(props.formConfig)
+    props.formConfig &&
+    typeof props.formConfig === 'object' &&
+    !Array.isArray(props.formConfig)
       ? (props.formConfig as Record<string, unknown>)
       : {};
   return {
@@ -45,7 +47,9 @@ function readFormConfig(props: Record<string, unknown>): LeadFormConfig {
   };
 }
 
-function legacyFieldsFromProps(props: Record<string, unknown>): LeadFormFieldSpec[] | null {
+function legacyFieldsFromProps(
+  props: Record<string, unknown>,
+): LeadFormFieldSpec[] | null {
   if (!Array.isArray(props.fields) || props.fields.length === 0) {
     return null;
   }
@@ -72,7 +76,9 @@ function legacyFieldsFromProps(props: Record<string, unknown>): LeadFormFieldSpe
     }));
 }
 
-export function buildLeadFormFieldSpecs(props: Record<string, unknown>): LeadFormFieldSpec[] {
+export function buildLeadFormFieldSpecs(
+  props: Record<string, unknown>,
+): LeadFormFieldSpec[] {
   const legacy = legacyFieldsFromProps(props);
   if (legacy && !props.formConfig) {
     return legacy;
@@ -102,14 +108,30 @@ export function buildLeadFormFieldSpecs(props: Record<string, unknown>): LeadFor
       { name: 'firstName', label: 'Prénom', type: 'text', required: true },
     );
   } else {
-    fields.push({ name: 'fullName', label: 'Nom complet', type: 'text', required: true, fullWidth: true });
+    fields.push({
+      name: 'fullName',
+      label: 'Nom complet',
+      type: 'text',
+      required: true,
+      fullWidth: true,
+    });
   }
 
   if (config.showEmail) {
-    fields.push({ name: 'email', label: 'Email', type: 'email', required: false });
+    fields.push({
+      name: 'email',
+      label: 'Email',
+      type: 'email',
+      required: false,
+    });
   }
 
-  fields.push({ name: 'phone', label: 'Téléphone', type: 'tel', required: true });
+  fields.push({
+    name: 'phone',
+    label: 'Téléphone',
+    type: 'tel',
+    required: true,
+  });
 
   if (config.showCity) {
     fields.push({

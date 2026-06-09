@@ -6,18 +6,23 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import archiver from 'archiver';
+import { createReadStream } from 'fs';
+import { access } from 'fs/promises';
 import { PassThrough } from 'stream';
+import { AssetRenderService } from '../page-assets/asset-render.service';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   buildExportFilename,
   buildLandingConfigJs,
   deriveApiBaseUrl,
-  STATIC_LEAD_FORM_JS,
 } from '../page-export/static-export.builder';
+import { extractBuilderV3AssetIds } from './builder-v3-asset-collector';
+import {
+  buildBuilderV3ZipEntries,
+  type BuilderV3ZipEntry,
+} from './builder-v3-export.utils';
 import { BuilderV3HtmlCompilerService } from './builder-v3-html-compiler.service';
 import type { ExportBuilderV3DocumentDto } from './dto/export-builder-v3-document.dto';
-
-type ZipTextEntry = { kind: 'text'; path: string; content: string };
 
 @Injectable()
 export class BuilderV3ExportService {
@@ -27,6 +32,7 @@ export class BuilderV3ExportService {
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
     private readonly htmlCompiler: BuilderV3HtmlCompilerService,
+    private readonly assetRenderService: AssetRenderService,
   ) {}
 
   async exportZip(
@@ -68,14 +74,16 @@ export class BuilderV3ExportService {
         typeof pageTheme.bodyFont === 'string' ? pageTheme.bodyFont : 'Roboto';
 
       const pageTitle =
-        (typeof pageSettings.metaTitle === 'string' && pageSettings.metaTitle.trim()) ||
+        (typeof pageSettings.metaTitle === 'string' &&
+          pageSettings.metaTitle.trim()) ||
         (typeof pageTheme.seoTitle === 'string' && pageTheme.seoTitle.trim()) ||
         pageVersion.landingPage.title;
 
       const metaDescription =
         (typeof pageSettings.metaDescription === 'string' &&
           pageSettings.metaDescription.trim()) ||
-        (typeof pageTheme.seoDescription === 'string' && pageTheme.seoDescription.trim()) ||
+        (typeof pageTheme.seoDescription === 'string' &&
+          pageTheme.seoDescription.trim()) ||
         `Campagne ${pageVersion.landingPage.campaign.name} — Auto Hall`;
 
       const blocks = (dto.blocks ?? []).map((block, index) => ({
@@ -84,8 +92,15 @@ export class BuilderV3ExportService {
         propsJson: block.propsJson ?? {},
       }));
 
+      const assetIds = extractBuilderV3AssetIds({ blocks, pageSettings });
+      const assetMap = await this.assetRenderService.buildAssetMapForAssetIds(
+        assetIds,
+        'export',
+      );
+      const renderContext = { mode: 'export' as const, assetMap };
+
       this.logger.log(
-        `Compiling V3 export for pageVersion=${pageVersionId} blocks=${blocks.length}`,
+        `Compiling V3 export for pageVersion=${pageVersionId} blocks=${blocks.length} assets=${Object.keys(assetMap).length}`,
       );
 
       const indexHtml = this.htmlCompiler.compile({
@@ -96,6 +111,8 @@ export class BuilderV3ExportService {
         headingFont,
         bodyFont,
         blocks,
+        renderContext,
+        pageSettings,
       });
 
       const leadEndpoint = this.resolvePublicLeadEndpoint();
@@ -108,26 +125,13 @@ export class BuilderV3ExportService {
         landingSlug: pageVersion.landingPage.slug,
       });
 
-      const zipEntries: ZipTextEntry[] = [
-        { kind: 'text', path: 'index.html', content: indexHtml },
-        { kind: 'text', path: 'js/landing-config.js', content: landingConfigJs },
-        { kind: 'text', path: 'js/lead-form.js', content: STATIC_LEAD_FORM_JS },
-        {
-          kind: 'text',
-          path: 'README_DEPLOYMENT.txt',
-          content: `Auto Hall — Landing page statique (Builder V3)
-============================================
-
-1. Déployez le contenu du ZIP sur un hébergement statique.
-2. Ouvrez index.html dans un navigateur pour vérifier le rendu.
-3. Testez le formulaire lead en conditions réelles.
-
-Support : Auto Hall SI Digital
-`,
-        },
-      ];
-
-      const buffer = await this.buildZipBuffer(zipEntries);
+      const zipEntries = buildBuilderV3ZipEntries({
+        indexHtml,
+        landingConfigJs,
+        assetMap,
+      });
+      const zipEntriesWithFiles = await this.filterExistingFileEntries(zipEntries);
+      const buffer = await this.buildZipBuffer(zipEntriesWithFiles);
       const filename =
         buildExportFilename(
           pageVersion.landingPage.slug,
@@ -159,6 +163,25 @@ Support : Auto Hall SI Digital
     }
   }
 
+  private async filterExistingFileEntries(
+    entries: BuilderV3ZipEntry[],
+  ): Promise<BuilderV3ZipEntry[]> {
+    const filtered: BuilderV3ZipEntry[] = [];
+    for (const entry of entries) {
+      if (entry.kind === 'text') {
+        filtered.push(entry);
+        continue;
+      }
+      const exists = await access(entry.absolutePath)
+        .then(() => true)
+        .catch(() => false);
+      if (exists) {
+        filtered.push(entry);
+      }
+    }
+    return filtered;
+  }
+
   private resolvePublicLeadEndpoint(): string {
     const configured = this.configService.get<string>('PUBLIC_LEAD_ENDPOINT');
     if (configured?.trim()) return configured.trim();
@@ -177,7 +200,7 @@ Support : Auto Hall SI Digital
     return `http://localhost:${port}/api/public/leads`;
   }
 
-  private buildZipBuffer(entries: ZipTextEntry[]): Promise<Buffer> {
+  private buildZipBuffer(entries: BuilderV3ZipEntry[]): Promise<Buffer> {
     return new Promise((resolve, reject) => {
       const archive = archiver('zip', { zlib: { level: 9 } });
       const stream = new PassThrough();
@@ -191,7 +214,13 @@ Support : Auto Hall SI Digital
       archive.pipe(stream);
 
       for (const entry of entries) {
-        archive.append(entry.content, { name: entry.path });
+        if (entry.kind === 'text') {
+          archive.append(entry.content, { name: entry.path });
+        } else {
+          archive.append(createReadStream(entry.absolutePath), {
+            name: entry.path,
+          });
+        }
       }
 
       void archive.finalize();

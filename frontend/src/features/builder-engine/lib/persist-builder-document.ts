@@ -1,32 +1,39 @@
 import {
   createEditorBlock,
   deleteEditorBlock,
+  fetchEditorBlocks,
   updateEditorBlock,
 } from '@/features/editor/api/editorApi';
-import type {
-  EditorBlockType,
-  EditorPageBlock,
-} from '@/features/editor/types/editor.types';
-import { EDITOR_BLOCK_TYPES } from '@/features/landing/landing-block-catalog';
+import type { EditorPageBlock } from '@/features/editor/types/editor.types';
+import { getActivePaletteBlocks } from '../registry/block-registry';
 import type { BuilderDocumentBlock } from '../types';
+import { apiBlocksToBuilderBlocks } from './api-block-mapper';
+import { assertNoBlobUrlsInBlocks } from './blob-url-guard';
 
-const VALID_BLOCK_TYPES = new Set<string>(EDITOR_BLOCK_TYPES);
+const VALID_BLOCK_TYPES = new Set(getActivePaletteBlocks().map((entry) => entry.type));
 
-function assertBlockType(type: string): EditorBlockType {
+function assertBlockType(type: string): string {
   if (!VALID_BLOCK_TYPES.has(type)) {
     throw new Error(`Type de bloc non supporté : ${type}`);
   }
-  return type as EditorBlockType;
+  return type;
+}
+
+function toBlockKey(blockId: string): string {
+  return blockId.trim().toLowerCase();
 }
 
 /**
  * Synchronise le document Zustand vers l'API (créations, mises à jour, suppressions, ordre).
+ * Re-fetch les blocs serveur pour aligner les IDs frontend sur la base.
  */
 export async function persistBuilderDocument(
   pageVersionId: string,
   documentBlocks: BuilderDocumentBlock[],
   baseline: EditorPageBlock[],
-): Promise<void> {
+): Promise<BuilderDocumentBlock[]> {
+  assertNoBlobUrlsInBlocks(documentBlocks);
+
   const baselineIds = new Set(baseline.map((b) => b.id));
   const currentIds = new Set(documentBlocks.map((b) => b.id));
 
@@ -52,7 +59,11 @@ export async function persistBuilderDocument(
         blockType,
         propsJson: block.propsJson,
         sortOrder,
+        blockKey: toBlockKey(block.id),
       });
     }
   }
+
+  const refreshed = await fetchEditorBlocks(pageVersionId);
+  return apiBlocksToBuilderBlocks(refreshed.data);
 }

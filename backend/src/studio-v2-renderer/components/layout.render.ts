@@ -22,7 +22,8 @@ export function renderSection(
   props: Record<string, unknown>,
   renderSlots: SlotRenderer,
 ): string {
-  const tone = typeof props.backgroundTone === 'string' ? props.backgroundTone : 'light';
+  const tone =
+    typeof props.backgroundTone === 'string' ? props.backgroundTone : 'light';
   const spacing =
     typeof props.spacing === 'string'
       ? props.spacing
@@ -42,8 +43,12 @@ export function renderContainer(
   props: Record<string, unknown>,
   renderSlots: SlotRenderer,
 ): string {
-  const maxWidth = typeof props.maxWidth === 'string' ? props.maxWidth : 'standard';
-  const align = props.align === 'center' || props.alignment === 'center' ? 'center' : 'left';
+  const maxWidth =
+    typeof props.maxWidth === 'string' ? props.maxWidth : 'standard';
+  const align =
+    props.align === 'center' || props.alignment === 'center'
+      ? 'center'
+      : 'left';
 
   return `<div class="vs2-container vs2-max-${escapeHtml(maxWidth)} vs2-align-${align}">${renderSlots(props)}</div>`;
 }
@@ -53,14 +58,19 @@ export function renderColumns(
   renderSlots: SlotRenderer,
   ctx: StudioV2RenderContext & { renderNode: (node: PuckNode) => string },
 ): string {
-  const ratio = typeof props.columnRatio === 'string' ? props.columnRatio.replace('-', '_') : '50_50';
+  const ratio =
+    typeof props.columnRatio === 'string'
+      ? props.columnRatio.replace('-', '_')
+      : '50_50';
   const gap = typeof props.columnGap === 'string' ? props.columnGap : 'normal';
   const valign =
     props.verticalAlign === 'center' || props.verticalAlign === 'bottom'
       ? props.verticalAlign
       : 'top';
   const stack =
-    props.mobileStack === 'right_first' ? 'vs2-columns--right-first' : 'vs2-columns--left-first';
+    props.mobileStack === 'right_first'
+      ? 'vs2-columns--right-first'
+      : 'vs2-columns--left-first';
   const align = props.alignment === 'center' ? 'center' : 'left';
 
   const left = Array.isArray(props.left)
@@ -71,9 +81,7 @@ export function renderColumns(
     : [];
 
   const renderChildren = (nodes: typeof left) =>
-    nodes
-      .map((node) => ctx.renderNode(node))
-      .join('');
+    nodes.map((node) => ctx.renderNode(node)).join('');
 
   return `<div class="vs2-columns vs2-ratio-${escapeHtml(ratio)} vs2-gap-${escapeHtml(gap)} vs2-valign-${valign} vs2-align-${align} ${stack}"><div class="vs2-columns__col">${renderChildren(left)}</div><div class="vs2-columns__col">${renderChildren(right)}</div></div>`;
 }

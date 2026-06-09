@@ -11,7 +11,10 @@ import {
   renderLeadFormRequiredNoteHtml,
 } from './lead-form-fields.render';
 
-function propString(props: Record<string, unknown>, ...keys: string[]): string | null {
+function propString(
+  props: Record<string, unknown>,
+  ...keys: string[]
+): string | null {
   for (const key of keys) {
     const value = props[key];
     if (typeof value === 'string' && value.trim()) return value.trim();
@@ -28,7 +31,9 @@ function escapeHtml(value: string): string {
     .replace(/'/g, '&#39;');
 }
 
-function parseFormProps(props: Record<string, unknown>): Record<string, unknown> {
+function parseFormProps(
+  props: Record<string, unknown>,
+): Record<string, unknown> {
   const form = props.form;
   if (form && typeof form === 'object' && !Array.isArray(form)) {
     return form as Record<string, unknown>;
@@ -40,7 +45,8 @@ export function renderHeroFormCampaignHtml(
   props: Record<string, unknown>,
   context?: LandingRenderContext,
 ): string {
-  const layoutVariant = propString(props, 'layoutVariant') ?? 'text_left_form_right';
+  const layoutVariant =
+    propString(props, 'layoutVariant') ?? 'text_left_form_right';
   const design = (props.design as Record<string, unknown> | undefined) ?? {};
   const tone = propString(design, 'tone') ?? 'light';
   const imagePosition = propString(design, 'imagePosition') ?? 'none';
@@ -59,15 +65,21 @@ export function renderHeroFormCampaignHtml(
   const btnClass = `${buildButtonClasses(formDesign)} lp-lead-form__submit`;
   const formTitle = propString(formProps, 'title');
   const formSubtitle = propString(formProps, 'subtitle');
-  const submitText = propString(formProps, 'submitText') ?? 'Envoyer votre demande';
+  const submitText =
+    propString(formProps, 'submitText') ?? 'Envoyer votre demande';
   const privacyNote = propString(formProps, 'privacyNote', 'legalNote');
 
   const fieldsHtml = renderLeadFormFieldsHtml(formProps);
   const consentHtml = renderLeadFormConsentHtml(formProps);
   const requiredNoteHtml = renderLeadFormRequiredNoteHtml(formProps);
 
-  const primaryBtnClass = buildButtonClasses(normalizeBlockDesign('hero', props));
-  const imgClass = buildMediaImgClasses('lp-hero', normalizeBlockDesign('hero', props));
+  const primaryBtnClass = buildButtonClasses(
+    normalizeBlockDesign('hero', props),
+  );
+  const imgClass = buildMediaImgClasses(
+    'lp-hero',
+    normalizeBlockDesign('hero', props),
+  );
 
   const actions: string[] = [];
   if (buttonText) {

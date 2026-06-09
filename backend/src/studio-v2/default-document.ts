@@ -11,7 +11,8 @@ function buildRawDefaultStudioV2Document(): Record<string, unknown> {
         themePreset: 'autohall-blue',
         seo: {
           title: 'Offre véhicule — Auto Hall',
-          description: 'Découvrez nos offres véhicules neufs et demandez un essai en ligne.',
+          description:
+            'Découvrez nos offres véhicules neufs et demandez un essai en ligne.',
         },
       },
     },
@@ -57,7 +58,8 @@ function buildRawDefaultStudioV2Document(): Record<string, unknown> {
                           type: 'LeadFormAutoHall',
                           props: {
                             title: 'Contactez-nous',
-                            subtitle: 'Un conseiller vous recontacte rapidement.',
+                            subtitle:
+                              'Un conseiller vous recontacte rapidement.',
                             submitText: 'Envoyer votre demande',
                             showCity: true,
                             showMessage: true,

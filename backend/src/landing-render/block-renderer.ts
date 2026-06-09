@@ -29,7 +29,7 @@ export type RenderPageShell = {
 
 function propsAsRecord(propsJson: Prisma.JsonValue): Record<string, unknown> {
   if (propsJson && typeof propsJson === 'object' && !Array.isArray(propsJson)) {
-    return propsJson as Record<string, unknown>;
+    return propsJson;
   }
   return {};
 }
@@ -146,7 +146,10 @@ function parseMetrics(props: Record<string, unknown>): MetricItem[] {
     .filter((item) => item.value && item.label);
 }
 
-function parseStringList(props: Record<string, unknown>, key: string): string[] {
+function parseStringList(
+  props: Record<string, unknown>,
+  key: string,
+): string[] {
   if (!Array.isArray(props[key])) {
     return [];
   }
@@ -177,7 +180,10 @@ function parseLeadFormFields(props: Record<string, unknown>): LeadFormField[] {
 }
 
 function renderTextParagraphs(content: string): string {
-  const parts = content.split(/\n\n+/).map((p) => p.trim()).filter(Boolean);
+  const parts = content
+    .split(/\n\n+/)
+    .map((p) => p.trim())
+    .filter(Boolean);
   if (parts.length === 0) {
     return '<p class="lp-text__p">—</p>';
   }
@@ -186,7 +192,10 @@ function renderTextParagraphs(content: string): string {
     .join('');
 }
 
-function renderSectionHeading(heading: string | null, subtitle: string | null): string {
+function renderSectionHeading(
+  heading: string | null,
+  subtitle: string | null,
+): string {
   return `
     ${heading ? `<h2 class="lp-section-title">${escapeHtml(heading)}</h2>` : ''}
     ${subtitle ? `<p class="lp-section-subtitle">${escapeHtml(subtitle)}</p>` : ''}`;
@@ -194,7 +203,11 @@ function renderSectionHeading(heading: string | null, subtitle: string | null): 
 
 function renderLeadFormHtml(props: Record<string, unknown>): string {
   const design = normalizeBlockDesign('lead_form', props);
-  const sectionClass = buildBlockSectionClasses('lead_form', 'lp-lead-form', design);
+  const sectionClass = buildBlockSectionClasses(
+    'lead_form',
+    'lp-lead-form',
+    design,
+  );
   const inlineVars = buildInlineStyleVars(design);
   const btnClass = `${buildButtonClasses(design)} lp-lead-form__submit`;
 
@@ -255,10 +268,16 @@ function renderHeroHtml(
   const subtitle = propString(props, 'subtitle');
   const eyebrow = propString(props, 'eyebrow', 'kicker', 'badge');
   const buttonText = propString(props, 'buttonText');
-  const buttonTarget = propString(props, 'buttonTarget', 'href') ?? '#lead-form';
-  const secondaryText = propString(props, 'secondaryButtonText', 'secondaryCtaText');
+  const buttonTarget =
+    propString(props, 'buttonTarget', 'href') ?? '#lead-form';
+  const secondaryText = propString(
+    props,
+    'secondaryButtonText',
+    'secondaryCtaText',
+  );
   const secondaryTarget =
-    propString(props, 'secondaryButtonTarget', 'secondaryCtaTarget') ?? '#offer';
+    propString(props, 'secondaryButtonTarget', 'secondaryCtaTarget') ??
+    '#offer';
   const imageSrc = resolveHeroImageSrc(props, context);
   const imageAlt = propString(props, 'alt', 'imageAlt') ?? '';
 
@@ -269,11 +288,14 @@ function renderHeroHtml(
     );
   }
   if (secondaryText) {
-    actions.push(renderBtn(secondaryTarget, secondaryText, 'secondary', design.buttonSize));
+    actions.push(
+      renderBtn(secondaryTarget, secondaryText, 'secondary', design.buttonSize),
+    );
   }
 
   const isBgLayout = design.layoutVariant === 'background_image';
-  const hideMedia = design.layoutVariant === 'minimal' || design.mediaPosition === 'none';
+  const hideMedia =
+    design.layoutVariant === 'minimal' || design.mediaPosition === 'none';
 
   const bgMediaHtml =
     isBgLayout && imageSrc
@@ -383,7 +405,8 @@ function renderOfferHighlightsHtml(
   const priceValue = propString(props, 'priceValue', 'price');
   const monthlyValue = propString(props, 'monthlyValue', 'monthlyFrom');
   const buttonText = propString(props, 'buttonText', 'ctaLabel');
-  const buttonTarget = propString(props, 'buttonTarget', 'ctaTarget') ?? '#lead-form';
+  const buttonTarget =
+    propString(props, 'buttonTarget', 'ctaTarget') ?? '#lead-form';
   const imageSrc = resolveHeroImageSrc(props, context);
   const imageAlt = propString(props, 'alt') ?? '';
   const heading = propString(props, 'heading', 'title');
@@ -474,7 +497,8 @@ function parseVehicleRangeItems(
         imageSrc: resolveHeroImageSrc(merged, context),
         imageAlt: propString(item, 'alt') ?? '',
         ctaText: propString(item, 'ctaText', 'buttonText') ?? 'Découvrir',
-        ctaTarget: propString(item, 'ctaTarget', 'buttonTarget') ?? '#lead-form',
+        ctaTarget:
+          propString(item, 'ctaTarget', 'buttonTarget') ?? '#lead-form',
       };
     })
     .filter((item) => item.name);
@@ -526,7 +550,11 @@ function renderFeaturesShowcaseHtml(
   context?: LandingRenderContext,
 ): string {
   const design = normalizeBlockDesign('features', props);
-  const sectionClass = buildBlockSectionClasses('features', 'lp-features lp-features--showcase', design);
+  const sectionClass = buildBlockSectionClasses(
+    'features',
+    'lp-features lp-features--showcase',
+    design,
+  );
   const inlineVars = buildInlineStyleVars(design);
   const imgClass = buildMediaImgClasses('lp-showcase', design);
 
@@ -560,7 +588,9 @@ function renderFeaturesShowcaseHtml(
           </div>`;
 
   const showcaseInner =
-    design.mediaPosition === 'left' ? `${mediaHtml}${copyHtml}` : `${copyHtml}${mediaHtml}`;
+    design.mediaPosition === 'left'
+      ? `${mediaHtml}${copyHtml}`
+      : `${copyHtml}${mediaHtml}`;
 
   return `
     <section class="${sectionClass}" id="model"${inlineVars}>
@@ -582,7 +612,11 @@ function renderFeaturesHtml(
     return renderFeaturesShowcaseHtml(props, context);
   }
 
-  const sectionClass = buildBlockSectionClasses('features', 'lp-features', design);
+  const sectionClass = buildBlockSectionClasses(
+    'features',
+    'lp-features',
+    design,
+  );
   const inlineVars = buildInlineStyleVars(design);
   const heading = propString(props, 'heading', 'title');
   const subtitle = propString(props, 'subtitle');
@@ -618,13 +652,17 @@ function renderFeaturesHtml(
 function renderFinancingHtml(props: Record<string, unknown>): string {
   const heading = propString(props, 'heading', 'title');
   const subtitle = propString(props, 'subtitle');
-  const ctaLabel = propString(props, 'ctaLabel', 'buttonText') ?? 'Simuler mon financement';
-  const ctaTarget = propString(props, 'ctaTarget', 'buttonTarget') ?? '#lead-form';
+  const ctaLabel =
+    propString(props, 'ctaLabel', 'buttonText') ?? 'Simuler mon financement';
+  const ctaTarget =
+    propString(props, 'ctaTarget', 'buttonTarget') ?? '#lead-form';
   const paymentExample = propString(props, 'paymentExample', 'monthlyFrom');
   const bullets = parseStringList(props, 'bullets');
 
   const listHtml = bullets
-    .map((bullet) => `<li class="lp-financing__bullet">${escapeHtml(bullet)}</li>`)
+    .map(
+      (bullet) => `<li class="lp-financing__bullet">${escapeHtml(bullet)}</li>`,
+    )
     .join('');
 
   const paymentHtml = paymentExample
@@ -725,14 +763,19 @@ function renderFaqHtml(props: Record<string, unknown>): string {
 
 function renderFinalCtaHtml(props: Record<string, unknown>): string {
   const design = normalizeBlockDesign('final_cta', props);
-  const sectionClass = buildBlockSectionClasses('final_cta', 'lp-final-cta', design);
+  const sectionClass = buildBlockSectionClasses(
+    'final_cta',
+    'lp-final-cta',
+    design,
+  );
   const inlineVars = buildInlineStyleVars(design);
   const btnClass = buildButtonClasses(design);
 
   const title = propString(props, 'title', 'heading');
   const subtitle = propString(props, 'subtitle', 'description');
   const buttonText = propString(props, 'buttonText', 'label');
-  const buttonTarget = propString(props, 'buttonTarget', 'target') ?? '#lead-form';
+  const buttonTarget =
+    propString(props, 'buttonTarget', 'target') ?? '#lead-form';
 
   const buttonHtml = buttonText
     ? `<a class="${btnClass}" href="${escapeHtml(buttonTarget)}">${escapeHtml(buttonText)}</a>`
@@ -752,7 +795,11 @@ function renderFinalCtaHtml(props: Record<string, unknown>): string {
 
 function renderFooterLegalHtml(props: Record<string, unknown>): string {
   const design = normalizeBlockDesign('footer_legal', props);
-  const sectionClass = buildBlockSectionClasses('footer_legal', 'lp-footer-legal', design);
+  const sectionClass = buildBlockSectionClasses(
+    'footer_legal',
+    'lp-footer-legal',
+    design,
+  );
   const inlineVars = buildInlineStyleVars(design);
 
   const legalText = propString(props, 'legalText', 'text');
@@ -845,7 +892,8 @@ export function renderBlockHtml(
   }
 
   if (type === 'button') {
-    const label = propString(props, 'label', 'text', 'buttonText') ?? 'En savoir plus';
+    const label =
+      propString(props, 'label', 'text', 'buttonText') ?? 'En savoir plus';
     const target = propString(props, 'target', 'href', 'buttonTarget') ?? '#';
     const description = propString(props, 'description', 'subtitle');
 

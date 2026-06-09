@@ -147,7 +147,8 @@ export class PageBlocksService {
     ) {
       throw new ConflictException({
         success: false,
-        message: 'A block with this blockKey already exists on this page version',
+        message:
+          'A block with this blockKey already exists on this page version',
         code: 'PAGE_BLOCK_KEY_CONFLICT',
       });
     }

@@ -28,7 +28,10 @@ export type ExportLandingConfig = {
 export function deriveApiBaseUrl(leadEndpoint: string): string {
   const normalized = leadEndpoint.replace(/\/$/, '');
   if (normalized.endsWith('/api/public/leads')) {
-    return normalized.slice(0, -'/api/public/leads'.length) || 'http://localhost:3000';
+    return (
+      normalized.slice(0, -'/api/public/leads'.length) ||
+      'http://localhost:3000'
+    );
   }
   return normalized.replace(/\/api\/.*$/, '') || 'http://localhost:3000';
 }
@@ -206,7 +209,10 @@ export const STATIC_LEAD_FORM_JS = `document.addEventListener('DOMContentLoaded'
 /** @deprecated Alias — préférer STATIC_LEAD_FORM_JS pour les exports studio. */
 export const STATIC_MAIN_JS = STATIC_LEAD_FORM_JS;
 
-export function buildExportFilename(slug: string, versionNumber: number): string {
+export function buildExportFilename(
+  slug: string,
+  versionNumber: number,
+): string {
   const safeSlug = slug
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')

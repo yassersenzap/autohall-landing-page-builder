@@ -7,9 +7,9 @@ import {
 
 describe('static export lead form', () => {
   it('deriveApiBaseUrl strips the public leads path', () => {
-    expect(
-      deriveApiBaseUrl('https://api.autohall.ma/api/public/leads'),
-    ).toBe('https://api.autohall.ma');
+    expect(deriveApiBaseUrl('https://api.autohall.ma/api/public/leads')).toBe(
+      'https://api.autohall.ma',
+    );
     expect(deriveApiBaseUrl('http://localhost:3000/api/public/leads/')).toBe(
       'http://localhost:3000',
     );
@@ -25,7 +25,9 @@ describe('static export lead form', () => {
       landingSlug: 'offre-clio',
     });
 
-    expect(js).toContain('"leadEndpoint":"https://api.autohall.ma/api/public/leads"');
+    expect(js).toContain(
+      '"leadEndpoint":"https://api.autohall.ma/api/public/leads"',
+    );
     expect(js).toContain('"apiBaseUrl":"https://api.autohall.ma"');
   });
 

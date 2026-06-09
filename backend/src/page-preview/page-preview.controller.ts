@@ -20,7 +20,9 @@ export class PagePreviewController {
 
   @Roles(...READ_ROLES)
   @Get('preview')
-  async getPreview(@Param('pageVersionId', ParseUUIDPipe) pageVersionId: string) {
+  async getPreview(
+    @Param('pageVersionId', ParseUUIDPipe) pageVersionId: string,
+  ) {
     const data = await this.pagePreviewService.getPreview(pageVersionId);
 
     return {

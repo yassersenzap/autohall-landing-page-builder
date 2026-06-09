@@ -1,5 +1,11 @@
 import { PageVersionStatus } from '@prisma/client';
-import { IsEnum, IsObject, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsEnum,
+  IsObject,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 export class CreatePageVersionDto {
   @IsOptional()

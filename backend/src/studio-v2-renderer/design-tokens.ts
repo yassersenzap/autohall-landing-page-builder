@@ -68,7 +68,9 @@ export function resolveDesignTokens(
   rootProps: Record<string, unknown> | undefined,
 ): StudioV2DesignTokens {
   const presetKey =
-    typeof rootProps?.themePreset === 'string' ? rootProps.themePreset : 'autohall-blue';
+    typeof rootProps?.themePreset === 'string'
+      ? rootProps.themePreset
+      : 'autohall-blue';
   const preset = THEME_PRESETS[presetKey] ?? THEME_PRESETS['autohall-blue'];
   const custom =
     rootProps?.designTokens &&

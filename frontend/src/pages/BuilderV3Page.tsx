@@ -4,7 +4,8 @@ import { StudioLayout } from '@/features/builder-v3/layout/StudioLayout';
 import { StudioTopBar, type StudioV3SaveStatus } from '@/features/builder-v3/layout/StudioTopBar';
 import { PageSettingsSheet } from '@/features/builder-v3/panels/PageSettingsSheet';
 import { exportBuilderV3Zip } from '@/features/builder-v3/lib/export-builder-v3';
-import { saveBuilderDocumentDesign } from '@/features/builder-v3/lib/save-builder-v3';
+import { saveBuilderDocumentDesign, BuilderSaveError } from '@/features/builder-v3/lib/save-builder-v3';
+import { BlobUrlValidationError } from '@/features/builder-v3/lib/export-builder-v3';
 import { StudioToast } from '@/components/ui/StudioToast';
 import { useStudioToast } from '@/components/ui/use-studio-toast';
 import {
@@ -71,10 +72,14 @@ export default function BuilderV3Page() {
     try {
       await saveBuilderDocumentDesign(pageVersionId);
       setSaveStatus('saved');
-      showSuccess('Design sauvegardé avec succès');
-    } catch {
+      showSuccess('Design sauvegardé sur le serveur');
+    } catch (err) {
       setSaveStatus('dirty');
-      showError('Échec de la sauvegarde. Réessayez.');
+      const message =
+        err instanceof BuilderSaveError || err instanceof BlobUrlValidationError
+          ? err.message
+          : 'Échec de la sauvegarde. Réessayez.';
+      showError(message);
     }
   }, [pageVersionId, showError, showSuccess]);
 
@@ -84,8 +89,12 @@ export default function BuilderV3Page() {
       try {
         await saveBuilderDocumentDesign(pageVersionId);
         setSaveStatus('saved');
-      } catch {
-        showError('Sauvegarde locale requise avant l’aperçu.');
+      } catch (err) {
+        const message =
+          err instanceof BuilderSaveError || err instanceof BlobUrlValidationError
+            ? err.message
+            : 'Sauvegarde requise avant l’aperçu.';
+        showError(message);
         return;
       }
     }
@@ -103,7 +112,13 @@ export default function BuilderV3Page() {
       await exportBuilderV3Zip(pageVersionId);
       showSuccess('Export ZIP téléchargé');
     } catch (err) {
-      showError(err instanceof Error ? err.message : 'Export ZIP impossible.');
+      const message =
+        err instanceof BlobUrlValidationError || err instanceof BuilderSaveError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : 'Export ZIP impossible.';
+      showError(message);
     } finally {
       setExportLoading(false);
     }
@@ -116,8 +131,8 @@ export default function BuilderV3Page() {
   if (!documentHydrated) {
     return (
       <div className="flex h-screen flex-col items-center justify-center gap-2 bg-neutral-950 text-neutral-400">
-        <p className="text-sm">Restauration du design depuis le cache local…</p>
-        <p className="text-xs text-neutral-600">Ne pas rafraîchir — hydratation en cours</p>
+        <p className="text-sm">Chargement du design depuis le serveur…</p>
+        <p className="text-xs text-neutral-600">Récupération des blocs et du thème</p>
       </div>
     );
   }

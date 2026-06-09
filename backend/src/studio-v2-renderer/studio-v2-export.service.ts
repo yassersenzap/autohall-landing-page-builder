@@ -70,7 +70,8 @@ export class StudioV2ExportService {
       throw new NotFoundException('Page version not found');
     }
 
-    const record = await this.studioV2DocumentService.getOrCreate(pageVersionId);
+    const record =
+      await this.studioV2DocumentService.getOrCreate(pageVersionId);
     const document = record.documentJson as PuckDocument;
     const readiness = validateStudioV2Readiness(document);
 
@@ -86,7 +87,7 @@ export class StudioV2ExportService {
     this.assertNoForbiddenUrls(document);
 
     const assetMap = await this.assetRenderService.buildAssetMapForPuckDocument(
-      document as Record<string, unknown>,
+      document,
       'export',
     );
 
@@ -128,7 +129,11 @@ export class StudioV2ExportService {
       { kind: 'text', path: 'assets/style.css', content: styleCss },
       { kind: 'text', path: 'js/landing-config.js', content: landingConfigJs },
       { kind: 'text', path: 'js/lead-form.js', content: STATIC_LEAD_FORM_JS },
-      { kind: 'text', path: 'README_DEPLOYMENT.txt', content: README_DEPLOYMENT },
+      {
+        kind: 'text',
+        path: 'README_DEPLOYMENT.txt',
+        content: README_DEPLOYMENT,
+      },
     ];
 
     for (const entry of Object.values(assetMap)) {
@@ -154,17 +159,24 @@ export class StudioV2ExportService {
 
   private assertNoForbiddenUrls(document: PuckDocument): void {
     const json = JSON.stringify(document);
-    if (json.includes('localhost') || json.includes('data:image') || json.includes('/api/assets/')) {
+    if (
+      json.includes('localhost') ||
+      json.includes('data:image') ||
+      json.includes('/api/assets/')
+    ) {
       throw new BadRequestException({
         success: false,
-        message: 'Export V2 refusé : URL interdite (localhost, base64 ou API privée).',
+        message:
+          'Export V2 refusé : URL interdite (localhost, base64 ou API privée).',
         code: 'STUDIO_V2_FORBIDDEN_URL',
       });
     }
 
     const walk = (value: unknown): void => {
       if (typeof value === 'string' && containsForbiddenAssetUrl(value)) {
-        throw new BadRequestException('Export V2 refusé : URL image interdite.');
+        throw new BadRequestException(
+          'Export V2 refusé : URL image interdite.',
+        );
       }
       if (Array.isArray(value)) {
         for (const item of value) walk(item);
@@ -201,7 +213,9 @@ export class StudioV2ExportService {
         if (entry.kind === 'text') {
           archive.append(entry.content, { name: entry.path });
         } else {
-          archive.append(createReadStream(entry.absolutePath), { name: entry.path });
+          archive.append(createReadStream(entry.absolutePath), {
+            name: entry.path,
+          });
         }
       }
 

@@ -48,9 +48,18 @@ const HERO_LAYOUTS = new Set([
   'minimal',
 ]);
 
-const FORM_LAYOUTS = new Set(['card_right', 'card_below', 'full_width', 'compact']);
+const FORM_LAYOUTS = new Set([
+  'card_right',
+  'card_below',
+  'full_width',
+  'compact',
+]);
 const TEXT_LAYOUTS = new Set(['centered', 'left_aligned', 'two_columns']);
-const IMAGE_LAYOUTS = new Set(['contained', 'full_bleed', 'image_with_caption']);
+const IMAGE_LAYOUTS = new Set([
+  'contained',
+  'full_bleed',
+  'image_with_caption',
+]);
 const FEATURES_LAYOUTS = new Set([
   'showcase',
   'grid_cards',
@@ -84,7 +93,9 @@ export function normalizeHexColor(value: unknown): string | null {
   return null;
 }
 
-export function extractDesignRaw(props: Record<string, unknown>): Record<string, unknown> {
+export function extractDesignRaw(
+  props: Record<string, unknown>,
+): Record<string, unknown> {
   const design = props.design;
   if (design && typeof design === 'object' && !Array.isArray(design)) {
     return design as Record<string, unknown>;
@@ -102,8 +113,12 @@ function legacyMediaPosition(props: Record<string, unknown>): 'left' | 'right' {
   return props.imageAlignment === 'left' ? 'left' : 'right';
 }
 
-function defaultHeroLayout(props: Record<string, unknown>, raw: Record<string, unknown>): string {
-  const fromDesign = typeof raw.layoutVariant === 'string' ? raw.layoutVariant : '';
+function defaultHeroLayout(
+  props: Record<string, unknown>,
+  raw: Record<string, unknown>,
+): string {
+  const fromDesign =
+    typeof raw.layoutVariant === 'string' ? raw.layoutVariant : '';
   if (HERO_LAYOUTS.has(fromDesign)) return fromDesign;
   if (raw.mediaPosition === 'background') return 'background_image';
   if (legacyMediaPosition(props) === 'left') return 'split_image_left';
@@ -125,7 +140,10 @@ function defaultImageLayout(raw: Record<string, unknown>): string {
   return IMAGE_LAYOUTS.has(v) ? v : 'contained';
 }
 
-function defaultFeaturesLayout(props: Record<string, unknown>, raw: Record<string, unknown>): string {
+function defaultFeaturesLayout(
+  props: Record<string, unknown>,
+  raw: Record<string, unknown>,
+): string {
   const v = typeof raw.layoutVariant === 'string' ? raw.layoutVariant : '';
   if (FEATURES_LAYOUTS.has(v)) return v;
   if (props.layout === 'showcase' || propHasImage(props)) return 'showcase';
@@ -170,7 +188,9 @@ function resolveLayoutVariant(
     case 'footer_legal':
       return defaultFooterLayout(raw);
     default:
-      return typeof raw.layoutVariant === 'string' ? raw.layoutVariant : 'default';
+      return typeof raw.layoutVariant === 'string'
+        ? raw.layoutVariant
+        : 'default';
   }
 }
 
@@ -189,7 +209,10 @@ export function normalizeBlockDesign(
   let mediaPosition: NormalizedBlockDesign['mediaPosition'] = 'right';
   if (raw.mediaPosition === 'left' || raw.mediaPosition === 'right') {
     mediaPosition = raw.mediaPosition;
-  } else if (raw.mediaPosition === 'background' || raw.mediaPosition === 'none') {
+  } else if (
+    raw.mediaPosition === 'background' ||
+    raw.mediaPosition === 'none'
+  ) {
     mediaPosition = raw.mediaPosition;
   } else {
     mediaPosition = legacyMediaPosition(props);
@@ -214,8 +237,16 @@ export function normalizeBlockDesign(
     backgroundMode: bgFromRaw,
     paddingTop: pickSpacing(raw.paddingTop, 'normal'),
     paddingBottom: pickSpacing(raw.paddingBottom, 'normal'),
-    contentWidth: pickEnum(raw.contentWidth, new Set(['narrow', 'normal', 'wide']), 'normal'),
-    alignment: pickEnum(raw.alignment, new Set(['left', 'center', 'right']), 'left'),
+    contentWidth: pickEnum(
+      raw.contentWidth,
+      new Set(['narrow', 'normal', 'wide']),
+      'normal',
+    ),
+    alignment: pickEnum(
+      raw.alignment,
+      new Set(['left', 'center', 'right']),
+      'left',
+    ),
     mediaPosition,
     mediaFit: pickEnum(raw.mediaFit, new Set(['cover', 'contain']), 'cover'),
     mediaFocal: pickEnum(
@@ -228,7 +259,11 @@ export function normalizeBlockDesign(
       new Set(['none', 'soft', 'medium', 'strong']),
       'medium',
     ),
-    mediaShadow: pickEnum(raw.mediaShadow, new Set(['none', 'soft', 'strong']), 'soft'),
+    mediaShadow: pickEnum(
+      raw.mediaShadow,
+      new Set(['none', 'soft', 'strong']),
+      'soft',
+    ),
     overlayOpacity: pickEnum(
       raw.overlayOpacity,
       new Set(['none', 'light', 'medium', 'strong']),
@@ -270,7 +305,10 @@ export function buildSpacingClasses(
   ];
 }
 
-export function buildMediaImgClasses(prefix: string, design: NormalizedBlockDesign): string {
+export function buildMediaImgClasses(
+  prefix: string,
+  design: NormalizedBlockDesign,
+): string {
   return [
     `${prefix}__img`,
     `${prefix}__img--fit-${design.mediaFit}`,
@@ -304,9 +342,11 @@ export function buildBlockSectionClasses(
 
 export function buildInlineStyleVars(design: NormalizedBlockDesign): string {
   const parts: string[] = [];
-  if (design.backgroundColor) parts.push(`--lp-block-bg:${design.backgroundColor}`);
+  if (design.backgroundColor)
+    parts.push(`--lp-block-bg:${design.backgroundColor}`);
   if (design.textColor) parts.push(`--lp-block-text:${design.textColor}`);
-  if (design.headingColor) parts.push(`--lp-block-heading:${design.headingColor}`);
+  if (design.headingColor)
+    parts.push(`--lp-block-heading:${design.headingColor}`);
   if (design.ctaColor) parts.push(`--lp-block-cta:${design.ctaColor}`);
   return parts.length ? ` style="${parts.join(';')}"` : '';
 }

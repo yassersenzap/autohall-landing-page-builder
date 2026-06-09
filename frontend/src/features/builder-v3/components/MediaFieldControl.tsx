@@ -18,6 +18,8 @@ type MediaFieldControlProps = {
   value: MediaFieldValue;
   onChange: (next: MediaFieldValue) => void;
   className?: string;
+  /** When false, blob URLs are rejected (page settings / export-safe fields). */
+  allowBlobFallback?: boolean;
 };
 
 function resolvePreviewUrl(value: MediaFieldValue): string {
@@ -26,10 +28,11 @@ function resolvePreviewUrl(value: MediaFieldValue): string {
 }
 
 export function MediaFieldControl({
-  label = 'Visuel',
+  label = 'Importer une image',
   value,
   onChange,
   className,
+  allowBlobFallback = false,
 }: MediaFieldControlProps) {
   const pageVersionId = getBuilderPersistPageVersionId();
   const { assets, uploading, upload } = usePageAssets(pageVersionId || null);
@@ -46,6 +49,9 @@ export function MediaFieldControl({
     async (file: File | null) => {
       if (!file || !file.type.startsWith('image/')) return;
       if (!pageVersionId) {
+        if (!allowBlobFallback) {
+          return;
+        }
         patch({ imageUrl: URL.createObjectURL(file), imageAssetId: '' });
         return;
       }
@@ -54,7 +60,7 @@ export function MediaFieldControl({
         patch({ imageAssetId: asset.id, imageUrl: '' });
       }
     },
-    [pageVersionId, patch, upload],
+    [pageVersionId, patch, upload, allowBlobFallback],
   );
 
   return (
@@ -71,16 +77,27 @@ export function MediaFieldControl({
               value.objectFit === 'contain' ? 'object-contain p-2' : 'object-cover',
             )}
           />
-          <ShadButton
-            type="button"
-            size="sm"
-            variant="secondary"
-            className="absolute right-2 top-2 h-7 w-7 border-neutral-600 bg-neutral-950/80 p-0"
-            onClick={() => patch({ imageUrl: '', imageAssetId: '' })}
-            aria-label="Retirer l'image"
-          >
-            <X className="h-3.5 w-3.5" />
-          </ShadButton>
+          <div className="absolute right-2 top-2 flex gap-1">
+            <ShadButton
+              type="button"
+              size="sm"
+              variant="secondary"
+              className="h-7 border-neutral-600 bg-neutral-950/80 px-2 text-[0.625rem]"
+              onClick={() => inputRef.current?.click()}
+            >
+              Remplacer
+            </ShadButton>
+            <ShadButton
+              type="button"
+              size="sm"
+              variant="secondary"
+              className="h-7 w-7 border-neutral-600 bg-neutral-950/80 p-0"
+              onClick={() => patch({ imageUrl: '', imageAssetId: '' })}
+              aria-label="Retirer l'image"
+            >
+              <X className="h-3.5 w-3.5" />
+            </ShadButton>
+          </div>
         </div>
       ) : (
         <div
@@ -111,9 +128,17 @@ export function MediaFieldControl({
             {dragOver ? <Upload className="h-5 w-5" /> : <ImagePlus className="h-5 w-5" />}
           </div>
           <p className="text-xs font-medium text-neutral-300">
-            {uploading ? 'Import en cours…' : 'Importer une image'}
+            {uploading
+              ? 'Import en cours…'
+              : !pageVersionId && !allowBlobFallback
+                ? 'Import indisponible'
+                : 'Importer une image'}
           </p>
-          <p className="text-[0.625rem] text-neutral-500">PNG, JPG — enregistrée sur la campagne</p>
+          <p className="text-[0.625rem] text-neutral-500">
+            {!pageVersionId && !allowBlobFallback
+              ? 'Utilisez la bibliothèque de la page — les fichiers locaux ne sont pas exportables.'
+              : 'PNG, JPG — enregistrée sur la campagne'}
+          </p>
         </div>
       )}
 
@@ -155,7 +180,7 @@ export function MediaFieldControl({
 
       <div className="space-y-1.5">
         <Label htmlFor="media-alt" className="text-xs text-neutral-500">
-          Texte alternatif (accessibilité)
+          Texte alternatif
         </Label>
         <input
           id="media-alt"
@@ -169,7 +194,7 @@ export function MediaFieldControl({
 
       <div className="space-y-1.5">
         <Label htmlFor="media-fit" className="text-xs text-neutral-500">
-          Cadrage
+          Recadrage
         </Label>
         <select
           id="media-fit"

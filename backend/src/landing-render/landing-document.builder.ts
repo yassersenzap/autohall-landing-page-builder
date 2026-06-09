@@ -20,7 +20,9 @@ export type BuildLandingDocumentInput = {
   renderContext?: LandingRenderContext;
 };
 
-export function buildLandingDocumentHtml(input: BuildLandingDocumentInput): string {
+export function buildLandingDocumentHtml(
+  input: BuildLandingDocumentInput,
+): string {
   const theme = resolveLandingTheme(input.themeJson);
   const body = renderBlocksHtml(input.blocks, input.renderContext);
   const header = renderPageShellHeader(input.shell);
@@ -71,7 +73,9 @@ export function buildLandingPreviewFragment(input: {
   mainHtml: string;
 } {
   const theme = resolveLandingTheme(input.themeJson);
-  const blocksWithIds = input.blocks as Array<RenderBlockInput & { id?: string }>;
+  const blocksWithIds = input.blocks as Array<
+    RenderBlockInput & { id?: string }
+  >;
 
   const blocksHtml = blocksWithIds.map((block, index) => ({
     id: block.id ?? `block-${index}`,

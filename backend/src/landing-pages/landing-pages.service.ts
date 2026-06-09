@@ -116,7 +116,8 @@ export class LandingPagesService {
         where: { id },
         data: {
           title: dto.title?.trim(),
-          slug: dto.slug === undefined ? undefined : this.normalizeSlug(dto.slug),
+          slug:
+            dto.slug === undefined ? undefined : this.normalizeSlug(dto.slug),
           publicBaseUrl:
             dto.publicBaseUrl === undefined
               ? undefined

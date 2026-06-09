@@ -1,16 +1,15 @@
-import { getBlockLabel } from '@/features/landing/landing-block-catalog';
+import { getRegistryEntry } from '../registry/block-registry';
 import type { EditorPageBlock } from '@/features/editor/types/editor.types';
-import { BUILDER_PALETTE } from '../constants/palette';
 import type { BuilderDocumentBlock } from '../types';
 
 export function apiBlockToBuilderBlock(block: EditorPageBlock): BuilderDocumentBlock {
   const type = block.blockType.toLowerCase();
-  const paletteItem = BUILDER_PALETTE.find((p) => p.type === type);
+  const registryEntry = getRegistryEntry(type);
 
   return {
     id: block.id,
     type,
-    label: paletteItem?.label ?? getBlockLabel(block.blockType),
+    label: registryEntry?.label ?? `[Bloc ${type}]`,
     sortOrder: block.sortOrder,
     propsJson:
       block.propsJson && typeof block.propsJson === 'object' && !Array.isArray(block.propsJson)
