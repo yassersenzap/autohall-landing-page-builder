@@ -16,10 +16,23 @@ import {
 import { renderHeroFormCampaignHtml } from './hero-form-campaign.render';
 import { renderPromoAutohallHtml } from './promo-autohall.render';
 import {
+  buildBlockDesignClasses,
+  normalizeSectionDesign,
+} from './block-design-system';
+import {
   buildPremiumCtaClass,
   buildPremiumSectionClasses,
   normalizePremiumDesign,
 } from './premium-block-design';
+import {
+  renderCtaBandHtml,
+  renderGalleryHtml,
+  renderMediaOnlyHtml,
+  renderPricingTrimHtml,
+  renderRichTextHtml,
+  renderSpacerDividerHtml,
+  renderVideoEmbedHtml,
+} from './v3-content-blocks.render';
 
 export type RenderBlockInput = {
   blockType: string;
@@ -116,7 +129,17 @@ function parseListItems(
 }
 
 function parseQuotes(props: Record<string, unknown>): QuoteItem[] {
-  return parseObjectList(props, 'quotes')
+  const fromQuotes = parseObjectList(props, 'quotes')
+    .map((item) => ({
+      text: propString(item, 'text', 'quote') ?? '',
+      author: propString(item, 'author', 'name') ?? '',
+      role: propString(item, 'role', 'subtitle') ?? '',
+    }))
+    .filter((item) => item.text);
+
+  if (fromQuotes.length > 0) return fromQuotes;
+
+  return parseObjectList(props, 'items')
     .map((item) => ({
       text: propString(item, 'text', 'quote') ?? '',
       author: propString(item, 'author', 'name') ?? '',
@@ -354,6 +377,8 @@ function renderHeroHtml(
 }
 
 function renderTrustBarHtml(props: Record<string, unknown>): string {
+  const design = normalizeSectionDesign('trust_bar', props);
+  const sectionClass = buildBlockDesignClasses('lp-trust-bar', design);
   const metrics = parseMetrics(props);
   if (metrics.length === 0) {
     return '';
@@ -370,7 +395,7 @@ function renderTrustBarHtml(props: Record<string, unknown>): string {
     .join('');
 
   return `
-    <section class="lp-block lp-trust-bar" aria-label="Réassurance">
+    <section class="lp-block ${sectionClass}" aria-label="Réassurance">
       <div class="lp-section">
         <div class="lp-trust-bar__grid">${items}</div>
       </div>
@@ -378,6 +403,8 @@ function renderTrustBarHtml(props: Record<string, unknown>): string {
 }
 
 function renderBenefitsHtml(props: Record<string, unknown>): string {
+  const design = normalizeSectionDesign('benefits', props);
+  const sectionClass = buildBlockDesignClasses('lp-benefits', design);
   const heading = propString(props, 'heading', 'title');
   const subtitle = propString(props, 'subtitle');
   const items = parseListItems(props, 'items');
@@ -392,11 +419,13 @@ function renderBenefitsHtml(props: Record<string, unknown>): string {
     )
     .join('');
 
+  if (!heading && !cards) return '';
+
   return `
-    <section class="lp-block lp-benefits">
+    <section class="lp-block ${sectionClass}">
       <div class="lp-section">
-        <div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>
-        <div class="lp-benefits__grid">${cards}</div>
+        ${heading || subtitle ? `<div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>` : ''}
+        ${cards ? `<div class="lp-benefits__grid">${cards}</div>` : ''}
       </div>
     </section>`;
 }
@@ -533,6 +562,8 @@ function renderVehicleRangeHtml(
   props: Record<string, unknown>,
   context?: LandingRenderContext,
 ): string {
+  const design = normalizeSectionDesign('vehicle_range', props);
+  const sectionClass = buildBlockDesignClasses('lp-vehicle-range', design);
   const heading = propString(props, 'heading', 'title');
   const subtitle = propString(props, 'subtitle');
   const vehicles = parseVehicleRangeItems(props, context);
@@ -561,11 +592,13 @@ function renderVehicleRangeHtml(
     })
     .join('');
 
+  if (!heading && !cards) return '';
+
   return `
-    <section class="lp-block lp-vehicle-range">
+    <section class="lp-block ${sectionClass}">
       <div class="lp-section">
-        <div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>
-        <div class="lp-vehicle-range__grid">${cards}</div>
+        ${heading || subtitle ? `<div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>` : ''}
+        ${cards ? `<div class="lp-vehicle-range__grid">${cards}</div>` : ''}
       </div>
     </section>`;
 }
@@ -736,6 +769,8 @@ function renderAfterSalesHtml(props: Record<string, unknown>): string {
 }
 
 function renderTestimonialsHtml(props: Record<string, unknown>): string {
+  const design = normalizeSectionDesign('testimonials', props);
+  const sectionClass = buildBlockDesignClasses('lp-testimonials', design);
   const heading = propString(props, 'heading', 'title');
   const subtitle = propString(props, 'subtitle');
   const quotes = parseQuotes(props);
@@ -753,16 +788,20 @@ function renderTestimonialsHtml(props: Record<string, unknown>): string {
     )
     .join('');
 
+  if (!heading && !cards) return '';
+
   return `
-    <section class="lp-block lp-testimonials">
+    <section class="lp-block ${sectionClass}">
       <div class="lp-section">
-        <div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>
-        <div class="lp-testimonials__grid">${cards}</div>
+        ${heading || subtitle ? `<div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>` : ''}
+        ${cards ? `<div class="lp-testimonials__grid">${cards}</div>` : ''}
       </div>
     </section>`;
 }
 
 function renderFaqHtml(props: Record<string, unknown>): string {
+  const design = normalizeSectionDesign('faq', props);
+  const sectionClass = buildBlockDesignClasses('lp-faq', design);
   const heading = propString(props, 'heading', 'title');
   const subtitle = propString(props, 'subtitle');
   const items = parseFaqItems(props);
@@ -777,11 +816,13 @@ function renderFaqHtml(props: Record<string, unknown>): string {
     )
     .join('');
 
+  if (!heading && !rows) return '';
+
   return `
-    <section class="lp-block lp-faq">
+    <section class="lp-block ${sectionClass}">
       <div class="lp-section lp-section--narrow">
-        <div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>
-        <div class="lp-faq__list">${rows}</div>
+        ${heading || subtitle ? `<div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>` : ''}
+        ${rows ? `<div class="lp-faq__list">${rows}</div>` : ''}
       </div>
     </section>`;
 }
@@ -915,7 +956,7 @@ export function renderBlockHtml(
     return `
     <section class="${sectionClass} lp-media--empty"${inlineVars}>
       <div class="lp-section">
-        <div class="lp-media__placeholder">Sélectionnez une image</div>
+        <div class="lp-media__placeholder" aria-hidden="true"></div>
       </div>
     </section>`;
   }
@@ -977,6 +1018,38 @@ export function renderBlockHtml(
 
   if (type === 'footer_legal') {
     return renderFooterLegalHtml(props);
+  }
+
+  if (type === 'cta_band') {
+    return renderCtaBandHtml(props);
+  }
+
+  if (type === 'rich_text') {
+    return renderRichTextHtml(props);
+  }
+
+  if (type === 'media_only') {
+    return renderMediaOnlyHtml(props, context);
+  }
+
+  if (type === 'gallery') {
+    return renderGalleryHtml(props, context);
+  }
+
+  if (type === 'spacer_divider') {
+    return renderSpacerDividerHtml(props);
+  }
+
+  if (type === 'video_embed') {
+    return renderVideoEmbedHtml(props);
+  }
+
+  if (type === 'pricing_trim') {
+    return renderPricingTrimHtml(props);
+  }
+
+  if (type === 'vehicle_features') {
+    return renderFeaturesHtml(props, context);
   }
 
   return `

@@ -1,35 +1,35 @@
 import { asPropString } from '@/features/builder-engine/lib/block-props';
+import { buildBlockDesignClasses, normalizeSectionDesign } from '@/features/builder-engine/lib/block-design-system';
 
 type FooterLegalBlockPreviewProps = {
   propsJson: Record<string, unknown>;
 };
 
 export function FooterLegalBlockPreview({ propsJson }: FooterLegalBlockPreviewProps) {
-  const legalText =
-    asPropString(propsJson.legalText) ||
-    '© Auto Hall — Tous droits réservés. Mentions légales, politique de confidentialité et conditions générales disponibles sur demande en concession.';
+  const design = normalizeSectionDesign('footer_legal', propsJson);
+  const sectionClass = buildBlockDesignClasses('lp-footer-legal', design);
+  const legalText = asPropString(propsJson.legalText);
   const rawLinks = Array.isArray(propsJson.links) ? propsJson.links : [];
   const links = rawLinks as Array<{ label?: string; href?: string }>;
 
   return (
-    <footer className="relative border-t border-neutral-800 bg-neutral-950 px-6 py-10">
-      <div className="relative z-10 mx-auto max-w-7xl space-y-4">
+    <footer className={`lp-block ${sectionClass}`}>
+      <div className="lp-section">
+        {legalText ? <p className="lp-footer-legal__text">{legalText}</p> : null}
         {links.length > 0 ? (
-          <nav className="flex flex-wrap gap-x-4 gap-y-2">
+          <nav className="lp-footer-legal__links">
             {links.map((link, index) => {
-              const label = link.label || `Lien ${index + 1}`;
+              const label = link.label;
+              const href = link.href || '#';
+              if (!label) return null;
               return (
-                <span key={`${label}-${index}`} className="text-xs text-neutral-400 underline-offset-2 hover:underline">
+                <a key={`${label}-${index}`} className="lp-footer-legal__link" href={href}>
                   {label}
-                </span>
+                </a>
               );
             })}
           </nav>
         ) : null}
-        <p className="text-xs leading-relaxed text-neutral-400">{legalText}</p>
-        <p className="text-[0.625rem] uppercase tracking-wider text-neutral-600">
-          Auto Hall · Landing Studio
-        </p>
       </div>
     </footer>
   );

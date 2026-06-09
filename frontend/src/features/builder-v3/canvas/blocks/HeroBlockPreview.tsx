@@ -49,12 +49,12 @@ export function HeroBlockPreview({ propsJson, interactive: interactiveProp }: He
       {props.title ? (
         <h1 className="lp-hero__title">{props.title}</h1>
       ) : (
-        <CanvasEmptyHint className="lp-hero__title">Titre principal à renseigner</CanvasEmptyHint>
+        <CanvasEmptyHint className="lp-hero__title">Titre</CanvasEmptyHint>
       )}
       {props.subtitle ? (
         <p className="lp-hero__subtitle">{props.subtitle}</p>
       ) : (
-        <CanvasEmptyHint className="lp-hero__subtitle">Sous-titre à renseigner</CanvasEmptyHint>
+        <CanvasEmptyHint className="lp-hero__subtitle">Sous-titre</CanvasEmptyHint>
       )}
       {props.buttonText || props.secondaryButtonText ? (
         <div className="lp-hero__actions">

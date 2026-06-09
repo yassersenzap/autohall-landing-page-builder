@@ -1,6 +1,10 @@
 import { asPropString } from '@/features/builder-engine/lib/block-props';
 import { HeroBlockImage } from '@/features/builder-engine/components/media/HeroBlockImage';
 import {
+  buildBlockDesignClasses,
+  normalizeSectionDesign,
+} from '@/features/builder-engine/lib/block-design-system';
+import {
   buildButtonClasses,
   buildCanvasInlineStyle,
   buildCanvasSectionClass,
@@ -128,22 +132,59 @@ type VehicleRangeBlockPreviewProps = {
 };
 
 export function VehicleRangeBlockPreview({ propsJson }: VehicleRangeBlockPreviewProps) {
-  const heading = asPropString(propsJson.heading) || 'Notre gamme';
+  const design = normalizeSectionDesign('vehicle_range', propsJson);
+  const sectionClass = buildBlockDesignClasses('lp-vehicle-range', design);
+  const heading = asPropString(propsJson.heading);
+  const subtitle = asPropString(propsJson.subtitle);
   const vehicles = Array.isArray(propsJson.vehicles) ? propsJson.vehicles : [];
 
   return (
-    <section className="lp-section lp-block px-6 py-12">
-      <h2 className="mb-6 text-center text-2xl font-bold text-neutral-900">{heading}</h2>
-      <div className="mx-auto grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {vehicles.slice(0, 3).map((v, i) => {
-          const item = v && typeof v === 'object' ? (v as Record<string, unknown>) : {};
-          return (
-            <article key={i} className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
-              <p className="font-semibold text-neutral-900">{asPropString(item.name) || `Modèle ${i + 1}`}</p>
-              <p className="text-xs text-neutral-500">{asPropString(item.energy) || '—'}</p>
-            </article>
-          );
-        })}
+    <section className={`lp-block ${sectionClass}`}>
+      <div className="lp-section">
+        {heading || subtitle ? (
+          <div className="lp-section-head">
+            {heading ? <h2 className="lp-section-title">{heading}</h2> : null}
+            {subtitle ? <p className="lp-section-subtitle">{subtitle}</p> : null}
+          </div>
+        ) : null}
+        <div className="lp-vehicle-range__grid">
+          {vehicles.slice(0, 6).map((v, i) => {
+            const item = v && typeof v === 'object' ? (v as Record<string, unknown>) : {};
+            const name = asPropString(item.name);
+            const energy = asPropString(item.energy);
+            const tag = asPropString(item.tag);
+            const ctaText = asPropString(item.ctaText) || 'Découvrir';
+            const ctaTarget = asPropString(item.ctaTarget) || '#lead-form';
+            const imageAssetId = asPropString(item.imageAssetId);
+            const imageUrl = asPropString(item.imageUrl);
+            const hasImage = Boolean(imageAssetId || imageUrl);
+            if (!name) return null;
+            return (
+              <article key={i} className="lp-vehicle-card">
+                <div className="lp-vehicle-card__media">
+                  {hasImage ? (
+                    <HeroBlockImage
+                      imageAssetId={imageAssetId}
+                      imageUrl={imageUrl}
+                      alt={asPropString(item.alt) || name}
+                      className="lp-vehicle-card__img"
+                    />
+                  ) : (
+                    <div className="lp-vehicle-card__placeholder" aria-hidden />
+                  )}
+                </div>
+                <div className="lp-vehicle-card__body">
+                  {tag ? <span className="lp-vehicle-card__tag">{tag}</span> : null}
+                  <h3 className="lp-vehicle-card__name">{name}</h3>
+                  {energy ? <span className="lp-vehicle-card__energy">{energy}</span> : null}
+                  <a className="lp-btn lp-btn--secondary lp-btn--md lp-vehicle-card__cta" href={ctaTarget}>
+                    {ctaText}
+                  </a>
+                </div>
+              </article>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
@@ -154,22 +195,35 @@ type BenefitsBlockPreviewProps = {
 };
 
 export function BenefitsBlockPreview({ propsJson }: BenefitsBlockPreviewProps) {
-  const heading = asPropString(propsJson.heading) || 'Nos avantages';
+  const design = normalizeSectionDesign('benefits', propsJson);
+  const sectionClass = buildBlockDesignClasses('lp-benefits', design);
+  const heading = asPropString(propsJson.heading);
+  const subtitle = asPropString(propsJson.subtitle);
   const items = Array.isArray(propsJson.items) ? propsJson.items : [];
 
   return (
-    <section className="lp-section lp-block px-6 py-12 bg-neutral-50">
-      <h2 className="mb-6 text-center text-2xl font-bold text-neutral-900">{heading}</h2>
-      <div className="mx-auto grid max-w-4xl gap-4 sm:grid-cols-3">
-        {items.slice(0, 3).map((item, i) => {
-          const row = item && typeof item === 'object' ? (item as Record<string, unknown>) : {};
-          return (
-            <div key={i} className="rounded-lg bg-white p-4 shadow-sm">
-              <p className="font-medium text-neutral-900">{asPropString(row.title) || `Avantage ${i + 1}`}</p>
-              <p className="mt-1 text-sm text-neutral-600">{asPropString(row.description)}</p>
-            </div>
-          );
-        })}
+    <section className={`lp-block ${sectionClass}`}>
+      <div className="lp-section">
+        {heading || subtitle ? (
+          <div className="lp-section-head">
+            {heading ? <h2 className="lp-section-title">{heading}</h2> : null}
+            {subtitle ? <p className="lp-section-subtitle">{subtitle}</p> : null}
+          </div>
+        ) : null}
+        <div className="lp-benefits__grid">
+          {items.slice(0, 6).map((item, i) => {
+            const row = item && typeof item === 'object' ? (item as Record<string, unknown>) : {};
+            const title = asPropString(row.title);
+            const description = asPropString(row.description);
+            if (!title && !description) return null;
+            return (
+              <article key={i} className="lp-card lp-benefits__card">
+                {title ? <h3 className="lp-card__title">{title}</h3> : null}
+                {description ? <p className="lp-card__text">{description}</p> : null}
+              </article>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
@@ -180,27 +234,27 @@ type TrustBarBlockPreviewProps = {
 };
 
 export function TrustBarBlockPreview({ propsJson }: TrustBarBlockPreviewProps) {
+  const design = normalizeSectionDesign('trust_bar', propsJson);
+  const sectionClass = buildBlockDesignClasses('lp-trust-bar', design);
   const metrics = Array.isArray(propsJson.metrics) ? propsJson.metrics : [];
 
   return (
-    <section className="lp-section lp-block border-y border-neutral-200 bg-white px-6 py-8">
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-8 text-center">
-        {metrics.length > 0 ? (
-          metrics.slice(0, 4).map((m, i) => {
+    <section className={`lp-block ${sectionClass}`} aria-label="Réassurance">
+      <div className="lp-section">
+        <div className="lp-trust-bar__grid">
+          {metrics.slice(0, 4).map((m, i) => {
             const row = m && typeof m === 'object' ? (m as Record<string, unknown>) : {};
+            const value = asPropString(row.value);
+            const label = asPropString(row.label);
+            if (!value || !label) return null;
             return (
-              <div key={i}>
-                <p className="text-lg font-bold text-neutral-900">{asPropString(row.value) || '—'}</p>
-                <p className="text-xs text-neutral-500">{asPropString(row.label) || 'Indicateur'}</p>
+              <div key={i} className="lp-trust-bar__item">
+                <p className="lp-trust-bar__value">{value}</p>
+                <p className="lp-trust-bar__label">{label}</p>
               </div>
             );
-          })
-        ) : (
-          <>
-            <div><p className="font-bold">+50</p><p className="text-xs text-neutral-500">Concessionnaires</p></div>
-            <div><p className="font-bold">24h</p><p className="text-xs text-neutral-500">Réponse conseiller</p></div>
-          </>
-        )}
+          })}
+        </div>
       </div>
     </section>
   );
@@ -221,7 +275,7 @@ export function FinalCtaBlockPreview({
   const btnClass = buildButtonClasses(design);
   const title = asPropString(propsJson.title);
   const subtitle = asPropString(propsJson.subtitle);
-  const buttonText = asPropString(propsJson.buttonText) || 'Contactez-nous';
+  const buttonText = asPropString(propsJson.buttonText);
   const buttonTarget = asPropString(propsJson.buttonTarget) || '#lead-form';
 
   return (
@@ -234,9 +288,11 @@ export function FinalCtaBlockPreview({
             <CanvasEmptyHint className="lp-final-cta__title">Titre de conversion</CanvasEmptyHint>
           )}
           {subtitle ? <p className="lp-final-cta__subtitle">{subtitle}</p> : null}
-          <CanvasCtaLink href={buttonTarget} className={btnClass} interactive={interactive}>
-            {buttonText}
-          </CanvasCtaLink>
+          {buttonText ? (
+            <CanvasCtaLink href={buttonTarget} className={btnClass} interactive={interactive}>
+              {buttonText}
+            </CanvasCtaLink>
+          ) : null}
         </div>
       </div>
     </section>

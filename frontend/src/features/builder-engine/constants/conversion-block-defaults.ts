@@ -4,8 +4,9 @@ export function buildVideoEmbedDefaults(
   overrides: Record<string, unknown> = {},
 ): Record<string, unknown> {
   return {
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    videoUrl: '',
     title: 'Découvrez le véhicule en vidéo',
+    design: { variant: 'standard', tone: 'neutral', alignment: 'center' },
     ...overrides,
   };
 }
