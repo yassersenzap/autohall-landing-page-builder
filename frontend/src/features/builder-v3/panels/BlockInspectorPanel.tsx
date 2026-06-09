@@ -25,7 +25,8 @@ import {
   isMarketingInspectorBlock,
   MarketingBlockInspectorFields,
 } from './MarketingBlockInspectorFields';
-import { PremiumDesignInspectorFields } from './PremiumDesignInspectorFields';
+import { BlockDesignInspectorFields } from './BlockDesignInspectorFields';
+import { INSPECTOR_DESIGN_BLOCKS } from '@/features/builder-engine/lib/block-design-system';
 import { SECTION_PADDING_OPTIONS } from '../constants/block-layout';
 import {
   MEDIA_ASPECT_RATIO_OPTIONS,
@@ -124,8 +125,7 @@ export function BlockInspectorPanel({
   const isFAQ = block.type === 'faq';
   const isTestimonials = block.type === 'testimonials';
   const isMarketingBlock = isMarketingInspectorBlock(block.type);
-  const isPremiumDesignBlock =
-    block.type === 'hero_form_campaign' || block.type === 'vehicle_offer';
+  const isPremiumDesignBlock = INSPECTOR_DESIGN_BLOCKS.has(block.type);
   const supportsBackground = isPromo || isHero;
   const heroBgActive =
     isHero &&
@@ -782,8 +782,8 @@ export function BlockInspectorPanel({
             {tab === 'design' && (
               <div className="space-y-4">
                 {isPremiumDesignBlock && (
-                  <PremiumDesignInspectorFields
-                    blockType={block.type as 'hero_form_campaign' | 'vehicle_offer'}
+                  <BlockDesignInspectorFields
+                    blockType={block.type}
                     propsJson={block.propsJson}
                     onPatch={(designPatch) => updateBlockProps(block.id, designPatch)}
                   />

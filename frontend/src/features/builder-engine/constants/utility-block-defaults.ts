@@ -4,10 +4,11 @@ export function buildRichTextDefaults(
   overrides: Record<string, unknown> = {},
 ): Record<string, unknown> {
   return {
-    titre: 'Titre de section',
+    titre: 'Un accompagnement de confiance',
     contenu:
-      'Texte descriptif pour accompagner votre campagne. Restez concis et orienté bénéfice client.',
+      'Auto Hall vous guide à chaque étape : choix du modèle, financement, essai en concession et prise en charge après-vente.',
     alignement: 'center',
+    design: { variant: 'standard', tone: 'light', alignment: 'center' },
     ...overrides,
   };
 }

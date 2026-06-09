@@ -1,6 +1,7 @@
 import { asPropString } from '@/features/builder-engine/lib/block-props';
+import { HeroBlockImage } from '@/features/builder-engine/components/media/HeroBlockImage';
+import { buildBlockDesignClasses, normalizeSectionDesign } from '@/features/builder-engine/lib/block-design-system';
 import { assetPublicFileUrl } from '@/lib/page-assets-api';
-import { cn } from '@/lib/utils';
 
 type GalleryImage = {
   url?: string;
@@ -13,62 +14,42 @@ type GalleryBlockPreviewProps = {
 };
 
 function resolveGalleryImageSrc(image: GalleryImage): string {
-  if (image.imageAssetId) {
-    return assetPublicFileUrl(image.imageAssetId);
-  }
+  if (image.imageAssetId) return assetPublicFileUrl(image.imageAssetId);
   return image.url ?? '';
 }
 
 export function GalleryBlockPreview({ propsJson }: GalleryBlockPreviewProps) {
+  const design = normalizeSectionDesign('gallery', propsJson);
+  const sectionClass = buildBlockDesignClasses('lp-gallery', design);
   const heading = asPropString(propsJson.heading);
+  const subtitle = asPropString(propsJson.subtitle);
   const rawImages = Array.isArray(propsJson.images) ? propsJson.images : [];
-  const images = (rawImages as GalleryImage[]).slice(0, 3);
-
-  while (images.length < 3) {
-    images.push({ url: '', alt: '' });
-  }
+  const images = (rawImages as GalleryImage[]).slice(0, 6);
 
   return (
-    <section className="relative w-full bg-neutral-950 py-2">
-      {heading ? (
-        <div className="relative z-10 px-6 py-8 text-center">
-          <h2
-            className="text-xl font-bold text-white sm:text-2xl"
-            style={{ fontFamily: 'var(--font-heading)' }}
-          >
-            {heading}
-          </h2>
+    <section className={`lp-block ${sectionClass}`}>
+      <div className="lp-section">
+        {heading || subtitle ? (
+          <div className="lp-section-head">
+            {heading ? <h2 className="lp-section-title">{heading}</h2> : null}
+            {subtitle ? <p className="lp-section-subtitle">{subtitle}</p> : null}
+          </div>
+        ) : null}
+        <div className="lp-gallery__grid">
+          {images.map((image, index) => {
+            const src = resolveGalleryImageSrc(image);
+            const alt = image.alt || 'Photo véhicule Auto Hall';
+            return (
+              <figure key={`gallery-${index}`} className="lp-gallery__cell">
+                {src ? (
+                  <HeroBlockImage imageUrl={src} alt={alt} className="lp-gallery__img" />
+                ) : (
+                  <div className="lp-gallery__placeholder" aria-hidden />
+                )}
+              </figure>
+            );
+          })}
         </div>
-      ) : null}
-
-      <div className="relative z-10 grid grid-cols-1 gap-1 sm:grid-cols-3">
-        {images.map((image, index) => {
-          const src = resolveGalleryImageSrc(image);
-          const alt = image.alt || `Visuel ${index + 1}`;
-          return (
-            <div
-              key={`gallery-${index}`}
-              className="group relative aspect-[4/3] overflow-hidden sm:aspect-[3/4]"
-            >
-              {src ? (
-                <img
-                  src={src}
-                  alt={alt}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-              ) : (
-                <div
-                  className={cn(
-                    'flex h-full w-full items-center justify-center bg-neutral-800 text-xs text-neutral-500',
-                  )}
-                >
-                  Image {index + 1}
-                </div>
-              )}
-              <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/20" />
-            </div>
-          );
-        })}
       </div>
     </section>
   );
