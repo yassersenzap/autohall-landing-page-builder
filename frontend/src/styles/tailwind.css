@@ -4,7 +4,9 @@
   [data-studio-theme='dark'],
   [data-studio-theme='dark'] *,
   .ui-lab-dashboard-01,
-  .ui-lab-dashboard-01 *
+  .ui-lab-dashboard-01 *,
+  .auto-hall-admin-shell,
+  .auto-hall-admin-shell *
 ));
 
 @theme {

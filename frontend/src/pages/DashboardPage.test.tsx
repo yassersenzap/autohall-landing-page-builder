@@ -15,8 +15,8 @@ vi.mock('@/lib/lead-dashboard', () => ({
   getLeadDashboardKpis: vi.fn(),
 }));
 
-vi.mock('@/components/dashboard/LeadDashboardMetrics', () => ({
-  LeadDashboardMetrics: () => <div data-testid="lead-metrics" />,
+vi.mock('@/components/dashboard/DashboardLeadPerformance', () => ({
+  DashboardLeadPerformance: () => <div data-testid="lead-metrics" />,
 }));
 
 describe('DashboardPage', () => {
@@ -43,10 +43,10 @@ describe('DashboardPage', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getAllByRole('link', { name: /Ouvrir le Studio/i }).length).toBeGreaterThan(0);
+      expect(screen.getByText(/Production en cours/i)).toBeInTheDocument();
     });
 
-    const studioLink = screen.getAllByRole('link', { name: /Ouvrir le Studio/i })[0];
+    const studioLink = screen.getByRole('link', { name: /^Studio$/i });
     expect(studioLink).toHaveAttribute('href', `/page-versions/${pageVersionId}/studio`);
   });
 
@@ -58,7 +58,7 @@ describe('DashboardPage', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/Centre de commande/i)).toBeInTheDocument();
+      expect(screen.getByText(/Pilotez les campagnes/i)).toBeInTheDocument();
     });
 
     expect(screen.queryByText(/\bV1\b/i)).not.toBeInTheDocument();

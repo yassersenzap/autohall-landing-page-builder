@@ -1,29 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import {
-  Download,
-  Eye,
-  LayoutGrid,
-  PenLine,
-  Plus,
-  Users,
-} from 'lucide-react';
-import { LeadDashboardMetrics } from '@/components/dashboard/LeadDashboardMetrics';
-import { ShadButton, buttonVariants } from '@/components/ui/primitives';
-import {
-  ActionCard,
-  ActionCardGrid,
-  CommandHero,
-  MetricStrip,
-  MetricTile,
-} from '@/design-system';
+
+import { DASHBOARD01_CONTENT_PAD } from '@/components/admin/dashboard01-layout';
+import { DashboardKpiStrip } from '@/components/dashboard/DashboardKpiStrip';
+import { DashboardLeadPerformance } from '@/components/dashboard/DashboardLeadPerformance';
+import { DashboardProductionPanel } from '@/components/dashboard/DashboardProductionPanel';
+import { DashboardQuickActions } from '@/components/dashboard/DashboardQuickActions';
 import { useStudioSession } from '@/hooks/useStudioSession';
-import { cn } from '@/lib/utils';
 import { ApiError, meRequest, type AuthUser } from '@/lib/api';
-import { getPreviewRoute, getStudioRoute } from '@/lib/landing-studio-routes';
 import { getLeadDashboardKpis, type LeadDashboardKpis } from '@/lib/lead-dashboard';
 import { canViewLeads } from '@/lib/leads';
-import { studioNavState } from '@/lib/studio-session';
 import { downloadLandingExport } from '@/lib/landing-export.api';
 
 export default function DashboardPage() {
@@ -90,174 +75,56 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[12rem] items-center justify-center text-sm text-muted-foreground">
-        Chargement du centre de commande…
+      <div className="flex min-h-48 items-center justify-center px-4 text-sm text-muted-foreground lg:px-6">
+        Chargement du tableau de bord…
       </div>
     );
   }
 
   if (error) {
     return (
-      <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+      <p className="mx-4 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive lg:mx-6">
         {error}
       </p>
     );
   }
 
-  const showLeads = user && canViewLeads(user.role);
-  const studioState = session ? studioNavState(session) : undefined;
+  const showLeads = Boolean(user && canViewLeads(user.role));
 
   return (
-    <div className="ds-page-stack font-sans">
-      <CommandHero
-        title="Centre de commande"
-        description={
-          user
-            ? `Bienvenue, ${user.fullName} — pilotez la production de landing pages Auto Hall.`
-            : 'Pilotez la production de landing pages Auto Hall.'
-        }
-        actions={
-          <>
-            {session ? (
-              <Link
-                to={getStudioRoute(session.pageVersionId)}
-                state={studioState}
-                className={cn(buttonVariants({ variant: 'default', size: 'default' }))}
-              >
-                <PenLine className="h-4 w-4" />
-                Ouvrir le Studio
-              </Link>
-            ) : (
-              <ShadButton variant="default" disabled>
-                <PenLine className="h-4 w-4" />
-                Ouvrir le Studio
-              </ShadButton>
-            )}
-            <Link
-              to="/campaigns"
-              className={cn(buttonVariants({ variant: 'secondary', size: 'default' }))}
-            >
-              <LayoutGrid className="h-4 w-4" />
-              Campagnes
-            </Link>
-          </>
-        }
+    <>
+      <p className={`${DASHBOARD01_CONTENT_PAD} -mt-2 text-sm text-muted-foreground`}>
+        Pilotez les campagnes, landing pages et leads Auto Hall.
+      </p>
+
+      <DashboardKpiStrip
+        sessionActive={Boolean(session)}
+        sessionLabel={session?.label}
+        kpis={kpis}
+        showLeads={showLeads}
       />
 
-      <MetricStrip>
-        <MetricTile label="Produit" value="Landing Studio" />
-        <MetricTile label="Session Studio" value={session ? 'Active' : '—'} />
-        {showLeads && kpis ? (
-          <>
-            <MetricTile label="Leads totaux" value={kpis.totalLeads} />
-            <MetricTile label="Contactés" value={`${kpis.contactedRatePercent} %`} />
-            <MetricTile
-              label="Relances"
-              value={kpis.overdueFollowUps}
-            />
-          </>
-        ) : (
-          <Link to="/campaigns" className="block transition-opacity hover:opacity-90">
-            <MetricTile label="Campagnes" value="Gérer →" />
-          </Link>
-        )}
-      </MetricStrip>
+      <DashboardProductionPanel
+        session={session}
+        exporting={exporting}
+        onExport={() => void handleExportLatest()}
+      />
 
-      <section aria-label="Actions de production">
-        <h2 className="ds-section-title mb-3">Production</h2>
-        <ActionCardGrid>
-          <ActionCard
-            title="Ouvrir le Studio"
-            description={
-              session
-                ? `Reprendre ${session.label} — éditeur visuel officiel.`
-                : 'Ouvrez une version pour activer le Studio.'
-            }
-            icon={PenLine}
-            href={session ? getStudioRoute(session.pageVersionId) : undefined}
-            variant="primary"
-            size="large"
-            disabled={!session}
-            disabledHint="Créez une campagne, une landing et une version pour démarrer."
-            spanClass="ds-bento__span-6"
-          />
-          <ActionCard
-            title="Créer une campagne"
-            description="Lancez une nouvelle campagne et ses landing pages."
-            icon={Plus}
-            href="/campaigns"
-            spanClass="ds-bento__span-3"
-          />
-          <ActionCard
-            title="Campagnes"
-            description="Landings, versions et actions de production."
-            icon={LayoutGrid}
-            href="/campaigns"
-            spanClass="ds-bento__span-3"
-          />
-          {session ? (
-            <ActionCard
-              title="Aperçu"
-              description={`Prévisualiser ${session.label}`}
-              icon={Eye}
-              href={getPreviewRoute(session.pageVersionId)}
-              spanClass="ds-bento__span-3"
-            />
-          ) : (
-            <ActionCard
-              title="Aperçu"
-              description="Disponible après ouverture d'une version."
-              icon={Eye}
-              disabled
-              disabledHint="Aucune version en session."
-              spanClass="ds-bento__span-3"
-            />
-          )}
-          {session ? (
-            <ActionCard
-              title="Export ZIP"
-              description="Télécharger le package de la dernière version."
-              icon={Download}
-              onClick={() => void handleExportLatest()}
-              disabled={exporting}
-              disabledHint={exporting ? 'Export en cours…' : undefined}
-              spanClass="ds-bento__span-3"
-            />
-          ) : (
-            <ActionCard
-              title="Export ZIP"
-              description="Disponible pour une version prête."
-              icon={Download}
-              disabled
-              disabledHint="Ouvrez le Studio sur une version."
-              spanClass="ds-bento__span-3"
-            />
-          )}
-          {showLeads ? (
-            <ActionCard
-              title="Leads"
-              description="Suivi des demandes et conversions landing."
-              icon={Users}
-              href="/leads"
-              spanClass="ds-bento__span-3"
-            />
-          ) : null}
-        </ActionCardGrid>
-      </section>
+      <DashboardQuickActions showLeads={showLeads} />
 
       {kpisError ? (
-        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <p className="mx-4 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive lg:mx-6">
           {kpisError}
         </p>
       ) : null}
 
       {exportError ? (
-        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <p className="mx-4 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive lg:mx-6">
           {exportError}
         </p>
       ) : null}
 
-      {showLeads && kpis ? <LeadDashboardMetrics kpis={kpis} /> : null}
-    </div>
+      {showLeads && kpis ? <DashboardLeadPerformance kpis={kpis} /> : null}
+    </>
   );
 }

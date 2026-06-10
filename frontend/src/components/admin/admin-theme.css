@@ -1,0 +1,24 @@
+@import '@fontsource-variable/geist';
+@import '@/ui-lab/styles/dashboard-01-theme.css';
+
+/* Auto Hall admin uses the exact dashboard-01 token scope + brand CTA */
+.auto-hall-admin-shell.ui-lab-dashboard-01 {
+  --ah-brand-red: #d71920;
+  --ah-brand-red-hover: #b9151b;
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
+}
+
+.auto-hall-admin-shell.ui-lab-dashboard-01 .ah-cta-primary {
+  background-color: var(--ah-brand-red) !important;
+  color: #fff !important;
+}
+
+.auto-hall-admin-shell.ui-lab-dashboard-01 .ah-cta-primary:hover {
+  background-color: var(--ah-brand-red-hover) !important;
+  color: #fff !important;
+}
+
+.auto-hall-admin-shell.ui-lab-dashboard-01 .ah-cta-primary:disabled {
+  opacity: 0.5;
+}
