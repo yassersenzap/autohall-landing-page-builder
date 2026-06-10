@@ -7,8 +7,7 @@ import { AutoHallNavMain } from '@/components/admin/AutoHallNavMain';
 import { AutoHallNavSecondary } from '@/components/admin/AutoHallNavSecondary';
 import { AutoHallNavUser } from '@/components/admin/AutoHallNavUser';
 import type { AuthUser } from '@/lib/api';
-import { readStudioSession } from '@/lib/studio-session';
-import { useStudioSession } from '@/hooks/useStudioSession';
+import { useStudioEntry } from '@/hooks/useStudioEntry';
 import {
   Sidebar,
   SidebarContent,
@@ -32,7 +31,7 @@ export function AutoHallDashboardSidebar({
   user,
   ...props
 }: AutoHallDashboardSidebarProps & ComponentProps<typeof Sidebar>) {
-  const session = useStudioSession() ?? readStudioSession();
+  const { session, loading } = useStudioEntry();
   const displayUser = user
     ? { name: user.fullName, email: user.email }
     : DEFAULT_USER;
@@ -69,7 +68,7 @@ export function AutoHallDashboardSidebar({
       </SidebarHeader>
 
       <SidebarContent>
-        <AutoHallNavMain session={session} />
+        <AutoHallNavMain session={session} loading={loading} />
         <AutoHallNavSecondary className="mt-auto" />
       </SidebarContent>
 

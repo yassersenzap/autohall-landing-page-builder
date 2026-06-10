@@ -6,7 +6,7 @@ import { AutoHallMetricCard, AutoHallMetricGrid } from '@/components/admin/AutoH
 import { AutoHallPanel } from '@/components/admin/AutoHallPanel';
 import { ADMIN_CONTENT_PAD } from '@/components/admin/admin-layout';
 import { createCampaignsTableColumns } from '@/components/campaigns/campaigns-table-columns';
-import { useStudioSession } from '@/hooks/useStudioSession';
+import { useStudioEntry } from '@/hooks/useStudioEntry';
 import { CreateCampaignPanel } from '@/components/campaigns/CreateCampaignPanel';
 import { DataTable } from '@/components/ui/data-table';
 import { ApiError, logoutClient, meRequest } from '@/lib/api';
@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/shadcn/button';
 
 export default function CampaignsPage() {
   const navigate = useNavigate();
-  const studioSession = useStudioSession();
+  const { session: studioSession } = useStudioEntry();
   const columns = createCampaignsTableColumns(studioSession);
   const [campaigns, setCampaigns] = useState<CampaignListItem[]>([]);
   const [role, setRole] = useState<string | null>(null);

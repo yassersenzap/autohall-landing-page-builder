@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
 import { LayoutDashboard, LayoutGrid, PenLine, Users } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useStudioSession } from '@/hooks/useStudioSession';
-import { readStudioSession, studioNavState as buildNavState } from '@/lib/studio-session';
+import { useStudioEntry } from '@/hooks/useStudioEntry';
+import { STUDIO_EMPTY_MESSAGE } from '@/lib/studio-entry';
+import { studioNavState as buildNavState } from '@/lib/studio-session';
 import { getStudioRoute } from '@/lib/landing-studio-routes';
 import { logoutClient, logoutRequest } from '@/lib/api';
 import { ShadButton } from '@/components/ui/primitives';
@@ -22,8 +23,7 @@ type AppShellProps = {
 export function AppShell({ children }: AppShellProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  const session = useStudioSession();
-  const studioSession = session ?? readStudioSession();
+  const { session: studioSession, loading: studioLoading } = useStudioEntry();
 
   async function handleLogout() {
     try {
@@ -62,7 +62,14 @@ export function AppShell({ children }: AppShellProps) {
           ))}
 
           <p className="ds-sidebar__label mt-4">Production</p>
-          {studioSession ? (
+          {studioLoading ? (
+            <span className="ds-nav-item pointer-events-none opacity-50" aria-disabled>
+              <span className="ds-nav-item__icon-box opacity-40">
+                <PenLine className="ds-nav-item__icon" aria-hidden />
+              </span>
+              <span>Chargement du Studio…</span>
+            </span>
+          ) : studioSession ? (
             <SidebarNavItem
               to={getStudioRoute(studioSession.pageVersionId)}
               label="Ouvrir le Studio"
@@ -77,12 +84,12 @@ export function AppShell({ children }: AppShellProps) {
           ) : (
             <span
               className="ds-nav-item pointer-events-none opacity-50"
-              title="Ouvrez une version pour activer le Studio"
+              title={STUDIO_EMPTY_MESSAGE}
             >
               <span className="ds-nav-item__icon-box opacity-40">
                 <PenLine className="ds-nav-item__icon" aria-hidden />
               </span>
-              <span>Studio indisponible</span>
+              <span>Aucune version</span>
             </span>
           )}
         </nav>
