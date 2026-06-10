@@ -31,14 +31,34 @@ Les routes legacy (`/blocks`, `/studio-v2`, `/preview`) redirigent vers ces URLs
 
 Le code archivé V1/V2 (`frontend/src/_archive`) a été retiré du dépôt. L'export ZIP passe par `frontend/src/lib/landing-export.api.ts` (appels backend depuis le dashboard).
 
-## Installation locale
+## Variables d'environnement
+
+Trois fichiers distincts — ne pas mélanger les rôles :
+
+| Fichier | Usage | Versionné |
+| --- | --- | --- |
+| **`.env`** (racine) | Docker Compose / déploiement SI uniquement | Non |
+| **`frontend/.env`** | `npm run dev` Vite (hors Docker) | Non |
+| **`backend/.env`** | `npm run start:dev` NestJS + Prisma local (hors Docker) | Non |
+| **`.env.example`** (×3) | Modèles avec placeholders | Oui |
+
+Règles :
+
+- **Docker** : `cp .env.example .env` à la racine → `POSTGRES_PASSWORD`, `JWT_SECRET`, `DATABASE_URL` avec hôte **`postgres`**, `VITE_API_BASE_URL` pour le build frontend, `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` pour le seed initial.
+- **Backend local** : `cp backend/.env.example backend/.env` → `DATABASE_URL` avec hôte **`localhost`**, `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` pour `npm run db:seed`.
+- **Frontend local** : `cp frontend/.env.example frontend/.env` → `VITE_API_BASE_URL=http://localhost:3000`.
+- Les landing pages exportées (ZIP) sont statiques : **aucun secret** ne doit y figurer.
+
+Exemple ports **local Docker** (défaut dans `.env.example`) : frontend `http://localhost:8081`, backend `http://localhost:3001`.
+
+## Installation locale (hors Docker applicatif)
 
 ```bash
-cp .env.example .env
+docker compose up -d postgres
+
 cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
-
-docker compose up -d
+# Éditer backend/.env : DATABASE_URL (localhost), JWT_SECRET, CORS, PUBLIC_API_BASE_URL, SEED_ADMIN_*
 
 cd backend && npm install && npx prisma generate && npx prisma migrate deploy && npm run db:seed && npm run start:dev
 
@@ -49,7 +69,7 @@ Vérifications :
 
 ```bash
 curl http://localhost:3000/health
-# Frontend : http://localhost:5173
+# Frontend Vite : http://localhost:5173
 ```
 
 ## Qualité (CI locale)
@@ -75,23 +95,27 @@ Le frontend appelle l'API via `VITE_API_BASE_URL` (compilée au **build** de l'i
 ```bash
 git pull
 cp .env.example .env
-# Éditer .env : POSTGRES_PASSWORD, JWT_SECRET, DATABASE_URL (host postgres), CORS, URLs publiques
+# Éditer .env : POSTGRES_PASSWORD, JWT_SECRET, SEED_ADMIN_*, DATABASE_URL (host postgres), CORS, URLs publiques
 
 docker compose config
 docker compose build
 docker compose up -d
 docker compose logs -f backend
+docker compose exec backend npm run db:seed
 ```
 
 Ouvrir le frontend : `http://<hôte>:<FRONTEND_PORT>/` (ex. `http://10.100.8.10:8080/` ou port 80 si `FRONTEND_PORT=80`).
 
-Exemple `.env` pour serveur SI `10.100.8.10` (adapter les secrets) :
+Exemple **racine `.env`** pour serveur SI `10.100.8.10` (placeholders — ne pas committer) :
 
 ```env
-FRONTEND_PORT=8080
-POSTGRES_PASSWORD=<secret>
-JWT_SECRET=<secret>
-DATABASE_URL=postgresql://autohall_user:<secret>@postgres:5432/autohall_lp_builder?schema=public
+FRONTEND_PORT=80
+BACKEND_PORT=3000
+POSTGRES_PASSWORD=CHANGE_ME_STRONG_PASSWORD
+JWT_SECRET=CHANGE_ME_LONG_RANDOM_SECRET_MIN_32_CHARS
+SEED_ADMIN_EMAIL=admin@autohall.local
+SEED_ADMIN_PASSWORD=CHANGE_ME_ADMIN_PASSWORD_MIN_12_CHARS
+DATABASE_URL=postgresql://autohall_user:CHANGE_ME_STRONG_PASSWORD@postgres:5432/autohall_lp_builder?schema=public
 CORS_ALLOWED_ORIGINS=http://10.100.8.10,http://10.100.8.10:8080
 PUBLIC_API_BASE_URL=http://10.100.8.10:3000
 VITE_API_BASE_URL=http://10.100.8.10:3000
