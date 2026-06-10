@@ -1,15 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+
+import { AutoHallEmptyState } from '@/components/admin/AutoHallEmptyState';
+import { AutoHallPanel } from '@/components/admin/AutoHallPanel';
+import { DASHBOARD01_CONTENT_PAD } from '@/components/admin/dashboard01-layout';
 import LeadsFilters, {
   type LeadsFilterValues,
 } from '../components/leads/LeadsFilters';
 import LeadsTable from '../components/leads/LeadsTable';
-import { StudioPageHeader } from '@/components/studio/StudioPageHeader';
-import { Card } from '../components/ui/Card';
 import { ApiError, logoutClient, meRequest } from '../lib/api';
 import { listCampaigns, type CampaignListItem } from '../lib/campaigns';
 import { listLandingPages, type LandingPageListItem } from '../lib/landing-pages';
 import {
+  canPurgeLeads,
   canViewLeads,
   getAssignableUsers,
   listLeadEvents,
@@ -18,6 +21,7 @@ import {
   type LeadEventListItem,
   type LeadsPagination,
 } from '../lib/leads';
+import { Button } from '@/ui-lab/ui/button';
 
 function initialFilters(searchParams: URLSearchParams): LeadsFilterValues {
   return {
@@ -154,7 +158,7 @@ export default function LeadsPage() {
     return () => {
       cancelled = true;
     };
-  }, [loadLeads, navigate]);
+  }, [loadLeads, navigate, startingFilters]);
 
   useEffect(() => {
     if (!filters.campaignId) {
@@ -231,71 +235,92 @@ export default function LeadsPage() {
 
   if (role && !canViewLeads(role)) {
     return (
-      <div className="ds-page-stack">
-        <p className="ui-alert ui-alert--error">
-          Accès refusé : votre rôle ne permet pas de consulter les leads.
-        </p>
-        <Link to="/dashboard" className="ui-link">
-          Retour au tableau de bord
-        </Link>
-      </div>
+      <section className={DASHBOARD01_CONTENT_PAD}>
+        <AutoHallEmptyState
+          title="Accès refusé"
+          description="Votre rôle ne permet pas de consulter les leads."
+          action={
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/dashboard">Retour au tableau de bord</Link>
+            </Button>
+          }
+        />
+      </section>
     );
   }
 
   return (
-    <div className="ds-page-stack leads-page" data-page="leads">
-      <StudioPageHeader
-        title="Leads reçus"
-        description="Soumissions issues des landing pages exportées et du formulaire public."
-        backTo="/dashboard"
-        backLabel="Tableau de bord"
-      />
+    <>
+      <p className={`${DASHBOARD01_CONTENT_PAD} -mt-2 text-sm text-muted-foreground`}>
+        Soumissions issues des landing pages exportées et du formulaire public.
+      </p>
 
-      {error ? <p className="ui-alert ui-alert--error">{error}</p> : null}
+      {error ? (
+        <p
+          className={`${DASHBOARD01_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
+        >
+          {error}
+        </p>
+      ) : null}
+
       {purgeMessage ? (
-        <p className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+        <p
+          className={`${DASHBOARD01_CONTENT_PAD} rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-400`}
+        >
           {purgeMessage}
         </p>
       ) : null}
 
-      <Card title="Filtres" padding="none" className="leads-filter-card">
-        <LeadsFilters
-        values={filters}
-        campaigns={campaigns}
-        landingPages={landingPages}
-        assignableUsers={assignableUsers}
-        onChange={setFilters}
-        onApply={handleApplyFilters}
-        onRefresh={handleRefresh}
-        loading={loading}
-        />
-      </Card>
+      <section className={DASHBOARD01_CONTENT_PAD}>
+        <AutoHallPanel title="Filtres" description="Affinez la liste des leads reçus.">
+          <LeadsFilters
+            values={filters}
+            campaigns={campaigns}
+            landingPages={landingPages}
+            assignableUsers={assignableUsers}
+            onChange={setFilters}
+            onApply={handleApplyFilters}
+            onRefresh={handleRefresh}
+            loading={loading}
+          />
+        </AutoHallPanel>
+      </section>
 
-      <Card padding="none" className="leads-results-card">
-        <LeadsTable
-          leads={leads}
-          pagination={pagination}
-          loading={loading}
-          onPageChange={handlePageChange}
-        />
-      </Card>
+      <section className={DASHBOARD01_CONTENT_PAD}>
+        <AutoHallPanel
+          title="Résultats"
+          description="Liste paginée des soumissions correspondant aux filtres appliqués."
+          contentClassName="min-w-0"
+        >
+          <LeadsTable
+            leads={leads}
+            pagination={pagination}
+            loading={loading}
+            onPageChange={handlePageChange}
+          />
+        </AutoHallPanel>
+      </section>
 
-      {role === 'ADMIN' ? (
-        <div className="flex flex-col items-start gap-2 rounded-xl border border-neutral-800 bg-neutral-900/40 px-5 py-4">
-          <p className="text-sm text-neutral-500">
-            Zone admin — nettoyage avant livraison (supprime uniquement les leads, pas les
-            campagnes ni les comptes).
-          </p>
-          <button
-            type="button"
-            onClick={() => void handlePurgeAllLeads()}
-            disabled={purging || loading}
-            className="rounded-md border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-300 transition-colors hover:border-neutral-600 hover:bg-neutral-700 hover:text-neutral-100 disabled:opacity-50"
+      {role && canPurgeLeads(role) ? (
+        <section className={DASHBOARD01_CONTENT_PAD}>
+          <AutoHallPanel
+            title="Zone admin"
+            description="Nettoyage avant livraison — supprime uniquement les leads, pas les campagnes ni les comptes."
+            className="ah-admin-muted-zone"
           >
-            {purging ? 'Purge en cours…' : 'Purger les leads de test'}
-          </button>
-        </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="text-muted-foreground"
+              onClick={() => void handlePurgeAllLeads()}
+              disabled={purging || loading}
+            >
+              {purging ? 'Purge en cours…' : 'Purger les leads de test'}
+            </Button>
+          </AutoHallPanel>
+        </section>
       ) : null}
-    </div>
+    </>
   );
 }

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
+
+import { AutoHallEmptyState } from '@/components/admin/AutoHallEmptyState';
 import { LeadAvatar } from './LeadAvatar';
-import { Button } from '../ui/Button';
 import { PriorityBadge } from '../ui/PriorityBadge';
 import { StatusBadge } from '../ui/StatusBadge';
 import {
@@ -8,6 +9,15 @@ import {
   type LeadEventListItem,
   type LeadsPagination,
 } from '../../lib/leads';
+import { Button } from '@/ui-lab/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/ui-lab/ui/table';
 
 type LeadsTableProps = {
   leads: LeadEventListItem[];
@@ -38,128 +48,137 @@ export default function LeadsTable({
   onPageChange,
 }: LeadsTableProps) {
   if (loading) {
-    return <p className="ui-table-panel__loading">Chargement des leads…</p>;
-  }
-
-  if (leads.length === 0) {
     return (
-      <p className="ui-table-panel__empty">
-        Aucun lead trouvé pour ces critères de filtrage.
+      <p className="py-12 text-center text-sm text-muted-foreground">
+        Chargement des leads…
       </p>
     );
   }
 
+  if (leads.length === 0) {
+    return (
+      <AutoHallEmptyState
+        title="Aucun lead trouvé"
+        description="Aucun lead ne correspond à ces critères de filtrage. Ajustez les filtres ou rafraîchissez la liste."
+        className="ah-target-empty-state"
+      />
+    );
+  }
+
   return (
-    <>
-      <div className="ui-table-panel__head">
-        <h2 className="ui-table-panel__title">Résultats</h2>
-        <span className="ui-table-panel__meta">
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-end gap-2 px-1">
+        <span className="text-sm text-muted-foreground">
           {pagination.total} lead{pagination.total > 1 ? 's' : ''} · page{' '}
           {pagination.page} / {pagination.totalPages}
         </span>
       </div>
-      <div className="leads-table-scroll">
-        <table className="leads-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Contact</th>
-              <th>Campagne</th>
-              <th>Landing</th>
-              <th>Priorité</th>
-              <th>Assigné</th>
-              <th>Relance</th>
-              <th>Statut</th>
-              <th className="leads-table__col-source">Source</th>
-              <th className="leads-table__col-actions" aria-label="Actions" />
-            </tr>
-          </thead>
-          <tbody>
-            {leads.map((lead) => (
-              <tr key={lead.id}>
-                <td className="leads-table__date">{formatDate(lead.createdAt)}</td>
-                <td>
-                  <div className="flex items-center gap-3">
-                    <LeadAvatar name={lead.fullName} />
-                    <div className="min-w-0">
-                      <span className="block font-medium text-neutral-100">
-                        {lead.fullName}
-                      </span>
-                      <span className="block text-sm text-neutral-500">{lead.phone}</span>
-                      {lead.email ? (
-                        <span className="block text-sm text-neutral-500">{lead.email}</span>
-                      ) : null}
+
+      <div className="ah-target-table overflow-hidden rounded-xl">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Date</TableHead>
+                <TableHead>Contact</TableHead>
+                <TableHead>Campagne</TableHead>
+                <TableHead>Landing</TableHead>
+                <TableHead>Priorité</TableHead>
+                <TableHead>Assigné</TableHead>
+                <TableHead>Relance</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead>Source</TableHead>
+                <TableHead className="text-right">Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {leads.map((lead) => (
+                <TableRow key={lead.id}>
+                  <TableCell className="whitespace-nowrap text-muted-foreground">
+                    {formatDate(lead.createdAt)}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex min-w-[12rem] items-center gap-3">
+                      <LeadAvatar name={lead.fullName} />
+                      <div className="min-w-0">
+                        <span className="block font-medium">{lead.fullName}</span>
+                        <span className="block text-sm text-muted-foreground">{lead.phone}</span>
+                        {lead.email ? (
+                          <span className="block text-sm text-muted-foreground">{lead.email}</span>
+                        ) : null}
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td>
-                  <span className="leads-table__cell-primary">{lead.campaignName}</span>
-                  {(lead.brand ?? lead.model) ? (
-                    <span className="leads-table__contact-line">
-                      {[lead.brand, lead.model].filter(Boolean).join(' · ')}
+                  </TableCell>
+                  <TableCell>
+                    <span className="block font-medium">{lead.campaignName}</span>
+                    {(lead.brand ?? lead.model) ? (
+                      <span className="block text-sm text-muted-foreground">
+                        {[lead.brand, lead.model].filter(Boolean).join(' · ')}
+                      </span>
+                    ) : null}
+                  </TableCell>
+                  <TableCell>
+                    <span className="block">{lead.landingPageTitle}</span>
+                    <span className="block text-sm text-muted-foreground">
+                      /{lead.landingPageSlug}
                     </span>
-                  ) : null}
-                </td>
-                <td>
-                  <span className="leads-table__landing-title">
-                    {lead.landingPageTitle}
-                  </span>
-                  <span className="leads-table__landing-slug">
-                    /{lead.landingPageSlug}
-                  </span>
-                </td>
-                <td>
-                  <PriorityBadge priority={lead.priority} />
-                </td>
-                <td>{lead.assignedToName ?? '—'}</td>
-                <td
-                  className={
-                    lead.isFollowUpOverdue ? 'text-amber-400 font-medium' : undefined
-                  }
-                >
-                  {formatLeadDate(lead.nextFollowUpAt)}
-                  {lead.isFollowUpOverdue ? (
-                    <span className="ml-1.5 inline-flex items-center rounded-md border border-amber-500/20 bg-amber-500/10 px-1.5 py-0.5 text-xs font-semibold text-amber-400">
-                      En retard
-                    </span>
-                  ) : null}
-                </td>
-                <td>
-                  <StatusBadge status={lead.status} />
-                </td>
-                <td className="leads-table__source leads-table__col-source" title={lead.sourceUrl}>
-                  {truncateText(lead.sourceUrl)}
-                </td>
-                <td className="leads-table__actions">
-                  <Link
-                    to={`/leads/${lead.id}`}
-                    className="ui-btn ui-btn--ghost ui-btn--sm"
+                  </TableCell>
+                  <TableCell>
+                    <PriorityBadge priority={lead.priority} />
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {lead.assignedToName ?? '—'}
+                  </TableCell>
+                  <TableCell
+                    className={
+                      lead.isFollowUpOverdue ? 'font-medium text-amber-600 dark:text-amber-400' : undefined
+                    }
                   >
-                    Voir
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    {formatLeadDate(lead.nextFollowUpAt)}
+                    {lead.isFollowUpOverdue ? (
+                      <span className="ml-1.5 inline-flex items-center rounded-md border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-400">
+                        En retard
+                      </span>
+                    ) : null}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={lead.status} />
+                  </TableCell>
+                  <TableCell
+                    className="max-w-[10rem] truncate text-muted-foreground"
+                    title={lead.sourceUrl}
+                  >
+                    {truncateText(lead.sourceUrl)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to={`/leads/${lead.id}`}>Voir</Link>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
+
       {pagination.totalPages > 1 ? (
-        <div className="leads-pagination">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <Button
             type="button"
-            variant="secondary"
+            variant="outline"
             size="sm"
             disabled={pagination.page <= 1}
             onClick={() => onPageChange(pagination.page - 1)}
           >
             Page précédente
           </Button>
-          <span className="leads-pagination__meta">
+          <span className="text-sm text-muted-foreground">
             Page {pagination.page} sur {pagination.totalPages}
           </span>
           <Button
             type="button"
-            variant="secondary"
+            variant="outline"
             size="sm"
             disabled={pagination.page >= pagination.totalPages}
             onClick={() => onPageChange(pagination.page + 1)}
@@ -168,6 +187,6 @@ export default function LeadsTable({
           </Button>
         </div>
       ) : null}
-    </>
+    </div>
   );
 }

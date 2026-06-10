@@ -1,16 +1,13 @@
 import { useState, type FormEvent } from 'react';
 import { Plus } from 'lucide-react';
+
+import { AutoHallPanel } from '@/components/admin/AutoHallPanel';
+import { DASHBOARD01_CONTENT_PAD } from '@/components/admin/dashboard01-layout';
 import { ApiError } from '@/lib/api';
 import { createCampaign } from '@/lib/campaigns';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  ShadButton,
-  ShadInput,
-} from '@/components/ui/primitives';
+import { Button } from '@/ui-lab/ui/button';
+import { Input } from '@/ui-lab/ui/input';
+import { Label } from '@/ui-lab/ui/label';
 
 type CreateCampaignPanelProps = {
   onCreated: () => void;
@@ -49,41 +46,62 @@ export function CreateCampaignPanel({ onCreated }: CreateCampaignPanelProps) {
   }
 
   return (
-    <Card className="campaign-create-card">
-      <CardHeader>
-        <CardTitle>Nouvelle campagne</CardTitle>
-        <CardDescription>
-          Créez une campagne pour regrouper vos landing pages et versions.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <section className={DASHBOARD01_CONTENT_PAD}>
+      <AutoHallPanel
+        title="Nouvelle campagne"
+        description="Créez une campagne pour regrouper vos landing pages et versions."
+      >
         <form className="grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit}>
-          <ShadInput label="Nom" value={name} onChange={(e) => setName(e.target.value)} required maxLength={180} />
-          <ShadInput label="Marque" value={brand} onChange={(e) => setBrand(e.target.value)} required maxLength={100} />
-          <ShadInput
-            label="Modèle (optionnel)"
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-            maxLength={100}
-          />
-          <ShadInput
-            label="Type"
-            value={campaignType}
-            onChange={(e) => setCampaignType(e.target.value)}
-            required
-            maxLength={80}
-          />
+          <div className="grid gap-2">
+            <Label htmlFor="campaign-name">Nom</Label>
+            <Input
+              id="campaign-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              maxLength={180}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="campaign-brand">Marque</Label>
+            <Input
+              id="campaign-brand"
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
+              required
+              maxLength={100}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="campaign-model">Modèle (optionnel)</Label>
+            <Input
+              id="campaign-model"
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              maxLength={100}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="campaign-type">Type</Label>
+            <Input
+              id="campaign-type"
+              value={campaignType}
+              onChange={(e) => setCampaignType(e.target.value)}
+              required
+              maxLength={80}
+            />
+          </div>
           {error ? (
             <p className="sm:col-span-2 text-sm text-destructive">{error}</p>
           ) : null}
           <div className="sm:col-span-2">
-            <ShadButton type="submit" disabled={submitting}>
-              <Plus className="h-4 w-4" />
+            <Button type="submit" disabled={submitting}>
+              <Plus className="size-4" aria-hidden />
               {submitting ? 'Création…' : 'Créer la campagne'}
-            </ShadButton>
+            </Button>
           </div>
         </form>
-      </CardContent>
-    </Card>
+      </AutoHallPanel>
+    </section>
   );
 }

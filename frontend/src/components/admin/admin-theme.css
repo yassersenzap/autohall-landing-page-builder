@@ -1,24 +1,189 @@
 @import '@fontsource-variable/geist';
-@import '@/ui-lab/styles/dashboard-01-theme.css';
+@import '@/ui-lab/autohall-dashboard-target/styles/target-theme.css';
 
-/* Auto Hall admin uses the exact dashboard-01 token scope + brand CTA */
-.auto-hall-admin-shell.ui-lab-dashboard-01 {
-  --ah-brand-red: #d71920;
-  --ah-brand-red-hover: #b9151b;
-  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
-  font-family: var(--font-sans);
+/* Production admin shell — same token scope as autohall-dashboard-target */
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target {
+  --ah-brand-red: #c41e24;
+  --ah-brand-red-hover: #a8191e;
+  --ah-brand-accent: #c41e24;
 }
 
-.auto-hall-admin-shell.ui-lab-dashboard-01 .ah-cta-primary {
-  background-color: var(--ah-brand-red) !important;
-  color: #fff !important;
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-cta-primary {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
 }
 
-.auto-hall-admin-shell.ui-lab-dashboard-01 .ah-cta-primary:hover {
-  background-color: var(--ah-brand-red-hover) !important;
-  color: #fff !important;
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-cta-primary:hover:not(:disabled) {
+  background-color: color-mix(in oklab, var(--primary) 90%, var(--foreground)) !important;
 }
 
-.auto-hall-admin-shell.ui-lab-dashboard-01 .ah-cta-primary:disabled {
-  opacity: 0.5;
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-cta-primary:disabled {
+  opacity: 0.55;
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-cta-primary .ah-brand-accent-icon {
+  color: var(--ah-brand-accent);
+}
+
+/* ── Portaled sidebar user dropdown (Radix Portal → document body) ─────────── */
+.ah-admin-portal-menu {
+  font-family: var(--font-sans, 'Geist Variable', ui-sans-serif, system-ui, sans-serif);
+  border-width: 1px;
+  border-style: solid;
+}
+
+.ah-admin-portal-menu[data-ah-target-theme='dark'] {
+  color-scheme: dark;
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --foreground: oklch(0.985 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --destructive: oklch(0.704 0.191 22.216);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  background-color: var(--popover);
+  color: var(--popover-foreground);
+  border-color: var(--border);
+  box-shadow:
+    0 4px 6px -1px oklch(0 0 0 / 0.35),
+    0 2px 4px -2px oklch(0 0 0 / 0.25);
+}
+
+.ah-admin-portal-menu[data-ah-target-theme='light'] {
+  color-scheme: light;
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0 0);
+  --foreground: oklch(0.25 0 0);
+  --muted-foreground: oklch(0.5 0 0);
+  --accent: oklch(0.94 0 0);
+  --accent-foreground: oklch(0.2 0 0);
+  --border: oklch(0.82 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  background-color: var(--popover);
+  color: var(--popover-foreground);
+  border-color: var(--border);
+  box-shadow:
+    0 0 0 1px oklch(0.82 0 0),
+    0 4px 12px oklch(0 0 0 / 0.08);
+}
+
+.ah-admin-portal-menu [data-slot='dropdown-menu-separator'] {
+  background-color: var(--border);
+}
+
+.ah-admin-portal-menu [data-slot='dropdown-menu-item']:focus,
+.ah-admin-portal-menu [data-slot='dropdown-menu-item'][data-highlighted] {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+  outline: none;
+}
+
+.ah-admin-portal-menu [data-slot='dropdown-menu-item'][data-variant='destructive']:focus,
+.ah-admin-portal-menu [data-slot='dropdown-menu-item'][data-variant='destructive'][data-highlighted] {
+  background-color: color-mix(in oklab, var(--destructive) 10%, var(--popover));
+  color: var(--destructive);
+}
+
+.ah-admin-portal-menu [data-slot='dropdown-menu-item'][data-variant='destructive'] svg {
+  color: var(--destructive);
+}
+
+/* ── Light mode polish — campaigns / leads forms & controls ──────────────── */
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] [data-slot='input'],
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] .ah-admin-native-select {
+  background-color: oklch(1 0 0);
+  border-color: oklch(0.82 0 0);
+  color: oklch(0.25 0 0);
+  box-shadow: 0 1px 2px oklch(0 0 0 / 0.04);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] [data-slot='input']::placeholder {
+  color: oklch(0.58 0 0);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] [data-slot='input']:focus-visible,
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] .ah-admin-native-select:focus-visible {
+  border-color: oklch(0.68 0 0);
+  box-shadow: 0 0 0 3px oklch(0.68 0 0 / 0.22);
+  outline: none;
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='dark'] [data-slot='input']:focus-visible,
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='dark'] .ah-admin-native-select:focus-visible {
+  border-color: oklch(0.556 0 0);
+  box-shadow: 0 0 0 3px oklch(0.556 0 0 / 0.28);
+  outline: none;
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] .ah-target-panel-card [data-slot='button'][data-variant='outline'],
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] .ah-target-table ~ div [data-slot='button'][data-variant='outline'],
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] .ah-target-main [data-slot='button'][data-variant='outline'] {
+  border-color: oklch(0.82 0 0);
+  background-color: oklch(1 0 0);
+  color: oklch(0.2 0 0);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] .ah-target-panel-card [data-slot='button'][data-variant='outline']:hover:not(:disabled),
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] .ah-target-table ~ div [data-slot='button'][data-variant='outline']:hover:not(:disabled),
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] .ah-target-main [data-slot='button'][data-variant='outline']:hover:not(:disabled) {
+  background-color: oklch(0.965 0 0);
+  border-color: oklch(0.76 0 0);
+  color: oklch(0.2 0 0);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] .ah-target-empty-state {
+  border: 1px dashed oklch(0.82 0 0);
+  background-color: oklch(0.985 0 0);
+  color: oklch(0.25 0 0);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='dark'] .ah-target-empty-state {
+  border: 1px dashed oklch(1 0 0 / 12%);
+  background-color: color-mix(in oklab, var(--card) 55%, transparent);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-admin-muted-zone {
+  border-style: dashed !important;
+  opacity: 1 !important;
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] .ah-admin-muted-zone {
+  background-color: oklch(0.955 0 0) !important;
+  border-color: oklch(0.82 0 0) !important;
+  box-shadow: none !important;
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='dark'] .ah-admin-muted-zone {
+  background-color: color-mix(in oklab, var(--muted) 35%, var(--card)) !important;
+  border-color: oklch(1 0 0 / 10%) !important;
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-lead-avatar {
+  background-color: var(--muted);
+  color: var(--muted-foreground);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] .ah-admin-native-select {
+  accent-color: oklch(0.2 0 0);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-admin-checkbox {
+  accent-color: var(--primary);
 }

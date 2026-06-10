@@ -2,6 +2,7 @@ import { IconDotsVertical, IconLogout } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 
 import { logoutClient, logoutRequest } from '@/lib/api';
+import { useTargetTheme } from '@/ui-lab/autohall-dashboard-target/context/TargetThemeContext';
 import {
   Avatar,
   AvatarFallback,
@@ -32,6 +33,7 @@ type AutoHallNavUserProps = {
 
 export function AutoHallNavUser({ user }: AutoHallNavUserProps) {
   const { isMobile } = useSidebar();
+  const { mode } = useTargetTheme();
   const navigate = useNavigate();
   const initials = user.name
     .split(' ')
@@ -76,7 +78,8 @@ export function AutoHallNavUser({ user }: AutoHallNavUserProps) {
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="ah-admin-portal-menu w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg border-border bg-popover text-popover-foreground shadow-md"
+            data-ah-target-theme={mode}
             side={isMobile ? 'bottom' : 'right'}
             align="end"
             sideOffset={4}
@@ -98,7 +101,7 @@ export function AutoHallNavUser({ user }: AutoHallNavUserProps) {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => void handleLogout()}>
+            <DropdownMenuItem variant="destructive" onClick={() => void handleLogout()}>
               <IconLogout />
               Déconnexion
             </DropdownMenuItem>

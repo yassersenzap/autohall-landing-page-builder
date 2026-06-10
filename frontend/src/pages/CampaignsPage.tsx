@@ -1,26 +1,21 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutGrid, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
+
+import { AutoHallMetricCard, AutoHallMetricGrid } from '@/components/admin/AutoHallMetricCard';
+import { AutoHallPanel } from '@/components/admin/AutoHallPanel';
+import { DASHBOARD01_CONTENT_PAD } from '@/components/admin/dashboard01-layout';
 import { createCampaignsTableColumns } from '@/components/campaigns/campaigns-table-columns';
 import { useStudioSession } from '@/hooks/useStudioSession';
 import { CreateCampaignPanel } from '@/components/campaigns/CreateCampaignPanel';
-import { StudioPageHeader } from '@/components/studio/StudioPageHeader';
 import { DataTable } from '@/components/ui/data-table';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  ShadButton,
-} from '@/components/ui/primitives';
-import { MetricStrip, MetricTile } from '@/design-system';
 import { ApiError, logoutClient, meRequest } from '@/lib/api';
 import {
   canManageCampaigns,
   listCampaigns,
   type CampaignListItem,
 } from '@/lib/campaigns';
+import { Button } from '@/ui-lab/ui/button';
 
 export default function CampaignsPage() {
   const navigate = useNavigate();
@@ -67,49 +62,47 @@ export default function CampaignsPage() {
   const draftCount = campaigns.filter((c) => c.status === 'DRAFT').length;
 
   return (
-    <div className="ds-page-stack font-sans">
-      <StudioPageHeader
-        title="Campagnes"
-        description="Gérez vos campagnes marketing, marques et landing pages associées."
-        backTo="/dashboard"
-        backLabel="Tableau de bord"
-        actions={
-          <ShadButton variant="outline" size="sm" onClick={() => void loadData()} disabled={loading}>
-            <RefreshCw className={loading ? 'h-3.5 w-3.5 animate-spin' : 'h-3.5 w-3.5'} />
-            Actualiser
-          </ShadButton>
-        }
-      />
+    <>
+      <p className={`${DASHBOARD01_CONTENT_PAD} -mt-2 text-sm text-muted-foreground`}>
+        Gérez vos campagnes marketing, marques et landing pages associées.
+      </p>
 
       {error ? (
-        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <p
+          className={`${DASHBOARD01_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
+        >
           {error}
         </p>
       ) : null}
 
-      <MetricStrip>
-        <MetricTile label="Total campagnes" value={loading ? '…' : campaigns.length} />
-        <MetricTile label="Actives" value={loading ? '…' : activeCount} />
-        <MetricTile label="Brouillons" value={loading ? '…' : draftCount} />
-      </MetricStrip>
+      <AutoHallMetricGrid>
+        <AutoHallMetricCard
+          label="Total campagnes"
+          value={loading ? '…' : campaigns.length}
+        />
+        <AutoHallMetricCard label="Actives" value={loading ? '…' : activeCount} />
+        <AutoHallMetricCard label="Brouillons" value={loading ? '…' : draftCount} />
+      </AutoHallMetricGrid>
 
       {canWrite ? <CreateCampaignPanel onCreated={() => void loadData()} /> : null}
 
-      <Card className="campaigns-table-card">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <LayoutGrid className="h-4 w-4 text-muted-foreground" />
-            Liste des campagnes
-          </CardTitle>
-          <CardDescription>
-            Tri, recherche et accès rapide aux landing pages de chaque campagne.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      <section className={DASHBOARD01_CONTENT_PAD}>
+        <AutoHallPanel
+          title="Liste des campagnes"
+          description="Tri, recherche et accès rapide aux landing pages de chaque campagne."
+          action={
+            <Button variant="outline" size="sm" onClick={() => void loadData()} disabled={loading}>
+              <RefreshCw className={loading ? 'size-4 animate-spin' : 'size-4'} aria-hidden />
+              Actualiser
+            </Button>
+          }
+          contentClassName="min-w-0"
+        >
           {loading ? (
             <p className="py-12 text-center text-sm text-muted-foreground">Chargement…</p>
           ) : (
             <DataTable
+              variant="target"
               columns={columns}
               data={campaigns}
               searchColumnId="name"
@@ -118,8 +111,8 @@ export default function CampaignsPage() {
               emptyMessage="Aucune campagne. Créez-en une pour démarrer."
             />
           )}
-        </CardContent>
-      </Card>
-    </div>
+        </AutoHallPanel>
+      </section>
+    </>
   );
 }

@@ -1,8 +1,9 @@
+import { Moon, Sun } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { ThemeToggle } from '@/components/studio/ThemeToggle';
-import { logoutClient, logoutRequest } from '@/lib/api';
 import { getAdminRouteTitle } from '@/components/admin/admin-route-titles';
+import { logoutClient, logoutRequest } from '@/lib/api';
+import { useTargetTheme } from '@/ui-lab/autohall-dashboard-target/context/TargetThemeContext';
 import { Button } from '@/ui-lab/ui/button';
 import { Separator } from '@/ui-lab/ui/separator';
 import { SidebarTrigger } from '@/ui-lab/ui/sidebar';
@@ -10,7 +11,9 @@ import { SidebarTrigger } from '@/ui-lab/ui/sidebar';
 export function AutoHallAdminHeader() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { mode, toggleMode } = useTargetTheme();
   const title = getAdminRouteTitle(location.pathname);
+  const isLight = mode === 'light';
 
   async function handleLogout() {
     try {
@@ -24,7 +27,7 @@ export function AutoHallAdminHeader() {
   }
 
   return (
-    <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
+    <header className="ah-target-header flex h-(--header-height) shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
       <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
         <SidebarTrigger className="-ml-1" />
         <Separator
@@ -33,7 +36,14 @@ export function AutoHallAdminHeader() {
         />
         <h1 className="text-base font-medium">{title}</h1>
         <div className="ml-auto flex items-center gap-2">
-          <ThemeToggle />
+          <Button variant="outline" size="sm" type="button" onClick={toggleMode}>
+            {isLight ? (
+              <Moon className="size-4" aria-hidden />
+            ) : (
+              <Sun className="size-4" aria-hidden />
+            )}
+            {isLight ? 'Sombre' : 'Clair'}
+          </Button>
           <Button variant="outline" size="sm" onClick={() => void handleLogout()}>
             Déconnexion
           </Button>

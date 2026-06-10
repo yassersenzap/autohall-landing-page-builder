@@ -1,6 +1,7 @@
 import type { ComponentProps } from 'react';
-import { IconInnerShadowTop } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
+
+import autoHallLogo from '@/assets/Logo_Auto_Hall-removebg-preview.png';
 
 import { AutoHallNavMain } from '@/components/admin/AutoHallNavMain';
 import { AutoHallNavSecondary } from '@/components/admin/AutoHallNavSecondary';
@@ -38,15 +39,23 @@ export function AutoHallDashboardSidebar({
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="ah-target-brand">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
+              className="data-[slot=sidebar-menu-button]:px-2! data-[slot=sidebar-menu-button]:py-2!"
             >
               <Link to="/dashboard">
-                <IconInnerShadowTop className="size-5!" />
+                <span className="ah-brand-logo-wrap">
+                  <img
+                    src={autoHallLogo}
+                    alt=""
+                    className="ah-brand-logo"
+                    width={36}
+                    height={32}
+                  />
+                </span>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate text-base font-semibold">Auto Hall</span>
                   <span className="truncate text-xs text-muted-foreground">

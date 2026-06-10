@@ -63,13 +63,13 @@ export function AutoHallNavMain({ session }: AutoHallNavMainProps) {
     <SidebarMenuButton
       asChild
       tooltip="Ouvrir le Studio"
-      className="min-w-8 ah-cta-primary duration-200 ease-linear hover:opacity-95 active:opacity-95"
+      className="ah-sidebar-studio-cta min-w-8 duration-200 ease-linear"
     >
       <NavLink
         to={getStudioRoute(session.pageVersionId)}
         state={studioNavState(session)}
       >
-        <IconPencil />
+        <IconPencil className="ah-brand-accent-icon" />
         <span>Ouvrir le Studio</span>
       </NavLink>
     </SidebarMenuButton>
@@ -78,10 +78,10 @@ export function AutoHallNavMain({ session }: AutoHallNavMainProps) {
       <TooltipTrigger asChild>
         <SidebarMenuButton
           disabled
-          className="min-w-8 ah-cta-primary"
+          className="ah-sidebar-studio-cta min-w-8"
           aria-disabled
         >
-          <IconPencil />
+          <IconPencil className="ah-brand-accent-icon" />
           <span>Studio indisponible</span>
         </SidebarMenuButton>
       </TooltipTrigger>

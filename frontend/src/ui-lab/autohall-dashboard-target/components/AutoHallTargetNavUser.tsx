@@ -13,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/ui-lab/ui/dropdown-menu';
+import { useTargetTheme } from '@/ui-lab/autohall-dashboard-target/context/TargetThemeContext';
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -28,6 +29,7 @@ const DEMO_USER = {
 
 export function AutoHallTargetNavUser() {
   const { isMobile } = useSidebar();
+  const { mode } = useTargetTheme();
 
   return (
     <SidebarMenu>
@@ -53,7 +55,8 @@ export function AutoHallTargetNavUser() {
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="ah-admin-portal-menu w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg border-border bg-popover text-popover-foreground shadow-md"
+            data-ah-target-theme={mode}
             side={isMobile ? 'bottom' : 'right'}
             align="end"
             sideOffset={4}
@@ -74,7 +77,7 @@ export function AutoHallTargetNavUser() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem variant="destructive" asChild>
               <Link to="/login">
                 <IconLogout />
                 Déconnexion

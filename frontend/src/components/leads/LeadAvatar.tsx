@@ -17,7 +17,7 @@ export function LeadAvatar({ name, className }: LeadAvatarProps) {
   return (
     <div
       className={cn(
-        'flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-500/15 text-sm font-semibold text-blue-400 ring-1 ring-blue-500/25',
+        'ah-lead-avatar flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold text-muted-foreground ring-1 ring-border',
         className,
       )}
       aria-hidden

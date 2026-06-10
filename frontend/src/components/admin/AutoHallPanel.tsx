@@ -27,7 +27,7 @@ export function AutoHallPanel({
   contentClassName,
 }: AutoHallPanelProps) {
   return (
-    <Card className={cn('shadow-xs', className)}>
+    <Card className={cn('ah-target-panel-card @container/card', className)}>
       <CardHeader className={action ? 'grid-cols-[1fr_auto]' : undefined}>
         <div>
           <CardTitle className="text-base font-medium">{title}</CardTitle>
