@@ -7,7 +7,7 @@ import {
   AutoHallPanel,
   AutoHallSubpageBack,
   AutoHallWorkflowSteps,
-  DASHBOARD01_CONTENT_PAD,
+  ADMIN_CONTENT_PAD,
 } from '@/components/admin';
 import { StatusBadge } from '@/components/ui/primitives/status-badge';
 import { downloadLandingExport } from '@/lib/landing-export.api';
@@ -180,7 +180,7 @@ export default function LandingPageVersionsPage() {
   if (!landingPageId) {
     return (
       <p
-        className={`${DASHBOARD01_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
+        className={`${ADMIN_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
       >
         Identifiant de landing page invalide.
       </p>
@@ -191,12 +191,12 @@ export default function LandingPageVersionsPage() {
     <>
       <AutoHallSubpageBack to={backLink.to} label={backLink.label} state={backLink.state} />
 
-      <p className={`${DASHBOARD01_CONTENT_PAD} -mt-2 text-sm text-muted-foreground`}>
+      <p className={`${ADMIN_CONTENT_PAD} -mt-2 text-sm text-muted-foreground`}>
         {landingPageTitle ? `Landing : ${landingPageTitle}` : `Landing ${landingPageId}`}
       </p>
 
       {latestVersion ? (
-        <section className={`${DASHBOARD01_CONTENT_PAD} flex justify-end`}>
+        <section className={`${ADMIN_CONTENT_PAD} flex justify-end`}>
           <Button variant="outline" size="sm" className="ah-cta-studio" asChild>
             <Link
               to={getStudioRoute(latestVersion.id)}
@@ -216,7 +216,7 @@ export default function LandingPageVersionsPage() {
         </section>
       ) : null}
 
-      <section className={DASHBOARD01_CONTENT_PAD}>
+      <section className={ADMIN_CONTENT_PAD}>
         <AutoHallWorkflowSteps
           steps={[
             { id: 'campaign', label: 'Campagne', done: true },
@@ -228,18 +228,18 @@ export default function LandingPageVersionsPage() {
       </section>
 
       {loading ? (
-        <p className={`${DASHBOARD01_CONTENT_PAD} text-sm text-muted-foreground`}>Chargement…</p>
+        <p className={`${ADMIN_CONTENT_PAD} text-sm text-muted-foreground`}>Chargement…</p>
       ) : null}
 
       {error ? (
         <p
-          className={`${DASHBOARD01_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
+          className={`${ADMIN_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
         >
           {error}
         </p>
       ) : null}
 
-      <section className={DASHBOARD01_CONTENT_PAD}>
+      <section className={ADMIN_CONTENT_PAD}>
         <AutoHallPanel
           title="Dernière version"
           description="Point d’entrée principal vers le Studio, l’aperçu et l’export ZIP."
@@ -320,7 +320,7 @@ export default function LandingPageVersionsPage() {
       </section>
 
       {canWrite ? (
-        <section className={DASHBOARD01_CONTENT_PAD}>
+        <section className={ADMIN_CONTENT_PAD}>
           <AutoHallPanel title="Nouvelle version">
             <form className="grid max-w-md gap-4" onSubmit={handleCreate}>
               <div className="grid gap-2">
@@ -341,7 +341,7 @@ export default function LandingPageVersionsPage() {
         </section>
       ) : null}
 
-      <section className={DASHBOARD01_CONTENT_PAD}>
+      <section className={ADMIN_CONTENT_PAD}>
         <AutoHallPanel title={`Historique (${versions.length})`} contentClassName="min-w-0">
           {versions.length === 0 && !loading ? (
             <AutoHallEmptyState

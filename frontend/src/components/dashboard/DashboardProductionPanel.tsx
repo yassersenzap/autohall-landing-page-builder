@@ -1,7 +1,7 @@
 import { IconDownload, IconEye, IconPencil } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 
-import { DASHBOARD01_CONTENT_PAD } from '@/components/admin/dashboard01-layout';
+import { ADMIN_CONTENT_PAD } from '@/components/admin/admin-layout';
 import type { StudioSession } from '@/lib/studio-session';
 import { getPreviewRoute, getStudioRoute } from '@/lib/landing-studio-routes';
 import { studioNavState } from '@/lib/studio-session';
@@ -27,7 +27,7 @@ export function DashboardProductionPanel({
   onExport,
 }: DashboardProductionPanelProps) {
   return (
-    <div className={DASHBOARD01_CONTENT_PAD}>
+    <div className={ADMIN_CONTENT_PAD}>
       <Card className="@container/card">
         <CardHeader>
           <CardTitle>Production en cours</CardTitle>

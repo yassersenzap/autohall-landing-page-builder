@@ -15,7 +15,7 @@ import {
   AutoHallEmptyState,
   AutoHallPanel,
   AutoHallSubpageBack,
-  DASHBOARD01_CONTENT_PAD,
+  ADMIN_CONTENT_PAD,
 } from '@/components/admin';
 import LeadActivityHistory from '../components/leads/LeadActivityHistory';
 import LeadFollowUpForm from '../components/leads/LeadFollowUpForm';
@@ -219,7 +219,7 @@ export default function LeadDetailPage() {
 
   if (!id) {
     return (
-      <section className={DASHBOARD01_CONTENT_PAD}>
+      <section className={ADMIN_CONTENT_PAD}>
         <AutoHallEmptyState
           title="Identifiant manquant"
           description="Identifiant de lead manquant."
@@ -235,7 +235,7 @@ export default function LeadDetailPage() {
 
   if (loading) {
     return (
-      <p className={`${DASHBOARD01_CONTENT_PAD} text-sm text-muted-foreground`}>
+      <p className={`${ADMIN_CONTENT_PAD} text-sm text-muted-foreground`}>
         Chargement du lead…
       </p>
     );
@@ -243,7 +243,7 @@ export default function LeadDetailPage() {
 
   if (role && !canViewLeads(role)) {
     return (
-      <section className={DASHBOARD01_CONTENT_PAD}>
+      <section className={ADMIN_CONTENT_PAD}>
         <AutoHallEmptyState
           title="Accès refusé"
           description="Votre rôle ne permet pas de gérer les leads."
@@ -261,7 +261,7 @@ export default function LeadDetailPage() {
     return (
       <>
         <AutoHallSubpageBack to="/leads" label="Retour à la liste" />
-        <section className={DASHBOARD01_CONTENT_PAD}>
+        <section className={ADMIN_CONTENT_PAD}>
           <AutoHallEmptyState
             title="Lead introuvable"
             description={error ?? 'Ce lead n’existe pas ou a été supprimé.'}
@@ -281,7 +281,7 @@ export default function LeadDetailPage() {
     <>
       <AutoHallSubpageBack to="/leads" label="Retour à la liste" />
 
-      <section className={DASHBOARD01_CONTENT_PAD}>
+      <section className={ADMIN_CONTENT_PAD}>
         <header className="space-y-3">
           <h2 className="text-2xl font-semibold tracking-tight">{lead.fullName}</h2>
           <div className="flex flex-wrap items-center gap-2">
@@ -296,7 +296,7 @@ export default function LeadDetailPage() {
 
       {error ? (
         <p
-          className={`${DASHBOARD01_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
+          className={`${ADMIN_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
         >
           {error}
         </p>
@@ -304,7 +304,7 @@ export default function LeadDetailPage() {
 
       {success ? (
         <p
-          className={`${DASHBOARD01_CONTENT_PAD} rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-400`}
+          className={`${ADMIN_CONTENT_PAD} rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-400`}
         >
           {success}
         </p>
@@ -312,13 +312,13 @@ export default function LeadDetailPage() {
 
       {followUpSuccess ? (
         <p
-          className={`${DASHBOARD01_CONTENT_PAD} rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-400`}
+          className={`${ADMIN_CONTENT_PAD} rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-400`}
         >
           {followUpSuccess}
         </p>
       ) : null}
 
-      <section className={DASHBOARD01_CONTENT_PAD}>
+      <section className={ADMIN_CONTENT_PAD}>
         <AutoHallPanel title="Informations">
           <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <MetaField icon={<Phone className="h-3.5 w-3.5" />} label="Téléphone">
@@ -365,7 +365,7 @@ export default function LeadDetailPage() {
         </AutoHallPanel>
       </section>
 
-      <section className={DASHBOARD01_CONTENT_PAD}>
+      <section className={ADMIN_CONTENT_PAD}>
         <AutoHallPanel title="Message client">
           <p className="text-base leading-relaxed text-muted-foreground">
             {lead.message?.trim() ? lead.message : 'Aucun message laissé.'}
@@ -373,7 +373,7 @@ export default function LeadDetailPage() {
         </AutoHallPanel>
       </section>
 
-      <section className={DASHBOARD01_CONTENT_PAD}>
+      <section className={ADMIN_CONTENT_PAD}>
         <AutoHallPanel title="Commentaire interne">
           <p className="text-base leading-relaxed text-muted-foreground">
             {lead.internalComment?.trim()
@@ -383,7 +383,7 @@ export default function LeadDetailPage() {
         </AutoHallPanel>
       </section>
 
-      <section className={DASHBOARD01_CONTENT_PAD}>
+      <section className={ADMIN_CONTENT_PAD}>
         <AutoHallPanel title="Suivi interne">
           <LeadFollowUpForm
             key={`${lead.id}-${lead.priority}-${lead.assignedToUserId ?? ''}-${lead.nextFollowUpAt ?? ''}`}
@@ -395,7 +395,7 @@ export default function LeadDetailPage() {
         </AutoHallPanel>
       </section>
 
-      <section className={DASHBOARD01_CONTENT_PAD}>
+      <section className={ADMIN_CONTENT_PAD}>
         <AutoHallPanel title="Statut et commentaire">
           <LeadStatusForm
             key={`${lead.id}-${lead.status}-${lead.internalComment ?? ''}`}
@@ -407,7 +407,7 @@ export default function LeadDetailPage() {
         </AutoHallPanel>
       </section>
 
-      <section className={DASHBOARD01_CONTENT_PAD}>
+      <section className={ADMIN_CONTENT_PAD}>
         <AutoHallPanel title="Historique d'activité">
           <LeadActivityHistory
             items={history}

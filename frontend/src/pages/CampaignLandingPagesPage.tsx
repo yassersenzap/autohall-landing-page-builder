@@ -7,7 +7,7 @@ import {
   AutoHallPanel,
   AutoHallSubpageBack,
   AutoHallWorkflowSteps,
-  DASHBOARD01_CONTENT_PAD,
+  ADMIN_CONTENT_PAD,
 } from '@/components/admin';
 import { StatusBadge } from '@/components/ui/primitives/status-badge';
 import { useStudioSession } from '@/hooks/useStudioSession';
@@ -110,7 +110,7 @@ export default function CampaignLandingPagesPage() {
   if (!campaignId) {
     return (
       <p
-        className={`${DASHBOARD01_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
+        className={`${ADMIN_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
       >
         Identifiant de campagne invalide.
       </p>
@@ -121,12 +121,12 @@ export default function CampaignLandingPagesPage() {
     <>
       <AutoHallSubpageBack to="/campaigns" label="Campagnes" />
 
-      <p className={`${DASHBOARD01_CONTENT_PAD} -mt-2 text-sm text-muted-foreground`}>
+      <p className={`${ADMIN_CONTENT_PAD} -mt-2 text-sm text-muted-foreground`}>
         {campaignName ? `Campagne : ${campaignName}` : `Campagne ${campaignId}`}
       </p>
 
       {campaignStudio ? (
-        <section className={`${DASHBOARD01_CONTENT_PAD} flex justify-end`}>
+        <section className={`${ADMIN_CONTENT_PAD} flex justify-end`}>
           <Button variant="outline" size="sm" className="ah-cta-studio" asChild>
             <Link
               to={getStudioRoute(campaignStudio.pageVersionId)}
@@ -139,7 +139,7 @@ export default function CampaignLandingPagesPage() {
         </section>
       ) : null}
 
-      <section className={DASHBOARD01_CONTENT_PAD}>
+      <section className={ADMIN_CONTENT_PAD}>
         <AutoHallWorkflowSteps
           steps={[
             { id: 'campaigns', label: 'Campagnes', done: true },
@@ -151,19 +151,19 @@ export default function CampaignLandingPagesPage() {
       </section>
 
       {loading ? (
-        <p className={`${DASHBOARD01_CONTENT_PAD} text-sm text-muted-foreground`}>Chargement…</p>
+        <p className={`${ADMIN_CONTENT_PAD} text-sm text-muted-foreground`}>Chargement…</p>
       ) : null}
 
       {error ? (
         <p
-          className={`${DASHBOARD01_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
+          className={`${ADMIN_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
         >
           {error}
         </p>
       ) : null}
 
       {canWrite ? (
-        <section className={DASHBOARD01_CONTENT_PAD}>
+        <section className={ADMIN_CONTENT_PAD}>
           <AutoHallPanel
             title="Créer une landing page"
             description="Chaque landing dispose de versions gérées dans le centre de production."
@@ -202,7 +202,7 @@ export default function CampaignLandingPagesPage() {
         </section>
       ) : null}
 
-      <section className={DASHBOARD01_CONTENT_PAD}>
+      <section className={ADMIN_CONTENT_PAD}>
         <AutoHallPanel title={`Liste (${landingPages.length})`} contentClassName="min-w-0">
           {landingPages.length === 0 && !loading ? (
             <AutoHallEmptyState

@@ -8,4 +8,4 @@ export { AutoHallPanel } from './AutoHallPanel';
 export { AutoHallEmptyState } from './AutoHallEmptyState';
 export { AutoHallSubpageBack } from './AutoHallSubpageBack';
 export { AutoHallWorkflowSteps, type AutoHallWorkflowStep } from './AutoHallWorkflowSteps';
-export { DASHBOARD01_SECTION_GRID, DASHBOARD01_CONTENT_PAD } from './dashboard01-layout';
+export { ADMIN_SECTION_GRID, ADMIN_CONTENT_PAD } from './admin-layout';

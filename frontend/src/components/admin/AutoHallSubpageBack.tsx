@@ -1,7 +1,7 @@
 import { ArrowLeft } from 'lucide-react';
 import { Link, type LinkProps } from 'react-router-dom';
 
-import { DASHBOARD01_CONTENT_PAD } from '@/components/admin/dashboard01-layout';
+import { ADMIN_CONTENT_PAD } from '@/components/admin/admin-layout';
 import { cn } from '@/lib/utils';
 
 type AutoHallSubpageBackProps = {
@@ -18,7 +18,7 @@ export function AutoHallSubpageBack({
   className,
 }: AutoHallSubpageBackProps) {
   return (
-    <div className={cn(DASHBOARD01_CONTENT_PAD, className)}>
+    <div className={cn(ADMIN_CONTENT_PAD, className)}>
       <Link
         to={to}
         state={state}

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { DASHBOARD01_SECTION_GRID } from '@/components/admin/dashboard01-layout';
+import { ADMIN_SECTION_GRID } from '@/components/admin/admin-layout';
 import {
   Card,
   CardDescription,
@@ -48,5 +48,5 @@ export function AutoHallMetricCard({
 }
 
 export function AutoHallMetricGrid({ children }: { children: ReactNode }) {
-  return <div className={DASHBOARD01_SECTION_GRID}>{children}</div>;
+  return <div className={ADMIN_SECTION_GRID}>{children}</div>;
 }

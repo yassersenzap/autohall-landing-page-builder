@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { IconAlertTriangle } from '@tabler/icons-react';
 import type { ColumnDef } from '@tanstack/react-table';
 
-import { DASHBOARD01_CONTENT_PAD, DASHBOARD01_SECTION_GRID } from '@/components/admin/dashboard01-layout';
+import { ADMIN_CONTENT_PAD, ADMIN_SECTION_GRID } from '@/components/admin/admin-layout';
 import { AutoHallMetricCard } from '@/components/admin/AutoHallMetricCard';
 import { DataTable } from '@/components/ui/data-table';
 import { STATUS_LABELS, type LeadDashboardKpis } from '@/lib/lead-dashboard';
@@ -66,7 +66,7 @@ export function DashboardLeadPerformance({ kpis }: DashboardLeadPerformanceProps
 
   return (
     <section className="flex flex-col gap-6" aria-labelledby="lead-performance-heading">
-      <div className={DASHBOARD01_CONTENT_PAD}>
+      <div className={ADMIN_CONTENT_PAD}>
         <h3 id="lead-performance-heading" className="text-base font-medium">
           Performance leads
         </h3>
@@ -75,7 +75,7 @@ export function DashboardLeadPerformance({ kpis }: DashboardLeadPerformanceProps
         </p>
       </div>
 
-      <div className={DASHBOARD01_SECTION_GRID}>
+      <div className={ADMIN_SECTION_GRID}>
         <AutoHallMetricCard label="Reçus aujourd'hui" value={kpis.receivedToday} />
         <AutoHallMetricCard label="Cette semaine" value={kpis.receivedThisWeek} />
         <AutoHallMetricCard
@@ -85,7 +85,7 @@ export function DashboardLeadPerformance({ kpis }: DashboardLeadPerformanceProps
         <AutoHallMetricCard label="Total leads" value={kpis.totalLeads} />
       </div>
 
-      <div className={`grid gap-4 lg:grid-cols-2 ${DASHBOARD01_CONTENT_PAD}`}>
+      <div className={`grid gap-4 lg:grid-cols-2 ${ADMIN_CONTENT_PAD}`}>
         <Card>
           <CardHeader>
             <CardTitle>Répartition par statut</CardTitle>
@@ -141,7 +141,7 @@ export function DashboardLeadPerformance({ kpis }: DashboardLeadPerformanceProps
         </Card>
       </div>
 
-      <div className={`grid gap-4 lg:grid-cols-2 ${DASHBOARD01_CONTENT_PAD}`}>
+      <div className={`grid gap-4 lg:grid-cols-2 ${ADMIN_CONTENT_PAD}`}>
         <Card>
           <CardHeader>
             <CardTitle>Par priorité</CardTitle>
@@ -177,7 +177,7 @@ export function DashboardLeadPerformance({ kpis }: DashboardLeadPerformanceProps
         </Card>
       </div>
 
-      <div className={DASHBOARD01_CONTENT_PAD}>
+      <div className={ADMIN_CONTENT_PAD}>
         <Card>
           <CardHeader>
             <CardTitle>Relances en retard</CardTitle>

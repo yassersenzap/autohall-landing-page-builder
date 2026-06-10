@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Plus } from 'lucide-react';
 
 import { AutoHallPanel } from '@/components/admin/AutoHallPanel';
-import { DASHBOARD01_CONTENT_PAD } from '@/components/admin/dashboard01-layout';
+import { ADMIN_CONTENT_PAD } from '@/components/admin/admin-layout';
 import { ApiError } from '@/lib/api';
 import { createCampaign } from '@/lib/campaigns';
 import { Button } from '@/components/ui/shadcn/button';
@@ -46,7 +46,7 @@ export function CreateCampaignPanel({ onCreated }: CreateCampaignPanelProps) {
   }
 
   return (
-    <section className={DASHBOARD01_CONTENT_PAD}>
+    <section className={ADMIN_CONTENT_PAD}>
       <AutoHallPanel
         title="Nouvelle campagne"
         description="Créez une campagne pour regrouper vos landing pages et versions."

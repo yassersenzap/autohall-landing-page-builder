@@ -1,7 +1,7 @@
 import { IconLayoutGrid, IconPlus, IconUsers } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 
-import { DASHBOARD01_CONTENT_PAD } from '@/components/admin/dashboard01-layout';
+import { ADMIN_CONTENT_PAD } from '@/components/admin/admin-layout';
 import { Button } from '@/components/ui/shadcn/button';
 import {
   Card,
@@ -17,7 +17,7 @@ type DashboardQuickActionsProps = {
 
 export function DashboardQuickActions({ showLeads }: DashboardQuickActionsProps) {
   return (
-    <div className={DASHBOARD01_CONTENT_PAD}>
+    <div className={ADMIN_CONTENT_PAD}>
       <Card>
         <CardHeader>
           <CardTitle>Raccourcis</CardTitle>

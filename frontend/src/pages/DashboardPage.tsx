@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { DASHBOARD01_CONTENT_PAD } from '@/components/admin/dashboard01-layout';
+import { ADMIN_CONTENT_PAD } from '@/components/admin/admin-layout';
 import { DashboardKpiStrip } from '@/components/dashboard/DashboardKpiStrip';
 import { DashboardLeadPerformance } from '@/components/dashboard/DashboardLeadPerformance';
 import { DashboardProductionPanel } from '@/components/dashboard/DashboardProductionPanel';
@@ -93,7 +93,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      <p className={`${DASHBOARD01_CONTENT_PAD} -mt-2 text-sm text-muted-foreground`}>
+      <p className={`${ADMIN_CONTENT_PAD} -mt-2 text-sm text-muted-foreground`}>
         Pilotez les campagnes, landing pages et leads Auto Hall.
       </p>
 

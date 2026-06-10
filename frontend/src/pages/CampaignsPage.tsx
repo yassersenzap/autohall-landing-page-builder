@@ -4,7 +4,7 @@ import { RefreshCw } from 'lucide-react';
 
 import { AutoHallMetricCard, AutoHallMetricGrid } from '@/components/admin/AutoHallMetricCard';
 import { AutoHallPanel } from '@/components/admin/AutoHallPanel';
-import { DASHBOARD01_CONTENT_PAD } from '@/components/admin/dashboard01-layout';
+import { ADMIN_CONTENT_PAD } from '@/components/admin/admin-layout';
 import { createCampaignsTableColumns } from '@/components/campaigns/campaigns-table-columns';
 import { useStudioSession } from '@/hooks/useStudioSession';
 import { CreateCampaignPanel } from '@/components/campaigns/CreateCampaignPanel';
@@ -63,13 +63,13 @@ export default function CampaignsPage() {
 
   return (
     <>
-      <p className={`${DASHBOARD01_CONTENT_PAD} -mt-2 text-sm text-muted-foreground`}>
+      <p className={`${ADMIN_CONTENT_PAD} -mt-2 text-sm text-muted-foreground`}>
         Gérez vos campagnes marketing, marques et landing pages associées.
       </p>
 
       {error ? (
         <p
-          className={`${DASHBOARD01_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
+          className={`${ADMIN_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
         >
           {error}
         </p>
@@ -86,7 +86,7 @@ export default function CampaignsPage() {
 
       {canWrite ? <CreateCampaignPanel onCreated={() => void loadData()} /> : null}
 
-      <section className={DASHBOARD01_CONTENT_PAD}>
+      <section className={ADMIN_CONTENT_PAD}>
         <AutoHallPanel
           title="Liste des campagnes"
           description="Tri, recherche et accès rapide aux landing pages de chaque campagne."

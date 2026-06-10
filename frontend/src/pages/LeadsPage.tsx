@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { AutoHallEmptyState } from '@/components/admin/AutoHallEmptyState';
 import { AutoHallPanel } from '@/components/admin/AutoHallPanel';
-import { DASHBOARD01_CONTENT_PAD } from '@/components/admin/dashboard01-layout';
+import { ADMIN_CONTENT_PAD } from '@/components/admin/admin-layout';
 import LeadsFilters, {
   type LeadsFilterValues,
 } from '../components/leads/LeadsFilters';
@@ -235,7 +235,7 @@ export default function LeadsPage() {
 
   if (role && !canViewLeads(role)) {
     return (
-      <section className={DASHBOARD01_CONTENT_PAD}>
+      <section className={ADMIN_CONTENT_PAD}>
         <AutoHallEmptyState
           title="Accès refusé"
           description="Votre rôle ne permet pas de consulter les leads."
@@ -251,13 +251,13 @@ export default function LeadsPage() {
 
   return (
     <>
-      <p className={`${DASHBOARD01_CONTENT_PAD} -mt-2 text-sm text-muted-foreground`}>
+      <p className={`${ADMIN_CONTENT_PAD} -mt-2 text-sm text-muted-foreground`}>
         Soumissions issues des landing pages exportées et du formulaire public.
       </p>
 
       {error ? (
         <p
-          className={`${DASHBOARD01_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
+          className={`${ADMIN_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
         >
           {error}
         </p>
@@ -265,13 +265,13 @@ export default function LeadsPage() {
 
       {purgeMessage ? (
         <p
-          className={`${DASHBOARD01_CONTENT_PAD} rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-400`}
+          className={`${ADMIN_CONTENT_PAD} rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-400`}
         >
           {purgeMessage}
         </p>
       ) : null}
 
-      <section className={DASHBOARD01_CONTENT_PAD}>
+      <section className={ADMIN_CONTENT_PAD}>
         <AutoHallPanel title="Filtres" description="Affinez la liste des leads reçus.">
           <LeadsFilters
             values={filters}
@@ -286,7 +286,7 @@ export default function LeadsPage() {
         </AutoHallPanel>
       </section>
 
-      <section className={DASHBOARD01_CONTENT_PAD}>
+      <section className={ADMIN_CONTENT_PAD}>
         <AutoHallPanel
           title="Résultats"
           description="Liste paginée des soumissions correspondant aux filtres appliqués."
@@ -302,7 +302,7 @@ export default function LeadsPage() {
       </section>
 
       {role && canPurgeLeads(role) ? (
-        <section className={DASHBOARD01_CONTENT_PAD}>
+        <section className={ADMIN_CONTENT_PAD}>
           <AutoHallPanel
             title="Zone admin"
             description="Nettoyage avant livraison — supprime uniquement les leads, pas les campagnes ni les comptes."
