@@ -28,6 +28,9 @@ services:
       dockerfile: Dockerfile
     container_name: autohall_lp_backend
     restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
     depends_on:
       postgres:
         condition: service_healthy
