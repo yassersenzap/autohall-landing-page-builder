@@ -1,9 +1,11 @@
 import { useState, type FormEvent } from 'react';
 import { STATUS_LABELS } from '../../lib/lead-dashboard';
 import { LEAD_STATUSES } from '../../lib/leads';
-import { CRM_FIELD_CLASS, CRM_SUBMIT_BTN_CLASS } from '@/lib/lead-badge-styles';
-import { Button } from '../ui/Button';
-import { Select } from '../ui/Select';
+import { Button } from '@/ui-lab/ui/button';
+import { Label } from '@/ui-lab/ui/label';
+
+const selectClassName =
+  'ah-admin-native-select flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50';
 
 type LeadStatusFormProps = {
   currentStatus: string;
@@ -29,32 +31,36 @@ export default function LeadStatusForm({
   }
 
   return (
-    <form className="ui-form-stack lead-status-form" onSubmit={handleSubmit}>
-      <Select
-        label="Statut"
-        value={status}
-        onChange={(e) => setStatus(e.target.value)}
-        disabled={submitting}
-        className={CRM_FIELD_CLASS}
-      >
-        {LEAD_STATUSES.map((value) => (
-          <option key={value} value={value}>
-            {STATUS_LABELS[value] ?? value}
-          </option>
-        ))}
-      </Select>
-      <label className="ui-field">
-        <span className="ui-field__label">Commentaire interne</span>
+    <form className="grid max-w-md gap-4" onSubmit={handleSubmit}>
+      <div className="grid gap-2">
+        <Label htmlFor="lead-status">Statut</Label>
+        <select
+          id="lead-status"
+          className={selectClassName}
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          disabled={submitting}
+        >
+          {LEAD_STATUSES.map((value) => (
+            <option key={value} value={value}>
+              {STATUS_LABELS[value] ?? value}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="lead-internal-comment">Commentaire interne</Label>
         <textarea
-          className={`ui-textarea ${CRM_FIELD_CLASS}`}
+          id="lead-internal-comment"
+          className="ah-admin-textarea"
           rows={4}
           placeholder="Notes visibles uniquement en interne"
           value={internalComment}
           onChange={(e) => setInternalComment(e.target.value)}
           disabled={submitting}
         />
-      </label>
-      <Button type="submit" disabled={submitting} className={CRM_SUBMIT_BTN_CLASS}>
+      </div>
+      <Button type="submit" disabled={submitting}>
         {submitting ? 'Enregistrement…' : 'Enregistrer le statut'}
       </Button>
     </form>

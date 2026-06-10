@@ -187,3 +187,130 @@
 .auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-admin-checkbox {
   accent-color: var(--primary);
 }
+
+/* ── Workflow steps (campaign → landing → versions) ─────────────────────── */
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-target-workflow-step {
+  border-color: var(--border);
+  background-color: var(--card);
+  color: var(--muted-foreground);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-target-workflow-step--active {
+  border-color: var(--border);
+  background-color: var(--accent);
+  color: var(--foreground);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-target-workflow-step--done {
+  background-color: var(--muted);
+  color: var(--muted-foreground);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-target-workflow-step--pending {
+  background-color: var(--card);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-target-workflow-step__index {
+  background-color: var(--muted);
+  color: var(--muted-foreground);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-target-workflow-step--active .ah-target-workflow-step__index {
+  background-color: var(--foreground);
+  color: var(--background);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-target-workflow-step--done .ah-target-workflow-step__index {
+  background-color: color-mix(in oklab, var(--foreground) 12%, transparent);
+  color: var(--foreground);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] .ah-target-workflow-step--active {
+  border-color: oklch(0.82 0 0);
+  background-color: oklch(0.965 0 0);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] .ah-target-workflow-step--active .ah-target-workflow-step__index {
+  background-color: oklch(0.2 0 0);
+  color: oklch(1 0 0);
+}
+
+/* ── Sub-route list rows ─────────────────────────────────────────────────── */
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-admin-list-row {
+  border-color: var(--border);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] .ah-admin-list-row {
+  border-color: oklch(0.88 0 0);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-target-panel-card--emphasis {
+  border-color: var(--border);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] .ah-target-panel-card--emphasis {
+  border-color: oklch(0.78 0 0);
+  box-shadow: var(--ah-panel-shadow);
+}
+
+/* ── Lead detail ─────────────────────────────────────────────────────────── */
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-admin-textarea {
+  display: flex;
+  width: 100%;
+  min-height: 6rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--input);
+  background-color: transparent;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--foreground);
+  box-shadow: 0 1px 2px oklch(0 0 0 / 0.04);
+  outline: none;
+  resize: vertical;
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] .ah-admin-textarea {
+  background-color: oklch(1 0 0);
+  border-color: oklch(0.82 0 0);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-admin-textarea:focus-visible {
+  border-color: oklch(0.556 0 0);
+  box-shadow: 0 0 0 3px oklch(0.556 0 0 / 0.28);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] .ah-admin-textarea:focus-visible {
+  border-color: oklch(0.68 0 0);
+  box-shadow: 0 0 0 3px oklch(0.68 0 0 / 0.22);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-lead-history-item {
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  background-color: var(--card);
+  padding: 0.875rem 1rem;
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target[data-ah-target-theme='light'] .ah-lead-history-item {
+  border-color: oklch(0.88 0 0);
+  background-color: oklch(1 0 0);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-lead-meta-label {
+  color: var(--muted-foreground);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-lead-meta-value {
+  color: var(--foreground);
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-admin-link {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.auto-hall-admin-shell.ui-lab-autohall-dashboard-target .ah-admin-link:hover {
+  color: var(--muted-foreground);
+}

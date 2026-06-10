@@ -1,20 +1,15 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Download, Eye, PenLine } from 'lucide-react';
-import { StudioPageHeader } from '@/components/studio/StudioPageHeader';
-import { ActionBar, WorkflowSteps } from '@/components/ui/app';
+
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  ShadButton,
-  ShadInput,
-  buttonVariants,
-} from '@/components/ui/primitives';
+  AutoHallEmptyState,
+  AutoHallPanel,
+  AutoHallSubpageBack,
+  AutoHallWorkflowSteps,
+  DASHBOARD01_CONTENT_PAD,
+} from '@/components/admin';
 import { StatusBadge } from '@/components/ui/primitives/status-badge';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { downloadLandingExport } from '@/lib/landing-export.api';
 import { ApiError, logoutClient, meRequest } from '@/lib/api';
 import { getPreviewRoute, getStudioRoute } from '@/lib/landing-studio-routes';
@@ -26,7 +21,9 @@ import {
   type PageVersionListItem,
 } from '@/lib/page-versions';
 import { persistStudioSessionFromVersion } from '@/lib/studio-session';
-import { cn } from '@/lib/utils';
+import { Button } from '@/ui-lab/ui/button';
+import { Input } from '@/ui-lab/ui/input';
+import { Label } from '@/ui-lab/ui/label';
 
 type LocationState = {
   landingPageTitle?: string;
@@ -182,26 +179,25 @@ export default function LandingPageVersionsPage() {
 
   if (!landingPageId) {
     return (
-      <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+      <p
+        className={`${DASHBOARD01_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
+      >
         Identifiant de landing page invalide.
       </p>
     );
   }
 
   return (
-    <div className="ds-page-stack font-sans">
-      <StudioPageHeader
-        title="Centre de production"
-        description={
-          landingPageTitle
-            ? `Landing : ${landingPageTitle}`
-            : `Landing ${landingPageId}`
-        }
-        backTo={backLink.to}
-        backState={backLink.state}
-        backLabel={backLink.label}
-        actions={
-          latestVersion ? (
+    <>
+      <AutoHallSubpageBack to={backLink.to} label={backLink.label} state={backLink.state} />
+
+      <p className={`${DASHBOARD01_CONTENT_PAD} -mt-2 text-sm text-muted-foreground`}>
+        {landingPageTitle ? `Landing : ${landingPageTitle}` : `Landing ${landingPageId}`}
+      </p>
+
+      {latestVersion ? (
+        <section className={`${DASHBOARD01_CONTENT_PAD} flex justify-end`}>
+          <Button variant="outline" size="sm" className="ah-cta-studio" asChild>
             <Link
               to={getStudioRoute(latestVersion.id)}
               state={versionNavState(
@@ -212,82 +208,86 @@ export default function LandingPageVersionsPage() {
                 campaignName,
               )}
               onClick={() => handleOpenStudio(latestVersion)}
-              className={cn(buttonVariants({ variant: 'default', size: 'sm' }))}
             >
-              <PenLine className="h-3.5 w-3.5" />
+              <PenLine className="size-3.5" />
               Ouvrir le Studio
             </Link>
-          ) : null
-        }
-      />
+          </Button>
+        </section>
+      ) : null}
 
-      <WorkflowSteps
-        steps={[
-          { id: 'campaign', label: 'Campagne', done: true },
-          { id: 'landing', label: 'Landing', done: true },
-          { id: 'versions', label: 'Versions', active: true },
-          { id: 'studio', label: 'Studio', done: !!latestVersion },
-        ]}
-      />
+      <section className={DASHBOARD01_CONTENT_PAD}>
+        <AutoHallWorkflowSteps
+          steps={[
+            { id: 'campaign', label: 'Campagne', done: true },
+            { id: 'landing', label: 'Landing', done: true },
+            { id: 'versions', label: 'Versions', active: true },
+            { id: 'studio', label: 'Studio', done: !!latestVersion },
+          ]}
+        />
+      </section>
 
       {loading ? (
-        <p className="text-sm text-muted-foreground">Chargement…</p>
+        <p className={`${DASHBOARD01_CONTENT_PAD} text-sm text-muted-foreground`}>Chargement…</p>
       ) : null}
+
       {error ? (
-        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <p
+          className={`${DASHBOARD01_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
+        >
           {error}
         </p>
       ) : null}
 
-      <Card className={latestVersion ? 'border-primary/25' : undefined}>
-        <CardHeader>
-          <CardTitle>Dernière version</CardTitle>
-          <CardDescription>
-            Point d’entrée principal vers le Studio, l’aperçu et l’export ZIP.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      <section className={DASHBOARD01_CONTENT_PAD}>
+        <AutoHallPanel
+          title="Dernière version"
+          description="Point d’entrée principal vers le Studio, l’aperçu et l’export ZIP."
+          className={latestVersion ? 'ah-target-panel-card--emphasis' : undefined}
+        >
           {latestVersion ? (
             <div className="space-y-4">
               <div className="flex flex-wrap items-center gap-3">
-                <p className="text-sm font-medium text-foreground">
+                <p className="text-sm font-medium">
                   v{latestVersion.versionNumber}
                   {latestVersion.label ? ` — ${latestVersion.label}` : ''}
                 </p>
                 <StatusBadge status={latestVersion.status} />
               </div>
-              <ActionBar>
-                <Link
-                  to={getStudioRoute(latestVersion.id)}
-                  state={versionNavState(
-                    latestVersion,
-                    landingPageId,
-                    landingPageTitle,
-                    campaignId,
-                    campaignName,
-                  )}
-                  onClick={() => handleOpenStudio(latestVersion)}
-                  className={cn(buttonVariants({ variant: 'default', size: 'sm' }))}
-                >
-                  <PenLine className="h-3.5 w-3.5" />
-                  Ouvrir le Studio
-                </Link>
-                <Link
-                  to={getPreviewRoute(latestVersion.id)}
-                  state={versionNavState(
-                    latestVersion,
-                    landingPageId,
-                    landingPageTitle,
-                    campaignId,
-                    campaignName,
-                  )}
-                  className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }))}
-                >
-                  <Eye className="h-3.5 w-3.5" />
-                  Aperçu
-                </Link>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" className="ah-cta-studio" asChild>
+                  <Link
+                    to={getStudioRoute(latestVersion.id)}
+                    state={versionNavState(
+                      latestVersion,
+                      landingPageId,
+                      landingPageTitle,
+                      campaignId,
+                      campaignName,
+                    )}
+                    onClick={() => handleOpenStudio(latestVersion)}
+                  >
+                    <PenLine className="size-3.5" />
+                    Ouvrir le Studio
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <Link
+                    to={getPreviewRoute(latestVersion.id)}
+                    state={versionNavState(
+                      latestVersion,
+                      landingPageId,
+                      landingPageTitle,
+                      campaignId,
+                      campaignName,
+                    )}
+                  >
+                    <Eye className="size-3.5" />
+                    Aperçu
+                  </Link>
+                </Button>
                 {canWrite && latestVersion.status === 'DRAFT' ? (
-                  <ShadButton
+                  <Button
                     type="button"
                     size="sm"
                     variant="outline"
@@ -295,71 +295,69 @@ export default function LandingPageVersionsPage() {
                     onClick={() => void handlePublish(latestVersion.id)}
                   >
                     {publishingId === latestVersion.id ? 'Publication…' : 'Publier'}
-                  </ShadButton>
+                  </Button>
                 ) : null}
                 {canWrite && latestVersion.status === 'PUBLISHED' ? (
-                  <ShadButton
+                  <Button
                     type="button"
                     size="sm"
                     variant="outline"
                     disabled={exportingId === latestVersion.id}
                     onClick={() => void handleExport(latestVersion)}
                   >
-                    <Download className="h-3.5 w-3.5" />
+                    <Download className="size-3.5" />
                     {exportingId === latestVersion.id ? 'Export…' : 'Export ZIP'}
-                  </ShadButton>
+                  </Button>
                 ) : null}
-              </ActionBar>
+              </div>
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">
               Créez une première version pour ouvrir le Studio et démarrer la production.
             </p>
           )}
-        </CardContent>
-      </Card>
+        </AutoHallPanel>
+      </section>
 
       {canWrite ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Nouvelle version</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form className="flex max-w-md flex-col gap-4" onSubmit={handleCreate}>
-              <ShadInput
-                label="Libellé (optionnel)"
-                value={label}
-                onChange={(e) => setLabel(e.target.value)}
-                maxLength={120}
-                placeholder="Ex. Promo été"
-              />
-              <ShadButton type="submit" disabled={submitting}>
+        <section className={DASHBOARD01_CONTENT_PAD}>
+          <AutoHallPanel title="Nouvelle version">
+            <form className="grid max-w-md gap-4" onSubmit={handleCreate}>
+              <div className="grid gap-2">
+                <Label htmlFor="version-label">Libellé (optionnel)</Label>
+                <Input
+                  id="version-label"
+                  value={label}
+                  onChange={(e) => setLabel(e.target.value)}
+                  maxLength={120}
+                  placeholder="Ex. Promo été"
+                />
+              </div>
+              <Button type="submit" disabled={submitting}>
                 {submitting ? 'Création…' : 'Créer la version'}
-              </ShadButton>
+              </Button>
             </form>
-          </CardContent>
-        </Card>
+          </AutoHallPanel>
+        </section>
       ) : null}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Historique ({versions.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <section className={DASHBOARD01_CONTENT_PAD}>
+        <AutoHallPanel title={`Historique (${versions.length})`} contentClassName="min-w-0">
           {versions.length === 0 && !loading ? (
-            <EmptyState
+            <AutoHallEmptyState
               title="Aucune version"
               description="Créez une version pour commencer la production dans le Studio."
+              className="ah-target-empty-state"
             />
           ) : (
-            <ul className="divide-y divide-border">
+            <ul className="divide-y divide-border ah-admin-list-row">
               {versions.map((version) => (
                 <li
                   key={version.id}
                   className="flex flex-wrap items-center justify-between gap-3 py-4 first:pt-0 last:pb-0"
                 >
                   <div className="min-w-0">
-                    <p className="font-medium text-foreground">
+                    <p className="font-medium">
                       v{version.versionNumber}
                       {version.label ? ` — ${version.label}` : ''}
                     </p>
@@ -367,37 +365,39 @@ export default function LandingPageVersionsPage() {
                       Créée le {new Date(version.createdAt).toLocaleString('fr-FR')}
                     </p>
                   </div>
-                  <ActionBar align="end">
+                  <div className="flex flex-wrap items-center justify-end gap-2">
                     <StatusBadge status={version.status} />
-                    <Link
-                      to={getStudioRoute(version.id)}
-                      state={versionNavState(
-                        version,
-                        landingPageId,
-                        landingPageTitle,
-                        campaignId,
-                        campaignName,
-                      )}
-                      onClick={() => handleOpenStudio(version)}
-                      className={cn(buttonVariants({ variant: 'default', size: 'sm' }))}
-                    >
-                      Ouvrir le Studio
-                    </Link>
-                    <Link
-                      to={getPreviewRoute(version.id)}
-                      state={versionNavState(
-                        version,
-                        landingPageId,
-                        landingPageTitle,
-                        campaignId,
-                        campaignName,
-                      )}
-                      className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }))}
-                    >
-                      Aperçu
-                    </Link>
+                    <Button variant="outline" size="sm" className="ah-cta-studio" asChild>
+                      <Link
+                        to={getStudioRoute(version.id)}
+                        state={versionNavState(
+                          version,
+                          landingPageId,
+                          landingPageTitle,
+                          campaignId,
+                          campaignName,
+                        )}
+                        onClick={() => handleOpenStudio(version)}
+                      >
+                        Ouvrir le Studio
+                      </Link>
+                    </Button>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link
+                        to={getPreviewRoute(version.id)}
+                        state={versionNavState(
+                          version,
+                          landingPageId,
+                          landingPageTitle,
+                          campaignId,
+                          campaignName,
+                        )}
+                      >
+                        Aperçu
+                      </Link>
+                    </Button>
                     {canWrite && version.status === 'DRAFT' ? (
-                      <ShadButton
+                      <Button
                         type="button"
                         size="sm"
                         variant="outline"
@@ -405,10 +405,10 @@ export default function LandingPageVersionsPage() {
                         onClick={() => void handlePublish(version.id)}
                       >
                         Publier
-                      </ShadButton>
+                      </Button>
                     ) : null}
                     {canWrite && version.status === 'PUBLISHED' ? (
-                      <ShadButton
+                      <Button
                         type="button"
                         size="sm"
                         variant="outline"
@@ -416,15 +416,15 @@ export default function LandingPageVersionsPage() {
                         onClick={() => void handleExport(version)}
                       >
                         Export ZIP
-                      </ShadButton>
+                      </Button>
                     ) : null}
-                  </ActionBar>
+                  </div>
                 </li>
               ))}
             </ul>
           )}
-        </CardContent>
-      </Card>
-    </div>
+        </AutoHallPanel>
+      </section>
+    </>
   );
 }

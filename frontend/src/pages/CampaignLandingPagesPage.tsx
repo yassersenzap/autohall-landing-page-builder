@@ -1,20 +1,15 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { PenLine } from 'lucide-react';
-import { StudioPageHeader } from '@/components/studio/StudioPageHeader';
-import { ActionBar, WorkflowSteps } from '@/components/ui/app';
+
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  ShadButton,
-  ShadInput,
-  buttonVariants,
-} from '@/components/ui/primitives';
+  AutoHallEmptyState,
+  AutoHallPanel,
+  AutoHallSubpageBack,
+  AutoHallWorkflowSteps,
+  DASHBOARD01_CONTENT_PAD,
+} from '@/components/admin';
 import { StatusBadge } from '@/components/ui/primitives/status-badge';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { useStudioSession } from '@/hooks/useStudioSession';
 import { ApiError, logoutClient, meRequest } from '@/lib/api';
 import { getStudioRoute } from '@/lib/landing-studio-routes';
@@ -26,7 +21,9 @@ import {
   type LandingPageListItem,
 } from '@/lib/landing-pages';
 import { studioNavState } from '@/lib/studio-session';
-import { cn } from '@/lib/utils';
+import { Button } from '@/ui-lab/ui/button';
+import { Input } from '@/ui-lab/ui/input';
+import { Label } from '@/ui-lab/ui/label';
 
 type LocationState = {
   campaignName?: string;
@@ -112,105 +109,116 @@ export default function CampaignLandingPagesPage() {
 
   if (!campaignId) {
     return (
-      <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+      <p
+        className={`${DASHBOARD01_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
+      >
         Identifiant de campagne invalide.
       </p>
     );
   }
 
   return (
-    <div className="ds-page-stack font-sans">
-      <StudioPageHeader
-        title="Landing pages"
-        description={campaignName ? `Campagne : ${campaignName}` : `Campagne ${campaignId}`}
-        backTo="/campaigns"
-        backLabel="Campagnes"
-        actions={
-          campaignStudio ? (
+    <>
+      <AutoHallSubpageBack to="/campaigns" label="Campagnes" />
+
+      <p className={`${DASHBOARD01_CONTENT_PAD} -mt-2 text-sm text-muted-foreground`}>
+        {campaignName ? `Campagne : ${campaignName}` : `Campagne ${campaignId}`}
+      </p>
+
+      {campaignStudio ? (
+        <section className={`${DASHBOARD01_CONTENT_PAD} flex justify-end`}>
+          <Button variant="outline" size="sm" className="ah-cta-studio" asChild>
             <Link
               to={getStudioRoute(campaignStudio.pageVersionId)}
               state={studioNavState(campaignStudio)}
-              className={cn(buttonVariants({ variant: 'default', size: 'sm' }))}
             >
-              <PenLine className="h-3.5 w-3.5" />
+              <PenLine className="size-3.5" />
               Ouvrir le Studio
             </Link>
-          ) : null
-        }
-      />
+          </Button>
+        </section>
+      ) : null}
 
-      <WorkflowSteps
-        steps={[
-          { id: 'campaigns', label: 'Campagnes', done: true },
-          { id: 'landings', label: 'Landing pages', active: true },
-          { id: 'versions', label: 'Versions' },
-          { id: 'studio', label: 'Studio' },
-        ]}
-      />
+      <section className={DASHBOARD01_CONTENT_PAD}>
+        <AutoHallWorkflowSteps
+          steps={[
+            { id: 'campaigns', label: 'Campagnes', done: true },
+            { id: 'landings', label: 'Landing pages', active: true },
+            { id: 'versions', label: 'Versions' },
+            { id: 'studio', label: 'Studio' },
+          ]}
+        />
+      </section>
 
-      {loading ? <p className="text-sm text-muted-foreground">Chargement…</p> : null}
+      {loading ? (
+        <p className={`${DASHBOARD01_CONTENT_PAD} text-sm text-muted-foreground`}>Chargement…</p>
+      ) : null}
+
       {error ? (
-        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <p
+          className={`${DASHBOARD01_CONTENT_PAD} rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive`}
+        >
           {error}
         </p>
       ) : null}
 
       {canWrite ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Créer une landing page</CardTitle>
-            <CardDescription>
-              Chaque landing dispose de versions gérées dans le centre de production.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form className="flex max-w-md flex-col gap-4" onSubmit={handleCreate}>
-              <ShadInput
-                label="Titre"
-                value={title}
-                onChange={(e) => handleTitleChange(e.target.value)}
-                required
-                maxLength={180}
-              />
-              <ShadInput
-                label="Slug (URL)"
-                value={slug}
-                onChange={(e) => {
-                  setSlugTouched(true);
-                  setSlug(e.target.value);
-                }}
-                required
-                maxLength={180}
-                pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
-                title="Minuscules, chiffres et tirets uniquement"
-              />
-              <ShadButton type="submit" disabled={submitting}>
+        <section className={DASHBOARD01_CONTENT_PAD}>
+          <AutoHallPanel
+            title="Créer une landing page"
+            description="Chaque landing dispose de versions gérées dans le centre de production."
+          >
+            <form className="grid max-w-md gap-4" onSubmit={handleCreate}>
+              <div className="grid gap-2">
+                <Label htmlFor="landing-title">Titre</Label>
+                <Input
+                  id="landing-title"
+                  value={title}
+                  onChange={(e) => handleTitleChange(e.target.value)}
+                  required
+                  maxLength={180}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="landing-slug">Slug (URL)</Label>
+                <Input
+                  id="landing-slug"
+                  value={slug}
+                  onChange={(e) => {
+                    setSlugTouched(true);
+                    setSlug(e.target.value);
+                  }}
+                  required
+                  maxLength={180}
+                  pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
+                  title="Minuscules, chiffres et tirets uniquement"
+                />
+              </div>
+              <Button type="submit" disabled={submitting}>
                 {submitting ? 'Création…' : 'Créer la landing page'}
-              </ShadButton>
+              </Button>
             </form>
-          </CardContent>
-        </Card>
+          </AutoHallPanel>
+        </section>
       ) : null}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Liste ({landingPages.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <section className={DASHBOARD01_CONTENT_PAD}>
+        <AutoHallPanel title={`Liste (${landingPages.length})`} contentClassName="min-w-0">
           {landingPages.length === 0 && !loading ? (
-            <EmptyState
+            <AutoHallEmptyState
               title="Aucune landing page"
               description="Créez une landing puis une version pour ouvrir le Studio."
+              className="ah-target-empty-state"
             />
           ) : (
-            <ul className="divide-y divide-border">
+            <ul className="divide-y divide-border ah-admin-list-row">
               {landingPages.map((page) => (
                 <li
                   key={page.id}
                   className="flex flex-wrap items-center justify-between gap-3 py-4 first:pt-0 last:pb-0"
                 >
                   <div className="min-w-0">
-                    <p className="flex flex-wrap items-center gap-2 font-medium text-foreground">
+                    <p className="flex flex-wrap items-center gap-2 font-medium">
                       {page.title}
                       <StatusBadge status={page.status} />
                     </p>
@@ -222,7 +230,7 @@ export default function CampaignLandingPagesPage() {
                       </p>
                     ) : null}
                   </div>
-                  <ActionBar align="end">
+                  <Button variant="outline" size="sm" asChild>
                     <Link
                       to={`/landing-pages/${page.id}/versions`}
                       state={{
@@ -230,17 +238,16 @@ export default function CampaignLandingPagesPage() {
                         campaignId,
                         campaignName,
                       }}
-                      className={cn(buttonVariants({ variant: 'default', size: 'sm' }))}
                     >
                       Versions & Studio
                     </Link>
-                  </ActionBar>
+                  </Button>
                 </li>
               ))}
             </ul>
           )}
-        </CardContent>
-      </Card>
-    </div>
+        </AutoHallPanel>
+      </section>
+    </>
   );
 }

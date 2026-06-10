@@ -6,10 +6,12 @@ import {
   type AssignableUser,
   type LeadEventDetail,
 } from '../../lib/leads';
-import { CRM_FIELD_CLASS, CRM_SUBMIT_BTN_CLASS } from '@/lib/lead-badge-styles';
-import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
-import { Select } from '../ui/Select';
+import { Button } from '@/ui-lab/ui/button';
+import { Input } from '@/ui-lab/ui/input';
+import { Label } from '@/ui-lab/ui/label';
+
+const selectClassName =
+  'ah-admin-native-select flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50';
 
 type LeadFollowUpFormProps = {
   lead: LeadEventDetail;
@@ -48,49 +50,57 @@ export default function LeadFollowUpForm({
   }
 
   return (
-    <form className="ui-form-stack" onSubmit={handleSubmit}>
-      <Select
-        label="Priorité"
-        value={priority}
-        onChange={(e) => setPriority(e.target.value)}
-        disabled={submitting}
-        className={CRM_FIELD_CLASS}
-      >
-        {LEAD_PRIORITIES.map((value) => (
-          <option key={value} value={value}>
-            {PRIORITY_LABELS[value]}
-          </option>
-        ))}
-      </Select>
-      <Select
-        label="Assigné à"
-        value={assignedToUserId}
-        onChange={(e) => setAssignedToUserId(e.target.value)}
-        disabled={submitting}
-        className={CRM_FIELD_CLASS}
-      >
-        <option value="">Non assigné</option>
-        {assignableUsers.map((user) => (
-          <option key={user.id} value={user.id}>
-            {user.fullName}
-          </option>
-        ))}
-      </Select>
-      <Input
-        label="Prochaine relance"
-        type="datetime-local"
-        value={nextFollowUpAt}
-        onChange={(e) => setNextFollowUpAt(e.target.value)}
-        disabled={submitting}
-        className={CRM_FIELD_CLASS}
-      />
+    <form className="grid max-w-md gap-4" onSubmit={handleSubmit}>
+      <div className="grid gap-2">
+        <Label htmlFor="lead-priority">Priorité</Label>
+        <select
+          id="lead-priority"
+          className={selectClassName}
+          value={priority}
+          onChange={(e) => setPriority(e.target.value)}
+          disabled={submitting}
+        >
+          {LEAD_PRIORITIES.map((value) => (
+            <option key={value} value={value}>
+              {PRIORITY_LABELS[value]}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="lead-assigned">Assigné à</Label>
+        <select
+          id="lead-assigned"
+          className={selectClassName}
+          value={assignedToUserId}
+          onChange={(e) => setAssignedToUserId(e.target.value)}
+          disabled={submitting}
+        >
+          <option value="">Non assigné</option>
+          {assignableUsers.map((user) => (
+            <option key={user.id} value={user.id}>
+              {user.fullName}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="lead-follow-up">Prochaine relance</Label>
+        <Input
+          id="lead-follow-up"
+          type="datetime-local"
+          value={nextFollowUpAt}
+          onChange={(e) => setNextFollowUpAt(e.target.value)}
+          disabled={submitting}
+        />
+      </div>
       {lead.lastContactAt ? (
-        <p className="lead-detail__text">
+        <p className="text-sm text-muted-foreground">
           Dernier contact :{' '}
           {new Date(lead.lastContactAt).toLocaleString('fr-FR')}
         </p>
       ) : null}
-      <Button type="submit" disabled={submitting} className={CRM_SUBMIT_BTN_CLASS}>
+      <Button type="submit" disabled={submitting}>
         {submitting ? 'Enregistrement…' : 'Enregistrer le suivi'}
       </Button>
     </form>
