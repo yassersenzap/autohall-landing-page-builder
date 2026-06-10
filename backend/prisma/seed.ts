@@ -14,7 +14,7 @@ import {
 } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { Pool } from 'pg';
-import { buildDefaultStudioV2Document } from '../src/studio-v2/default-document';
+import { buildDefaultStudioV2Document } from './seed-data/default-studio-document';
 
 function loadEnv(): void {
   const rootEnv = join(__dirname, '..', '..', '.env');
@@ -23,15 +23,37 @@ function loadEnv(): void {
   config({ path: backendEnv, override: true });
 }
 
-const SEED_ADMIN_EMAIL = 'admin@autohall.local';
-/** Mot de passe de développement uniquement — ne jamais utiliser en production. */
-const SEED_ADMIN_PASSWORD = 'Autohall_Dev_2026!';
+const DEFAULT_SEED_ADMIN_EMAIL = 'admin@autohall.local';
 
-async function runSeed(prisma: PrismaClient): Promise<void> {
-  const passwordHash = await bcrypt.hash(SEED_ADMIN_PASSWORD, 10);
+function resolveSeedAdminCredentials(): { email: string; password: string } {
+  const email =
+    process.env.SEED_ADMIN_EMAIL?.trim() || DEFAULT_SEED_ADMIN_EMAIL;
+  const password = process.env.SEED_ADMIN_PASSWORD?.trim();
+
+  if (!password) {
+    throw new Error(
+      '[seed] SEED_ADMIN_PASSWORD is not set. Configure it in the root .env (Docker) or backend/.env (local dev), then run npm run db:seed again.',
+    );
+  }
+
+  if (password.length < 12) {
+    throw new Error(
+      '[seed] SEED_ADMIN_PASSWORD must be at least 12 characters.',
+    );
+  }
+
+  return { email, password };
+}
+
+async function runSeed(
+  prisma: PrismaClient,
+  adminEmail: string,
+  adminPassword: string,
+): Promise<void> {
+  const passwordHash = await bcrypt.hash(adminPassword, 10);
 
   const admin = await prisma.user.upsert({
-    where: { email: SEED_ADMIN_EMAIL },
+    where: { email: adminEmail },
     update: {
       fullName: 'Administrateur Auto Hall (seed)',
       role: UserRole.ADMIN,
@@ -40,7 +62,7 @@ async function runSeed(prisma: PrismaClient): Promise<void> {
     },
     create: {
       fullName: 'Administrateur Auto Hall (seed)',
-      email: SEED_ADMIN_EMAIL,
+      email: adminEmail,
       passwordHash,
       role: UserRole.ADMIN,
       isActive: true,
@@ -370,7 +392,8 @@ async function runSeed(prisma: PrismaClient): Promise<void> {
   }
 
   console.log('[seed] Données de démonstration prêtes.');
-  console.log(`[seed] Admin : ${SEED_ADMIN_EMAIL} (mot de passe documenté dans prisma/seed.ts — dev uniquement)`);
+  console.log(`[seed] Admin user ready: ${adminEmail}`);
+  console.log('[seed] Password loaded from SEED_ADMIN_PASSWORD.');
   console.log(`[seed] Campagne : ${campaign.name}`);
   console.log(`[seed] Landing : /${landingPage.slug} (version ${pageVersion.versionNumber})`);
   console.log(`[seed] Landing Studio : document prêt pour la version ${pageVersion.id}`);
@@ -387,8 +410,11 @@ async function main(): Promise<void> {
   const pool = new Pool({ connectionString });
   const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
 
+  const { email: adminEmail, password: adminPassword } =
+    resolveSeedAdminCredentials();
+
   try {
-    await runSeed(prisma);
+    await runSeed(prisma, adminEmail, adminPassword);
   } finally {
     await prisma.$disconnect();
     await pool.end();

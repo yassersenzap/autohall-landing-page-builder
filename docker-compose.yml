@@ -45,6 +45,8 @@ services:
       EXPORT_STORAGE_PATH: /app/storage/exports
       ASSETS_MAX_FILE_SIZE: ${ASSETS_MAX_FILE_SIZE:-5242880}
       PUBLIC_API_BASE_URL: ${PUBLIC_API_BASE_URL:-http://localhost:3000}
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@autohall.local}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-}
     ports:
       - "${BACKEND_PORT:-3000}:3000"
     volumes:

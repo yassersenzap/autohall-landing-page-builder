@@ -1,13 +1,12 @@
 import { join } from 'path';
 
 /**
- * Chemins .env (depuis backend/) :
- * 1. racine du dépôt — fichier principal
- * 2. backend/.env — surcharges locales optionnelles
+ * Chemins .env pour NestJS / Prisma CLI en développement local (cwd = backend/).
  *
- * ConfigModule Nest : la première entrée a la priorité sur les doublons.
+ * Le .env racine est réservé à Docker Compose — il n'est pas chargé ici.
+ * En conteneur, les variables viennent de docker-compose `environment`.
  */
 export function getEnvFilePaths(): string[] {
   const cwd = process.cwd();
-  return [join(cwd, '..', '.env'), join(cwd, '.env')];
+  return [join(cwd, '.env')];
 }

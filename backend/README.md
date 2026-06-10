@@ -106,7 +106,7 @@ Les variables d’environnement sont chargées via `@nestjs/config` (`ConfigModu
 
 Rôles Prisma : `ADMIN`, `SI_DIGITAL`, `MARKETER`, `VIEWER` (le rôle marketing métier correspond à `MARKETER`).
 
-Utilisateur de développement (seed) : `admin@autohall.local` — mot de passe dans `prisma/seed.ts`.
+Utilisateur de développement (seed) : `admin@autohall.local` — mot de passe : valeur de `SEED_ADMIN_PASSWORD` dans le fichier `.env` (`backend/.env` en local, `.env` racine en Docker).
 
 ## Campagnes (fondation)
 
@@ -124,9 +124,10 @@ Utilisateur de développement (seed) : `admin@autohall.local` — mot de passe d
 curl http://localhost:3000/health
 curl http://localhost:3000/health/db
 
+# Mot de passe : valeur de SEED_ADMIN_PASSWORD dans backend/.env (ou .env racine en Docker)
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d "{\"email\":\"admin@autohall.local\",\"password\":\"Autohall_Dev_2026!\"}"
+  -d "{\"email\":\"admin@autohall.local\",\"password\":\"$SEED_ADMIN_PASSWORD\"}"
 
 curl http://localhost:3000/api/auth/me \
   -H "Authorization: Bearer <accessToken>"
@@ -274,9 +275,10 @@ curl -o export.zip "http://localhost:3000/api/page-versions/${PAGE_VERSION_ID}/e
 ### Exemple PowerShell
 
 ```powershell
+# Mot de passe : valeur de SEED_ADMIN_PASSWORD dans backend/.env (ou .env racine en Docker)
 $login = Invoke-RestMethod -Uri "http://localhost:3000/api/auth/login" -Method POST `
   -ContentType "application/json" `
-  -Body '{"email":"admin@autohall.local","password":"Autohall_Dev_2026!"}'
+  -Body (@{ email = "admin@autohall.local"; password = $env:SEED_ADMIN_PASSWORD } | ConvertTo-Json)
 $token = $login.data.accessToken
 $pageVersionId = "<uuid-version-publiee>"
 
@@ -382,4 +384,4 @@ npx prisma migrate dev --name init_database_foundation
 npm run db:seed
 ```
 
-Le mot de passe de l’utilisateur admin créé par le seed est défini dans `prisma/seed.ts` (environnement local uniquement, jamais en production).
+Le mot de passe de l’utilisateur admin créé par le seed est configuré via `SEED_ADMIN_PASSWORD` dans le fichier `.env` (jamais dans le code source).

@@ -2,44 +2,35 @@
 
 ## Stack complète (recommandée)
 
-Depuis la **racine du dépôt**, Compose démarre PostgreSQL, le backend NestJS et le frontend Nginx :
+Depuis la **racine du dépôt** :
 
 ```bash
 cp .env.example .env
-# Configurer POSTGRES_PASSWORD, JWT_SECRET, URLs (voir .env.example)
-
+# Éditer le .env RACINE uniquement (voir ../.env.example)
 docker compose up -d
+docker compose exec backend npm run db:seed
 ```
 
-Instructions détaillées (déploiement SI, mise à jour, dépannage) : [`../README.md`](../README.md#déploiement-docker-si--test-interne).
+Le seed lit `SEED_ADMIN_EMAIL` et `SEED_ADMIN_PASSWORD` depuis le `.env` racine (jamais de mot de passe dans le code source).
 
-| Service | Conteneur | Port hôte (défaut) | Rôle |
+Instructions détaillées : [`../README.md`](../README.md#déploiement-docker-si--test-interne).
+
+| Service | Conteneur | Port hôte (exemple local) | Rôle |
 | --- | --- | --- | --- |
 | postgres | `autohall_lp_postgres` | 5432 | Base PostgreSQL |
-| backend | `autohall_lp_backend` | 3000 | API NestJS + migrations Prisma au démarrage |
-| frontend | `autohall_lp_frontend` | 8080 → Nginx :80 | SPA React (builder) |
+| backend | `autohall_lp_backend` | 3001 (ou 3000 en SI) | API NestJS + migrations Prisma |
+| frontend | `autohall_lp_frontend` | 8081 → Nginx :80 | SPA React (builder) |
 
-## PostgreSQL + pgAdmin seuls (dev local)
+**Important :** le `.env` racine sert **uniquement** à Docker Compose. Le développement local Vite/NestJS utilise `frontend/.env` et `backend/.env`.
 
-Pour développer backend/frontend sur la machine hôte avec uniquement Postgres en Docker :
+## PostgreSQL seul (dev backend/frontend sur l'hôte)
 
 ```bash
 docker compose up -d postgres
-# DATABASE_URL avec host localhost dans backend/.env ou .env racine
+# DATABASE_URL avec host localhost dans backend/.env (pas le .env racine)
 ```
 
-pgAdmin (profil optionnel) :
-
-```bash
-docker compose --profile pgadmin up -d
-```
-
-| Service | URL | Identifiants |
-| --- | --- | --- |
-| PostgreSQL (hôte) | `localhost:5432` | `POSTGRES_USER` / `POSTGRES_PASSWORD` |
-| pgAdmin | http://localhost:5050 | `PGADMIN_DEFAULT_EMAIL` / `PGADMIN_DEFAULT_PASSWORD` |
-
-Connexion pgAdmin → Postgres : hôte **`postgres`**, port **5432**.
+pgAdmin (profil optionnel) : `docker compose --profile pgadmin up -d`
 
 ## Volumes
 
@@ -49,9 +40,9 @@ Connexion pgAdmin → Postgres : hôte **`postgres`**, port **5432**.
 ## Commandes utiles
 
 ```bash
+docker compose config
 docker compose ps
 docker compose logs -f backend
-docker compose logs -f frontend
-docker compose down          # conserver les volumes
-docker compose down -v       # supprimer les données Postgres (destructif)
+docker compose down
+docker compose down -v   # destructif : supprime les données Postgres
 ```

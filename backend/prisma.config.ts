@@ -9,8 +9,8 @@ for (const envPath of getEnvFilePaths()) {
 
 /**
  * Prisma CLI datasource URL.
- * - Docker: set via Compose `environment` / root `.env` (host must be `postgres`).
- * - Local: set in root `.env` or `backend/.env`.
+ * - Docker: set via Compose `environment` (host must be `postgres`).
+ * - Local: set in `backend/.env` (host `localhost`).
  * Use process.env (not env()) so `prisma generate` can run at image build without a real DB.
  */
 function resolveDatabaseUrl(): string | undefined {

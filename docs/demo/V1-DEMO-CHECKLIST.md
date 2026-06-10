@@ -28,7 +28,7 @@ Variables utiles :
 ## Compte admin (seed)
 
 - Email : `admin@autohall.local`
-- Mot de passe : `Autohall_Dev_2026!`
+- Mot de passe : valeur de `SEED_ADMIN_PASSWORD` dans le fichier `.env` (`backend/.env` en local)
 
 ## Données seed utiles
 

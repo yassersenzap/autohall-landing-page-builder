@@ -130,7 +130,7 @@ cd ../frontend && npm run build
 | Élément | Valeur |
 |---------|--------|
 | **Email admin** | `admin@autohall.local` |
-| **Mot de passe** | `Autohall_Dev_2026!` (défini dans `backend/prisma/seed.ts` — **dev uniquement**) |
+| **Mot de passe** | Valeur de `SEED_ADMIN_PASSWORD` dans le fichier `.env` (`backend/.env` en local, `.env` racine en Docker) |
 | **Rôle** | `ADMIN` |
 | **Campagne démo** | `Campagne démo — Offre printemps` (UUID fixe seed : `00000000-0000-4000-8000-000000000001`) |
 | **Landing slug** | `demo-offre-printemps` |
