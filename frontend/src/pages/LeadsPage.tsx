@@ -21,7 +21,7 @@ import {
   type LeadEventListItem,
   type LeadsPagination,
 } from '../lib/leads';
-import { Button } from '@/ui-lab/ui/button';
+import { Button } from '@/components/ui/shadcn/button';
 
 function initialFilters(searchParams: URLSearchParams): LeadsFilterValues {
   return {

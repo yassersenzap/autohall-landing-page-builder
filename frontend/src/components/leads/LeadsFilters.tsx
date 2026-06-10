@@ -7,9 +7,9 @@ import { STATUS_LABELS } from '../../lib/lead-dashboard';
 import type { CampaignListItem } from '../../lib/campaigns';
 import type { LandingPageListItem } from '../../lib/landing-pages';
 import type { AssignableUser } from '../../lib/leads';
-import { Button } from '@/ui-lab/ui/button';
-import { Input } from '@/ui-lab/ui/input';
-import { Label } from '@/ui-lab/ui/label';
+import { Button } from '@/components/ui/shadcn/button';
+import { Input } from '@/components/ui/shadcn/input';
+import { Label } from '@/components/ui/shadcn/label';
 import { cn } from '@/lib/utils';
 
 export type LeadsFilterValues = {

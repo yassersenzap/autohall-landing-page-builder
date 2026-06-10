@@ -32,11 +32,6 @@ const BuilderV3Page = lazy(() => import('./pages/BuilderV3Page'));
 
 const BuilderV3PreviewPage = lazy(() => import('./pages/BuilderV3PreviewPage'));
 
-const Dashboard01LabPage = lazy(() => import('./pages/ui-lab/Dashboard01LabPage'));
-const AutoHallDashboardTargetPage = lazy(
-  () => import('./pages/ui-lab/AutoHallDashboardTargetPage'),
-);
-
 
 
 function StudioRouteFallback() {
@@ -60,18 +55,6 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
 
           <Route path="/login" element={<LoginPage />} />
-
-          <Route path="/ui-lab/dashboard-01" element={
-            <Suspense fallback={<p className="p-6 text-sm text-muted-foreground">Chargement du lab UI…</p>}>
-              <Dashboard01LabPage />
-            </Suspense>
-          } />
-
-          <Route path="/ui-lab/autohall-dashboard-target" element={
-            <Suspense fallback={<p className="p-6 text-sm text-muted-foreground">Chargement de la cible visuelle…</p>}>
-              <AutoHallDashboardTargetPage />
-            </Suspense>
-          } />
 
           <Route element={<ProtectedFullscreenRoute />}>
 

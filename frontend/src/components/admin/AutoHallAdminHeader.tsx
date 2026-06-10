@@ -3,10 +3,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import { getAdminRouteTitle } from '@/components/admin/admin-route-titles';
 import { logoutClient, logoutRequest } from '@/lib/api';
-import { useTargetTheme } from '@/ui-lab/autohall-dashboard-target/context/TargetThemeContext';
-import { Button } from '@/ui-lab/ui/button';
-import { Separator } from '@/ui-lab/ui/separator';
-import { SidebarTrigger } from '@/ui-lab/ui/sidebar';
+import { useTargetTheme } from '@/components/admin/TargetThemeContext';
+import { Button } from '@/components/ui/shadcn/button';
+import { Separator } from '@/components/ui/shadcn/separator';
+import { SidebarTrigger } from '@/components/ui/shadcn/sidebar';
 
 export function AutoHallAdminHeader() {
   const location = useLocation();

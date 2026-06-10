@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { STATUS_LABELS } from '../../lib/lead-dashboard';
 import { LEAD_STATUSES } from '../../lib/leads';
-import { Button } from '@/ui-lab/ui/button';
-import { Label } from '@/ui-lab/ui/label';
+import { Button } from '@/components/ui/shadcn/button';
+import { Label } from '@/components/ui/shadcn/label';
 
 const selectClassName =
   'ah-admin-native-select flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50';

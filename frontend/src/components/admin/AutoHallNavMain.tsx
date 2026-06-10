@@ -16,12 +16,12 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/ui-lab/ui/sidebar';
+} from '@/components/ui/shadcn/sidebar';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@/ui-lab/ui/tooltip';
+} from '@/components/ui/shadcn/tooltip';
 
 const NAV_ITEMS = [
   { to: '/dashboard', title: 'Tableau de bord', icon: IconDashboard, end: true },

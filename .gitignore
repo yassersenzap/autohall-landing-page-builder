@@ -99,6 +99,8 @@ temp/
 *.tmp
 *.temp
 .playwright-cli/
+.qa-screenshots/
+frontend/.qa-screenshots/
 # Local / AI-private docs (keep docs/architecture, docs/mvp, etc. versionable)
 docs-private/
 docs/ai-handoff/

@@ -2,12 +2,12 @@ import { IconDotsVertical, IconLogout } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 
 import { logoutClient, logoutRequest } from '@/lib/api';
-import { useTargetTheme } from '@/ui-lab/autohall-dashboard-target/context/TargetThemeContext';
+import { useTargetTheme } from '@/components/admin/TargetThemeContext';
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from '@/ui-lab/ui/avatar';
+} from '@/components/ui/shadcn/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,13 +15,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/ui-lab/ui/dropdown-menu';
+} from '@/components/ui/shadcn/dropdown-menu';
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from '@/ui-lab/ui/sidebar';
+} from '@/components/ui/shadcn/sidebar';
 
 type AutoHallNavUserProps = {
   user: {

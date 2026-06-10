@@ -21,9 +21,9 @@ import {
   type PageVersionListItem,
 } from '@/lib/page-versions';
 import { persistStudioSessionFromVersion } from '@/lib/studio-session';
-import { Button } from '@/ui-lab/ui/button';
-import { Input } from '@/ui-lab/ui/input';
-import { Label } from '@/ui-lab/ui/label';
+import { Button } from '@/components/ui/shadcn/button';
+import { Input } from '@/components/ui/shadcn/input';
+import { Label } from '@/components/ui/shadcn/label';
 
 type LocationState = {
   landingPageTitle?: string;

@@ -2,14 +2,14 @@ import { IconLayoutGrid, IconPlus, IconUsers } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 
 import { DASHBOARD01_CONTENT_PAD } from '@/components/admin/dashboard01-layout';
-import { Button } from '@/ui-lab/ui/button';
+import { Button } from '@/components/ui/shadcn/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/ui-lab/ui/card';
+} from '@/components/ui/shadcn/card';
 
 type DashboardQuickActionsProps = {
   showLeads: boolean;

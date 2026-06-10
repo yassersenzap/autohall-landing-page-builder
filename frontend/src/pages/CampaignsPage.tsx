@@ -15,7 +15,7 @@ import {
   listCampaigns,
   type CampaignListItem,
 } from '@/lib/campaigns';
-import { Button } from '@/ui-lab/ui/button';
+import { Button } from '@/components/ui/shadcn/button';
 
 export default function CampaignsPage() {
   const navigate = useNavigate();

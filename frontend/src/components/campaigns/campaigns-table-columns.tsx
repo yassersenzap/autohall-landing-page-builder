@@ -8,7 +8,7 @@ import type { StudioSession } from '@/lib/studio-session';
 import { studioNavState } from '@/lib/studio-session';
 import type { CampaignListItem } from '@/lib/campaigns';
 import { downloadLandingExport } from '@/lib/landing-export.api';
-import { Button } from '@/ui-lab/ui/button';
+import { Button } from '@/components/ui/shadcn/button';
 
 function optionalCount(source: CampaignListItem, key: 'landingPagesCount' | 'versionsCount'): number | null {
   const value = (source as Record<string, unknown>)[key];

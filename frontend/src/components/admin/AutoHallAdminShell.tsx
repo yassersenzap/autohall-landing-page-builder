@@ -6,9 +6,9 @@ import { AutoHallDashboardSidebar } from '@/components/admin/AutoHallDashboardSi
 import {
   TargetThemeProvider,
   useTargetTheme,
-} from '@/ui-lab/autohall-dashboard-target/context/TargetThemeContext';
-import { SidebarInset, SidebarProvider } from '@/ui-lab/ui/sidebar';
-import { TooltipProvider } from '@/ui-lab/ui/tooltip';
+} from '@/components/admin/TargetThemeContext';
+import { SidebarInset, SidebarProvider } from '@/components/ui/shadcn/sidebar';
+import { TooltipProvider } from '@/components/ui/shadcn/tooltip';
 
 import '@/components/admin/admin-theme.css';
 
@@ -24,7 +24,7 @@ function AutoHallAdminShellInner({
 
   return (
     <div
-      className="ui-lab-autohall-dashboard-target auto-hall-admin-shell"
+      className="auto-hall-admin-shell"
       data-ah-target-theme={mode}
     >
       <TooltipProvider>

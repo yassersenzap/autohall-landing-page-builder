@@ -8,7 +8,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/ui-lab/ui/sidebar';
+} from '@/components/ui/shadcn/sidebar';
 
 const SECONDARY_ITEMS = [
   { to: '/', title: 'Accueil public', icon: IconHome, end: true },

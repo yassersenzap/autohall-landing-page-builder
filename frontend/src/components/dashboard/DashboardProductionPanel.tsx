@@ -5,7 +5,7 @@ import { DASHBOARD01_CONTENT_PAD } from '@/components/admin/dashboard01-layout';
 import type { StudioSession } from '@/lib/studio-session';
 import { getPreviewRoute, getStudioRoute } from '@/lib/landing-studio-routes';
 import { studioNavState } from '@/lib/studio-session';
-import { Button } from '@/ui-lab/ui/button';
+import { Button } from '@/components/ui/shadcn/button';
 import {
   Card,
   CardAction,
@@ -13,7 +13,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/ui-lab/ui/card';
+} from '@/components/ui/shadcn/card';
 
 type DashboardProductionPanelProps = {
   session: StudioSession | null;

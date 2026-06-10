@@ -35,7 +35,7 @@ import {
   type LeadEventDetail,
   type LeadStatusHistoryItem,
 } from '../lib/leads';
-import { Button } from '@/ui-lab/ui/button';
+import { Button } from '@/components/ui/shadcn/button';
 
 function formatDate(value: string): string {
   return new Date(value).toLocaleString('fr-FR');

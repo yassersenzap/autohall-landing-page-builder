@@ -1,4 +1,5 @@
 export { AutoHallAdminShell } from './AutoHallAdminShell';
+export { TargetThemeProvider, useTargetTheme, type TargetThemeMode } from './TargetThemeContext';
 export { AutoHallDashboardSidebar } from './AutoHallDashboardSidebar';
 export { AutoHallAdminHeader } from './AutoHallAdminHeader';
 export { AutoHallPageHeader } from './AutoHallPageHeader';

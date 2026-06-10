@@ -7,15 +7,15 @@ import { AutoHallMetricCard } from '@/components/admin/AutoHallMetricCard';
 import { DataTable } from '@/components/ui/data-table';
 import { STATUS_LABELS, type LeadDashboardKpis } from '@/lib/lead-dashboard';
 import { formatLeadDate, PRIORITY_LABELS } from '@/lib/leads';
-import { Badge } from '@/ui-lab/ui/badge';
-import { Button } from '@/ui-lab/ui/button';
+import { Badge } from '@/components/ui/shadcn/badge';
+import { Button } from '@/components/ui/shadcn/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/ui-lab/ui/card';
+} from '@/components/ui/shadcn/card';
 import {
   Table,
   TableBody,
@@ -23,7 +23,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/ui-lab/ui/table';
+} from '@/components/ui/shadcn/table';
 
 type DashboardLeadPerformanceProps = {
   kpis: LeadDashboardKpis;

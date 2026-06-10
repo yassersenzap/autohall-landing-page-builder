@@ -9,7 +9,7 @@ import {
   type LeadEventListItem,
   type LeadsPagination,
 } from '../../lib/leads';
-import { Button } from '@/ui-lab/ui/button';
+import { Button } from '@/components/ui/shadcn/button';
 import {
   Table,
   TableBody,
@@ -17,7 +17,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/ui-lab/ui/table';
+} from '@/components/ui/shadcn/table';
 
 type LeadsTableProps = {
   leads: LeadEventListItem[];

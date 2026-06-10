@@ -5,9 +5,9 @@ import { AutoHallPanel } from '@/components/admin/AutoHallPanel';
 import { DASHBOARD01_CONTENT_PAD } from '@/components/admin/dashboard01-layout';
 import { ApiError } from '@/lib/api';
 import { createCampaign } from '@/lib/campaigns';
-import { Button } from '@/ui-lab/ui/button';
-import { Input } from '@/ui-lab/ui/input';
-import { Label } from '@/ui-lab/ui/label';
+import { Button } from '@/components/ui/shadcn/button';
+import { Input } from '@/components/ui/shadcn/input';
+import { Label } from '@/components/ui/shadcn/label';
 
 type CreateCampaignPanelProps = {
   onCreated: () => void;

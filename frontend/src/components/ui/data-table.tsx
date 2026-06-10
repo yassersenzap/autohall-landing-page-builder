@@ -13,8 +13,8 @@ import { useState } from 'react';
 import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/ui-lab/ui/button';
-import { Input } from '@/ui-lab/ui/input';
+import { Button } from '@/components/ui/shadcn/button';
+import { Input } from '@/components/ui/shadcn/input';
 import {
   Table,
   TableBody,
@@ -22,7 +22,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/ui-lab/ui/table';
+} from '@/components/ui/shadcn/table';
 import { ShadButton } from './primitives/button';
 import {
   Table as LegacyTable,

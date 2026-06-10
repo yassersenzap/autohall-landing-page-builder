@@ -7,7 +7,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/ui-lab/ui/card';
+} from '@/components/ui/shadcn/card';
 import { cn } from '@/lib/utils';
 
 type AutoHallMetricCardProps = {
