@@ -10,7 +10,7 @@ import {
   ADMIN_CONTENT_PAD,
 } from '@/components/admin';
 import { StatusBadge } from '@/components/ui/primitives/status-badge';
-import { useStudioSession } from '@/hooks/useStudioSession';
+import { useStudioEntry } from '@/hooks/useStudioEntry';
 import { ApiError, logoutClient, meRequest } from '@/lib/api';
 import { getStudioRoute } from '@/lib/landing-studio-routes';
 import {
@@ -34,7 +34,7 @@ export default function CampaignLandingPagesPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const campaignName = (location.state as LocationState | null)?.campaignName ?? null;
-  const studioSession = useStudioSession();
+  const { session: studioSession } = useStudioEntry();
 
   const [landingPages, setLandingPages] = useState<LandingPageListItem[]>([]);
   const [role, setRole] = useState<string | null>(null);

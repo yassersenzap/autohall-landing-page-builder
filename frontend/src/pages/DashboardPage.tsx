@@ -5,7 +5,7 @@ import { DashboardKpiStrip } from '@/components/dashboard/DashboardKpiStrip';
 import { DashboardLeadPerformance } from '@/components/dashboard/DashboardLeadPerformance';
 import { DashboardProductionPanel } from '@/components/dashboard/DashboardProductionPanel';
 import { DashboardQuickActions } from '@/components/dashboard/DashboardQuickActions';
-import { useStudioSession } from '@/hooks/useStudioSession';
+import { useStudioEntry } from '@/hooks/useStudioEntry';
 import { ApiError, meRequest, type AuthUser } from '@/lib/api';
 import { getLeadDashboardKpis, type LeadDashboardKpis } from '@/lib/lead-dashboard';
 import { canViewLeads } from '@/lib/leads';
@@ -19,7 +19,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
-  const session = useStudioSession();
+  const { session, loading: studioLoading } = useStudioEntry();
 
   useEffect(() => {
     let cancelled = false;
@@ -106,6 +106,7 @@ export default function DashboardPage() {
 
       <DashboardProductionPanel
         session={session}
+        loading={studioLoading}
         exporting={exporting}
         onExport={() => void handleExportLatest()}
       />

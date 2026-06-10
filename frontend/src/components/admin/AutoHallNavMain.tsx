@@ -54,12 +54,24 @@ function NavItem({
   );
 }
 
+import { STUDIO_EMPTY_MESSAGE } from '@/lib/studio-entry';
+
 type AutoHallNavMainProps = {
   session: StudioSession | null;
+  loading?: boolean;
 };
 
-export function AutoHallNavMain({ session }: AutoHallNavMainProps) {
-  const studioButton = session ? (
+export function AutoHallNavMain({ session, loading = false }: AutoHallNavMainProps) {
+  const studioButton = loading ? (
+    <SidebarMenuButton
+      disabled
+      className="ah-sidebar-studio-cta min-w-8"
+      aria-disabled
+    >
+      <IconPencil className="ah-brand-accent-icon" />
+      <span>Chargement du Studio…</span>
+    </SidebarMenuButton>
+  ) : session ? (
     <SidebarMenuButton
       asChild
       tooltip="Ouvrir le Studio"
@@ -82,11 +94,11 @@ export function AutoHallNavMain({ session }: AutoHallNavMainProps) {
           aria-disabled
         >
           <IconPencil className="ah-brand-accent-icon" />
-          <span>Studio indisponible</span>
+          <span>Aucune version</span>
         </SidebarMenuButton>
       </TooltipTrigger>
-      <TooltipContent side="right">
-        Ouvrez une version de landing pour activer le Studio.
+      <TooltipContent side="right" className="max-w-xs">
+        {STUDIO_EMPTY_MESSAGE}
       </TooltipContent>
     </Tooltip>
   );
