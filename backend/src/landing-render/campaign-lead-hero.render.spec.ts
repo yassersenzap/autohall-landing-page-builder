@@ -139,6 +139,19 @@ describe('campaign-lead-hero.render', () => {
     expect(html).not.toContain('blob:');
   });
 
+  it('shows Symfony placeholder note without Twig syntax in static HTML', () => {
+    const html = renderCampaignLeadHeroHtml({
+      ...baseProps,
+      formProviderType: 'autohall_symfony_testdrive',
+      symfonyFormIncludeKey: 'testdrive_campaign',
+    });
+
+    expect(html).toContain('Formulaire Symfony Auto Hall');
+    expect(html).toContain('lp-campaign-lead-hero__provider-note');
+    expect(html).not.toMatch(/\{%|\{\{/);
+    expect(html).not.toContain('_campaign_form.html.twig');
+  });
+
   it('routes through renderBlockHtml', () => {
     const html = renderBlockHtml({
       blockType: 'campaign_lead_hero',

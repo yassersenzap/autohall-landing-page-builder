@@ -17,6 +17,7 @@ import {
   deriveApiBaseUrl,
 } from '../page-export/static-export.builder';
 import { extractBuilderV3AssetIds } from './builder-v3-asset-collector';
+import { buildSymfonyExportZipEntries } from '../symfony-export/symfony-export.artifacts';
 import {
   buildBuilderV3ZipEntries,
   type BuilderV3ZipEntry,
@@ -125,10 +126,16 @@ export class BuilderV3ExportService {
         landingSlug: pageVersion.landingPage.slug,
       });
 
+      const symfonyZipEntries = buildSymfonyExportZipEntries({
+        blocks,
+        pageTitle,
+      });
+
       const zipEntries = buildBuilderV3ZipEntries({
         indexHtml,
         landingConfigJs,
         assetMap,
+        extraTextEntries: symfonyZipEntries,
       });
       const zipEntriesWithFiles = await this.filterExistingFileEntries(zipEntries);
       const buffer = await this.buildZipBuffer(zipEntriesWithFiles);

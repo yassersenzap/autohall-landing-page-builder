@@ -19,6 +19,7 @@ export function buildBuilderV3ZipEntries(input: {
   indexHtml: string;
   landingConfigJs: string;
   assetMap: RenderAssetMap;
+  extraTextEntries?: BuilderV3ZipTextEntry[];
 }): BuilderV3ZipEntry[] {
   const entries: BuilderV3ZipEntry[] = [
     { kind: 'text', path: 'index.html', content: input.indexHtml },
@@ -43,6 +44,10 @@ Support : Auto Hall SI Digital
 `,
     },
   ];
+
+  if (input.extraTextEntries?.length) {
+    entries.push(...input.extraTextEntries);
+  }
 
   for (const entry of Object.values(input.assetMap)) {
     entries.push({

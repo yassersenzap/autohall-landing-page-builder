@@ -138,4 +138,59 @@ describe('BuilderV3ExportService', () => {
       true,
     );
   });
+
+  it('adds Symfony artifacts to ZIP without altering static index.html Twig-free output', async () => {
+    const result = await service.exportZip(pageVersionId, {
+      blocks: [
+        {
+          type: 'campaign_lead_hero',
+          sortOrder: 1,
+          propsJson: {
+            brandId: 'ford',
+            campaignTitle: 'Ford Ranger',
+            formTitle: 'Essai',
+            formCtaLabel: 'Continuer',
+            formProviderType: 'autohall_symfony_testdrive',
+            exportTarget: 'symfony_twig_page',
+            symfonyFormIncludeKey: 'testdrive_campaign',
+          },
+        },
+      ],
+      pageTheme: {},
+      pageSettings: {},
+    });
+
+    const zipText = result.buffer.toString('latin1');
+    expect(zipText).toContain('symfony/campaign-lead-hero.fragment.html.twig');
+    expect(zipText).toContain('symfony/README_SYMFONY_INTEGRATION.md');
+    expect(zipText).toContain('symfony/campaign-page.example.html.twig');
+    expect(zipText).toContain('index.html');
+    expect(zipText).toContain('js/lead-form.js');
+    expect(zipText).not.toMatch(/localhost:5173|\/studio/i);
+  });
+
+  it('does not add Symfony folder for default static export', async () => {
+    const result = await service.exportZip(pageVersionId, {
+      blocks: [
+        {
+          type: 'campaign_lead_hero',
+          sortOrder: 1,
+          propsJson: {
+            brandId: 'ford',
+            campaignTitle: 'Ford Ranger',
+            formTitle: 'Essai',
+            formCtaLabel: 'Continuer',
+            formProviderType: 'builder_lead_api',
+            exportTarget: 'static_html',
+          },
+        },
+      ],
+      pageTheme: {},
+      pageSettings: {},
+    });
+
+    const zipText = result.buffer.toString('latin1');
+    expect(zipText).not.toContain('symfony/campaign-lead-hero.fragment.html.twig');
+    expect(zipText).not.toContain('README_SYMFONY_INTEGRATION');
+  });
 });

@@ -1,4 +1,8 @@
 import type { LandingRenderContext } from './render-asset.types';
+import {
+  parseCampaignLeadHeroFormIntegration,
+  SYMFONY_FORM_STATIC_EXPORT_NOTE,
+} from '../symfony-export/export-contracts.registry';
 import { buildBrandInlineStyle, resolveBrandPresetTokens } from './brand-presets';
 import {
   buildHeroFocalInlineStyle,
@@ -279,10 +283,16 @@ function renderFormShellHtml(props: Record<string, unknown>): string {
     : '';
 
   const fieldLabel = formPrimaryFieldLabel ?? 'Champ principal';
+  const integration = parseCampaignLeadHeroFormIntegration(props);
+  const providerNote =
+    integration.formProviderType === 'autohall_symfony_testdrive'
+      ? `<p class="lp-campaign-lead-hero__provider-note">${escapeHtml(SYMFONY_FORM_STATIC_EXPORT_NOTE)}</p>`
+      : '';
 
   return `
     <aside class="lp-campaign-lead-hero__form" id="lead-form">
       <div class="lp-campaign-lead-hero__form-card">
+        ${providerNote}
         ${progressHtml}
         ${formTitle ? `<h2 class="lp-campaign-lead-hero__form-title">${escapeHtml(formTitle)}</h2>` : ''}
         ${formSubtitle ? `<p class="lp-campaign-lead-hero__form-subtitle">${escapeHtml(formSubtitle)}</p>` : ''}
