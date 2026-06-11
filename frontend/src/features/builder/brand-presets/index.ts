@@ -10,6 +10,7 @@ export type {
   RecommendedBlockType,
 } from './brand-preset.types';
 export { BRAND_PRESET_REQUIRED_TOKEN_KEYS } from './brand-preset.types';
+export { resolveBrandCtaPrimaryTextColor } from './brand-cta-contrast';
 export {
   buildBrandCssVarMap,
   buildBrandCssVarString,

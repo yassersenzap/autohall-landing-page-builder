@@ -2,6 +2,7 @@ import { asPropString } from '@/features/builder-engine/lib/block-props';
 import type { BuilderDocumentBlock } from '@/features/builder-engine/types';
 import { BRAND_PRESETS } from '@/features/builder/brand-presets';
 import type { BrandPresetId } from '@/features/builder/brand-presets';
+import { HERO_CROP_PRESETS } from '@/features/builder/blocks/hero-vehicle-offer/hero-image-controls';
 import { Label, ShadInput, ShadTextarea } from '@/components/ui/primitives';
 import { FieldHint } from '../components/BlockInspectorPanel.shared';
 import { MediaFieldControl } from '../components/MediaFieldControl';
@@ -12,23 +13,46 @@ type HeroVehicleOfferInspectorFieldsProps = {
   patch: (p: Record<string, unknown>) => void;
 };
 
-function heroMediaFromProps(propsJson: Record<string, unknown>): MediaFieldValue {
+const CROP_PRESET_LABELS: Record<string, string> = {
+  center: 'Centre',
+  top: 'Haut',
+  bottom: 'Bas',
+  left: 'Gauche',
+  right: 'Droite',
+  custom: 'Personnalisé',
+};
+
+function desktopMediaFromProps(propsJson: Record<string, unknown>): MediaFieldValue {
   return {
     imageAssetId: asPropString(propsJson.heroImage),
     imageUrl: asPropString(propsJson.heroImageUrl),
-    alt: asPropString(propsJson.modelName) || asPropString(propsJson.headline),
-    objectFit: (asPropString(propsJson.imageFit) as 'cover' | 'contain') || 'cover',
   };
 }
 
-function patchHeroMedia(
+function mobileMediaFromProps(propsJson: Record<string, unknown>): MediaFieldValue {
+  return {
+    imageAssetId: asPropString(propsJson.mobileImage),
+    imageUrl: asPropString(propsJson.mobileImageUrl),
+  };
+}
+
+function patchDesktopMedia(
   patch: (p: Record<string, unknown>) => void,
   next: MediaFieldValue,
 ): void {
   patch({
     heroImage: next.imageAssetId ?? '',
     heroImageUrl: next.imageUrl ?? '',
-    imageFit: next.objectFit ?? 'cover',
+  });
+}
+
+function patchMobileMedia(
+  patch: (p: Record<string, unknown>) => void,
+  next: MediaFieldValue,
+): void {
+  patch({
+    mobileImage: next.imageAssetId ?? '',
+    mobileImageUrl: next.imageUrl ?? '',
   });
 }
 
@@ -71,6 +95,8 @@ export function HeroVehicleOfferInspectorFields({
   patch,
 }: HeroVehicleOfferInspectorFieldsProps) {
   const { propsJson } = block;
+  const cropPreset = asPropString(propsJson.cropPreset) || 'center';
+  const isCustomCrop = cropPreset === 'custom';
 
   return (
     <div className="space-y-4">
@@ -157,47 +183,115 @@ export function HeroVehicleOfferInspectorFields({
         />
       </div>
 
-      <MediaFieldControl
-        label="Image hero"
-        value={heroMediaFromProps(propsJson)}
-        onChange={(next) => patchHeroMedia(patch, next)}
-      />
+      <div className="rounded-md border border-neutral-800 bg-neutral-950/40 p-3 space-y-3">
+        <p className="text-xs font-medium text-neutral-300">Images</p>
 
-      <SelectField
-        id="v3-hvo-fit"
-        label="Ajustement image"
-        value={asPropString(propsJson.imageFit) || 'cover'}
-        options={[
-          { value: 'cover', label: 'Remplir (cover)' },
-          { value: 'contain', label: 'Contenir (contain)' },
-        ]}
-        onChange={(value) => patch({ imageFit: value })}
-      />
+        <MediaFieldControl
+          label="Image hero (desktop)"
+          value={desktopMediaFromProps(propsJson)}
+          onChange={(next) => patchDesktopMedia(patch, next)}
+        />
 
-      <SelectField
-        id="v3-hvo-position"
-        label="Position image"
-        value={asPropString(propsJson.imagePosition) || 'right'}
-        options={[
-          { value: 'left', label: 'Gauche' },
-          { value: 'right', label: 'Droite' },
-          { value: 'background', label: 'Arrière-plan' },
-        ]}
-        onChange={(value) => patch({ imagePosition: value })}
-      />
+        <MediaFieldControl
+          label="Image mobile (optionnel)"
+          value={mobileMediaFromProps(propsJson)}
+          onChange={(next) => patchMobileMedia(patch, next)}
+        />
 
-      <SelectField
-        id="v3-hvo-overlay"
-        label="Intensité overlay"
-        value={asPropString(propsJson.overlayIntensity) || 'medium'}
-        options={[
-          { value: 'none', label: 'Aucun' },
-          { value: 'light', label: 'Léger' },
-          { value: 'medium', label: 'Moyen' },
-          { value: 'heavy', label: 'Fort' },
-        ]}
-        onChange={(value) => patch({ overlayIntensity: value })}
-      />
+        <div className="space-y-1.5">
+          <Label htmlFor="v3-hvo-alt" className="text-neutral-400">
+            Texte alternatif (alt)
+          </Label>
+          <ShadInput
+            id="v3-hvo-alt"
+            value={asPropString(propsJson.heroImageAlt)}
+            onChange={(e) => patch({ heroImageAlt: e.target.value })}
+            placeholder="Ex. Ford Ranger vue 3/4"
+            className="border-neutral-700 bg-neutral-900 text-neutral-200"
+          />
+          <FieldHint>Accessibilité et SEO — décrit le visuel du véhicule.</FieldHint>
+        </div>
+
+        <SelectField
+          id="v3-hvo-fit"
+          label="Ajustement image"
+          value={asPropString(propsJson.imageFit) || 'cover'}
+          options={[
+            { value: 'cover', label: 'Remplir (cover)' },
+            { value: 'contain', label: 'Contenir (contain)' },
+          ]}
+          onChange={(value) => patch({ imageFit: value })}
+        />
+
+        <SelectField
+          id="v3-hvo-position"
+          label="Position image"
+          value={asPropString(propsJson.imagePosition) || 'right'}
+          options={[
+            { value: 'left', label: 'Gauche' },
+            { value: 'right', label: 'Droite' },
+            { value: 'background', label: 'Arrière-plan' },
+          ]}
+          onChange={(value) => patch({ imagePosition: value })}
+        />
+
+        <SelectField
+          id="v3-hvo-crop"
+          label="Recadrage (point focal)"
+          value={cropPreset}
+          options={HERO_CROP_PRESETS.map((value) => ({
+            value,
+            label: CROP_PRESET_LABELS[value] ?? value,
+          }))}
+          onChange={(value) => patch({ cropPreset: value })}
+        />
+
+        {isCustomCrop ? (
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="v3-hvo-focal-x" className="text-neutral-400">
+                Focal X (%)
+              </Label>
+              <ShadInput
+                id="v3-hvo-focal-x"
+                type="number"
+                min={0}
+                max={100}
+                value={asPropString(propsJson.focalPointX) || '50'}
+                onChange={(e) => patch({ focalPointX: Number(e.target.value) })}
+                className="border-neutral-700 bg-neutral-900 text-neutral-200"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="v3-hvo-focal-y" className="text-neutral-400">
+                Focal Y (%)
+              </Label>
+              <ShadInput
+                id="v3-hvo-focal-y"
+                type="number"
+                min={0}
+                max={100}
+                value={asPropString(propsJson.focalPointY) || '50'}
+                onChange={(e) => patch({ focalPointY: Number(e.target.value) })}
+                className="border-neutral-700 bg-neutral-900 text-neutral-200"
+              />
+            </div>
+          </div>
+        ) : null}
+
+        <SelectField
+          id="v3-hvo-overlay"
+          label="Intensité overlay"
+          value={asPropString(propsJson.overlayIntensity) || 'medium'}
+          options={[
+            { value: 'none', label: 'Aucun' },
+            { value: 'light', label: 'Léger' },
+            { value: 'medium', label: 'Moyen' },
+            { value: 'heavy', label: 'Fort' },
+          ]}
+          onChange={(value) => patch({ overlayIntensity: value })}
+        />
+      </div>
 
       <SelectField
         id="v3-hvo-layout"

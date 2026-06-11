@@ -1,5 +1,10 @@
 import type { LandingRenderContext } from './render-asset.types';
 import { buildBrandInlineStyle, resolveBrandPresetTokens } from './brand-presets';
+import {
+  buildHeroFocalInlineStyle,
+  resolveHeroFocalPoint,
+  resolveHeroImageAlt,
+} from './hero-image-controls';
 
 function propString(
   props: Record<string, unknown>,
@@ -60,6 +65,7 @@ function readDesign(props: Record<string, unknown>): Record<string, unknown> {
 
 function buildSectionClasses(props: Record<string, unknown>): string {
   const design = readDesign(props);
+  const focal = resolveHeroFocalPoint(props);
   const layoutVariant = pick(props.layoutVariant, [
     'split-media-right',
     'split-media-left',
@@ -68,7 +74,6 @@ function buildSectionClasses(props: Record<string, unknown>): string {
   ] as const, 'split-media-right');
   const imageFit = pick(props.imageFit, ['cover', 'contain'] as const, 'cover');
   const imagePosition = pick(props.imagePosition, ['left', 'right', 'background'] as const, 'right');
-  const focalPoint = pick(props.focalPoint, ['center', 'left', 'right', 'top', 'bottom'] as const, 'center');
   const overlayIntensity = pick(props.overlayIntensity, ['none', 'light', 'medium', 'heavy'] as const, 'medium');
   const tone = pick(design.tone, ['light', 'dark', 'brand'] as const, 'brand');
   const density = pick(design.density, ['compact', 'comfortable', 'immersive'] as const, 'comfortable');
@@ -81,7 +86,7 @@ function buildSectionClasses(props: Record<string, unknown>): string {
     `lp-hero-vehicle-offer--layout-${layoutVariant}`,
     `lp-hero-vehicle-offer--fit-${imageFit}`,
     `lp-hero-vehicle-offer--position-${imagePosition}`,
-    `lp-hero-vehicle-offer--focal-${focalPoint}`,
+    `lp-hero-vehicle-offer--crop-${focal.cropPreset}`,
     `lp-hero-vehicle-offer--overlay-${overlayIntensity}`,
     `lp-hero-vehicle-offer--tone-${tone}`,
     `lp-hero-vehicle-offer--density-${density}`,
@@ -89,6 +94,17 @@ function buildSectionClasses(props: Record<string, unknown>): string {
     `lp-hero-vehicle-offer--align-${alignContent}`,
     showOfferBadge ? 'lp-hero-vehicle-offer--has-badge' : 'lp-hero-vehicle-offer--no-badge',
   ].join(' ');
+}
+
+function buildSectionInlineStyle(props: Record<string, unknown>, brandId: unknown): string {
+  const brand = resolveBrandPresetTokens(brandId);
+  const focal = resolveHeroFocalPoint(props);
+  return [buildBrandInlineStyle(brand), buildHeroFocalInlineStyle(focal.x, focal.y)].join('; ');
+}
+
+function renderPlaceholderHtml(alt: string, wrapperClass?: string): string {
+  const placeholder = `<div class="lp-hero-vehicle-offer__media-placeholder" role="img" aria-label="${escapeHtml(alt)}"><span class="lp-hero-vehicle-offer__media-placeholder-icon" aria-hidden="true">◫</span><span class="lp-hero-vehicle-offer__media-placeholder-label">Aperçu véhicule</span></div>`;
+  return wrapperClass ? `<div class="${wrapperClass}">${placeholder}</div>` : placeholder;
 }
 
 function renderImageHtml(
@@ -101,9 +117,7 @@ function renderImageHtml(
 ): string {
   const src = resolveAssetImage(props, assetKey, urlKey, context);
   if (!src) {
-    return wrapperClass
-      ? `<div class="${wrapperClass}"><div class="lp-hero-vehicle-offer__media lp-hero-vehicle-offer__media--placeholder" aria-hidden="true"></div></div>`
-      : `<div class="lp-hero-vehicle-offer__media lp-hero-vehicle-offer__media--placeholder" aria-hidden="true"></div>`;
+    return renderPlaceholderHtml(alt, wrapperClass);
   }
 
   const img = `<img class="lp-hero-vehicle-offer__img" src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" loading="eager" decoding="async" />`;
@@ -120,8 +134,15 @@ function renderMediaHtml(
       ? '<div class="lp-hero-vehicle-offer__overlay" aria-hidden="true"></div>'
       : '';
 
-  const desktop = renderImageHtml(props, 'heroImage', 'heroImageUrl', alt, context, 'lp-hero-vehicle-offer__img-desktop');
+  const desktopSrc = resolveAssetImage(props, 'heroImage', 'heroImageUrl', context);
   const mobileSrc = resolveAssetImage(props, 'mobileImage', 'mobileImageUrl', context);
+
+  const desktop = desktopSrc
+    ? renderImageHtml(props, 'heroImage', 'heroImageUrl', alt, context, 'lp-hero-vehicle-offer__img-desktop')
+    : mobileSrc
+      ? renderImageHtml(props, 'mobileImage', 'mobileImageUrl', alt, context, 'lp-hero-vehicle-offer__img-desktop')
+      : renderPlaceholderHtml(alt, 'lp-hero-vehicle-offer__img-desktop');
+
   const mobile = mobileSrc
     ? `<div class="lp-hero-vehicle-offer__img-mobile"><img class="lp-hero-vehicle-offer__img" src="${escapeHtml(mobileSrc)}" alt="${escapeHtml(alt)}" loading="eager" decoding="async" /></div>`
     : '';
@@ -135,7 +156,7 @@ export function renderHeroVehicleOfferHtml(
 ): string {
   const brand = resolveBrandPresetTokens(props.brandId);
   const sectionClass = buildSectionClasses(props);
-  const inlineStyle = buildBrandInlineStyle(brand);
+  const inlineStyle = buildSectionInlineStyle(props, props.brandId);
 
   const modelName = propString(props, 'modelName');
   const headline = propString(props, 'headline');
@@ -147,7 +168,7 @@ export function renderHeroVehicleOfferHtml(
   const design = readDesign(props);
   const showBadge = design.showOfferBadge !== false && offerLabel;
 
-  const imageAlt = modelName || headline || 'Véhicule';
+  const imageAlt = resolveHeroImageAlt(props);
   const layoutVariant = pick(props.layoutVariant, [
     'split-media-right',
     'split-media-left',

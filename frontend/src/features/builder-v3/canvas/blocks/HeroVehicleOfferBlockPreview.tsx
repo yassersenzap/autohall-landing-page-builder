@@ -1,7 +1,8 @@
-import { brandCssVarMapToStyle, buildBrandCssVarMap } from '@/features/builder/brand-presets/brand-css-vars';
+import { buildBrandCssVarMap, brandCssVarMapToStyle } from '@/features/builder/brand-presets/brand-css-vars';
 import { resolveBrandPreset } from '@/features/builder/brand-presets/resolve-brand-preset';
 import {
   buildHeroVehicleOfferSectionClasses,
+  buildHeroVehicleOfferSectionStyle,
   parseHeroVehicleOfferProps,
 } from '@/features/builder/blocks/hero-vehicle-offer/parse-hero-vehicle-offer-props';
 import { HeroBlockImage } from '@/features/builder-engine/components/media/HeroBlockImage';
@@ -13,16 +14,29 @@ type HeroVehicleOfferBlockPreviewProps = {
   propsJson: Record<string, unknown>;
 };
 
+function HeroImagePlaceholder({ alt }: { alt: string }) {
+  return (
+    <div className="lp-hero-vehicle-offer__media-placeholder" role="img" aria-label={alt}>
+      <span className="lp-hero-vehicle-offer__media-placeholder-icon" aria-hidden>
+        ◫
+      </span>
+      <span className="lp-hero-vehicle-offer__media-placeholder-label">Aperçu véhicule</span>
+    </div>
+  );
+}
+
 export function HeroVehicleOfferBlockPreview({ propsJson }: HeroVehicleOfferBlockPreviewProps) {
   const { interactive } = useBuilderPreviewContext();
   const props = parseHeroVehicleOfferProps(propsJson);
   const brand = resolveBrandPreset(props.brandId);
   const sectionClass = buildHeroVehicleOfferSectionClasses(props);
-  const brandStyle = brandCssVarMapToStyle(buildBrandCssVarMap(brand));
+  const sectionStyle = buildHeroVehicleOfferSectionStyle(
+    props,
+    brandCssVarMapToStyle(buildBrandCssVarMap(brand)),
+  );
 
   const hasDesktopImage = Boolean(props.heroImage || props.heroImageUrl);
   const hasMobileImage = Boolean(props.mobileImage || props.mobileImageUrl);
-  const imageAlt = props.modelName || props.headline || 'Véhicule';
   const isBackground = props.imagePosition === 'background' || props.layoutVariant === 'full-bleed-overlay';
 
   const primaryCtaClass = [
@@ -76,33 +90,32 @@ export function HeroVehicleOfferBlockPreview({ propsJson }: HeroVehicleOfferBloc
     </div>
   );
 
-  const renderImage = (assetId: string | null, url: string | null, className: string) => {
+  const renderImage = (assetId: string | null, url: string | null) => {
     if (assetId || url) {
       return (
         <HeroBlockImage
           imageAssetId={assetId ?? undefined}
           imageUrl={url ?? undefined}
-          alt={imageAlt}
-          className={className}
+          alt={props.imageAlt}
+          className="lp-hero-vehicle-offer__img"
         />
       );
     }
-    return (
-      <div
-        className="lp-hero-vehicle-offer__media lp-hero-vehicle-offer__media--placeholder"
-        aria-hidden
-      />
-    );
+    return <HeroImagePlaceholder alt={props.imageAlt} />;
   };
 
   const mediaBlock = (
     <div className="lp-hero-vehicle-offer__media" data-lp-media>
       <div className="lp-hero-vehicle-offer__img-desktop">
-        {renderImage(props.heroImage, props.heroImageUrl, 'lp-hero-vehicle-offer__img')}
+        {hasDesktopImage
+          ? renderImage(props.heroImage, props.heroImageUrl)
+          : hasMobileImage
+            ? renderImage(props.mobileImage ?? null, props.mobileImageUrl)
+            : <HeroImagePlaceholder alt={props.imageAlt} />}
       </div>
       {hasMobileImage ? (
         <div className="lp-hero-vehicle-offer__img-mobile">
-          {renderImage(props.mobileImage ?? null, props.mobileImageUrl, 'lp-hero-vehicle-offer__img')}
+          {renderImage(props.mobileImage ?? null, props.mobileImageUrl)}
         </div>
       ) : null}
       {props.overlayIntensity !== 'none' ? (
@@ -113,8 +126,8 @@ export function HeroVehicleOfferBlockPreview({ propsJson }: HeroVehicleOfferBloc
 
   if (isBackground) {
     return (
-      <section className={sectionClass} style={brandStyle}>
-        {hasDesktopImage || hasMobileImage ? mediaBlock : null}
+      <section className={sectionClass} style={sectionStyle}>
+        {mediaBlock}
         <div className="lp-hero-vehicle-offer__inner">{contentBlock}</div>
       </section>
     );
@@ -124,7 +137,7 @@ export function HeroVehicleOfferBlockPreview({ propsJson }: HeroVehicleOfferBloc
     props.layoutVariant === 'split-media-left' || props.imagePosition === 'left';
 
   return (
-    <section className={sectionClass} style={brandStyle}>
+    <section className={sectionClass} style={sectionStyle}>
       <div className="lp-hero-vehicle-offer__inner">
         {mediaFirst ? mediaBlock : contentBlock}
         {mediaFirst ? contentBlock : mediaBlock}

@@ -2482,7 +2482,7 @@
 }
 .lp-hero-vehicle-offer__cta--primary.lp-hero-vehicle-offer__cta--primary {
   background: var(--lp-brand-primary, var(--lp-primary));
-  color: #fff;
+  color: var(--lp-brand-cta-primary-text, #fff);
   border: 1px solid transparent;
 }
 .lp-hero-vehicle-offer__cta--primary.lp-hero-vehicle-offer__cta--outline {
@@ -2529,7 +2529,9 @@
   height: 100%;
   display: block;
   min-height: inherit;
+  max-width: 100%;
   object-fit: cover;
+  object-position: var(--lp-hero-focal-x, 50%) var(--lp-hero-focal-y, 50%);
 }
 .lp-hero-vehicle-offer--fit-contain .lp-hero-vehicle-offer__img {
   object-fit: contain;
@@ -2537,11 +2539,38 @@
 .lp-hero-vehicle-offer--fit-cover .lp-hero-vehicle-offer__img {
   object-fit: cover;
 }
-.lp-hero-vehicle-offer--focal-center .lp-hero-vehicle-offer__img { object-position: 50% 50%; }
-.lp-hero-vehicle-offer--focal-left .lp-hero-vehicle-offer__img { object-position: 20% 50%; }
-.lp-hero-vehicle-offer--focal-right .lp-hero-vehicle-offer__img { object-position: 80% 50%; }
-.lp-hero-vehicle-offer--focal-top .lp-hero-vehicle-offer__img { object-position: 50% 20%; }
-.lp-hero-vehicle-offer--focal-bottom .lp-hero-vehicle-offer__img { object-position: 50% 80%; }
+.lp-hero-vehicle-offer__img-desktop,
+.lp-hero-vehicle-offer__img-mobile {
+  min-height: inherit;
+}
+.lp-hero-vehicle-offer__media-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: inherit;
+  padding: 2rem 1rem;
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--lp-brand-bg, var(--lp-surface-muted)) 88%, var(--lp-brand-primary, var(--lp-primary)) 12%),
+    var(--lp-brand-bg, var(--lp-surface-muted))
+  );
+  border: 1px dashed color-mix(in srgb, var(--lp-brand-primary, var(--lp-border)) 35%, transparent);
+  color: color-mix(in srgb, var(--lp-brand-text, var(--lp-text-muted)) 70%, transparent);
+}
+.lp-hero-vehicle-offer__media-placeholder-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+  opacity: 0.55;
+}
+.lp-hero-vehicle-offer__media-placeholder-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
 .lp-hero-vehicle-offer__overlay {
   position: absolute;
   inset: 0;

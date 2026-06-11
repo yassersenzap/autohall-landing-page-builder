@@ -1,5 +1,6 @@
 import { renderHeroVehicleOfferHtml } from './hero-vehicle-offer.render';
 import { resolveBrandPresetTokens } from './brand-presets';
+import { resolveBrandCtaPrimaryTextColor } from './brand-cta-contrast';
 import { renderBlockHtml } from './block-renderer';
 
 describe('hero-vehicle-offer.render', () => {
@@ -12,9 +13,10 @@ describe('hero-vehicle-offer.render', () => {
     priceText: 'À partir de 299 900 DH',
     primaryCtaLabel: 'Réserver un essai',
     secondaryCtaLabel: 'Voir les finitions',
+    heroImageAlt: 'Ford Ranger vue 3/4',
     imageFit: 'cover',
     imagePosition: 'right',
-    focalPoint: 'center',
+    cropPreset: 'center',
     overlayIntensity: 'medium',
     layoutVariant: 'split-media-right',
     design: { tone: 'brand', ctaStyle: 'primary', showOfferBadge: true },
@@ -33,22 +35,88 @@ describe('hero-vehicle-offer.render', () => {
     expect(html).toContain('Ford');
   });
 
-  it('reflects image controls in modifier classes', () => {
+  it('reflects image controls in modifier classes and focal inline style', () => {
     const html = renderHeroVehicleOfferHtml({
       ...baseProps,
       imageFit: 'contain',
       imagePosition: 'left',
-      focalPoint: 'top',
+      cropPreset: 'top',
       overlayIntensity: 'heavy',
       layoutVariant: 'full-bleed-overlay',
     });
 
     expect(html).toContain('lp-hero-vehicle-offer--fit-contain');
     expect(html).toContain('lp-hero-vehicle-offer--position-left');
-    expect(html).toContain('lp-hero-vehicle-offer--focal-top');
+    expect(html).toContain('lp-hero-vehicle-offer--crop-top');
     expect(html).toContain('lp-hero-vehicle-offer--overlay-heavy');
     expect(html).toContain('lp-hero-vehicle-offer--layout-full-bleed-overlay');
+    expect(html).toContain('--lp-hero-focal-x: 50%');
+    expect(html).toContain('--lp-hero-focal-y: 20%');
     expect(html).toContain('lp-hero-vehicle-offer__overlay');
+  });
+
+  it('exports custom focal point via inline CSS variables', () => {
+    const html = renderHeroVehicleOfferHtml({
+      ...baseProps,
+      cropPreset: 'custom',
+      focalPointX: 15,
+      focalPointY: 85,
+    });
+
+    expect(html).toContain('--lp-hero-focal-x: 15%');
+    expect(html).toContain('--lp-hero-focal-y: 85%');
+    expect(html).toContain('lp-hero-vehicle-offer--crop-custom');
+  });
+
+  it('exports mobile image safely with relative path', () => {
+    const html = renderHeroVehicleOfferHtml(
+      {
+        ...baseProps,
+        mobileImage: 'mobile-asset-id',
+      },
+      {
+        mode: 'export',
+        assetMap: {
+          'mobile-asset-id': {
+            previewUrl: 'http://localhost:3000/api/assets/mobile',
+            exportPath: 'assets/images/ranger-mobile.jpg',
+            storagePath: 'pv/mobile.jpg',
+            storedName: 'mobile.jpg',
+            mimeType: 'image/jpeg',
+            absolutePath: '/tmp/mobile.jpg',
+          },
+        },
+      },
+    );
+
+    expect(html).toContain('lp-hero-vehicle-offer__img-mobile');
+    expect(html).toContain('src="assets/images/ranger-mobile.jpg"');
+    expect(html).not.toContain('/api/assets/');
+  });
+
+  it('escapes alt text and renders placeholder when no image', () => {
+    const html = renderHeroVehicleOfferHtml({
+      ...baseProps,
+      heroImageAlt: 'Ranger <script>',
+      heroImage: '',
+      heroImageUrl: '',
+      mobileImage: '',
+      mobileImageUrl: '',
+    });
+
+    expect(html).toContain('aria-label="Ranger &lt;script&gt;"');
+    expect(html).toContain('lp-hero-vehicle-offer__media-placeholder');
+    expect(html).not.toContain('<script>');
+  });
+
+  it('includes brand-safe CTA text color for Opel', () => {
+    const html = renderHeroVehicleOfferHtml({
+      ...baseProps,
+      brandId: 'opel',
+    });
+
+    expect(html).toContain('--lp-brand-cta-primary-text: #111827');
+    expect(resolveBrandCtaPrimaryTextColor('opel', '#f7d300')).toBe('#111827');
   });
 
   it('does not include React or private builder references', () => {

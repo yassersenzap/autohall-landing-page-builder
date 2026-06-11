@@ -35,7 +35,8 @@ describe('premium block-registry foundation', () => {
     const imageKeys = definition?.imageControls.map((c) => c.key) ?? [];
     expect(imageKeys).toContain('heroImage');
     expect(imageKeys).toContain('imageFit');
-    expect(imageKeys).toContain('focalPoint');
+    expect(imageKeys).toContain('cropPreset');
+    expect(definition?.editableFields.map((f) => f.key)).toContain('heroImageAlt');
     expect(imageKeys).toContain('overlayIntensity');
     expect(imageKeys).toContain('mobileImage');
   });

@@ -15,9 +15,12 @@ export const heroVehicleOfferDefaultContent: HeroVehicleOfferContent = {
   primaryCtaLabel: 'Réserver un essai',
   secondaryCtaLabel: 'Voir les finitions',
   heroImage: null,
+  heroImageAlt: '',
   imageFit: 'cover',
   imagePosition: 'right',
-  focalPoint: 'center',
+  cropPreset: 'center',
+  focalPointX: 50,
+  focalPointY: 50,
   overlayIntensity: 'medium',
   layoutVariant: 'split-media-right',
   mobileImage: null,
@@ -58,6 +61,7 @@ export const heroVehicleOfferDefinition: BlockDefinition<
     { key: 'priceText', label: 'Prix / mention', fieldType: 'text', maxLength: 64 },
     { key: 'primaryCtaLabel', label: 'CTA principal', fieldType: 'cta', required: true },
     { key: 'secondaryCtaLabel', label: 'CTA secondaire', fieldType: 'cta' },
+    { key: 'heroImageAlt', label: 'Texte alternatif image', fieldType: 'text', maxLength: 120 },
   ],
   designControls: [
     {
@@ -160,9 +164,9 @@ export const heroVehicleOfferDefinition: BlockDefinition<
       ],
     },
     {
-      key: 'focalPoint',
-      label: 'Point focal',
-      fieldType: 'focal-point',
+      key: 'cropPreset',
+      label: 'Recadrage',
+      fieldType: 'select',
       defaultValue: 'center',
       options: [
         { value: 'center', label: 'Centre' },
@@ -170,6 +174,7 @@ export const heroVehicleOfferDefinition: BlockDefinition<
         { value: 'right', label: 'Droite' },
         { value: 'top', label: 'Haut' },
         { value: 'bottom', label: 'Bas' },
+        { value: 'custom', label: 'Personnalisé' },
       ],
     },
     {

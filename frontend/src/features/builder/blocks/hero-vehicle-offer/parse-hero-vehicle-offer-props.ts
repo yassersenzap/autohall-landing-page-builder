@@ -1,4 +1,9 @@
 import { asPropString } from '@/features/builder-engine/lib/block-props';
+import {
+  buildHeroFocalStyleVars,
+  resolveHeroFocalPoint,
+  resolveHeroImageAlt,
+} from './hero-image-controls';
 import type {
   HeroVehicleOfferContent,
   HeroVehicleOfferDesign,
@@ -18,7 +23,6 @@ const LAYOUT_VARIANTS = new Set<HeroVehicleOfferLayoutVariant>([
 
 const IMAGE_FITS = new Set(['cover', 'contain']);
 const IMAGE_POSITIONS = new Set(['left', 'right', 'background']);
-const FOCAL_POINTS = new Set(['center', 'left', 'right', 'top', 'bottom']);
 const OVERLAY_LEVELS = new Set(['none', 'light', 'medium', 'heavy']);
 
 function pickEnum<T extends string>(
@@ -63,12 +67,16 @@ export type ParsedHeroVehicleOfferProps = HeroVehicleOfferContent & {
   design: HeroVehicleOfferDesign;
   heroImageUrl: string | null;
   mobileImageUrl: string | null;
+  resolvedFocalX: number;
+  resolvedFocalY: number;
+  imageAlt: string;
 };
 
 export function parseHeroVehicleOfferProps(
   propsJson: Record<string, unknown>,
 ): ParsedHeroVehicleOfferProps {
   const design = readDesign(propsJson);
+  const focal = resolveHeroFocalPoint(propsJson);
 
   return {
     brandId: (asPropString(propsJson.brandId) as HeroVehicleOfferContent['brandId']) ||
@@ -83,6 +91,7 @@ export function parseHeroVehicleOfferProps(
     secondaryCtaLabel:
       asPropString(propsJson.secondaryCtaLabel) ?? heroVehicleOfferDefaultContent.secondaryCtaLabel,
     heroImage: asPropString(propsJson.heroImage) ?? null,
+    heroImageAlt: asPropString(propsJson.heroImageAlt) ?? heroVehicleOfferDefaultContent.heroImageAlt,
     heroImageUrl: asPropString(propsJson.heroImageUrl) ?? null,
     imageFit: pickEnum(
       propsJson.imageFit,
@@ -94,11 +103,9 @@ export function parseHeroVehicleOfferProps(
       IMAGE_POSITIONS as Set<HeroVehicleOfferContent['imagePosition']>,
       heroVehicleOfferDefaultContent.imagePosition,
     ),
-    focalPoint: pickEnum(
-      propsJson.focalPoint,
-      FOCAL_POINTS as Set<HeroVehicleOfferContent['focalPoint']>,
-      heroVehicleOfferDefaultContent.focalPoint,
-    ),
+    cropPreset: focal.cropPreset,
+    focalPointX: focal.x,
+    focalPointY: focal.y,
     overlayIntensity: pickEnum(
       propsJson.overlayIntensity,
       OVERLAY_LEVELS as Set<HeroVehicleOfferContent['overlayIntensity']>,
@@ -112,13 +119,21 @@ export function parseHeroVehicleOfferProps(
     mobileImage: asPropString(propsJson.mobileImage) ?? null,
     mobileImageUrl: asPropString(propsJson.mobileImageUrl) ?? null,
     design,
+    resolvedFocalX: focal.x,
+    resolvedFocalY: focal.y,
+    imageAlt: resolveHeroImageAlt(propsJson),
   };
 }
 
 export function buildHeroVehicleOfferSectionClasses(
   props: Pick<
     ParsedHeroVehicleOfferProps,
-    'layoutVariant' | 'imageFit' | 'imagePosition' | 'focalPoint' | 'overlayIntensity' | 'design'
+    | 'layoutVariant'
+    | 'imageFit'
+    | 'imagePosition'
+    | 'cropPreset'
+    | 'overlayIntensity'
+    | 'design'
   >,
 ): string {
   const { design } = props;
@@ -127,7 +142,7 @@ export function buildHeroVehicleOfferSectionClasses(
     `lp-hero-vehicle-offer--layout-${props.layoutVariant}`,
     `lp-hero-vehicle-offer--fit-${props.imageFit}`,
     `lp-hero-vehicle-offer--position-${props.imagePosition}`,
-    `lp-hero-vehicle-offer--focal-${props.focalPoint}`,
+    `lp-hero-vehicle-offer--crop-${props.cropPreset}`,
     `lp-hero-vehicle-offer--overlay-${props.overlayIntensity}`,
     `lp-hero-vehicle-offer--tone-${design.tone}`,
     `lp-hero-vehicle-offer--density-${design.density}`,
@@ -135,4 +150,14 @@ export function buildHeroVehicleOfferSectionClasses(
     `lp-hero-vehicle-offer--align-${design.alignContent}`,
     design.showOfferBadge ? 'lp-hero-vehicle-offer--has-badge' : 'lp-hero-vehicle-offer--no-badge',
   ].join(' ');
+}
+
+export function buildHeroVehicleOfferSectionStyle(
+  props: Pick<ParsedHeroVehicleOfferProps, 'resolvedFocalX' | 'resolvedFocalY'>,
+  brandStyle: Record<string, string>,
+): Record<string, string> {
+  return {
+    ...brandStyle,
+    ...buildHeroFocalStyleVars(props.resolvedFocalX, props.resolvedFocalY),
+  };
 }

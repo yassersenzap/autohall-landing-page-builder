@@ -1,4 +1,5 @@
 import type { BrandPreset } from './brand-preset.types';
+import { resolveBrandCtaPrimaryTextColor } from './brand-cta-contrast';
 
 export type BrandCssVarMap = {
   '--lp-brand-primary': string;
@@ -6,6 +7,7 @@ export type BrandCssVarMap = {
   '--lp-brand-accent': string;
   '--lp-brand-bg': string;
   '--lp-brand-text': string;
+  '--lp-brand-cta-primary-text': string;
 };
 
 export function buildBrandCssVarMap(preset: BrandPreset): BrandCssVarMap {
@@ -15,6 +17,10 @@ export function buildBrandCssVarMap(preset: BrandPreset): BrandCssVarMap {
     '--lp-brand-accent': preset.accentColor,
     '--lp-brand-bg': preset.backgroundColor,
     '--lp-brand-text': preset.textColor,
+    '--lp-brand-cta-primary-text': resolveBrandCtaPrimaryTextColor(
+      preset.id,
+      preset.primaryColor,
+    ),
   };
 }
 

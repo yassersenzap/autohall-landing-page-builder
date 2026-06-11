@@ -1,10 +1,6 @@
 import type { BrandPresetId } from '../../brand-presets';
-import type {
-  ImageFit,
-  ImageFocalPoint,
-  ImagePosition,
-  OverlayIntensity,
-} from '../../block-registry/image-control.types';
+import type { ImageFit, ImagePosition, OverlayIntensity } from '../../block-registry/image-control.types';
+import type { HeroCropPreset } from './hero-image-controls';
 
 export type HeroVehicleOfferLayoutVariant =
   | 'split-media-right'
@@ -22,9 +18,14 @@ export type HeroVehicleOfferContent = {
   primaryCtaLabel: string;
   secondaryCtaLabel: string;
   heroImage: string | null;
+  heroImageAlt: string;
   imageFit: ImageFit;
   imagePosition: ImagePosition;
-  focalPoint: ImageFocalPoint;
+  /** @deprecated Use cropPreset — kept for legacy documents */
+  focalPoint?: 'center' | 'left' | 'right' | 'top' | 'bottom';
+  cropPreset: HeroCropPreset;
+  focalPointX: number;
+  focalPointY: number;
   overlayIntensity: OverlayIntensity;
   layoutVariant: HeroVehicleOfferLayoutVariant;
   mobileImage?: string | null;

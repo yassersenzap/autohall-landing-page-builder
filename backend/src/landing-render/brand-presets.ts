@@ -1,3 +1,5 @@
+import { resolveBrandCtaPrimaryTextColor } from './brand-cta-contrast';
+
 /** Backend mirror of frontend brand preset tokens (export-safe subset). */
 
 export type BrandPresetTokens = {
@@ -181,5 +183,6 @@ export function buildBrandInlineStyle(tokens: BrandPresetTokens): string {
     `--lp-brand-accent: ${tokens.accentColor}`,
     `--lp-brand-bg: ${tokens.backgroundColor}`,
     `--lp-brand-text: ${tokens.textColor}`,
+    `--lp-brand-cta-primary-text: ${resolveBrandCtaPrimaryTextColor(tokens.id, tokens.primaryColor)}`,
   ].join('; ');
 }
