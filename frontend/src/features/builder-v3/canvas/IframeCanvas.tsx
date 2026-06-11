@@ -71,13 +71,13 @@ export function IframeCanvas({
 
   return (
     <div
-      className="flex min-h-0 flex-1 flex-col overflow-auto bg-neutral-900/80 p-6"
+      className="flex min-h-0 flex-1 flex-col overflow-auto bg-[#0c0c0e] p-5"
       data-builder-v3-canvas-host
     >
       <div
         className={cn(
           'relative mx-auto flex min-h-full flex-col transition-all duration-300',
-          isMobile ? 'w-[390px] shadow-2xl' : 'w-[1152px] max-w-full',
+          isMobile ? 'w-[390px]' : 'w-[1152px] max-w-full',
           paletteDropActive && isOver && 'ring-2 ring-blue-500 ring-offset-2 ring-offset-neutral-900',
         )}
         data-droppable-active={paletteDropActive && isOver ? 'true' : 'false'}
@@ -87,7 +87,7 @@ export function IframeCanvas({
           ref={iframeRef}
           title="Landing canvas"
           className={cn(
-            'h-full min-h-[720px] w-full rounded-lg border border-neutral-700 bg-white shadow-2xl shadow-black/40',
+            'h-full min-h-[720px] w-full rounded-xl border border-neutral-700/80 bg-white shadow-[0_24px_80px_rgba(0,0,0,0.45)] ring-1 ring-white/5',
             paletteDropActive && 'pointer-events-none select-none',
           )}
           sandbox="allow-same-origin allow-scripts"

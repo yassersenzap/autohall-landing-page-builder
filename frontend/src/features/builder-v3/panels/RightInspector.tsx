@@ -215,7 +215,7 @@ export function RightInspector() {
 
       <Separator className="bg-neutral-800" />
       <p className="px-4 py-2 text-[0.625rem] text-neutral-600">
-        Contenu · Design · Avancé
+        Contenu · Design · Layout · Media · Avancé
       </p>
     </aside>
   );

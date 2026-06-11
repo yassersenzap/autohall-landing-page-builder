@@ -14,12 +14,14 @@ import { getRegistryEntry } from '@/features/builder-engine/registry/block-regis
 import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
 import { CANVAS_DROP_ID } from '../constants/dnd';
 import { IframeCanvas } from '../canvas/IframeCanvas';
+import { CanvasToolbar } from './CanvasToolbar';
 import { LeftSidebar } from '../panels/LeftSidebar';
 import { RightInspector } from '../panels/RightInspector';
 
 type StudioLayoutProps = {
   header?: ReactNode;
   documentHydrated?: boolean;
+  onOpenPageSettings?: () => void;
 };
 
 type PaletteDragPreview = {
@@ -61,8 +63,14 @@ function PaletteDragMonitor({
   return null;
 }
 
-export function StudioLayout({ header, documentHydrated = true }: StudioLayoutProps) {
+export function StudioLayout({
+  header,
+  documentHydrated = true,
+  onOpenPageSettings,
+}: StudioLayoutProps) {
   const addBlock = useBuilderDocumentStore((s) => s.addBlock);
+  const deviceMode = useBuilderDocumentStore((s) => s.deviceMode);
+  const setDeviceMode = useBuilderDocumentStore((s) => s.setDeviceMode);
   const [paletteDropActive, setPaletteDropActive] = useState(false);
   const [dragPreview, setDragPreview] = useState<PaletteDragPreview | null>(null);
 
@@ -100,11 +108,14 @@ export function StudioLayout({ header, documentHydrated = true }: StudioLayoutPr
         )}
 
         <div className="flex min-h-0 flex-1 overflow-hidden">
-          <LeftSidebar />
-          <IframeCanvas
-            paletteDropActive={paletteDropActive}
-            documentHydrated={documentHydrated}
-          />
+          <LeftSidebar onOpenPageSettings={onOpenPageSettings} />
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+            <CanvasToolbar deviceMode={deviceMode} onDeviceModeChange={setDeviceMode} />
+            <IframeCanvas
+              paletteDropActive={paletteDropActive}
+              documentHydrated={documentHydrated}
+            />
+          </div>
           <RightInspector />
         </div>
       </div>

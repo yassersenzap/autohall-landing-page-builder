@@ -141,6 +141,7 @@ export default function BuilderV3Page() {
     <>
       <StudioLayout
         documentHydrated={documentHydrated}
+        onOpenPageSettings={() => setPageSettingsOpen(true)}
         header={
           <StudioTopBar
             subtitle={subtitle}

@@ -41,7 +41,7 @@ import {
   SPACER_TYPE_OPTIONS,
 } from '../constants/utility-blocks';
 
-type BlockPropertyTab = 'content' | 'design' | 'advanced';
+type BlockPropertyTab = 'content' | 'design' | 'layout' | 'media' | 'advanced';
 
 function BlockOrderActions({
   block,
@@ -136,7 +136,6 @@ export function BlockInspectorPanel({
   const isCampaignLeadHero = isCampaignLeadHeroBlock(block.type);
   const isMarketingBlock = isMarketingInspectorBlock(block.type);
   const isPremiumDesignBlock = INSPECTOR_DESIGN_BLOCKS.has(block.type);
-  const supportsBackground = isPromo || isHero;
   const heroBgActive =
     isHero &&
     (asPropString(block.propsJson.backgroundType) === 'color' ||
@@ -170,17 +169,21 @@ export function BlockInspectorPanel({
             <CardDescription className="text-xs text-neutral-500">
               {entry?.label ?? block.type}
             </CardDescription>
-            <Tabs
-              items={[
-                { id: 'content', label: 'Contenu' },
-                { id: 'design', label: 'Design' },
-                { id: 'advanced', label: 'Avancé' },
-              ]}
-              value={tab}
-              onChange={setTab}
-              ariaLabel="Propriétés du bloc"
-              className="border-neutral-800 bg-neutral-950/80"
-            />
+            <div data-testid="block-inspector-tabs">
+              <Tabs
+                items={[
+                  { id: 'content', label: 'Contenu' },
+                  { id: 'design', label: 'Design' },
+                  { id: 'layout', label: 'Layout' },
+                  { id: 'media', label: 'Media' },
+                  { id: 'advanced', label: 'Avancé' },
+                ]}
+                value={tab}
+                onChange={setTab}
+                ariaLabel="Propriétés du bloc"
+                className="border-neutral-800 bg-neutral-950/80"
+              />
+            </div>
           </CardHeader>
 
           <CardContent className="space-y-4 p-4 pt-3">
@@ -298,21 +301,6 @@ export function BlockInspectorPanel({
                   </>
                 )}
 
-                {(isHero || isPromo) && (
-                  <div className="space-y-1.5">
-                    <MediaFieldControl
-                      label="Visuel média (split / vignette)"
-                      value={mediaValueFromProps(block.propsJson)}
-                      onChange={(next) => patchMediaProps(patch, next)}
-                    />
-                    <FieldHint>
-                      {isPromo
-                        ? 'Utilisé comme fond si type « Image HD » dans Design, sinon visuel split.'
-                        : 'Image véhicule ou lifestyle pour la zone média de la bannière.'}
-                    </FieldHint>
-                  </div>
-                )}
-
                 {isHeroVehicleOffer && (
                   <HeroVehicleOfferInspectorFields block={block} patch={patch} />
                 )}
@@ -379,55 +367,17 @@ export function BlockInspectorPanel({
                 )}
 
                 {isGallery && (
-                  <>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="v3-inspector-gallery-title" className="text-neutral-400">
-                        Titre galerie
-                      </Label>
-                      <ShadInput
-                        id="v3-inspector-gallery-title"
-                        value={asPropString(block.propsJson.heading)}
-                        onChange={(e) => patch({ heading: e.target.value })}
-                        className="border-neutral-700 bg-neutral-900 text-neutral-200"
-                      />
-                    </div>
-                    {[0, 1, 2].map((index) => {
-                      const images = Array.isArray(block.propsJson.images)
-                        ? [
-                            ...(block.propsJson.images as Array<{
-                              url?: string;
-                              alt?: string;
-                              imageAssetId?: string;
-                              objectFit?: 'cover' | 'contain';
-                            }>),
-                          ]
-                        : [];
-                      while (images.length < 3) images.push({ url: '', alt: '' });
-                      const image = images[index] ?? { url: '', alt: '' };
-                      return (
-                        <MediaFieldControl
-                          key={`gallery-${index}`}
-                          label={`Image ${index + 1}`}
-                          value={{
-                            imageAssetId: image.imageAssetId,
-                            imageUrl: image.url ?? '',
-                            alt: image.alt,
-                            objectFit: 'cover',
-                          }}
-                          onChange={(next) => {
-                            images[index] = {
-                              ...image,
-                              url: next.imageAssetId ? '' : (next.imageUrl ?? ''),
-                              imageAssetId: next.imageAssetId,
-                              alt: next.alt,
-                              objectFit: next.objectFit ?? 'cover',
-                            };
-                            patch({ images });
-                          }}
-                        />
-                      );
-                    })}
-                  </>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="v3-inspector-gallery-title" className="text-neutral-400">
+                      Titre galerie
+                    </Label>
+                    <ShadInput
+                      id="v3-inspector-gallery-title"
+                      value={asPropString(block.propsJson.heading)}
+                      onChange={(e) => patch({ heading: e.target.value })}
+                      className="border-neutral-700 bg-neutral-900 text-neutral-200"
+                    />
+                  </div>
                 )}
 
                 {isFooter && (
@@ -476,79 +426,18 @@ export function BlockInspectorPanel({
                   </>
                 )}
 
-                {isMediaOnly && (
-                  <MediaFieldControl
-                    label="Importer une image"
-                    value={mediaValueFromProps(block.propsJson)}
-                    onChange={(next) => patchMediaProps(patch, next)}
-                  />
-                )}
-
-                {isSpacerDivider && (
-                  <>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="v3-inspector-spacer-type" className="text-neutral-400">
-                        Type de séparateur
-                      </Label>
-                      <select
-                        id="v3-inspector-spacer-type"
-                        value={spacerType}
-                        onChange={(e) => patch({ type: e.target.value })}
-                        className="w-full rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-neutral-200"
-                      >
-                        {SPACER_TYPE_OPTIONS.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                      <FieldHint>Ligne pleine, pointillée ou espace vide pour aérer la page.</FieldHint>
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="v3-inspector-spacer-hauteur" className="text-neutral-400">
-                        Hauteur
-                      </Label>
-                      <select
-                        id="v3-inspector-spacer-hauteur"
-                        value={spacerHauteur}
-                        onChange={(e) => patch({ hauteur: e.target.value })}
-                        className="w-full rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-neutral-200"
-                      >
-                        <option value="S">S — 32 px</option>
-                        <option value="M">M — 64 px</option>
-                        <option value="L">L — 128 px</option>
-                      </select>
-                    </div>
-                  </>
-                )}
-
                 {isVideoEmbed && (
-                  <>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="v3-inspector-video-title" className="text-neutral-400">
-                        Titre section
-                      </Label>
-                      <ShadInput
-                        id="v3-inspector-video-title"
-                        value={asPropString(block.propsJson.title)}
-                        onChange={(e) => patch({ title: e.target.value })}
-                        className="border-neutral-700 bg-neutral-900 text-neutral-200"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="v3-inspector-video-url" className="text-neutral-400">
-                        URL vidéo (YouTube / Vimeo)
-                      </Label>
-                      <ShadInput
-                        id="v3-inspector-video-url"
-                        value={asPropString(block.propsJson.videoUrl)}
-                        onChange={(e) => patch({ videoUrl: e.target.value })}
-                        placeholder="https://www.youtube.com/watch?v=..."
-                        className="border-neutral-700 bg-neutral-900 font-mono text-xs text-neutral-200"
-                      />
-                      <FieldHint>Lien watch YouTube ou page Vimeo — embed généré automatiquement.</FieldHint>
-                    </div>
-                  </>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="v3-inspector-video-title" className="text-neutral-400">
+                      Titre section
+                    </Label>
+                    <ShadInput
+                      id="v3-inspector-video-title"
+                      value={asPropString(block.propsJson.title)}
+                      onChange={(e) => patch({ title: e.target.value })}
+                      className="border-neutral-700 bg-neutral-900 text-neutral-200"
+                    />
+                  </div>
                 )}
 
                 {isCTABand && (
@@ -807,6 +696,65 @@ export function BlockInspectorPanel({
                   />
                 )}
 
+                {!isPremiumDesignBlock &&
+                  !isVehicleFeatures &&
+                  !isGallery &&
+                  !isPromo &&
+                  !isHero &&
+                  !isRichText &&
+                  !isMediaOnly &&
+                  !isSpacerDivider &&
+                  !isVideoEmbed &&
+                  !isCTABand &&
+                  !isPricingTrim &&
+                  !isFAQ &&
+                  !isTestimonials &&
+                  !isHeroVehicleOffer &&
+                  !isCampaignLeadHero && (
+                  <p className="text-xs text-neutral-500">
+                    Options de design limitées pour ce type de bloc — voir Layout ou Media.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {tab === 'layout' && (
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="v3-section-padding" className="text-neutral-400">
+                    Espacement vertical
+                  </Label>
+                  <select
+                    id="v3-section-padding"
+                    value={sectionPadding}
+                    onChange={(e) => patch({ sectionPadding: e.target.value })}
+                    className="w-full rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-neutral-200"
+                  >
+                    {SECTION_PADDING_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                  <FieldHint>Padding haut et bas appliqué à la section.</FieldHint>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="v3-anchor-id" className="text-neutral-400">
+                    Ancre (ID HTML)
+                  </Label>
+                  <ShadInput
+                    id="v3-anchor-id"
+                    value={anchorId}
+                    onChange={(e) => patch({ anchorId: e.target.value })}
+                    placeholder="ex. offre-speciale"
+                    className="border-neutral-700 bg-neutral-900 font-mono text-neutral-200"
+                  />
+                  <FieldHint>
+                    Permet les liens internes — ex. bouton CTA vers #offre-speciale.
+                  </FieldHint>
+                </div>
+
                 {(isPromo || isHero || isVehicleFeatures || isGallery) && (
                   <div className="space-y-2">
                     <Label className="text-neutral-400">Alignement du texte</Label>
@@ -839,27 +787,173 @@ export function BlockInspectorPanel({
                   />
                 )}
 
-                {isMediaOnly && (
+                {isSpacerDivider && (
+                  <>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="v3-inspector-spacer-type" className="text-neutral-400">
+                        Type de séparateur
+                      </Label>
+                      <select
+                        id="v3-inspector-spacer-type"
+                        value={spacerType}
+                        onChange={(e) => patch({ type: e.target.value })}
+                        className="w-full rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-neutral-200"
+                      >
+                        {SPACER_TYPE_OPTIONS.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                      <FieldHint>Ligne pleine, pointillée ou espace vide pour aérer la page.</FieldHint>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="v3-inspector-spacer-hauteur" className="text-neutral-400">
+                        Hauteur
+                      </Label>
+                      <select
+                        id="v3-inspector-spacer-hauteur"
+                        value={spacerHauteur}
+                        onChange={(e) => patch({ hauteur: e.target.value })}
+                        className="w-full rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-neutral-200"
+                      >
+                        <option value="S">S — 32 px</option>
+                        <option value="M">M — 64 px</option>
+                        <option value="L">L — 128 px</option>
+                      </select>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            {tab === 'media' && (
+              <div className="space-y-4">
+                {(isHero || isPromo) && (
                   <div className="space-y-1.5">
-                    <Label htmlFor="v3-inspector-aspect-ratio" className="text-neutral-400">
-                      Ratio d&apos;aspect
-                    </Label>
-                    <select
-                      id="v3-inspector-aspect-ratio"
-                      value={aspectRatio}
-                      onChange={(e) => patch({ aspectRatio: e.target.value })}
-                      className="w-full rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-neutral-200"
-                    >
-                      {MEDIA_ASPECT_RATIO_OPTIONS.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                    <FieldHint>16:9, 4:3 ou 21:9 — cadre verrouillé avec coins arrondis.</FieldHint>
+                    <MediaFieldControl
+                      label="Visuel média (split / vignette)"
+                      value={mediaValueFromProps(block.propsJson)}
+                      onChange={(next) => patchMediaProps(patch, next)}
+                    />
+                    <FieldHint>
+                      {isPromo
+                        ? 'Utilisé comme fond si type « Image HD » dans Avancé, sinon visuel split.'
+                        : 'Image véhicule ou lifestyle pour la zone média de la bannière.'}
+                    </FieldHint>
                   </div>
                 )}
 
+                {isMediaOnly && (
+                  <>
+                    <MediaFieldControl
+                      label="Importer une image"
+                      value={mediaValueFromProps(block.propsJson)}
+                      onChange={(next) => patchMediaProps(patch, next)}
+                    />
+                    <div className="space-y-1.5">
+                      <Label htmlFor="v3-inspector-aspect-ratio" className="text-neutral-400">
+                        Ratio d&apos;aspect
+                      </Label>
+                      <select
+                        id="v3-inspector-aspect-ratio"
+                        value={aspectRatio}
+                        onChange={(e) => patch({ aspectRatio: e.target.value })}
+                        className="w-full rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-neutral-200"
+                      >
+                        {MEDIA_ASPECT_RATIO_OPTIONS.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                      <FieldHint>16:9, 4:3 ou 21:9 — cadre verrouillé avec coins arrondis.</FieldHint>
+                    </div>
+                  </>
+                )}
+
+                {isGallery &&
+                  [0, 1, 2].map((index) => {
+                    const images = Array.isArray(block.propsJson.images)
+                      ? [
+                          ...(block.propsJson.images as Array<{
+                            url?: string;
+                            alt?: string;
+                            imageAssetId?: string;
+                            objectFit?: 'cover' | 'contain';
+                          }>),
+                        ]
+                      : [];
+                    while (images.length < 3) images.push({ url: '', alt: '' });
+                    const image = images[index] ?? { url: '', alt: '' };
+                    return (
+                      <MediaFieldControl
+                        key={`gallery-${index}`}
+                        label={`Image ${index + 1}`}
+                        value={{
+                          imageAssetId: image.imageAssetId,
+                          imageUrl: image.url ?? '',
+                          alt: image.alt,
+                          objectFit: 'cover',
+                        }}
+                        onChange={(next) => {
+                          images[index] = {
+                            ...image,
+                            url: next.imageAssetId ? '' : (next.imageUrl ?? ''),
+                            imageAssetId: next.imageAssetId,
+                            alt: next.alt,
+                            objectFit: next.objectFit ?? 'cover',
+                          };
+                          patch({ images });
+                        }}
+                      />
+                    );
+                  })}
+
+                {isVideoEmbed && (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="v3-inspector-video-url" className="text-neutral-400">
+                      URL vidéo (YouTube / Vimeo)
+                    </Label>
+                    <ShadInput
+                      id="v3-inspector-video-url"
+                      value={asPropString(block.propsJson.videoUrl)}
+                      onChange={(e) => patch({ videoUrl: e.target.value })}
+                      placeholder="https://www.youtube.com/watch?v=..."
+                      className="border-neutral-700 bg-neutral-900 font-mono text-xs text-neutral-200"
+                    />
+                    <FieldHint>Lien watch YouTube ou page Vimeo — embed généré automatiquement.</FieldHint>
+                  </div>
+                )}
+
+                {isHeroVehicleOffer && (
+                  <p className="text-xs text-neutral-500">
+                    Images hero et recadrage — onglet Contenu (inspecteur hero véhicule).
+                  </p>
+                )}
+
+                {isCampaignLeadHero && (
+                  <p className="text-xs text-neutral-500">
+                    Images campagne — onglet Contenu (inspecteur hero campagne + lead).
+                  </p>
+                )}
+
+                {!isHero &&
+                  !isPromo &&
+                  !isMediaOnly &&
+                  !isGallery &&
+                  !isVideoEmbed &&
+                  !isHeroVehicleOffer &&
+                  !isCampaignLeadHero && (
+                  <p className="text-xs text-neutral-500">
+                    Aucun champ média pour ce type de bloc.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {tab === 'advanced' && (
+              <div className="space-y-4">
                 {isPromo && (
                   <div className="rounded-lg border border-neutral-800 bg-neutral-950/50 p-3">
                     <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-neutral-500">
@@ -922,62 +1016,11 @@ export function BlockInspectorPanel({
                   />
                 )}
 
-                {!supportsBackground &&
-                  !isVehicleFeatures &&
-                  !isGallery &&
-                  !isPromo &&
-                  !isHero &&
-                  !isRichText &&
-                  !isMediaOnly &&
-                  !isSpacerDivider &&
-                  !isVideoEmbed &&
-                  !isCTABand &&
-                  !isPricingTrim &&
-                  !isFAQ &&
-                  !isTestimonials && (
+                {!isPromo && !isHero && (
                   <p className="text-xs text-neutral-500">
-                    Options de design limitées pour ce type de bloc.
+                    Paramètres avancés spécifiques — ancre et espacement dans Layout.
                   </p>
                 )}
-              </div>
-            )}
-
-            {tab === 'advanced' && (
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="v3-section-padding" className="text-neutral-400">
-                    Espacement vertical
-                  </Label>
-                  <select
-                    id="v3-section-padding"
-                    value={sectionPadding}
-                    onChange={(e) => patch({ sectionPadding: e.target.value })}
-                    className="w-full rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-neutral-200"
-                  >
-                    {SECTION_PADDING_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                  <FieldHint>Padding haut et bas appliqué à la section.</FieldHint>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="v3-anchor-id" className="text-neutral-400">
-                    Ancre (ID HTML)
-                  </Label>
-                  <ShadInput
-                    id="v3-anchor-id"
-                    value={anchorId}
-                    onChange={(e) => patch({ anchorId: e.target.value })}
-                    placeholder="ex. offre-speciale"
-                    className="border-neutral-700 bg-neutral-900 font-mono text-neutral-200"
-                  />
-                  <FieldHint>
-                    Permet les liens internes — ex. bouton CTA vers #offre-speciale.
-                  </FieldHint>
-                </div>
               </div>
             )}
           </CardContent>
