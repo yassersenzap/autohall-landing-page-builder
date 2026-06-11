@@ -1,6 +1,7 @@
 import type { BrandPresetId } from '../brand-presets';
 import type { DesignControl } from './design-control.types';
 import type { ImageControl } from './image-control.types';
+import type { InspectorControl } from './inspector-control.types';
 
 export type PremiumBlockCategory =
   | 'hero'
@@ -42,6 +43,8 @@ export type BlockDefinition<
   editableFields: EditableField[];
   designControls: DesignControl[];
   imageControls: ImageControl[];
+  /** Optional — resolved via inspector-controls-registry when not inlined. */
+  inspectorControls?: InspectorControl[];
   compatibleBrands: BrandPresetId[] | 'all';
   /** Key resolved by the private React builder preview layer. */
   builderRenderer: string;

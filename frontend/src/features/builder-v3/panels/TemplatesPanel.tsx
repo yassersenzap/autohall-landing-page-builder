@@ -51,8 +51,8 @@ export function TemplatesPanel() {
   const applyPageStarter = useBuilderDocumentStore((s) => s.applyPageStarter);
 
   return (
-    <ScrollArea className="min-h-0 flex-1" data-testid="studio-templates-panel">
-      <div className="space-y-4 p-3">
+    <ScrollArea className="h-full min-h-0" data-testid="studio-templates-panel">
+      <div className="space-y-4 p-3 pb-6">
         <div className="space-y-2">
           <TierHeader
             title={CATALOG_TIER_META.starters.title}

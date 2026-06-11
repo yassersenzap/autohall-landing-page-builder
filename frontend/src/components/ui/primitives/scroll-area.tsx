@@ -8,8 +8,9 @@ type ScrollAreaProps = HTMLAttributes<HTMLDivElement> & {
 export function ScrollArea({ children, className, ...props }: ScrollAreaProps) {
   return (
     <div
+      data-studio-panel-scroll=""
       className={cn(
-        'min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-width:thin]',
+        'h-full min-h-0 overflow-y-auto overscroll-contain [scrollbar-width:thin]',
         '[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border',
         className,
       )}

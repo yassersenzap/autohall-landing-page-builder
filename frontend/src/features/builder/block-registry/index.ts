@@ -12,6 +12,18 @@ export type {
   DesignControlType,
 } from './design-control.types';
 export type {
+  InspectorControl,
+  InspectorControlOption,
+  InspectorPropStore,
+  InspectorTab,
+  InspectorVisibilityCondition,
+} from './inspector-control.types';
+export {
+  getInspectorControlsForBlock,
+  getInspectorControlsForTab,
+  hasDefinitionDrivenInspector,
+} from './inspector-controls-registry';
+export type {
   HeroImageFields,
   ImageControl,
   ImageControlFieldType,

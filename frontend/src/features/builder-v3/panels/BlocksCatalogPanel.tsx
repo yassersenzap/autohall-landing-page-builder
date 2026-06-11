@@ -94,8 +94,8 @@ export function BlocksCatalogPanel() {
   const basicBlocks = getBasicBlockCatalog();
 
   return (
-    <ScrollArea className="min-h-0 flex-1" data-testid="studio-blocks-panel">
-      <div className="space-y-4 p-3">
+    <ScrollArea className="h-full min-h-0" data-testid="studio-blocks-panel">
+      <div className="space-y-4 p-3 pb-6">
         <div className="space-y-2">
           <CatalogTierHeader
             title={CATALOG_TIER_META.sections.title}

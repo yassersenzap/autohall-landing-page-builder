@@ -16,6 +16,7 @@ import {
   Tabs,
 } from '@/components/ui/primitives';
 import { cn } from '@/lib/utils';
+import { STUDIO_PANEL_BODY_SLOT_CLASS } from '../layout/studio-panel-scroll';
 import { GOOGLE_FONT_OPTIONS, resolveThemeFonts } from '../constants/google-fonts';
 import { THEME_PRESETS } from '../constants/theme-presets';
 import { BlockInspectorPanel } from './BlockInspectorPanel';
@@ -28,7 +29,7 @@ function ThemeFields() {
   const { headingFont, bodyFont } = resolveThemeFonts(pageTheme);
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 p-4 pb-6">
       <Card className="border-neutral-800 bg-neutral-900/50 text-neutral-100">
         <CardHeader className="p-4 pb-2">
           <CardTitle className="text-sm text-neutral-200">Thème global</CardTitle>
@@ -163,10 +164,10 @@ export function RightInspector() {
 
   return (
     <aside
-      className="flex h-full w-[320px] shrink-0 flex-col border-l border-neutral-800 bg-neutral-950"
+      className="flex h-full min-h-0 w-[320px] shrink-0 flex-col overflow-hidden border-l border-neutral-800 bg-neutral-950"
       data-builder-v3-right-inspector
     >
-      <div className="space-y-3 border-b border-neutral-800 px-4 py-3">
+      <div className="shrink-0 space-y-3 border-b border-neutral-800 px-4 py-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
             Inspecteur
@@ -191,7 +192,7 @@ export function RightInspector() {
         />
       </div>
 
-      <ScrollArea className="min-h-0 flex-1">
+      <div className={STUDIO_PANEL_BODY_SLOT_CLASS} data-testid="studio-inspector-body">
         {tab === 'block' ? (
           block ? (
             <BlockInspectorPanel
@@ -204,17 +205,21 @@ export function RightInspector() {
               canMoveDown={blockIndex >= 0 && blockIndex < blocks.length - 1}
             />
           ) : (
-            <p className="p-4 text-xs text-neutral-500">
-              Cliquez un bloc dans le canvas pour éditer contenu, design et paramètres avancés.
-            </p>
+            <ScrollArea className="h-full min-h-0" data-testid="studio-inspector-scroll">
+              <p className="p-4 text-xs text-neutral-500">
+                Cliquez un bloc dans le canvas pour éditer contenu, design et paramètres avancés.
+              </p>
+            </ScrollArea>
           )
         ) : (
-          <ThemeFields />
+          <ScrollArea className="h-full min-h-0" data-testid="studio-inspector-scroll">
+            <ThemeFields />
+          </ScrollArea>
         )}
-      </ScrollArea>
+      </div>
 
-      <Separator className="bg-neutral-800" />
-      <p className="px-4 py-2 text-[0.625rem] text-neutral-600">
+      <Separator className="shrink-0 bg-neutral-800" />
+      <p className="shrink-0 px-4 py-2 text-[0.625rem] text-neutral-600">
         Contenu · Design · Layout · Media · Avancé
       </p>
     </aside>

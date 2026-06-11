@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
   Label,
+  ScrollArea,
   ShadButton,
   ShadInput,
   ShadTextarea,
@@ -25,15 +26,9 @@ import {
   isMarketingInspectorBlock,
   MarketingBlockInspectorFields,
 } from './MarketingBlockInspectorFields';
-import {
-  CampaignLeadHeroInspectorFields,
-  isCampaignLeadHeroBlock,
-} from './CampaignLeadHeroInspectorFields';
-import {
-  HeroVehicleOfferInspectorFields,
-  isHeroVehicleOfferBlock,
-} from './HeroVehicleOfferInspectorFields';
 import { BlockDesignInspectorFields } from './BlockDesignInspectorFields';
+import { hasDefinitionDrivenInspector } from '@/features/builder/block-registry/inspector-controls-registry';
+import { DefinitionDrivenBlockInspector } from './inspector/DefinitionDrivenBlockInspector';
 import { INSPECTOR_DESIGN_BLOCKS } from '@/features/builder-engine/lib/block-design-system';
 import { SECTION_PADDING_OPTIONS } from '../constants/block-layout';
 import {
@@ -132,8 +127,7 @@ export function BlockInspectorPanel({
   const isPricingTrim = block.type === 'pricing_trim';
   const isFAQ = block.type === 'faq';
   const isTestimonials = block.type === 'testimonials';
-  const isHeroVehicleOffer = isHeroVehicleOfferBlock(block.type);
-  const isCampaignLeadHero = isCampaignLeadHeroBlock(block.type);
+  const usesDefinitionInspector = hasDefinitionDrivenInspector(block.type);
   const isMarketingBlock = isMarketingInspectorBlock(block.type);
   const isPremiumDesignBlock = INSPECTOR_DESIGN_BLOCKS.has(block.type);
   const heroBgActive =
@@ -152,7 +146,7 @@ export function BlockInspectorPanel({
   const patch = (p: Record<string, unknown>) => updateBlockProps(block.id, p);
 
   return (
-    <div className="space-y-3 pb-4">
+    <div className="flex h-full min-h-0 flex-col" data-testid="block-inspector-panel">
       <BlockOrderActions
         block={block}
         onMoveUp={onMoveUp}
@@ -162,9 +156,9 @@ export function BlockInspectorPanel({
         canMoveDown={canMoveDown}
       />
 
-      <div className="space-y-3 px-4">
-        <Card className="border-neutral-800 bg-neutral-900/50 text-neutral-100">
-          <CardHeader className="gap-2 p-4 pb-0">
+      <div className="flex min-h-0 flex-1 flex-col px-4 pb-4 pt-1">
+        <Card className="flex min-h-0 flex-1 flex-col overflow-hidden border-neutral-800 bg-neutral-900/50 text-neutral-100">
+          <CardHeader className="shrink-0 gap-2 border-b border-neutral-800/80 p-4 pb-3">
             <CardTitle className="text-sm text-neutral-200">{block.label}</CardTitle>
             <CardDescription className="text-xs text-neutral-500">
               {entry?.label ?? block.type}
@@ -186,7 +180,8 @@ export function BlockInspectorPanel({
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-4 p-4 pt-3">
+          <ScrollArea className="h-full min-h-0 flex-1" data-testid="block-inspector-scroll">
+            <CardContent className="space-y-4 p-4 pb-6">
             {tab === 'content' && (
               <div className="space-y-4">
                 {(isPromo || isHero || isForm || isVehicleFeatures) && (
@@ -301,12 +296,8 @@ export function BlockInspectorPanel({
                   </>
                 )}
 
-                {isHeroVehicleOffer && (
-                  <HeroVehicleOfferInspectorFields block={block} patch={patch} />
-                )}
-
-                {isCampaignLeadHero && (
-                  <CampaignLeadHeroInspectorFields block={block} patch={patch} />
+                {usesDefinitionInspector && (
+                  <DefinitionDrivenBlockInspector block={block} tab="content" onPatch={patch} />
                 )}
 
                 {isMarketingBlock && (
@@ -688,6 +679,10 @@ export function BlockInspectorPanel({
 
             {tab === 'design' && (
               <div className="space-y-4">
+                {usesDefinitionInspector && (
+                  <DefinitionDrivenBlockInspector block={block} tab="design" onPatch={patch} />
+                )}
+
                 {isPremiumDesignBlock && (
                   <BlockDesignInspectorFields
                     blockType={block.type}
@@ -696,7 +691,8 @@ export function BlockInspectorPanel({
                   />
                 )}
 
-                {!isPremiumDesignBlock &&
+                {!usesDefinitionInspector &&
+                  !isPremiumDesignBlock &&
                   !isVehicleFeatures &&
                   !isGallery &&
                   !isPromo &&
@@ -708,9 +704,7 @@ export function BlockInspectorPanel({
                   !isCTABand &&
                   !isPricingTrim &&
                   !isFAQ &&
-                  !isTestimonials &&
-                  !isHeroVehicleOffer &&
-                  !isCampaignLeadHero && (
+                  !isTestimonials && (
                   <p className="text-xs text-neutral-500">
                     Options de design limitées pour ce type de bloc — voir Layout ou Media.
                   </p>
@@ -720,6 +714,10 @@ export function BlockInspectorPanel({
 
             {tab === 'layout' && (
               <div className="space-y-4">
+                {usesDefinitionInspector && (
+                  <DefinitionDrivenBlockInspector block={block} tab="layout" onPatch={patch} />
+                )}
+
                 <div className="space-y-1.5">
                   <Label htmlFor="v3-section-padding" className="text-neutral-400">
                     Espacement vertical
@@ -926,25 +924,16 @@ export function BlockInspectorPanel({
                   </div>
                 )}
 
-                {isHeroVehicleOffer && (
-                  <p className="text-xs text-neutral-500">
-                    Images hero et recadrage — onglet Contenu (inspecteur hero véhicule).
-                  </p>
+                {usesDefinitionInspector && (
+                  <DefinitionDrivenBlockInspector block={block} tab="media" onPatch={patch} />
                 )}
 
-                {isCampaignLeadHero && (
-                  <p className="text-xs text-neutral-500">
-                    Images campagne — onglet Contenu (inspecteur hero campagne + lead).
-                  </p>
-                )}
-
-                {!isHero &&
+                {!usesDefinitionInspector &&
+                  !isHero &&
                   !isPromo &&
                   !isMediaOnly &&
                   !isGallery &&
-                  !isVideoEmbed &&
-                  !isHeroVehicleOffer &&
-                  !isCampaignLeadHero && (
+                  !isVideoEmbed && (
                   <p className="text-xs text-neutral-500">
                     Aucun champ média pour ce type de bloc.
                   </p>
@@ -954,6 +943,10 @@ export function BlockInspectorPanel({
 
             {tab === 'advanced' && (
               <div className="space-y-4">
+                {usesDefinitionInspector && (
+                  <DefinitionDrivenBlockInspector block={block} tab="advanced" onPatch={patch} />
+                )}
+
                 {isPromo && (
                   <div className="rounded-lg border border-neutral-800 bg-neutral-950/50 p-3">
                     <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-neutral-500">
@@ -1023,7 +1016,8 @@ export function BlockInspectorPanel({
                 )}
               </div>
             )}
-          </CardContent>
+            </CardContent>
+          </ScrollArea>
         </Card>
       </div>
     </div>

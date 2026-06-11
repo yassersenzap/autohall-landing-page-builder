@@ -19,18 +19,20 @@ export function LayersPanel({ className }: LayersPanelProps) {
 
   if (blocks.length === 0) {
     return (
-      <div className={cn('px-4 py-6', className)} data-testid="studio-layers-empty">
-        <p className="text-sm font-medium text-neutral-300">Aucun calque</p>
-        <p className="mt-1 text-xs leading-relaxed text-neutral-500">
-          Ajoutez un bloc depuis l’onglet Blocks ou un modèle de page pour commencer.
-        </p>
-      </div>
+      <ScrollArea className={cn('h-full min-h-0', className)} data-testid="studio-layers-panel">
+        <div className="px-4 py-6" data-testid="studio-layers-empty">
+          <p className="text-sm font-medium text-neutral-300">Aucun calque</p>
+          <p className="mt-1 text-xs leading-relaxed text-neutral-500">
+            Ajoutez un bloc depuis l’onglet Blocks ou un modèle de page pour commencer.
+          </p>
+        </div>
+      </ScrollArea>
     );
   }
 
   return (
-    <ScrollArea className={cn('min-h-0 flex-1', className)} data-testid="studio-layers-panel">
-      <ol className="space-y-1 px-2 py-2">
+    <ScrollArea className={cn('h-full min-h-0', className)} data-testid="studio-layers-panel">
+      <ol className="space-y-1 px-2 py-2 pb-6">
         {blocks.map((block, index) => {
           const catalog = getCatalogItem(block.type);
           const registry = getRegistryEntry(block.type);

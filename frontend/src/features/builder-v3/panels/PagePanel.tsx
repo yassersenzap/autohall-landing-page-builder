@@ -12,8 +12,8 @@ export function PagePanel({ onOpenPageSettings }: PagePanelProps) {
   const blocks = useBuilderDocumentStore((s) => s.blocks);
 
   return (
-    <ScrollArea className="min-h-0 flex-1" data-testid="studio-page-panel">
-      <div className="space-y-4 p-4">
+    <ScrollArea className="h-full min-h-0" data-testid="studio-page-panel">
+      <div className="space-y-4 p-4 pb-6">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Page</p>
           <p className="mt-1 text-sm font-medium text-neutral-200">

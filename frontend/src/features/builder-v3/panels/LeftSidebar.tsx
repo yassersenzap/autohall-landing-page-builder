@@ -3,6 +3,7 @@ import { countCatalogBlocks } from '@/features/builder-engine/foundation/builder
 import { getBasicBlockCatalog } from '@/features/builder-engine/foundation/catalog-tiers';
 import { Separator } from '@/components/ui/primitives';
 import { cn } from '@/lib/utils';
+import { STUDIO_PANEL_BODY_SLOT_CLASS } from '../layout/studio-panel-scroll';
 import {
   STUDIO_SIDEBAR_MODES,
   type StudioSidebarMode,
@@ -24,7 +25,7 @@ export function LeftSidebar({ onOpenPageSettings }: LeftSidebarProps) {
 
   return (
     <aside
-      className="flex h-full w-[300px] shrink-0 border-r border-neutral-800 bg-neutral-950"
+      className="flex h-full min-h-0 w-[300px] shrink-0 border-r border-neutral-800 bg-neutral-950"
       data-builder-v3-left-sidebar
       data-studio-sidebar-mode={mode}
     >
@@ -58,24 +59,24 @@ export function LeftSidebar({ onOpenPageSettings }: LeftSidebarProps) {
         })}
       </nav>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <div className="border-b border-neutral-800 px-3 py-3">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <div className="shrink-0 border-b border-neutral-800 px-3 py-3">
           <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Studio</p>
           <p className="mt-0.5 text-sm font-medium text-neutral-200">
             {activeMode?.shortLabel ?? 'Blocs'}
           </p>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-hidden">
+        <div className={STUDIO_PANEL_BODY_SLOT_CLASS} data-testid="studio-left-panel-body">
           {mode === 'blocks' && <BlocksCatalogPanel />}
-          {mode === 'layers' && <LayersPanel className="min-h-0 flex-1" />}
+          {mode === 'layers' && <LayersPanel />}
           {mode === 'assets' && <AssetsPanel />}
           {mode === 'templates' && <TemplatesPanel />}
           {mode === 'page' && <PagePanel onOpenPageSettings={onOpenPageSettings} />}
         </div>
 
-        <Separator className="bg-neutral-800" />
-        <div className="px-3 py-2">
+        <Separator className="shrink-0 bg-neutral-800" />
+        <div className="shrink-0 px-3 py-2">
           <p className="text-[0.625rem] text-neutral-600">
             {countCatalogBlocks()} blocs · {basicCount} atomiques
           </p>

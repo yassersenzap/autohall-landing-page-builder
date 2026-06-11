@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import {
   selectActiveBlock,
   useBuilderDocumentStore,
@@ -26,45 +27,53 @@ export function AssetsPanel() {
     });
   }
 
+  function PanelMessage({ children }: { children: ReactNode }) {
+    return (
+      <ScrollArea className="h-full min-h-0" data-testid="studio-assets-panel">
+        <div className="px-4 py-6">{children}</div>
+      </ScrollArea>
+    );
+  }
+
   if (!pageVersionId) {
     return (
-      <div className="px-4 py-6" data-testid="studio-assets-panel">
+      <PanelMessage>
         <p className="text-xs text-neutral-500">Chargement de la page…</p>
-      </div>
+      </PanelMessage>
     );
   }
 
   if (loading) {
     return (
-      <div className="px-4 py-6" data-testid="studio-assets-panel">
+      <PanelMessage>
         <p className="text-xs text-neutral-500">Chargement des médias…</p>
-      </div>
+      </PanelMessage>
     );
   }
 
   if (error) {
     return (
-      <div className="px-4 py-6" data-testid="studio-assets-panel">
+      <PanelMessage>
         <p className="text-sm font-medium text-red-300">Médias indisponibles</p>
         <p className="mt-1 text-xs text-neutral-500">{error}</p>
-      </div>
+      </PanelMessage>
     );
   }
 
   if (assets.length === 0) {
     return (
-      <div className="px-4 py-6" data-testid="studio-assets-panel">
+      <PanelMessage>
         <p className="text-sm font-medium text-neutral-300">Aucun média</p>
         <p className="mt-1 text-xs leading-relaxed text-neutral-500">
           Importez des images via l’inspecteur (onglet Media) d’un bloc sélectionné.
         </p>
-      </div>
+      </PanelMessage>
     );
   }
 
   return (
-    <ScrollArea className="min-h-0 flex-1" data-testid="studio-assets-panel">
-      <div className="space-y-3 p-3">
+    <ScrollArea className="h-full min-h-0" data-testid="studio-assets-panel">
+      <div className="space-y-3 p-3 pb-6">
         {canApplyToSelection ? (
           <p className="text-xs text-neutral-400">
             Cliquez un média pour l’appliquer au bloc sélectionné (

@@ -100,7 +100,10 @@ export function StudioLayout({
         onPreviewChange={setDragPreview}
       />
 
-      <div className="flex h-screen w-full flex-col overflow-hidden bg-neutral-950 text-white">
+      <div
+        className="flex h-screen w-full flex-col overflow-hidden bg-neutral-950 text-white"
+        data-studio-shell
+      >
         {header ?? (
           <header className="flex h-12 shrink-0 items-center border-b border-neutral-800 px-4">
             <p className="text-sm font-semibold tracking-tight">Auto Hall — Landing Studio</p>
