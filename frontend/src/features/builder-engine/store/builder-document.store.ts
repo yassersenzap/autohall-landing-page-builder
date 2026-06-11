@@ -1,3 +1,4 @@
+import { createSafeRandomId } from '@/lib/create-safe-random-id';
 import { create } from 'zustand';
 import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
 import { assetPublicFileUrl } from '@/lib/page-assets-api';
@@ -44,7 +45,7 @@ const pageScopedStorage: StateStorage = {
 function createBlockFromType(type: string, sortOrder: number): BuilderDocumentBlock {
   const item = getRegistryEntry(type);
   return {
-    id: crypto.randomUUID(),
+    id: createSafeRandomId(),
     type,
     label: item?.label ?? `[Bloc ${type}]`,
     sortOrder,
@@ -230,7 +231,7 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
         const source = blocks[sourceIndex];
         const copy: BuilderDocumentBlock = {
           ...source,
-          id: crypto.randomUUID(),
+          id: createSafeRandomId(),
           propsJson: JSON.parse(JSON.stringify(source.propsJson)) as Record<string, unknown>,
         };
 

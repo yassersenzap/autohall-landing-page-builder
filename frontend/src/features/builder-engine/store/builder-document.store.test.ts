@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { EditorPageBlock } from '@/features/editor/types/editor.types';
 import { isBuilderDocumentDirty } from '../lib/compare-builder-document';
 import { useBuilderDocumentStore } from './builder-document.store';
@@ -146,5 +146,45 @@ describe('builder-document.store removeBlock', () => {
     expect(state.blocks[0]?.id).toBe('local-hero');
     expect(state.themeDirty).toBe(true);
     expect(state.selectedBlockId).toBe('local-hero');
+  });
+});
+
+describe('builder-document.store applyPageStarter', () => {
+  const originalCrypto = globalThis.crypto;
+
+  beforeEach(() => {
+    useBuilderDocumentStore.getState().resetDocument();
+  });
+
+  afterEach(() => {
+    Object.defineProperty(globalThis, 'crypto', {
+      value: originalCrypto,
+      configurable: true,
+      writable: true,
+    });
+    vi.restoreAllMocks();
+  });
+
+  it('creates starter blocks when crypto.randomUUID is unavailable', () => {
+    Object.defineProperty(globalThis, 'crypto', {
+      value: {
+        getRandomValues: (array: Uint8Array) => {
+          array.fill(1);
+          return array;
+        },
+      },
+      configurable: true,
+      writable: true,
+    });
+
+    expect(() =>
+      useBuilderDocumentStore.getState().applyPageStarter(['hero_campaign'], 'replace'),
+    ).not.toThrow();
+
+    const { blocks } = useBuilderDocumentStore.getState();
+    expect(blocks).toHaveLength(1);
+    expect(blocks[0]?.type).toBe('hero_campaign');
+    expect(typeof blocks[0]?.id).toBe('string');
+    expect(blocks[0]?.id.length).toBeGreaterThan(0);
   });
 });
