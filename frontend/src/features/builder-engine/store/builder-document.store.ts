@@ -119,6 +119,9 @@ type BuilderDocumentState = {
   pageTheme: PageThemeDraft;
   pageSettings: PageSettingsDraft;
   themeDirty: boolean;
+  /** Bumped on successful save — used to sync preview without stale API reads. */
+  documentRevision: number;
+  lastSavedAt: number;
 
   addBlock: (type: string, index?: number) => void;
   addSection: (blockTypes: string[]) => void;
@@ -150,6 +153,7 @@ type BuilderDocumentState = {
     pageTheme: PageThemeDraft;
     pageSettings: PageSettingsDraft;
   }) => void;
+  markDocumentSaved: () => void;
   buildThemeJsonPayload: () => Record<string, unknown>;
   applyPageStarter: (blockTypes: string[], mode?: 'replace' | 'append') => void;
   resetDocument: () => void;
@@ -165,6 +169,8 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
       pageTheme: { ...DEFAULT_PAGE_THEME },
       pageSettings: { ...DEFAULT_PAGE_SETTINGS },
       themeDirty: false,
+      documentRevision: 0,
+      lastSavedAt: 0,
 
       addBlock: (type, index) => {
         const activeTypes = new Set(getActivePaletteBlocks().map((b) => b.type));
@@ -409,6 +415,13 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
         });
       },
 
+      markDocumentSaved: () => {
+        set((state) => ({
+          documentRevision: state.documentRevision + 1,
+          lastSavedAt: Date.now(),
+        }));
+      },
+
       buildThemeJsonPayload: () => {
         const { pageTheme, pageSettings } = get();
         return {
@@ -480,6 +493,8 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
           pageTheme: { ...DEFAULT_PAGE_THEME },
           pageSettings: { ...DEFAULT_PAGE_SETTINGS },
           themeDirty: false,
+          documentRevision: 0,
+          lastSavedAt: 0,
         }),
     }),
     {
@@ -530,12 +545,44 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
   ),
 );
 
+export type HydrateBuilderDocumentOptions = {
+  /** Append a cache-busting query when loading blocks from the API (preview refresh). */
+  cacheBust?: boolean;
+  /**
+   * When set, skip the API round-trip if the in-memory store already matches
+   * this revision (studio → preview navigation right after save).
+   */
+  preferMemoryRevision?: number;
+};
+
+export type HydrateBuilderDocumentResult =
+  | 'memory'
+  | 'server'
+  | 'localDraft'
+  | 'localStorage';
+
 /** Hydratation au montage — serveur prioritaire, draft local en fallback. */
-export async function hydrateBuilderDocumentStore(pageVersionId: string): Promise<void> {
+export async function hydrateBuilderDocumentStore(
+  pageVersionId: string,
+  options: HydrateBuilderDocumentOptions = {},
+): Promise<HydrateBuilderDocumentResult> {
   setBuilderPersistPageVersionId(pageVersionId);
 
+  const memoryState = useBuilderDocumentStore.getState();
+  if (
+    options.preferMemoryRevision !== undefined &&
+    persistPageVersionId === pageVersionId &&
+    memoryState.documentRevision === options.preferMemoryRevision &&
+    memoryState.blocks.length > 0
+  ) {
+    forcePersistBuilderDocument();
+    return 'memory';
+  }
+
   const { loadBuilderDocumentFromApi } = await import('../lib/load-builder-document');
-  const loaded = await loadBuilderDocumentFromApi(pageVersionId);
+  const loaded = await loadBuilderDocumentFromApi(pageVersionId, {
+    cacheBust: options.cacheBust,
+  });
   const store = useBuilderDocumentStore.getState();
 
   if (loaded.source === 'server') {
@@ -563,6 +610,7 @@ export async function hydrateBuilderDocumentStore(pageVersionId: string): Promis
   }
 
   forcePersistBuilderDocument();
+  return loaded.source;
 }
 
 /** Écrit immédiatement l'état courant dans localStorage (double sécurité au clic Sauvegarder). */

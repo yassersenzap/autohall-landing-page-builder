@@ -7,6 +7,7 @@ const updatePageVersionById = vi.fn();
 const writeLocalDraft = vi.fn();
 const forcePersistBuilderDocument = vi.fn();
 const applyServerSnapshot = vi.fn();
+const markDocumentSaved = vi.fn();
 
 const mockState = {
   blocks: [{ id: 'b1', type: 'hero_campaign', label: 'Hero', sortOrder: 0, propsJson: {} }],
@@ -62,6 +63,7 @@ vi.mock('@/features/builder-engine/store/builder-document.store', () => ({
     getState: () => ({
       ...mockState,
       applyServerSnapshot,
+      markDocumentSaved,
     }),
   },
 }));
@@ -74,6 +76,7 @@ describe('saveBuilderDocumentDesign', () => {
     writeLocalDraft.mockReset();
     forcePersistBuilderDocument.mockReset();
     applyServerSnapshot.mockReset();
+    markDocumentSaved.mockReset();
 
     fetchEditorBlocks.mockResolvedValue({ data: [] });
     persistBuilderDocument.mockResolvedValue(mockState.blocks);
@@ -93,6 +96,7 @@ describe('saveBuilderDocumentDesign', () => {
       themeJson: mockState.buildThemeJsonPayload(),
     });
     expect(applyServerSnapshot).toHaveBeenCalled();
+    expect(markDocumentSaved).toHaveBeenCalled();
     expect(writeLocalDraft).toHaveBeenCalled();
     expect(forcePersistBuilderDocument).toHaveBeenCalled();
   });

@@ -63,6 +63,7 @@ export async function saveBuilderDocumentDesign(pageVersionId: string): Promise<
       pageTheme: state.pageTheme,
       pageSettings: state.pageSettings,
     });
+    useBuilderDocumentStore.getState().markDocumentSaved();
 
     forcePersistBuilderDocument();
 

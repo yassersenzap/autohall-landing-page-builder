@@ -3,9 +3,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { StudioLayout } from '@/features/builder-v3/layout/StudioLayout';
 import { StudioTopBar, type StudioV3SaveStatus } from '@/features/builder-v3/layout/StudioTopBar';
 import { PageSettingsSheet } from '@/features/builder-v3/panels/PageSettingsSheet';
+import { warmIframeStyleAssets } from '@/features/builder-v3/canvas/inject-iframe-styles';
 import { exportBuilderV3Zip } from '@/features/builder-v3/lib/export-builder-v3';
 import { saveBuilderDocumentDesign, BuilderSaveError } from '@/features/builder-v3/lib/save-builder-v3';
 import { BlobUrlValidationError } from '@/features/builder-v3/lib/export-builder-v3';
+import { buildPreviewNavigationState } from '@/features/builder-v3/lib/preview-navigation-state';
 import { StudioToast } from '@/components/ui/StudioToast';
 import { useStudioToast } from '@/components/ui/use-studio-toast';
 import {
@@ -18,7 +20,7 @@ export default function BuilderV3Page() {
   const { pageVersionId } = useParams<{ pageVersionId: string }>();
   const navigate = useNavigate();
   const { toast, showSuccess, showError, dismiss } = useStudioToast();
-  const [saveStatus, setSaveStatus] = useState<StudioV3SaveStatus>('saved');
+  const [saveStatus, setSaveStatus] = useState<StudioV3SaveStatus>('loading');
   const [documentHydrated, setDocumentHydrated] = useState(false);
   const [pageSettingsOpen, setPageSettingsOpen] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
@@ -33,7 +35,9 @@ export default function BuilderV3Page() {
     let cancelled = false;
     skipDirtyRef.current = true;
     setDocumentHydrated(false);
+    setSaveStatus('loading');
 
+    void warmIframeStyleAssets();
     void hydrateBuilderDocumentStore(pageVersionId).then(() => {
       if (cancelled) return;
       setDocumentHydrated(true);
@@ -85,6 +89,7 @@ export default function BuilderV3Page() {
 
   const handlePreview = useCallback(async () => {
     if (!pageVersionId) return;
+    if (saveStatus === 'loading') return;
     if (saveStatus === 'dirty') {
       try {
         await saveBuilderDocumentDesign(pageVersionId);
@@ -98,7 +103,10 @@ export default function BuilderV3Page() {
         return;
       }
     }
-    navigate(getPreviewRoute(pageVersionId));
+    const previewRevision = useBuilderDocumentStore.getState().documentRevision;
+    navigate(getPreviewRoute(pageVersionId), {
+      state: buildPreviewNavigationState(previewRevision),
+    });
   }, [navigate, pageVersionId, saveStatus, showError]);
 
   const handleExport = useCallback(async () => {
@@ -128,15 +136,6 @@ export default function BuilderV3Page() {
     ? `Version ${pageVersionId.slice(0, 8)}…`
     : undefined;
 
-  if (!documentHydrated) {
-    return (
-      <div className="flex h-screen flex-col items-center justify-center gap-2 bg-neutral-950 text-neutral-400">
-        <p className="text-sm">Chargement du design depuis le serveur…</p>
-        <p className="text-xs text-neutral-600">Récupération des blocs et du thème</p>
-      </div>
-    );
-  }
-
   return (
     <>
       <StudioLayout
@@ -147,6 +146,7 @@ export default function BuilderV3Page() {
             subtitle={subtitle}
             deviceMode={deviceMode}
             saveStatus={saveStatus}
+            documentLoading={!documentHydrated}
             onDeviceModeChange={setDeviceMode}
             onSave={() => void handleSave()}
             onPreview={() => void handlePreview()}

@@ -4,6 +4,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
 import { cn } from '@/lib/utils';
 import { CANVAS_DROP_ID } from '../constants/dnd';
+import { StudioCanvasPlaceholder } from '../layout/StudioCanvasPlaceholder';
 import { CanvasDocument } from './CanvasDocument';
 import { injectIframeStyles } from './inject-iframe-styles';
 
@@ -106,11 +107,19 @@ export function IframeCanvas({
           />
         ) : null}
 
-        {!stylesReady && (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-lg bg-neutral-950/20">
-            <p className="rounded-md bg-neutral-900/90 px-3 py-1.5 text-xs text-neutral-300">
-              Chargement du canvas…
-            </p>
+        {(!stylesReady || !documentHydrated) && (
+          <div className="pointer-events-none absolute inset-0 z-10 rounded-xl bg-neutral-950/30 p-4">
+            <StudioCanvasPlaceholder
+              className="h-full min-h-0 border-none bg-neutral-900/70"
+              message={
+                !documentHydrated ? 'Chargement du document…' : 'Initialisation du canvas…'
+              }
+              detail={
+                !documentHydrated
+                  ? 'Récupération des blocs et du thème'
+                  : 'Injection des styles dans l’iframe'
+              }
+            />
           </div>
         )}
         {mountNode && stylesReady && documentHydrated

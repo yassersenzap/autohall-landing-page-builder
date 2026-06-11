@@ -31,6 +31,7 @@ type RequestOptions = {
   body?: unknown;
   auth?: boolean;
   signal?: AbortSignal;
+  cache?: RequestCache;
 };
 
 export async function apiRequest<T>(
@@ -53,6 +54,7 @@ export async function apiRequest<T>(
     headers,
     body: options.body ? JSON.stringify(options.body) : undefined,
     signal: options.signal,
+    cache: options.cache,
   });
 
   const payload = (await response.json().catch(() => null)) as

@@ -9,8 +9,18 @@ function pageBlocksBase(pageVersionId: string): string {
   return `/api/page-versions/${pageVersionId}/blocks`;
 }
 
-export async function fetchEditorBlocks(pageVersionId: string) {
-  return apiRequest<EditorPageBlock[]>(pageBlocksBase(pageVersionId));
+type FetchEditorBlocksOptions = {
+  cacheBust?: boolean;
+};
+
+export async function fetchEditorBlocks(
+  pageVersionId: string,
+  options: FetchEditorBlocksOptions = {},
+) {
+  const suffix = options.cacheBust ? `?_=${Date.now()}` : '';
+  return apiRequest<EditorPageBlock[]>(`${pageBlocksBase(pageVersionId)}${suffix}`, {
+    cache: 'no-store',
+  });
 }
 
 export async function createEditorBlock(

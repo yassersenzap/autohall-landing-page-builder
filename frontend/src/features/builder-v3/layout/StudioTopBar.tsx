@@ -4,7 +4,7 @@ import { ShadButton } from '@/components/ui/primitives';
 import { cn } from '@/lib/utils';
 import type { BuilderDeviceMode } from '@/features/builder-engine/lib/block-design-props';
 
-export type StudioV3SaveStatus = 'saved' | 'dirty' | 'saving';
+export type StudioV3SaveStatus = 'saved' | 'dirty' | 'saving' | 'loading';
 
 type StudioTopBarProps = {
   title?: string;
@@ -13,6 +13,7 @@ type StudioTopBarProps = {
   backLabel?: string;
   deviceMode: BuilderDeviceMode;
   saveStatus: StudioV3SaveStatus;
+  documentLoading?: boolean;
   onDeviceModeChange: (mode: BuilderDeviceMode) => void;
   onSave: () => void;
   onPreview: () => void;
@@ -22,6 +23,14 @@ type StudioTopBarProps = {
 };
 
 function SaveStatusBadge({ status }: { status: StudioV3SaveStatus }) {
+  if (status === 'loading') {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-700 bg-neutral-900 px-2.5 py-1 text-[0.6875rem] text-neutral-400">
+        <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
+        Chargement du document…
+      </span>
+    );
+  }
   if (status === 'saving') {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-700 bg-neutral-900 px-2.5 py-1 text-[0.6875rem] text-neutral-400">
@@ -58,7 +67,10 @@ export function StudioTopBar({
   onExport,
   exportLoading = false,
   onOpenPageSettings,
+  documentLoading = false,
 }: StudioTopBarProps) {
+  const actionsDisabled = documentLoading || saveStatus === 'loading' || saveStatus === 'saving';
+
   return (
     <header
       className="flex h-12 shrink-0 items-center justify-between gap-4 border-b border-neutral-800 bg-neutral-950 px-4"
@@ -116,7 +128,7 @@ export function StudioTopBar({
           </button>
         </div>
 
-        <SaveStatusBadge status={saveStatus} />
+        <SaveStatusBadge status={documentLoading ? 'loading' : saveStatus} />
 
         {onOpenPageSettings ? (
           <ShadButton
@@ -124,6 +136,7 @@ export function StudioTopBar({
             size="sm"
             variant="secondary"
             className="border-neutral-700 bg-neutral-900 text-neutral-100 hover:bg-neutral-800"
+            disabled={actionsDisabled}
             onClick={onOpenPageSettings}
             title="Paramètres de la page"
           >
@@ -137,7 +150,7 @@ export function StudioTopBar({
           size="sm"
           variant="secondary"
           className="border-neutral-700 bg-neutral-900 text-neutral-100 hover:bg-neutral-800"
-          disabled={saveStatus === 'saving'}
+          disabled={actionsDisabled}
           onClick={onSave}
         >
           <Save className="h-3.5 w-3.5" aria-hidden />
@@ -150,7 +163,7 @@ export function StudioTopBar({
             size="sm"
             variant="secondary"
             className="border-neutral-700 bg-neutral-900 text-neutral-100 hover:bg-neutral-800"
-            disabled={exportLoading || saveStatus === 'saving'}
+            disabled={actionsDisabled || exportLoading}
             onClick={onExport}
           >
             {exportLoading ? (
@@ -166,6 +179,7 @@ export function StudioTopBar({
           type="button"
           size="sm"
           className="bg-blue-600 text-white hover:bg-blue-500"
+          disabled={actionsDisabled}
           onClick={onPreview}
         >
           <Eye className="h-3.5 w-3.5" aria-hidden />

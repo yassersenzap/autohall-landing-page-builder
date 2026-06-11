@@ -3,6 +3,38 @@ import landingCssUrl from '../../../../../backend/src/landing-render/styles/land
 
 const V3_IFRAME_STYLE_MARKER = 'data-builder-v3-styles';
 
+let warmStyleAssetsPromise: Promise<void> | null = null;
+
+function preloadStylesheet(href: string): Promise<void> {
+  return new Promise((resolve) => {
+    const existing = document.querySelector<HTMLLinkElement>(`link[rel="stylesheet"][href="${href}"]`);
+    if (existing?.sheet) {
+      resolve();
+      return;
+    }
+
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    const done = () => resolve();
+    link.addEventListener('load', done, { once: true });
+    link.addEventListener('error', done, { once: true });
+    document.head.appendChild(link);
+    window.setTimeout(done, 2_000);
+  });
+}
+
+/** Warm critical stylesheet URLs while the document hydrates (studio boot). */
+export function warmIframeStyleAssets(): Promise<void> {
+  if (!warmStyleAssetsPromise) {
+    warmStyleAssetsPromise = Promise.all([
+      preloadStylesheet(indexCssUrl),
+      preloadStylesheet(landingCssUrl),
+    ]).then(() => undefined);
+  }
+  return warmStyleAssetsPromise;
+}
+
 function appendStylesheet(doc: Document, href: string, id?: string): HTMLLinkElement {
   const link = doc.createElement('link');
   link.rel = 'stylesheet';

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowLeft, Monitor, Smartphone } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { ShadButton } from '@/components/ui/primitives';
 import {
   hydrateBuilderDocumentStore,
@@ -13,9 +13,12 @@ import { PreviewDocument } from '@/features/builder-v3/canvas/PreviewDocument';
 import { BuilderPreviewProvider } from '@/features/builder-v3/context/BuilderPreviewContext';
 import { injectIframeStyles } from '@/features/builder-v3/canvas/inject-iframe-styles';
 import { applyPageSeoToDocument } from '@/features/builder-v3/lib/apply-page-seo';
+import { readPreviewRevision } from '@/features/builder-v3/lib/preview-navigation-state';
 
 export default function BuilderV3PreviewPage() {
   const { pageVersionId } = useParams<{ pageVersionId: string }>();
+  const location = useLocation();
+  const previewRevision = readPreviewRevision(location.state);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [mountNode, setMountNode] = useState<HTMLElement | null>(null);
   const [ready, setReady] = useState(false);
@@ -26,6 +29,7 @@ export default function BuilderV3PreviewPage() {
     landingSlug: string;
   } | null>(null);
   const pageSettings = useBuilderDocumentStore((s) => s.pageSettings);
+  const documentRevision = useBuilderDocumentStore((s) => s.documentRevision);
 
   const bootIframe = useCallback(async (iframe: HTMLIFrameElement) => {
     const doc = iframe.contentDocument;
@@ -47,15 +51,20 @@ export default function BuilderV3PreviewPage() {
     if (!pageVersionId) return;
 
     let cancelled = false;
+    setReady(false);
+    setMountNode(null);
 
-    void hydrateBuilderDocumentStore(pageVersionId).then(() => {
+    void hydrateBuilderDocumentStore(pageVersionId, {
+      cacheBust: true,
+      preferMemoryRevision: previewRevision,
+    }).then(() => {
       if (!cancelled) setReady(true);
     });
 
     return () => {
       cancelled = true;
     };
-  }, [pageVersionId]);
+  }, [pageVersionId, location.key, previewRevision]);
 
   useEffect(() => {
     if (!pageVersionId || !ready) return;
@@ -92,7 +101,7 @@ export default function BuilderV3PreviewPage() {
     }
     iframe.addEventListener('load', run);
     return () => iframe.removeEventListener('load', run);
-  }, [bootIframe, ready]);
+  }, [bootIframe, ready, documentRevision]);
 
   useEffect(() => {
     applyPageSeoToDocument(document, pageSettings, {
@@ -105,7 +114,7 @@ export default function BuilderV3PreviewPage() {
         fallbackTitle: 'Aperçu campagne Auto Hall',
       });
     }
-  }, [pageSettings, mountNode, ready]);
+  }, [pageSettings, mountNode, ready, documentRevision]);
 
   const previewProviderValue = useMemo(
     () => ({
@@ -124,13 +133,17 @@ export default function BuilderV3PreviewPage() {
 
   if (!ready) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-neutral-950 text-sm text-neutral-400">
-        Chargement de l&apos;aperçu depuis le cache local…
+      <div
+        className="flex min-h-screen items-center justify-center bg-neutral-950 text-sm text-neutral-400"
+        data-testid="preview-loading"
+      >
+        Chargement de l&apos;aperçu…
       </div>
     );
   }
 
   const previewTitle = pageSettings.metaTitle.trim() || 'Aperçu campagne Auto Hall';
+  const iframeKey = `${pageVersionId}-${documentRevision}`;
 
   return (
     <BuilderPreviewProvider value={previewProviderValue}>
@@ -182,11 +195,13 @@ export default function BuilderV3PreviewPage() {
           }
         >
           <iframe
+            key={iframeKey}
             ref={iframeRef}
             title="Aperçu landing"
             className="min-h-[720px] w-full rounded-lg border border-neutral-700 bg-white"
             sandbox="allow-same-origin allow-scripts"
             src="about:blank"
+            data-preview-revision={documentRevision}
           />
           {mountNode ? createPortal(<PreviewDocument />, mountNode) : null}
         </div>

@@ -24,11 +24,16 @@ export type LoadedBuilderDocument = {
  *
  * Theme/pageSettings load from GET /api/page-versions/:id — not the preview API.
  */
+export type LoadBuilderDocumentOptions = {
+  cacheBust?: boolean;
+};
+
 export async function loadBuilderDocumentFromApi(
   pageVersionId: string,
+  options: LoadBuilderDocumentOptions = {},
 ): Promise<LoadedBuilderDocument> {
   const [blocksResponse, versionResponse] = await Promise.all([
-    fetchEditorBlocks(pageVersionId),
+    fetchEditorBlocks(pageVersionId, { cacheBust: options.cacheBust }),
     fetchPageVersionById(pageVersionId).catch(() => null),
   ]);
 
