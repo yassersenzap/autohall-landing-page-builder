@@ -15,6 +15,7 @@ import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder
 import { CANVAS_DROP_ID } from '../constants/dnd';
 import { IframeCanvas } from '../canvas/IframeCanvas';
 import { CanvasToolbar } from './CanvasToolbar';
+import { useStudioCanvasShortcuts } from '../hooks/useStudioCanvasShortcuts';
 import { LeftSidebar } from '../panels/LeftSidebar';
 import { RightInspector } from '../panels/RightInspector';
 
@@ -73,6 +74,8 @@ export function StudioLayout({
   const setDeviceMode = useBuilderDocumentStore((s) => s.setDeviceMode);
   const [paletteDropActive, setPaletteDropActive] = useState(false);
   const [dragPreview, setDragPreview] = useState<PaletteDragPreview | null>(null);
+
+  useStudioCanvasShortcuts(documentHydrated);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {

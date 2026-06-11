@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   selectActiveBlock,
   useBuilderDocumentStore,
@@ -154,6 +154,14 @@ function ThemeFields() {
 export function RightInspector() {
   const [tab, setTab] = useState<InspectorTab>('block');
   const block = useBuilderDocumentStore(selectActiveBlock);
+
+  useEffect(() => {
+    function handleFocusInspector() {
+      setTab('block');
+    }
+    window.addEventListener('studio:focus-inspector', handleFocusInspector);
+    return () => window.removeEventListener('studio:focus-inspector', handleFocusInspector);
+  }, []);
   const blocks = useBuilderDocumentStore((s) => s.blocks);
   const updateBlockProps = useBuilderDocumentStore((s) => s.updateBlockProps);
   const moveBlockUp = useBuilderDocumentStore((s) => s.moveBlockUp);

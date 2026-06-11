@@ -105,9 +105,10 @@ export async function injectIframeStyles(doc: Document): Promise<void> {
     .v3-block-shell[data-selected="true"] {
       outline: 2px solid #3b82f6;
       outline-offset: -2px;
+      box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.25), 0 0 0 1px rgba(59, 130, 246, 0.15);
     }
     .v3-block-shell:hover:not([data-selected="true"]) {
-      outline: 1px dashed rgba(59, 130, 246, 0.45);
+      outline: 1px dashed rgba(59, 130, 246, 0.5);
       outline-offset: -1px;
     }
     .v3-block-shell--over { outline: 1px solid rgba(59, 130, 246, 0.6); outline-offset: -1px; }
@@ -150,6 +151,193 @@ export async function injectIframeStyles(doc: Document): Promise<void> {
     }
     .v3-block-grip:active { cursor: grabbing; transform: translateX(-50%) scale(1.05); }
     .v3-block-content { position: relative; width: 100%; pointer-events: auto; }
+    .v3-block-toolbar {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      z-index: 40;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.375rem;
+      max-width: min(100% - 1rem, 22rem);
+      pointer-events: auto;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .v3-block-toolbar__label {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.375rem;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+    .v3-block-toolbar__name {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: #f8fafc;
+      line-height: 1.2;
+    }
+    .v3-block-toolbar__type {
+      font-size: 0.5625rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #94a3b8;
+    }
+    .v3-block-toolbar__actions {
+      display: flex;
+      align-items: center;
+      gap: 0.125rem;
+      padding: 0.125rem;
+      border-radius: 0.5rem;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(8px);
+    }
+    .v3-block-toolbar__btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.75rem;
+      height: 1.75rem;
+      border: none;
+      border-radius: 0.375rem;
+      background: transparent;
+      color: #e2e8f0;
+      cursor: pointer;
+      transition: background 0.12s ease, color 0.12s ease;
+    }
+    .v3-block-toolbar__btn:hover:not(:disabled) {
+      background: rgba(59, 130, 246, 0.2);
+      color: #fff;
+    }
+    .v3-block-toolbar__btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+    .v3-block-toolbar__btn--danger:hover:not(:disabled) {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fecaca;
+    }
+    .v3-block-toolbar__insert-menu {
+      width: 12rem;
+      padding: 0.375rem;
+      border-radius: 0.5rem;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+    .v3-block-toolbar__insert-title {
+      margin: 0 0 0.25rem;
+      padding: 0.25rem 0.375rem;
+      font-size: 0.625rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+    }
+    .v3-block-toolbar__insert-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .v3-block-toolbar__insert-item,
+    .v3-block-toolbar__insert-cancel {
+      display: block;
+      width: 100%;
+      padding: 0.375rem 0.5rem;
+      border: none;
+      border-radius: 0.375rem;
+      background: transparent;
+      color: #e2e8f0;
+      font-size: 0.75rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .v3-block-toolbar__insert-item:hover {
+      background: rgba(59, 130, 246, 0.15);
+    }
+    .v3-block-toolbar__insert-cancel {
+      margin-top: 0.25rem;
+      color: #94a3b8;
+      font-size: 0.6875rem;
+    }
+    .v3-block-insert-slot {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      height: 0;
+      margin: 0;
+      z-index: 15;
+      pointer-events: none;
+    }
+    .v3-block-insert-slot:hover,
+    .v3-block-insert-slot:focus-within {
+      height: auto;
+      padding: 0.25rem 0;
+      pointer-events: auto;
+    }
+    .v3-block-insert-slot__trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.25rem 0.625rem;
+      border: 1px dashed rgba(59, 130, 246, 0.35);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.95);
+      color: #3b82f6;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(-2px);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12);
+      pointer-events: auto;
+    }
+    .v3-block-insert-slot:hover .v3-block-insert-slot__trigger,
+    .v3-block-insert-slot:focus-within .v3-block-insert-slot__trigger {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .v3-block-insert-slot__menu {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      z-index: 50;
+      width: 11rem;
+      margin-top: 0.25rem;
+      padding: 0.25rem;
+      transform: translateX(-50%);
+      border-radius: 0.5rem;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+      pointer-events: auto;
+    }
+    .v3-block-insert-slot__menu ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .v3-block-insert-slot__item {
+      display: block;
+      width: 100%;
+      padding: 0.375rem 0.5rem;
+      border: none;
+      border-radius: 0.375rem;
+      background: transparent;
+      color: #e2e8f0;
+      font-size: 0.75rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .v3-block-insert-slot__item:hover {
+      background: rgba(59, 130, 246, 0.15);
+    }
     .v3-canvas-empty-wrap {
       display: flex;
       flex-direction: column;

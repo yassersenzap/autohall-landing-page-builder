@@ -129,6 +129,8 @@ type BuilderDocumentState = {
   lastSavedAt: number;
 
   addBlock: (type: string, index?: number) => void;
+  /** Insert a block at a specific index (alias for addBlock with index). */
+  insertBlockAt: (type: string, index: number) => void;
   addSection: (blockTypes: string[]) => void;
   removeBlock: (blockId: string) => void;
   deleteBlock: (blockId: string) => void;
@@ -191,7 +193,12 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
         set({
           blocks: normalizeSortOrder(next),
           selectedBlockId: newBlock.id,
+          themeDirty: true,
         });
+      },
+
+      insertBlockAt: (type, index) => {
+        get().addBlock(type, index);
       },
 
       addSection: (blockTypes) => {
@@ -211,6 +218,7 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
         set({
           blocks: normalizeSortOrder(blocks),
           selectedBlockId: firstId,
+          themeDirty: true,
         });
       },
 
@@ -227,6 +235,7 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
 
         set({
           blocks,
+          themeDirty: true,
           ...selection,
         });
       },
@@ -253,6 +262,7 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
           blocks: normalizeSortOrder(next),
           selectedBlockId: copy.id,
           hoveredBlockId: copy.id,
+          themeDirty: true,
         });
       },
 
@@ -282,7 +292,7 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
 
         const [moved] = blocks.splice(oldIndex, 1);
         blocks.splice(newIndex, 0, moved);
-        set({ blocks: normalizeSortOrder(blocks) });
+        set({ blocks: normalizeSortOrder(blocks), themeDirty: true });
       },
 
       moveBlockToIndex: (blockId, newIndex) => {
@@ -292,7 +302,7 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
         const clamped = Math.max(0, Math.min(newIndex, blocks.length - 1));
         const [moved] = blocks.splice(oldIndex, 1);
         blocks.splice(clamped, 0, moved);
-        set({ blocks: normalizeSortOrder(blocks) });
+        set({ blocks: normalizeSortOrder(blocks), themeDirty: true });
       },
 
       moveBlockUp: (blockId) => {

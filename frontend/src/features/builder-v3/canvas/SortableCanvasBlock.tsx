@@ -2,11 +2,15 @@ import type { ReactNode } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
+import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
 import type { BuilderDocumentBlock } from '@/features/builder-engine/types';
 import { cn } from '@/lib/utils';
+import { CanvasBlockToolbar } from './CanvasBlockToolbar';
 
 type SortableCanvasBlockProps = {
   block: BuilderDocumentBlock;
+  blockIndex: number;
+  blockCount: number;
   selected: boolean;
   onSelect: (blockId: string) => void;
   children: ReactNode;
@@ -14,10 +18,13 @@ type SortableCanvasBlockProps = {
 
 export function SortableCanvasBlock({
   block,
+  blockIndex,
+  blockCount,
   selected,
   onSelect,
   children,
 }: SortableCanvasBlockProps) {
+  const hoverBlock = useBuilderDocumentStore((s) => s.hoverBlock);
   const {
     attributes,
     listeners,
@@ -44,6 +51,10 @@ export function SortableCanvasBlock({
       )}
       data-selected={selected ? 'true' : 'false'}
       data-dragging={isDragging ? 'true' : 'false'}
+      data-canvas-block-id={block.id}
+      data-canvas-block-selected={selected ? 'true' : 'false'}
+      onMouseEnter={() => hoverBlock(block.id)}
+      onMouseLeave={() => hoverBlock(null)}
       onClick={(event) => {
         event.stopPropagation();
         onSelect(block.id);
@@ -73,6 +84,14 @@ export function SortableCanvasBlock({
       >
         <GripVertical className="h-4 w-4" aria-hidden />
       </button>
+
+      {selected ? (
+        <CanvasBlockToolbar
+          block={block}
+          blockIndex={blockIndex}
+          blockCount={blockCount}
+        />
+      ) : null}
 
       <div className="v3-block-content">{children}</div>
     </div>

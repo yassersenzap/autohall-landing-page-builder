@@ -102,6 +102,25 @@ describe('builder-document.store removeBlock', () => {
     expect(useBuilderDocumentStore.getState().selectedBlockId).toBeNull();
   });
 
+  it('insertBlockAt inserts at the given index', () => {
+    useBuilderDocumentStore.getState().setInitialBlocks([hero('hero-1'), form('form-1')]);
+    useBuilderDocumentStore.getState().insertBlockAt('cta_band', 1);
+
+    const types = useBuilderDocumentStore.getState().blocks.map((b) => b.type);
+    expect(types).toEqual(['hero', 'cta_band', 'lead_form']);
+    expect(useBuilderDocumentStore.getState().themeDirty).toBe(true);
+  });
+
+  it('duplicateBlock creates a copy with a new id', () => {
+    useBuilderDocumentStore.getState().setInitialBlocks([hero('hero-1')]);
+    useBuilderDocumentStore.getState().duplicateBlock('hero-1');
+
+    const state = useBuilderDocumentStore.getState();
+    expect(state.blocks).toHaveLength(2);
+    expect(state.blocks[1]?.id).not.toBe('hero-1');
+    expect(state.themeDirty).toBe(true);
+  });
+
   it('moveBlockUp and moveBlockDown reorder blocks', () => {
     useBuilderDocumentStore.getState().setInitialBlocks([hero('hero-1'), form('form-1')]);
     useBuilderDocumentStore.getState().selectBlock('form-1');
