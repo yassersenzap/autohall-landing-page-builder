@@ -5,6 +5,7 @@ import {
   buildBlockDesignClasses,
   normalizeSectionDesign,
 } from './block-design-system';
+import { appendSectionStyleToClass } from './section-style/section-style.classes';
 
 function escapeHtml(value: string): string {
   return value
@@ -48,7 +49,10 @@ function renderTextParagraphs(content: string): string {
 
 export function renderCtaBandHtml(props: Record<string, unknown>): string {
   const design = normalizeSectionDesign('cta_band', props);
-  const sectionClass = buildBlockDesignClasses('lp-cta-band', design);
+  const sectionClass = appendSectionStyleToClass(
+    `lp-block ${buildBlockDesignClasses('lp-cta-band', design)}`,
+    props,
+  );
   const btnClass = buildBlockCtaClass(design, 'lp-btn lp-btn--md');
 
   const title = propString(props, 'title', 'heading');
@@ -58,7 +62,7 @@ export function renderCtaBandHtml(props: Record<string, unknown>): string {
   if (!title && !buttonText) return '';
 
   return `
-    <section class="lp-block ${sectionClass}">
+    <section class="${sectionClass}">
       <div class="lp-section lp-cta-band__inner">
         ${title ? `<p class="lp-cta-band__text">${escapeHtml(title)}</p>` : ''}
         ${buttonText ? `<a class="${btnClass}" href="${escapeHtml(buttonHref)}">${escapeHtml(buttonText)}</a>` : ''}

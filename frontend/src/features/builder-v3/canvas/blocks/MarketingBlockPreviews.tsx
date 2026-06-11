@@ -4,6 +4,7 @@ import {
   buildBlockDesignClasses,
   normalizeSectionDesign,
 } from '@/features/builder-engine/lib/block-design-system';
+import { mergeBlockSectionPresentation } from '@/features/builder/section-style';
 import {
   buildButtonClasses,
   buildCanvasInlineStyle,
@@ -235,11 +236,15 @@ type TrustBarBlockPreviewProps = {
 
 export function TrustBarBlockPreview({ propsJson }: TrustBarBlockPreviewProps) {
   const design = normalizeSectionDesign('trust_bar', propsJson);
-  const sectionClass = buildBlockDesignClasses('lp-trust-bar', design);
+  const { className: sectionClass } = mergeBlockSectionPresentation(
+    `lp-block ${buildBlockDesignClasses('lp-trust-bar', design)}`,
+    'trust_bar',
+    propsJson,
+  );
   const metrics = Array.isArray(propsJson.metrics) ? propsJson.metrics : [];
 
   return (
-    <section className={`lp-block ${sectionClass}`} aria-label="Réassurance">
+    <section className={sectionClass} aria-label="Réassurance">
       <div className="lp-section">
         <div className="lp-trust-bar__grid">
           {metrics.slice(0, 4).map((m, i) => {

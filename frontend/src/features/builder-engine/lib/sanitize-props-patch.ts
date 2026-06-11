@@ -1,3 +1,4 @@
+import { sanitizeSectionStylePatch } from '@/features/builder/section-style/section-style.registry';
 import { sanitizeBlockDesignProps } from './block-design-props';
 
 /**
@@ -106,6 +107,19 @@ export function sanitizePropsPatch(
       !Array.isArray(value)
     ) {
       const sanitized = sanitizeFormConfigObject(value as Record<string, unknown>);
+      if (Object.keys(sanitized).length > 0) {
+        out[key] = sanitized;
+      }
+      continue;
+    }
+
+    if (
+      key === 'sectionStyle' &&
+      value !== null &&
+      typeof value === 'object' &&
+      !Array.isArray(value)
+    ) {
+      const sanitized = sanitizeSectionStylePatch(value as Record<string, unknown>);
       if (Object.keys(sanitized).length > 0) {
         out[key] = sanitized;
       }

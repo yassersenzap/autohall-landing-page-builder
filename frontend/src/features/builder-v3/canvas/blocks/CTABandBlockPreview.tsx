@@ -1,5 +1,6 @@
 import { asPropString } from '@/features/builder-engine/lib/block-props';
 import { buildBlockCtaClass, buildBlockDesignClasses, normalizeSectionDesign } from '@/features/builder-engine/lib/block-design-system';
+import { mergeBlockSectionPresentation } from '@/features/builder/section-style';
 import { useBuilderPreviewContext } from '../../context/BuilderPreviewContext';
 import { CanvasCtaLink } from './CanvasCtaLink';
 
@@ -15,7 +16,11 @@ export function CTABandBlockPreview({
   const previewContext = useBuilderPreviewContext();
   const interactive = interactiveProp ?? previewContext.interactive;
   const design = normalizeSectionDesign('cta_band', propsJson);
-  const sectionClass = buildBlockDesignClasses('lp-cta-band', design);
+  const { className: sectionClass } = mergeBlockSectionPresentation(
+    `lp-block ${buildBlockDesignClasses('lp-cta-band', design)}`,
+    'cta_band',
+    propsJson,
+  );
   const btnClass = buildBlockCtaClass(design, 'lp-btn lp-btn--md');
 
   const title = asPropString(propsJson.title);
@@ -23,7 +28,7 @@ export function CTABandBlockPreview({
   const buttonHref = asPropString(propsJson.buttonHref) || '#lead-form';
 
   return (
-    <section className={`lp-block ${sectionClass}`}>
+    <section className={sectionClass}>
       <div className="lp-section lp-cta-band__inner">
         {title ? <p className="lp-cta-band__text">{title}</p> : null}
         {buttonText ? (

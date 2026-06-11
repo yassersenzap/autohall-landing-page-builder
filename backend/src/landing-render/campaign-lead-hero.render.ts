@@ -1,5 +1,9 @@
 import type { LandingRenderContext } from './render-asset.types';
 import {
+  appendSectionStyleToClass,
+  appendSectionStyleToInlineStyle,
+} from './section-style/section-style.classes';
+import {
   parseCampaignLeadHeroFormIntegration,
   SYMFONY_FORM_STATIC_EXPORT_NOTE,
 } from '../symfony-export/export-contracts.registry';
@@ -139,7 +143,7 @@ function buildSectionClasses(props: Record<string, unknown>): string {
   const showOfferBadge = design.showOfferBadge !== false;
   const showProgressBar = design.showProgressBar !== false;
 
-  return [
+  const base = [
     'lp-campaign-lead-hero',
     `lp-campaign-lead-hero--layout-${layoutVariant}`,
     `lp-campaign-lead-hero--fit-${imageFit}`,
@@ -152,12 +156,15 @@ function buildSectionClasses(props: Record<string, unknown>): string {
     showOfferBadge ? 'lp-campaign-lead-hero--has-badge' : 'lp-campaign-lead-hero--no-badge',
     showProgressBar ? 'lp-campaign-lead-hero--has-progress' : 'lp-campaign-lead-hero--no-progress',
   ].join(' ');
+
+  return appendSectionStyleToClass(base, props);
 }
 
 function buildSectionInlineStyle(props: Record<string, unknown>, brandId: unknown): string {
   const brand = resolveBrandPresetTokens(brandId);
   const focal = resolveHeroFocalPoint(props);
-  return [buildBrandInlineStyle(brand), buildHeroFocalInlineStyle(focal.x, focal.y)].join('; ');
+  const base = [buildBrandInlineStyle(brand), buildHeroFocalInlineStyle(focal.x, focal.y)].join('; ');
+  return appendSectionStyleToInlineStyle(base, props);
 }
 
 function resolvePrimaryAlt(props: Record<string, unknown>): string {

@@ -1,5 +1,6 @@
 import { asPropString } from '@/features/builder-engine/lib/block-props';
 import { buildBlockDesignClasses, normalizeSectionDesign } from '@/features/builder-engine/lib/block-design-system';
+import { mergeBlockSectionPresentation } from '@/features/builder/section-style';
 
 type FooterLegalBlockPreviewProps = {
   propsJson: Record<string, unknown>;
@@ -7,13 +8,17 @@ type FooterLegalBlockPreviewProps = {
 
 export function FooterLegalBlockPreview({ propsJson }: FooterLegalBlockPreviewProps) {
   const design = normalizeSectionDesign('footer_legal', propsJson);
-  const sectionClass = buildBlockDesignClasses('lp-footer-legal', design);
+  const { className: sectionClass } = mergeBlockSectionPresentation(
+    `lp-block ${buildBlockDesignClasses('lp-footer-legal', design)}`,
+    'footer_legal',
+    propsJson,
+  );
   const legalText = asPropString(propsJson.legalText);
   const rawLinks = Array.isArray(propsJson.links) ? propsJson.links : [];
   const links = rawLinks as Array<{ label?: string; href?: string }>;
 
   return (
-    <footer className={`lp-block ${sectionClass}`}>
+    <footer className={sectionClass}>
       <div className="lp-section">
         {legalText ? <p className="lp-footer-legal__text">{legalText}</p> : null}
         {links.length > 0 ? (

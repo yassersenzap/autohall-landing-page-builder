@@ -11,6 +11,7 @@ import {
   shouldRenderCampaignOverlay,
 } from '@/features/builder/blocks/campaign-lead-hero';
 import { SYMFONY_FORM_PREVIEW_NOTE } from '@/features/builder/export-contracts';
+import { mergeBlockSectionPresentation } from '@/features/builder/section-style';
 import { HeroBlockImage } from '@/features/builder-engine/components/media/HeroBlockImage';
 import { CanvasEmptyHint } from './CanvasEmptyHint';
 
@@ -155,13 +156,15 @@ export function CampaignLeadHeroBlockPreview({ propsJson }: CampaignLeadHeroBloc
   const props = parseCampaignLeadHeroProps(propsJson);
   const brand = resolveBrandPreset(props.brandId);
   const placement = props.contentPlacement || props.resolvedContentPlacement;
-  const sectionClass = buildCampaignLeadHeroSectionClasses({
+  const baseSectionClass = buildCampaignLeadHeroSectionClasses({
     ...props,
     resolvedContentPlacement: placement,
   });
-  const sectionStyle = buildCampaignLeadHeroSectionStyle(
-    props,
-    brandCssVarMapToStyle(buildBrandCssVarMap(brand)),
+  const { className: sectionClass, style: sectionStyle } = mergeBlockSectionPresentation(
+    baseSectionClass,
+    'campaign_lead_hero',
+    propsJson,
+    buildCampaignLeadHeroSectionStyle(props, brandCssVarMapToStyle(buildBrandCssVarMap(brand))),
   );
 
   const renderImage = (

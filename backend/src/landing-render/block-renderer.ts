@@ -21,6 +21,7 @@ import {
   buildBlockDesignClasses,
   normalizeSectionDesign,
 } from './block-design-system';
+import { appendSectionStyleToClass } from './section-style/section-style.classes';
 import {
   buildPremiumCtaClass,
   buildPremiumSectionClasses,
@@ -380,7 +381,10 @@ function renderHeroHtml(
 
 function renderTrustBarHtml(props: Record<string, unknown>): string {
   const design = normalizeSectionDesign('trust_bar', props);
-  const sectionClass = buildBlockDesignClasses('lp-trust-bar', design);
+  const sectionClass = appendSectionStyleToClass(
+    `lp-block ${buildBlockDesignClasses('lp-trust-bar', design)}`,
+    props,
+  );
   const metrics = parseMetrics(props);
   if (metrics.length === 0) {
     return '';
@@ -397,7 +401,7 @@ function renderTrustBarHtml(props: Record<string, unknown>): string {
     .join('');
 
   return `
-    <section class="lp-block ${sectionClass}" aria-label="Réassurance">
+    <section class="${sectionClass}" aria-label="Réassurance">
       <div class="lp-section">
         <div class="lp-trust-bar__grid">${items}</div>
       </div>
@@ -803,7 +807,10 @@ function renderTestimonialsHtml(props: Record<string, unknown>): string {
 
 function renderFaqHtml(props: Record<string, unknown>): string {
   const design = normalizeSectionDesign('faq', props);
-  const sectionClass = buildBlockDesignClasses('lp-faq', design);
+  const sectionClass = appendSectionStyleToClass(
+    `lp-block ${buildBlockDesignClasses('lp-faq', design)}`,
+    props,
+  );
   const heading = propString(props, 'heading', 'title');
   const subtitle = propString(props, 'subtitle');
   const items = parseFaqItems(props);
@@ -821,7 +828,7 @@ function renderFaqHtml(props: Record<string, unknown>): string {
   if (!heading && !rows) return '';
 
   return `
-    <section class="lp-block ${sectionClass}">
+    <section class="${sectionClass}">
       <div class="lp-section lp-section--narrow">
         ${heading || subtitle ? `<div class="lp-section-head">${renderSectionHeading(heading, subtitle)}</div>` : ''}
         ${rows ? `<div class="lp-faq__list">${rows}</div>` : ''}
@@ -863,10 +870,9 @@ function renderFinalCtaHtml(props: Record<string, unknown>): string {
 
 function renderFooterLegalHtml(props: Record<string, unknown>): string {
   const design = normalizeBlockDesign('footer_legal', props);
-  const sectionClass = buildBlockSectionClasses(
-    'footer_legal',
-    'lp-footer-legal',
-    design,
+  const sectionClass = appendSectionStyleToClass(
+    buildBlockSectionClasses('footer_legal', 'lp-footer-legal', design),
+    props,
   );
   const inlineVars = buildInlineStyleVars(design);
 

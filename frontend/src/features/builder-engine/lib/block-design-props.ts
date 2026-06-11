@@ -168,7 +168,7 @@ export function sanitizeBlockDesignProps(
   return out;
 }
 
-export type BuilderDeviceMode = 'desktop' | 'mobile';
+export type BuilderDeviceMode = 'desktop' | 'tablet' | 'mobile';
 
 export const IMAGE_ALIGNMENT_OPTIONS: { value: ImageAlignment; label: string }[] = [
   { value: 'right', label: 'Image à droite' },

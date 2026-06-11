@@ -6,6 +6,7 @@ import {
   parseHeroVehicleOfferProps,
 } from '@/features/builder/blocks/hero-vehicle-offer/parse-hero-vehicle-offer-props';
 import { HeroBlockImage } from '@/features/builder-engine/components/media/HeroBlockImage';
+import { mergeBlockSectionPresentation } from '@/features/builder/section-style';
 import { useBuilderPreviewContext } from '../../context/BuilderPreviewContext';
 import { CanvasEmptyHint } from './CanvasEmptyHint';
 import { CanvasCtaLink } from './CanvasCtaLink';
@@ -29,10 +30,14 @@ export function HeroVehicleOfferBlockPreview({ propsJson }: HeroVehicleOfferBloc
   const { interactive } = useBuilderPreviewContext();
   const props = parseHeroVehicleOfferProps(propsJson);
   const brand = resolveBrandPreset(props.brandId);
-  const sectionClass = buildHeroVehicleOfferSectionClasses(props);
-  const sectionStyle = buildHeroVehicleOfferSectionStyle(
-    props,
-    brandCssVarMapToStyle(buildBrandCssVarMap(brand)),
+  const { className: sectionClass, style: sectionStyle } = mergeBlockSectionPresentation(
+    buildHeroVehicleOfferSectionClasses(props),
+    'hero_vehicle_offer',
+    propsJson,
+    buildHeroVehicleOfferSectionStyle(
+      props,
+      brandCssVarMapToStyle(buildBrandCssVarMap(brand)),
+    ),
   );
 
   const hasDesktopImage = Boolean(props.heroImage || props.heroImageUrl);

@@ -1,4 +1,8 @@
 import type { LandingRenderContext } from './render-asset.types';
+import {
+  appendSectionStyleToClass,
+  appendSectionStyleToInlineStyle,
+} from './section-style/section-style.classes';
 import { buildBrandInlineStyle, resolveBrandPresetTokens } from './brand-presets';
 import {
   buildHeroFocalInlineStyle,
@@ -81,7 +85,7 @@ function buildSectionClasses(props: Record<string, unknown>): string {
   const alignContent = pick(design.alignContent, ['left', 'center'] as const, 'left');
   const showOfferBadge = design.showOfferBadge !== false;
 
-  return [
+  const base = [
     'lp-hero-vehicle-offer',
     `lp-hero-vehicle-offer--layout-${layoutVariant}`,
     `lp-hero-vehicle-offer--fit-${imageFit}`,
@@ -94,12 +98,15 @@ function buildSectionClasses(props: Record<string, unknown>): string {
     `lp-hero-vehicle-offer--align-${alignContent}`,
     showOfferBadge ? 'lp-hero-vehicle-offer--has-badge' : 'lp-hero-vehicle-offer--no-badge',
   ].join(' ');
+
+  return appendSectionStyleToClass(base, props);
 }
 
 function buildSectionInlineStyle(props: Record<string, unknown>, brandId: unknown): string {
   const brand = resolveBrandPresetTokens(brandId);
   const focal = resolveHeroFocalPoint(props);
-  return [buildBrandInlineStyle(brand), buildHeroFocalInlineStyle(focal.x, focal.y)].join('; ');
+  const base = [buildBrandInlineStyle(brand), buildHeroFocalInlineStyle(focal.x, focal.y)].join('; ');
+  return appendSectionStyleToInlineStyle(base, props);
 }
 
 function renderPlaceholderHtml(alt: string, wrapperClass?: string): string {

@@ -26,6 +26,7 @@ export function CanvasDocument() {
   const selectBlock = useBuilderDocumentStore((s) => s.selectBlock);
   const reorderBlocks = useBuilderDocumentStore((s) => s.reorderBlocks);
   const pageTheme = useBuilderDocumentStore((s) => s.pageTheme);
+  const deviceMode = useBuilderDocumentStore((s) => s.deviceMode);
 
   const { headingFont, bodyFont } = resolveThemeFonts(pageTheme);
 
@@ -85,7 +86,12 @@ export function CanvasDocument() {
   }
 
   return (
-    <div data-builder-v3-root className="min-h-full" data-studio-canvas-root>
+    <div
+      data-builder-v3-root
+      className="min-h-full"
+      data-studio-canvas-root
+      data-studio-viewport={deviceMode}
+    >
       <article
         className="lp-document min-h-full"
         data-theme={pageTheme.mode}

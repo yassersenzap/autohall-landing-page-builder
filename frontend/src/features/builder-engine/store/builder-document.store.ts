@@ -347,6 +347,15 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
                 : {};
             merged.formConfig = { ...prev, ...(safe.formConfig as Record<string, unknown>) };
           }
+          if (safe.sectionStyle && typeof safe.sectionStyle === 'object' && !Array.isArray(safe.sectionStyle)) {
+            const prev =
+              block.propsJson.sectionStyle &&
+              typeof block.propsJson.sectionStyle === 'object' &&
+              !Array.isArray(block.propsJson.sectionStyle)
+                ? (block.propsJson.sectionStyle as Record<string, unknown>)
+                : {};
+            merged.sectionStyle = { ...prev, ...(safe.sectionStyle as Record<string, unknown>) };
+          }
           return { ...block, propsJson: merged };
         });
 

@@ -4,6 +4,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
 import { cn } from '@/lib/utils';
 import { CANVAS_DROP_ID } from '../constants/dnd';
+import { STUDIO_VIEWPORT_WIDTHS } from '../constants/studio-viewport';
 import { StudioCanvasPlaceholder } from '../layout/StudioCanvasPlaceholder';
 import { CanvasDocument } from './CanvasDocument';
 import { injectIframeStyles } from './inject-iframe-styles';
@@ -23,7 +24,7 @@ export function IframeCanvas({
   const [mountNode, setMountNode] = useState<HTMLElement | null>(null);
   const [stylesReady, setStylesReady] = useState(false);
   const deviceMode = useBuilderDocumentStore((s) => s.deviceMode);
-  const isMobile = deviceMode === 'mobile';
+  const viewportWidth = STUDIO_VIEWPORT_WIDTHS[deviceMode];
 
   const { setNodeRef, isOver } = useDroppable({
     id: CANVAS_DROP_ID,
@@ -77,12 +78,13 @@ export function IframeCanvas({
     >
       <div
         className={cn(
-          'relative mx-auto flex min-h-full flex-col transition-all duration-300',
-          isMobile ? 'w-[390px]' : 'w-[1152px] max-w-full',
+          'relative mx-auto flex min-h-full max-w-full flex-col transition-all duration-300',
           paletteDropActive && isOver && 'ring-2 ring-blue-500 ring-offset-2 ring-offset-neutral-900',
         )}
+        style={{ width: viewportWidth }}
         data-droppable-active={paletteDropActive && isOver ? 'true' : 'false'}
         data-builder-v3-viewport={deviceMode}
+        data-studio-viewport-width={viewportWidth}
       >
         <iframe
           ref={iframeRef}
