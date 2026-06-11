@@ -31,6 +31,12 @@ describe('BuilderV3HtmlCompilerService all active blocks', () => {
       title: 'Réservez votre essai en concession',
       form: { title: 'Contact', submitText: 'Envoyer' },
     },
+    hero_vehicle_offer: {
+      brandId: 'ford',
+      modelName: 'Ford Ranger',
+      headline: 'Réservez votre essai en concession',
+      primaryCtaLabel: 'Essai',
+    },
     promo_autohall: { title: 'Auto Hall', formTitle: 'Offre', submitText: 'Envoyer' },
     lead_form: { title: 'Contact', submitText: 'Envoyer' },
     cta_band: { title: 'Essai gratuit', buttonText: 'Réserver' },
@@ -70,7 +76,7 @@ describe('BuilderV3HtmlCompilerService all active blocks', () => {
   };
 
   it('routes every active V3 block through landing render', () => {
-    expect(ACTIVE_V3_BLOCK_TYPES.length).toBe(20);
+    expect(ACTIVE_V3_BLOCK_TYPES.length).toBe(21);
     const html = compiler.compile({
       ...baseInput,
       blocks: ACTIVE_V3_BLOCK_TYPES.map((type, index) => ({

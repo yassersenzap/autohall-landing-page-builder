@@ -159,6 +159,7 @@ export function buildBlockCtaClass(
 export const ACTIVE_V3_BLOCK_TYPES = [
   'hero_campaign',
   'hero_form_campaign',
+  'hero_vehicle_offer',
   'promo_autohall',
   'lead_form',
   'cta_band',

@@ -25,6 +25,10 @@ import {
   isMarketingInspectorBlock,
   MarketingBlockInspectorFields,
 } from './MarketingBlockInspectorFields';
+import {
+  HeroVehicleOfferInspectorFields,
+  isHeroVehicleOfferBlock,
+} from './HeroVehicleOfferInspectorFields';
 import { BlockDesignInspectorFields } from './BlockDesignInspectorFields';
 import { INSPECTOR_DESIGN_BLOCKS } from '@/features/builder-engine/lib/block-design-system';
 import { SECTION_PADDING_OPTIONS } from '../constants/block-layout';
@@ -124,6 +128,7 @@ export function BlockInspectorPanel({
   const isPricingTrim = block.type === 'pricing_trim';
   const isFAQ = block.type === 'faq';
   const isTestimonials = block.type === 'testimonials';
+  const isHeroVehicleOffer = isHeroVehicleOfferBlock(block.type);
   const isMarketingBlock = isMarketingInspectorBlock(block.type);
   const isPremiumDesignBlock = INSPECTOR_DESIGN_BLOCKS.has(block.type);
   const supportsBackground = isPromo || isHero;
@@ -301,6 +306,10 @@ export function BlockInspectorPanel({
                         : 'Image véhicule ou lifestyle pour la zone média de la bannière.'}
                     </FieldHint>
                   </div>
+                )}
+
+                {isHeroVehicleOffer && (
+                  <HeroVehicleOfferInspectorFields block={block} patch={patch} />
                 )}
 
                 {isMarketingBlock && (

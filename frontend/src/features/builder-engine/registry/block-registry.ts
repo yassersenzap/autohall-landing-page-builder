@@ -115,6 +115,14 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     icon: '⊞',
   },
   {
+    type: 'hero_vehicle_offer',
+    label: 'Hero offre véhicule',
+    description: 'Hero premium brand-aware : modèle, offre, prix et CTAs.',
+    category: 'hero',
+    availability: 'stable',
+    icon: '◎',
+  },
+  {
     type: 'lead_form',
     label: 'Formulaire Auto Hall',
     description: 'Collecte leads conforme campagnes Auto Hall.',

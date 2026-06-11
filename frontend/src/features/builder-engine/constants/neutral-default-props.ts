@@ -24,10 +24,18 @@ import {
   buildHeroFormCampaignDefaults,
   buildVehicleOfferDefaults,
 } from './campaign-block-defaults';
+import {
+  heroVehicleOfferDefaultContent,
+  heroVehicleOfferDefaultDesign,
+} from '@/features/builder/blocks/hero-vehicle-offer';
 
 export const BUILDER_NEUTRAL_DEFAULT_PROPS: Record<string, Record<string, unknown>> = {
   hero_campaign: buildHeroCampaignDefaults('promo_image_right'),
   hero_form_campaign: buildHeroFormCampaignDefaults('sav_light_form'),
+  hero_vehicle_offer: {
+    ...heroVehicleOfferDefaultContent,
+    design: { ...heroVehicleOfferDefaultDesign },
+  },
   vehicle_offer: buildVehicleOfferDefaults('image_right_offer_left'),
   hero: {
     eyebrow: '',

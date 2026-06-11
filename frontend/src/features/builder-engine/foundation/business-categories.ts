@@ -50,6 +50,7 @@ export const BLOCK_BUSINESS_CATEGORY: Record<string, BuilderBusinessCategoryId> 
   promo_autohall: 'acquisition',
   hero_campaign: 'acquisition',
   hero_form_campaign: 'acquisition',
+  hero_vehicle_offer: 'acquisition',
   lead_form: 'acquisition',
   cta_band: 'acquisition',
   final_cta: 'acquisition',

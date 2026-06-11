@@ -58,6 +58,7 @@ describe('neutral-default-props', () => {
         'hero',
         'hero_campaign',
         'hero_form_campaign',
+        'hero_vehicle_offer',
         'image',
         'lead_form',
         'offer_highlights',

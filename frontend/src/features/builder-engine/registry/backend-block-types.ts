@@ -11,6 +11,7 @@ export const BACKEND_SUPPORTED_BLOCK_TYPES = new Set([
   'pricing_trim',
   'hero_campaign',
   'hero_form_campaign',
+  'hero_vehicle_offer',
   'vehicle_offer',
   'hero',
   'lead_form',

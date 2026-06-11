@@ -2351,3 +2351,246 @@
   border-radius: var(--lp-radius-lg);
 }
 
+/* Hero offre véhicule — premium brand-aware */
+.lp-hero-vehicle-offer {
+  position: relative;
+  width: 100%;
+  padding-block: var(--lp-section-y);
+  background: var(--lp-brand-bg, var(--lp-bg));
+  color: var(--lp-brand-text, var(--lp-text));
+  overflow: hidden;
+}
+.lp-hero-vehicle-offer__inner {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.75rem);
+  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  max-width: var(--lp-container-max, 72rem);
+  margin-inline: auto;
+  padding-inline: var(--lp-gutter, 1.25rem);
+}
+.lp-hero-vehicle-offer--layout-split-media-right .lp-hero-vehicle-offer__inner,
+.lp-hero-vehicle-offer--layout-split-media-left .lp-hero-vehicle-offer__inner {
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 900px) {
+  .lp-hero-vehicle-offer--layout-split-media-right .lp-hero-vehicle-offer__inner,
+  .lp-hero-vehicle-offer--layout-split-media-left .lp-hero-vehicle-offer__inner {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  }
+}
+.lp-hero-vehicle-offer--layout-stacked-mobile .lp-hero-vehicle-offer__inner {
+  grid-template-columns: minmax(0, 1fr);
+}
+.lp-hero-vehicle-offer--layout-full-bleed-overlay .lp-hero-vehicle-offer__inner,
+.lp-hero-vehicle-offer--position-background .lp-hero-vehicle-offer__inner {
+  position: relative;
+  z-index: 2;
+  min-height: clamp(22rem, 55vh, 36rem);
+  align-content: center;
+}
+.lp-hero-vehicle-offer--layout-full-bleed-overlay > .lp-hero-vehicle-offer__media,
+.lp-hero-vehicle-offer--position-background > .lp-hero-vehicle-offer__media {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 0;
+  min-height: 100%;
+}
+.lp-hero-vehicle-offer__content {
+  min-width: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.lp-hero-vehicle-offer--align-center .lp-hero-vehicle-offer__content {
+  text-align: center;
+  justify-items: center;
+}
+.lp-hero-vehicle-offer--align-left .lp-hero-vehicle-offer__content {
+  text-align: left;
+}
+.lp-hero-vehicle-offer__brand {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lp-brand-primary, var(--lp-primary));
+}
+.lp-hero-vehicle-offer__model {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--lp-brand-text, var(--lp-text)) 75%, transparent);
+}
+.lp-hero-vehicle-offer__badge {
+  display: inline-flex;
+  align-self: start;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: color-mix(in srgb, var(--lp-brand-primary, var(--lp-primary)) 14%, transparent);
+  color: var(--lp-brand-primary, var(--lp-primary));
+}
+.lp-hero-vehicle-offer--align-center .lp-hero-vehicle-offer__badge {
+  align-self: center;
+}
+.lp-hero-vehicle-offer__headline {
+  margin: 0;
+  font-size: clamp(1.875rem, 4.5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--lp-brand-text, var(--lp-text));
+}
+.lp-hero-vehicle-offer__subheadline {
+  margin: 0;
+  font-size: clamp(1rem, 2vw, 1.125rem);
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--lp-brand-text, var(--lp-text)) 82%, transparent);
+  max-width: 42ch;
+}
+.lp-hero-vehicle-offer--align-center .lp-hero-vehicle-offer__subheadline {
+  margin-inline: auto;
+}
+.lp-hero-vehicle-offer__price {
+  margin: 0.25rem 0 0;
+  font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+  font-weight: 700;
+  color: var(--lp-brand-primary, var(--lp-primary));
+}
+.lp-hero-vehicle-offer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+.lp-hero-vehicle-offer__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 999px;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  text-decoration: none;
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.lp-hero-vehicle-offer__cta--primary.lp-hero-vehicle-offer__cta--primary {
+  background: var(--lp-brand-primary, var(--lp-primary));
+  color: #fff;
+  border: 1px solid transparent;
+}
+.lp-hero-vehicle-offer__cta--primary.lp-hero-vehicle-offer__cta--outline {
+  background: transparent;
+  color: var(--lp-brand-primary, var(--lp-primary));
+  border: 1px solid color-mix(in srgb, var(--lp-brand-primary, var(--lp-primary)) 65%, transparent);
+}
+.lp-hero-vehicle-offer__cta--primary.lp-hero-vehicle-offer__cta--ghost {
+  background: transparent;
+  color: var(--lp-brand-primary, var(--lp-primary));
+  border: 1px solid transparent;
+}
+.lp-hero-vehicle-offer__cta--secondary.lp-hero-vehicle-offer__cta--outline,
+.lp-hero-vehicle-offer__cta--secondary.lp-hero-vehicle-offer__cta--ghost {
+  background: transparent;
+  color: var(--lp-brand-text, var(--lp-text));
+  border: 1px solid color-mix(in srgb, var(--lp-brand-text, var(--lp-text)) 25%, transparent);
+}
+.lp-hero-vehicle-offer__media {
+  position: relative;
+  border-radius: var(--lp-radius-lg);
+  overflow: hidden;
+  min-height: clamp(14rem, 32vw, 22rem);
+  background: color-mix(in srgb, var(--lp-brand-secondary, var(--lp-text)) 6%, var(--lp-brand-bg, var(--lp-bg)));
+}
+.lp-hero-vehicle-offer__img-desktop,
+.lp-hero-vehicle-offer__img-mobile {
+  width: 100%;
+  height: 100%;
+}
+.lp-hero-vehicle-offer__img-mobile {
+  display: none;
+}
+@media (max-width: 767px) {
+  .lp-hero-vehicle-offer__img-mobile {
+    display: block;
+  }
+  .lp-hero-vehicle-offer__img-desktop:has(+ .lp-hero-vehicle-offer__img-mobile) {
+    display: none;
+  }
+}
+.lp-hero-vehicle-offer__img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  min-height: inherit;
+  object-fit: cover;
+}
+.lp-hero-vehicle-offer--fit-contain .lp-hero-vehicle-offer__img {
+  object-fit: contain;
+}
+.lp-hero-vehicle-offer--fit-cover .lp-hero-vehicle-offer__img {
+  object-fit: cover;
+}
+.lp-hero-vehicle-offer--focal-center .lp-hero-vehicle-offer__img { object-position: 50% 50%; }
+.lp-hero-vehicle-offer--focal-left .lp-hero-vehicle-offer__img { object-position: 20% 50%; }
+.lp-hero-vehicle-offer--focal-right .lp-hero-vehicle-offer__img { object-position: 80% 50%; }
+.lp-hero-vehicle-offer--focal-top .lp-hero-vehicle-offer__img { object-position: 50% 20%; }
+.lp-hero-vehicle-offer--focal-bottom .lp-hero-vehicle-offer__img { object-position: 50% 80%; }
+.lp-hero-vehicle-offer__overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--lp-brand-secondary, #000) 10%, transparent) 0%,
+    color-mix(in srgb, var(--lp-brand-secondary, #000) 55%, transparent) 100%
+  );
+}
+.lp-hero-vehicle-offer--overlay-none .lp-hero-vehicle-offer__overlay { opacity: 0; }
+.lp-hero-vehicle-offer--overlay-light .lp-hero-vehicle-offer__overlay { opacity: 0.25; }
+.lp-hero-vehicle-offer--overlay-medium .lp-hero-vehicle-offer__overlay { opacity: 0.45; }
+.lp-hero-vehicle-offer--overlay-heavy .lp-hero-vehicle-offer__overlay { opacity: 0.65; }
+.lp-hero-vehicle-offer__media--placeholder {
+  width: 100%;
+  min-height: inherit;
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--lp-brand-bg, var(--lp-surface-muted)) 80%, var(--lp-brand-primary, var(--lp-primary)) 20%),
+    var(--lp-brand-bg, var(--lp-surface-muted))
+  );
+  border: 1px dashed color-mix(in srgb, var(--lp-brand-primary, var(--lp-border)) 35%, transparent);
+}
+.lp-hero-vehicle-offer--tone-light {
+  background: var(--lp-brand-bg, #fff);
+  color: var(--lp-brand-text, var(--lp-text));
+}
+.lp-hero-vehicle-offer--tone-dark {
+  background: color-mix(in srgb, var(--lp-brand-secondary, #111) 92%, #000);
+  color: var(--lp-brand-text, #fafafa);
+}
+.lp-hero-vehicle-offer--tone-brand {
+  background: color-mix(in srgb, var(--lp-brand-primary, var(--lp-primary)) 8%, var(--lp-brand-bg, var(--lp-bg)));
+}
+.lp-hero-vehicle-offer--density-compact {
+  padding-block: calc(var(--lp-section-y) * 0.65);
+}
+.lp-hero-vehicle-offer--density-immersive {
+  padding-block: calc(var(--lp-section-y) * 1.35);
+}
+.lp-hero-vehicle-offer--layout-full-bleed-overlay.lp-hero-vehicle-offer--tone-dark .lp-hero-vehicle-offer__headline,
+.lp-hero-vehicle-offer--layout-full-bleed-overlay.lp-hero-vehicle-offer--tone-dark .lp-hero-vehicle-offer__subheadline,
+.lp-hero-vehicle-offer--position-background.lp-hero-vehicle-offer--overlay-medium .lp-hero-vehicle-offer__headline,
+.lp-hero-vehicle-offer--position-background.lp-hero-vehicle-offer--overlay-heavy .lp-hero-vehicle-offer__headline {
+  color: #fff;
+}
+.lp-hero-vehicle-offer--layout-full-bleed-overlay.lp-hero-vehicle-offer--tone-dark .lp-hero-vehicle-offer__subheadline,
+.lp-hero-vehicle-offer--position-background.lp-hero-vehicle-offer--overlay-medium .lp-hero-vehicle-offer__subheadline {
+  color: color-mix(in srgb, #fff 85%, transparent);
+}
+

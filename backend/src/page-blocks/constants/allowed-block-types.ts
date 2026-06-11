@@ -2,6 +2,7 @@ export const ALLOWED_BLOCK_TYPES = [
   'promo_autohall',
   'hero_campaign',
   'hero_form_campaign',
+  'hero_vehicle_offer',
   'vehicle_offer',
   'vehicle_features',
   'vehicle_range',

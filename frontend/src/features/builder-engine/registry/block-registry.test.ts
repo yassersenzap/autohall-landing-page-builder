@@ -8,6 +8,7 @@ import {
 
 /** Types stables exposés via getActivePaletteBlocks (store.addBlock). */
 const DELIVERABLE_TYPES = [
+  'hero_vehicle_offer',
   'promo_autohall',
   'vehicle_features',
   'gallery',

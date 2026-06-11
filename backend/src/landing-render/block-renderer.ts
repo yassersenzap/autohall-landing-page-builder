@@ -14,6 +14,7 @@ import {
   renderLeadFormRequiredNoteHtml,
 } from './lead-form-fields.render';
 import { renderHeroFormCampaignHtml } from './hero-form-campaign.render';
+import { renderHeroVehicleOfferHtml } from './hero-vehicle-offer.render';
 import { renderPromoAutohallHtml } from './promo-autohall.render';
 import {
   buildBlockDesignClasses,
@@ -900,6 +901,10 @@ export function renderBlockHtml(
 
   if (type === 'hero_form_campaign') {
     return renderHeroFormCampaignHtml(props, context);
+  }
+
+  if (type === 'hero_vehicle_offer') {
+    return renderHeroVehicleOfferHtml(props, context);
   }
 
   if (type === 'promo_autohall') {

@@ -8,6 +8,7 @@ export const COMPLETE_SECTION_BLOCK_TYPES = new Set([
   'promo_autohall',
   'hero_campaign',
   'hero_form_campaign',
+  'hero_vehicle_offer',
   'vehicle_offer',
   'vehicle_features',
   'vehicle_range',

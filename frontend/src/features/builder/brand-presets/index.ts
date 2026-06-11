@@ -11,6 +11,17 @@ export type {
 } from './brand-preset.types';
 export { BRAND_PRESET_REQUIRED_TOKEN_KEYS } from './brand-preset.types';
 export {
+  buildBrandCssVarMap,
+  buildBrandCssVarString,
+  brandCssVarMapToStyle,
+} from './brand-css-vars';
+export type { BrandCssVarMap } from './brand-css-vars';
+export {
+  AUTOHALL_NEUTRAL_BRAND_PRESET,
+  resolveBrandPreset,
+  resolveBrandPresetId,
+} from './resolve-brand-preset';
+export {
   BRAND_PRESETS,
   getAllBrandPresets,
   getBrandPreset,
