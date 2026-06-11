@@ -1,4 +1,9 @@
 import type { BlockDefinition } from '../../block-registry/block-definition.types';
+import {
+  DEFAULT_EXPORT_TARGET,
+  DEFAULT_FORM_PROVIDER_TYPE,
+  DEFAULT_SYMFONY_INCLUDE_KEY,
+} from '../../export-contracts';
 import type { CampaignLeadHeroContent, CampaignLeadHeroDesign } from './campaign-lead-hero.types';
 import { CAMPAIGN_LEAD_HERO_TYPE } from './campaign-lead-hero.types';
 
@@ -27,6 +32,11 @@ export const campaignLeadHeroDefaultContent: CampaignLeadHeroContent = {
   formCtaLabel: 'Continuer',
   legalText: 'En soumettant ce formulaire, vous acceptez d’être contacté par Auto Hall.',
   footerText: 'Photos non contractuelles. Offre sous réserve de disponibilité.',
+  formProviderType: DEFAULT_FORM_PROVIDER_TYPE,
+  exportTarget: DEFAULT_EXPORT_TARGET,
+  formProviderPreviewMode: 'static_shell',
+  formExternalIframeSrc: '',
+  symfonyFormIncludeKey: DEFAULT_SYMFONY_INCLUDE_KEY,
 };
 
 export const campaignLeadHeroDefaultDesign: CampaignLeadHeroDesign = {

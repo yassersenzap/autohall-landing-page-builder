@@ -10,6 +10,7 @@ import {
   shouldRenderCampaignBeside,
   shouldRenderCampaignOverlay,
 } from '@/features/builder/blocks/campaign-lead-hero';
+import { SYMFONY_FORM_PREVIEW_NOTE } from '@/features/builder/export-contracts';
 import { HeroBlockImage } from '@/features/builder-engine/components/media/HeroBlockImage';
 import { CanvasEmptyHint } from './CanvasEmptyHint';
 
@@ -28,6 +29,36 @@ function MediaPlaceholder({ alt, label }: { alt: string; label: string }) {
   );
 }
 
+function FormProviderPreviewNote({
+  props,
+}: {
+  props: ReturnType<typeof parseCampaignLeadHeroProps>;
+}) {
+  if (props.formProviderType === 'autohall_symfony_testdrive') {
+    return (
+      <p
+        className="lp-campaign-lead-hero__provider-note"
+        data-testid="campaign-lead-symfony-form-note"
+      >
+        {SYMFONY_FORM_PREVIEW_NOTE}
+      </p>
+    );
+  }
+
+  if (props.formProviderType === 'external_iframe') {
+    return (
+      <p className="lp-campaign-lead-hero__provider-note" data-testid="campaign-lead-iframe-form-note">
+        Formulaire externe (iframe) — aperçu shell uniquement.
+        {props.formExternalIframeSrc
+          ? ` Source : ${props.formExternalIframeSrc}`
+          : ' Indiquez l’URL dans l’inspecteur.'}
+      </p>
+    );
+  }
+
+  return null;
+}
+
 function CampaignLeadFormShell({
   props,
 }: {
@@ -36,6 +67,7 @@ function CampaignLeadFormShell({
   return (
     <aside className="lp-campaign-lead-hero__form" id="lead-form">
       <div className="lp-campaign-lead-hero__form-card">
+        <FormProviderPreviewNote props={props} />
         {props.design.showProgressBar ? (
           <div className="lp-campaign-lead-hero__progress" aria-hidden="true">
             <div className="lp-campaign-lead-hero__progress-track">

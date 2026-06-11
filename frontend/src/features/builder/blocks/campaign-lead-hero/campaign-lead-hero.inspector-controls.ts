@@ -1,6 +1,15 @@
 import type { InspectorControl } from '../../block-registry/inspector-control.types';
+import {
+  getExportTargetOptions,
+  getFormProviderOptions,
+  getSymfonyIncludeKeyOptions,
+} from '../../export-contracts';
 import { HERO_CROP_PRESETS } from '../hero-vehicle-offer/hero-image-controls';
 import { CAMPAIGN_LEAD_HERO_TYPE } from './campaign-lead-hero.types';
+
+const FORM_PROVIDER_OPTIONS = getFormProviderOptions();
+const EXPORT_TARGET_OPTIONS = getExportTargetOptions();
+const SYMFONY_INCLUDE_OPTIONS = getSymfonyIncludeKeyOptions();
 
 const CROP_OPTIONS = HERO_CROP_PRESETS.map((value) => ({
   value,
@@ -308,6 +317,53 @@ export const campaignLeadHeroInspectorControls: InspectorControl[] = [
     ],
   },
   {
+    key: 'clh-form-provider',
+    propKey: 'formProviderType',
+    type: 'select',
+    label: 'Fournisseur formulaire',
+    tab: 'advanced',
+    group: 'Formulaire & export',
+    defaultValue: 'builder_lead_api',
+    options: FORM_PROVIDER_OPTIONS,
+    description:
+      'Prépare l’export — le Studio affiche un shell statique, sans capture lead réelle.',
+  },
+  {
+    key: 'clh-export-target',
+    propKey: 'exportTarget',
+    type: 'select',
+    label: 'Cible d’export',
+    tab: 'advanced',
+    group: 'Formulaire & export',
+    defaultValue: 'static_html',
+    options: EXPORT_TARGET_OPTIONS,
+    description: 'Format de publication visé — génération Twig non active dans cette version.',
+  },
+  {
+    key: 'clh-symfony-include',
+    propKey: 'symfonyFormIncludeKey',
+    type: 'select',
+    label: 'Clé include TestDrive Symfony',
+    tab: 'advanced',
+    group: 'Formulaire & export',
+    defaultValue: 'testdrive_campaign',
+    options: SYMFONY_INCLUDE_OPTIONS,
+    visibleWhen: { prop: 'formProviderType', equals: 'autohall_symfony_testdrive' },
+    description:
+      'Référence contrôlée vers le partial Symfony — pas de chemin Twig libre.',
+  },
+  {
+    key: 'clh-external-iframe',
+    propKey: 'formExternalIframeSrc',
+    type: 'text',
+    label: 'URL iframe externe',
+    tab: 'advanced',
+    group: 'Formulaire & export',
+    placeholder: 'https://formulaires.exemple-auto.ma/embed/campagne',
+    visibleWhen: { prop: 'formProviderType', equals: 'external_iframe' },
+    description: 'URL HTTPS du formulaire hébergé — utilisée à l’export, pas exécutée dans le Studio.',
+  },
+  {
     key: 'clh-legal',
     propKey: 'legalText',
     type: 'textarea',
@@ -322,8 +378,7 @@ export const campaignLeadHeroInspectorControls: InspectorControl[] = [
     label: 'Pied de formulaire',
     tab: 'advanced',
     group: 'Conformité',
-    description:
-      'Aperçu formulaire statique — l’intégration provider lead arrive au prochain commit.',
+    description: 'Texte affiché sous le shell formulaire dans l’aperçu Studio.',
   },
 ];
 

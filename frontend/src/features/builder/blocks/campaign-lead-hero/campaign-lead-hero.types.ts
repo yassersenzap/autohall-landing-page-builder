@@ -1,4 +1,10 @@
 import type { BrandPresetId } from '../../brand-presets';
+import type {
+  AutohallSymfonyIncludeKey,
+  ExportTargetType,
+  FormProviderPreviewMode,
+  FormProviderType,
+} from '../../export-contracts';
 import type { HeroCropPreset } from '../hero-vehicle-offer/hero-image-controls';
 
 export type CampaignLeadHeroLayoutVariant =
@@ -40,6 +46,14 @@ export type CampaignLeadHeroContent = {
   formCtaLabel: string;
   legalText: string;
   footerText: string;
+  /** Export / runtime form integration — Studio preview stays a static shell. */
+  formProviderType: FormProviderType;
+  exportTarget: ExportTargetType;
+  formProviderPreviewMode: FormProviderPreviewMode;
+  /** HTTPS URL for external_iframe provider only. */
+  formExternalIframeSrc: string;
+  /** Whitelisted Symfony TestDrive include key — never a raw Twig path. */
+  symfonyFormIncludeKey: AutohallSymfonyIncludeKey;
 };
 
 export type CampaignLeadHeroDesign = {

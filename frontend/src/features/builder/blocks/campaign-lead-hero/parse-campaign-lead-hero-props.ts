@@ -1,4 +1,5 @@
 import { asPropString } from '@/features/builder-engine/lib/block-props';
+import { parseCampaignLeadHeroFormIntegration } from '../../export-contracts';
 import {
   buildHeroFocalStyleVars,
   resolveHeroFocalPoint,
@@ -97,6 +98,7 @@ export function parseCampaignLeadHeroProps(
     layoutVariant,
     propsJson.contentPlacement,
   );
+  const formIntegration = parseCampaignLeadHeroFormIntegration(propsJson);
 
   return {
     brandId: (asPropString(propsJson.brandId) as CampaignLeadHeroContent['brandId']) ||
@@ -149,6 +151,7 @@ export function parseCampaignLeadHeroProps(
     formCtaLabel: asPropString(propsJson.formCtaLabel) || campaignLeadHeroDefaultContent.formCtaLabel,
     legalText: asPropString(propsJson.legalText) || campaignLeadHeroDefaultContent.legalText,
     footerText: asPropString(propsJson.footerText) || campaignLeadHeroDefaultContent.footerText,
+    ...formIntegration,
     design,
     resolvedFocalX: focal.x,
     resolvedFocalY: focal.y,
