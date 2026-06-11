@@ -1,5 +1,7 @@
 import type { BrandPresetId } from '@/features/builder/brand-presets';
 
+import type { BlockVariantRef } from '@/features/builder/block-variants';
+
 /** Block entry inside a campaign page template — merged onto neutral defaults at apply time. */
 export type CampaignTemplateBlockSpec = {
   type: string;
@@ -7,6 +9,8 @@ export type CampaignTemplateBlockSpec = {
   label?: string;
   /** Partial props merged onto getDefaultBlockProps(type) */
   props?: Record<string, unknown>;
+  /** Optional preset variant — applied after props merge when template apply supports it. */
+  variant?: BlockVariantRef;
 };
 
 export type CampaignPageTemplateCategory =

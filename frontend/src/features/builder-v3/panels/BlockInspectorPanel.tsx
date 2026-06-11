@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowDown, ArrowUp, Trash2 } from 'lucide-react';
 import { asPropString } from '@/features/builder-engine/lib/block-props';
 import { getRegistryEntry } from '@/features/builder-engine/registry/block-registry';
@@ -29,6 +29,7 @@ import {
 import { BlockDesignInspectorFields } from './BlockDesignInspectorFields';
 import { hasDefinitionDrivenInspector } from '@/features/builder/block-registry/inspector-controls-registry';
 import { DefinitionDrivenBlockInspector } from './inspector/DefinitionDrivenBlockInspector';
+import { BlockVariantPicker } from './inspector/BlockVariantPicker';
 import { INSPECTOR_DESIGN_BLOCKS } from '@/features/builder-engine/lib/block-design-system';
 import { SECTION_PADDING_OPTIONS } from '../constants/block-layout';
 import {
@@ -144,6 +145,17 @@ export function BlockInspectorPanel({
   const anchorId = asPropString(block.propsJson.anchorId);
 
   const patch = (p: Record<string, unknown>) => updateBlockProps(block.id, p);
+
+  useEffect(() => {
+    function handleFocusVariants(event: Event) {
+      const detail = (event as CustomEvent<{ blockId?: string }>).detail;
+      if (detail?.blockId && detail.blockId !== block.id) return;
+      setTab('design');
+    }
+
+    window.addEventListener('studio:focus-variants', handleFocusVariants);
+    return () => window.removeEventListener('studio:focus-variants', handleFocusVariants);
+  }, [block.id]);
 
   return (
     <div className="flex h-full min-h-0 flex-col" data-testid="block-inspector-panel">
@@ -679,6 +691,8 @@ export function BlockInspectorPanel({
 
             {tab === 'design' && (
               <div className="space-y-4">
+                <BlockVariantPicker block={block} />
+
                 {usesDefinitionInspector && (
                   <DefinitionDrivenBlockInspector block={block} tab="design" onPatch={patch} />
                 )}

@@ -14,6 +14,10 @@ import {
   selectFirstMeaningfulBlockId,
 } from '../foundation/apply-campaign-template';
 import { getCampaignPageTemplateById } from '../foundation/campaign-page-templates';
+import {
+  applyBlockVariantSafely,
+  mergeVariantPatchIntoProps,
+} from '@/features/builder/block-variants';
 
 const PERSIST_STORAGE_PREFIX = 'autohall-builder-storage:';
 const LEGACY_STORAGE_PREFIX = 'autohall-builder-v3:';
@@ -142,6 +146,7 @@ type BuilderDocumentState = {
   moveBlockUp: (blockId: string) => void;
   moveBlockDown: (blockId: string) => void;
   updateBlockProps: (blockId: string, patch: Record<string, unknown>) => void;
+  applyBlockVariant: (blockId: string, variantId: string) => boolean;
   setInitialBlocks: (blocks: BuilderDocumentBlock[]) => void;
   setDeviceMode: (mode: BuilderDeviceMode) => void;
   setPageTheme: (patch: Partial<PageThemeDraft>) => void;
@@ -361,6 +366,29 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
 
         if (!changed) return;
         set({ blocks });
+      },
+
+      applyBlockVariant: (blockId, variantId) => {
+        const block = findBlockById(get().blocks, blockId);
+        if (!block) return false;
+
+        const patch = applyBlockVariantSafely(block.type, block.propsJson, variantId);
+        if (!patch) return false;
+
+        const blocks = get().blocks.map((item) => {
+          if (item.id !== blockId) return item;
+          return {
+            ...item,
+            propsJson: mergeVariantPatchIntoProps(item.propsJson, patch),
+          };
+        });
+
+        set({
+          blocks,
+          themeDirty: true,
+          documentRevision: get().documentRevision + 1,
+        });
+        return true;
       },
 
       setInitialBlocks: (blocks) => {

@@ -5,8 +5,10 @@ import {
   Copy,
   PanelRight,
   Plus,
+  Sparkles,
   Trash2,
 } from 'lucide-react';
+import { hasBlockVariants } from '@/features/builder/block-variants';
 import { getCatalogItem } from '@/features/builder-engine/foundation/builder-catalog';
 import { getRegistryEntry } from '@/features/builder-engine/registry/block-registry';
 import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
@@ -21,6 +23,13 @@ type CanvasBlockToolbarProps = {
 
 function focusInspector() {
   window.dispatchEvent(new CustomEvent('studio:focus-inspector'));
+}
+
+function focusVariants(blockId: string) {
+  window.dispatchEvent(new CustomEvent('studio:focus-inspector'));
+  window.dispatchEvent(
+    new CustomEvent('studio:focus-variants', { detail: { blockId } }),
+  );
 }
 
 export function CanvasBlockToolbar({
@@ -105,6 +114,17 @@ export function CanvasBlockToolbar({
         >
           <PanelRight className="h-3.5 w-3.5" aria-hidden />
         </button>
+        {hasBlockVariants(block.type) ? (
+          <button
+            type="button"
+            className="v3-block-toolbar__btn"
+            onClick={() => focusVariants(block.id)}
+            aria-label="Styles rapides"
+            data-testid="canvas-toolbar-focus-variants"
+          >
+            <Sparkles className="h-3.5 w-3.5" aria-hidden />
+          </button>
+        ) : null}
         <button
           type="button"
           className="v3-block-toolbar__btn v3-block-toolbar__btn--insert"
