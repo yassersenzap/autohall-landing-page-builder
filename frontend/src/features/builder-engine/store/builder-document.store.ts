@@ -9,6 +9,11 @@ import type { BuilderDeviceMode } from '../lib/block-design-props';
 import { sanitizePropsPatch } from '../lib/sanitize-props-patch';
 import type { BuilderDocumentBlock } from '../types';
 import { findBlockById, sanitizeBlockSelection } from './block-selection';
+import {
+  materializeCampaignTemplate,
+  selectFirstMeaningfulBlockId,
+} from '../foundation/apply-campaign-template';
+import { getCampaignPageTemplateById } from '../foundation/campaign-page-templates';
 
 const PERSIST_STORAGE_PREFIX = 'autohall-builder-storage:';
 const LEGACY_STORAGE_PREFIX = 'autohall-builder-v3:';
@@ -156,6 +161,7 @@ type BuilderDocumentState = {
   markDocumentSaved: () => void;
   buildThemeJsonPayload: () => Record<string, unknown>;
   applyPageStarter: (blockTypes: string[], mode?: 'replace' | 'append') => void;
+  applyCampaignTemplate: (templateId: string) => void;
   resetDocument: () => void;
 };
 
@@ -481,6 +487,20 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
         set({
           blocks: normalizeSortOrder(blocks),
           selectedBlockId: starterBlocks[0]?.id ?? null,
+        });
+      },
+
+      applyCampaignTemplate: (templateId) => {
+        const template = getCampaignPageTemplateById(templateId);
+        if (!template) return;
+
+        const blocks = materializeCampaignTemplate(template);
+        if (blocks.length === 0) return;
+
+        set({
+          blocks: normalizeSortOrder(blocks),
+          selectedBlockId: selectFirstMeaningfulBlockId(blocks),
+          hoveredBlockId: null,
         });
       },
 

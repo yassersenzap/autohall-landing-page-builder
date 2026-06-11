@@ -1,40 +1,21 @@
-import { LayoutTemplate, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import { AlertTriangle, LayoutTemplate, Sparkles, Wand2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import {
   CATALOG_TIER_META,
 } from '@/features/builder-engine/foundation/catalog-tiers';
 import {
+  getCampaignPageTemplates,
+  getCampaignPageTemplateById,
+} from '@/features/builder-engine/foundation/campaign-page-templates';
+import type { CampaignPageTemplate } from '@/features/builder-engine/foundation/campaign-page-templates.types';
+import {
   getFullPageStarters,
   getSectionStarters,
 } from '@/features/builder-engine/foundation/page-starters';
 import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
-import { ScrollArea, Separator } from '@/components/ui/primitives';
-
-function StarterCard({
-  label,
-  description,
-  icon: Icon,
-  onClick,
-}: {
-  label: string;
-  description: string;
-  icon: LucideIcon;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-full rounded-lg border border-neutral-800 bg-neutral-900/80 p-3 text-left transition hover:border-blue-500/40 hover:bg-neutral-900"
-    >
-      <div className="mb-1 flex items-center gap-2">
-        <Icon className="h-3.5 w-3.5 text-blue-400" aria-hidden />
-        <span className="text-sm font-medium text-neutral-200">{label}</span>
-      </div>
-      <p className="text-xs text-neutral-500">{description}</p>
-    </button>
-  );
-}
+import { ScrollArea, Separator, ShadButton } from '@/components/ui/primitives';
+import { cn } from '@/lib/utils';
 
 function TierHeader({ title, description }: { title: string; description: string }) {
   return (
@@ -47,12 +28,170 @@ function TierHeader({ title, description }: { title: string; description: string
   );
 }
 
+function StarterCard({
+  label,
+  description,
+  icon: Icon,
+  onClick,
+  actionLabel,
+}: {
+  label: string;
+  description: string;
+  icon: LucideIcon;
+  onClick: () => void;
+  actionLabel?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-full rounded-lg border border-neutral-800 bg-neutral-900/80 p-3 text-left transition hover:border-blue-500/40 hover:bg-neutral-900"
+    >
+      <div className="mb-1 flex items-center gap-2">
+        <Icon className="h-3.5 w-3.5 text-blue-400" aria-hidden />
+        <span className="text-sm font-medium text-neutral-200">{label}</span>
+      </div>
+      <p className="text-xs text-neutral-500">{description}</p>
+      {actionLabel ? (
+        <p className="mt-2 text-[0.6875rem] font-medium text-blue-400/90">{actionLabel}</p>
+      ) : null}
+    </button>
+  );
+}
+
+function brandBadgeLabel(brandId: CampaignPageTemplate['brandId']): string {
+  if (brandId === 'autohall') return 'Auto Hall';
+  return brandId.charAt(0).toUpperCase() + brandId.slice(1).replace('_', ' ');
+}
+
+function CampaignTemplateCard({
+  template,
+  onUse,
+}: {
+  template: CampaignPageTemplate;
+  onUse: () => void;
+}) {
+  return (
+    <article
+      className="overflow-hidden rounded-xl border border-neutral-800/90 bg-neutral-950/60 shadow-sm"
+      data-testid={`campaign-template-card-${template.id}`}
+    >
+      <div className="flex items-start gap-3 border-b border-neutral-800/80 p-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-neutral-800 bg-neutral-900 text-[0.625rem] font-semibold uppercase tracking-wide text-neutral-400">
+          {template.previewLabel.split('·')[0]?.trim().slice(0, 3) ?? 'LP'}
+        </div>
+        <div className="min-w-0 flex-1 space-y-1">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <h4 className="text-sm font-medium text-neutral-100">{template.name}</h4>
+            <span className="rounded-full bg-neutral-800 px-2 py-0.5 text-[0.625rem] text-neutral-400">
+              {brandBadgeLabel(template.brandId)}
+            </span>
+          </div>
+          <p className="text-xs leading-relaxed text-neutral-500">{template.description}</p>
+          <p className="text-[0.6875rem] text-neutral-600">{template.recommendedUse}</p>
+        </div>
+      </div>
+      <div className="flex items-center justify-between gap-2 px-3 py-2.5">
+        <span className="text-[0.625rem] text-neutral-600">
+          {template.blocks.length} blocs · {template.previewLabel}
+        </span>
+        <ShadButton
+          type="button"
+          size="sm"
+          className="h-7 shrink-0 px-2.5 text-xs"
+          onClick={onUse}
+          data-testid={`campaign-template-use-${template.id}`}
+        >
+          Utiliser ce template
+        </ShadButton>
+      </div>
+    </article>
+  );
+}
+
 export function TemplatesPanel() {
   const applyPageStarter = useBuilderDocumentStore((s) => s.applyPageStarter);
+  const applyCampaignTemplate = useBuilderDocumentStore((s) => s.applyCampaignTemplate);
+  const blocks = useBuilderDocumentStore((s) => s.blocks);
+  const [pendingTemplateId, setPendingTemplateId] = useState<string | null>(null);
+
+  const pendingTemplate = pendingTemplateId
+    ? getCampaignPageTemplateById(pendingTemplateId)
+    : undefined;
+
+  function requestCampaignTemplate(templateId: string) {
+    if (blocks.length > 0) {
+      setPendingTemplateId(templateId);
+      return;
+    }
+    applyCampaignTemplate(templateId);
+  }
+
+  function confirmReplaceTemplate() {
+    if (!pendingTemplateId) return;
+    applyCampaignTemplate(pendingTemplateId);
+    setPendingTemplateId(null);
+  }
 
   return (
     <ScrollArea className="h-full min-h-0" data-testid="studio-templates-panel">
       <div className="space-y-4 p-3 pb-6">
+        {pendingTemplate ? (
+          <div
+            className="space-y-3 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3"
+            data-testid="campaign-template-replace-warning"
+          >
+            <div className="flex gap-2">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" aria-hidden />
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-amber-100">Remplacer le contenu actuel ?</p>
+                <p className="text-xs leading-relaxed text-amber-200/80">
+                  Le template « {pendingTemplate.name} » remplacera les {blocks.length} bloc
+                  {blocks.length > 1 ? 's' : ''} du canevas. Cette action est réversible via
+                  l’historique local tant que vous n’avez pas sauvegardé.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <ShadButton
+                type="button"
+                size="sm"
+                className="h-8 flex-1 text-xs"
+                onClick={confirmReplaceTemplate}
+                data-testid="campaign-template-confirm-replace"
+              >
+                Remplacer et appliquer
+              </ShadButton>
+              <ShadButton
+                type="button"
+                size="sm"
+                variant="secondary"
+                className={cn('h-8 flex-1 text-xs border-neutral-700')}
+                onClick={() => setPendingTemplateId(null)}
+                data-testid="campaign-template-cancel-replace"
+              >
+                Annuler
+              </ShadButton>
+            </div>
+          </div>
+        ) : null}
+
+        <div className="space-y-2.5">
+          <TierHeader
+            title={CATALOG_TIER_META.campaignTemplates.title}
+            description={CATALOG_TIER_META.campaignTemplates.description}
+          />
+          {getCampaignPageTemplates().map((template) => (
+            <CampaignTemplateCard
+              key={template.id}
+              template={template}
+              onUse={() => requestCampaignTemplate(template.id)}
+            />
+          ))}
+        </div>
+
+        <Separator className="bg-neutral-800" />
+
         <div className="space-y-2">
           <TierHeader
             title={CATALOG_TIER_META.starters.title}
@@ -82,10 +221,21 @@ export function TemplatesPanel() {
               label={section.label}
               description={section.description}
               icon={Sparkles}
+              actionLabel="Ajouter au canevas"
               onClick={() => applyPageStarter(section.blockTypes, 'append')}
             />
           ))}
         </div>
+
+        {blocks.length === 0 ? (
+          <p
+            className="flex items-center gap-1.5 rounded-lg border border-dashed border-neutral-800 px-3 py-2 text-xs text-neutral-500"
+            data-testid="templates-empty-page-hint"
+          >
+            <Wand2 className="h-3.5 w-3.5 shrink-0" aria-hidden />
+            Page vide — choisissez un template premium pour démarrer rapidement.
+          </p>
+        ) : null}
       </div>
     </ScrollArea>
   );

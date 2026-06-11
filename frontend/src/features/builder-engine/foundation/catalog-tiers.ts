@@ -53,6 +53,11 @@ export const CATALOG_TIER_META = {
     description:
       'Séquences pré-assemblées à ajouter sous vos sections existantes.',
   },
+  campaignTemplates: {
+    title: 'Templates campagne premium',
+    description:
+      'Pages complètes prêtes à personnaliser — marque, copy et visuels éditables.',
+  },
 } as const;
 
 export function getCompleteSectionCatalog(): CatalogBlockItem[] {
