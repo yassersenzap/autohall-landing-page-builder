@@ -139,7 +139,7 @@ describe('definition-driven inspector', () => {
     );
 
     expect(screen.getByLabelText('Ajustement image')).toBeInTheDocument();
-    expect(screen.getByText('Image hero (desktop)')).toBeInTheDocument();
+    expect(screen.getByText('Image principale (desktop)')).toBeInTheDocument();
   });
 
   it('hero_vehicle_offer uses definition-driven inspector fields', () => {

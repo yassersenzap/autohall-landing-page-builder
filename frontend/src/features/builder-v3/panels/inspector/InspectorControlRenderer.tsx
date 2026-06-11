@@ -5,7 +5,11 @@ import type { InspectorControl } from '@/features/builder/block-registry/inspect
 import { Label, ShadInput, ShadTextarea } from '@/components/ui/primitives';
 import { cn } from '@/lib/utils';
 import { FieldHint } from '../../components/BlockInspectorPanel.shared';
-import { MediaFieldControl, type MediaFieldValue } from '../../components/MediaFieldControl';
+import { MediaFieldControl } from '../../components/MediaFieldControl';
+import {
+  buildMediaValuePatch,
+  mediaValueFromKeys,
+} from '../../components/media-field-utils';
 import {
   buildControlPatch,
   groupControlsBySection,
@@ -19,36 +23,6 @@ type InspectorControlRendererProps = {
   onPatch: (patch: Record<string, unknown>) => void;
   emptyMessage?: string;
 };
-
-function mediaValueFromKeys(
-  propsJson: Record<string, unknown>,
-  assetKey: string,
-  urlKey: string,
-  altKey?: string,
-): MediaFieldValue {
-  return {
-    imageAssetId: asPropString(propsJson[assetKey]),
-    imageUrl: asPropString(propsJson[urlKey]),
-    alt: altKey ? asPropString(propsJson[altKey]) : undefined,
-  };
-}
-
-function patchMediaKeys(
-  onPatch: (patch: Record<string, unknown>) => void,
-  assetKey: string,
-  urlKey: string,
-  altKey: string | undefined,
-  next: MediaFieldValue,
-): void {
-  const patch: Record<string, unknown> = {
-    [assetKey]: next.imageAssetId ?? '',
-    [urlKey]: next.imageUrl ?? '',
-  };
-  if (altKey && next.alt !== undefined) {
-    patch[altKey] = next.alt;
-  }
-  onPatch(patch);
-}
 
 function InspectorField({
   control,
@@ -145,6 +119,7 @@ function InspectorField({
           onChange={(e) => apply(Number(e.target.value))}
           className="border-neutral-700 bg-neutral-900 text-neutral-200"
         />
+        {control.description ? <FieldHint>{control.description}</FieldHint> : null}
       </div>
     );
   }
@@ -276,16 +251,20 @@ function InspectorField({
       control.altKey,
     );
     return (
-      <div className="space-y-2">
-        <MediaFieldControl
-          label={control.label}
-          value={mediaValue}
-          onChange={(next) =>
-            patchMediaKeys(onPatch, control.assetKey, control.urlKey, control.altKey, next)
-          }
-        />
-        {control.description ? <FieldHint>{control.description}</FieldHint> : null}
-      </div>
+      <MediaFieldControl
+        label={control.label}
+        value={mediaValue}
+        assetKey={control.assetKey}
+        urlKey={control.urlKey}
+        helperText={control.description}
+        showAlt={!control.altKey}
+        showObjectFit={false}
+        onChange={(next) =>
+          onPatch(
+            buildMediaValuePatch(control.assetKey, control.urlKey, control.altKey, next),
+          )
+        }
+      />
     );
   }
 
@@ -317,7 +296,7 @@ export function InspectorControlRenderer({
           className={cn(
             'space-y-3',
             group
-              ? 'rounded-md border border-neutral-800 bg-neutral-950/40 p-3'
+              ? 'rounded-xl border border-neutral-800/90 bg-neutral-950/50 p-3.5'
               : undefined,
           )}
         >

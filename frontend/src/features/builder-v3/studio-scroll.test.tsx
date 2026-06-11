@@ -136,7 +136,7 @@ describe('Studio panel scrolling layout', () => {
     expect(screen.getByLabelText('Titre campagne')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Media' }));
-    expect(screen.getByText('Image principale')).toBeInTheDocument();
+    expect(screen.getByText('Image principale (desktop)')).toBeInTheDocument();
   });
 
   it('hero_vehicle_offer inspector renders design tab controls', () => {
