@@ -14,6 +14,7 @@ import {
   renderLeadFormRequiredNoteHtml,
 } from './lead-form-fields.render';
 import { renderHeroFormCampaignHtml } from './hero-form-campaign.render';
+import { renderCampaignLeadHeroHtml } from './campaign-lead-hero.render';
 import { renderHeroVehicleOfferHtml } from './hero-vehicle-offer.render';
 import { renderPromoAutohallHtml } from './promo-autohall.render';
 import {
@@ -905,6 +906,10 @@ export function renderBlockHtml(
 
   if (type === 'hero_vehicle_offer') {
     return renderHeroVehicleOfferHtml(props, context);
+  }
+
+  if (type === 'campaign_lead_hero') {
+    return renderCampaignLeadHeroHtml(props, context);
   }
 
   if (type === 'promo_autohall') {

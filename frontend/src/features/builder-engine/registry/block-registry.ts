@@ -123,6 +123,14 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     icon: '◎',
   },
   {
+    type: 'campaign_lead_hero',
+    label: 'Hero campagne + lead',
+    description: 'Hero campagne SI Digital : visuel, formulaire step-based et layouts flexibles.',
+    category: 'hero',
+    availability: 'stable',
+    icon: '⊞',
+  },
+  {
     type: 'lead_form',
     label: 'Formulaire Auto Hall',
     description: 'Collecte leads conforme campagnes Auto Hall.',

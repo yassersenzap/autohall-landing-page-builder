@@ -12,6 +12,7 @@ export const BACKEND_SUPPORTED_BLOCK_TYPES = new Set([
   'hero_campaign',
   'hero_form_campaign',
   'hero_vehicle_offer',
+  'campaign_lead_hero',
   'vehicle_offer',
   'hero',
   'lead_form',

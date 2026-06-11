@@ -3,6 +3,7 @@ export const ALLOWED_BLOCK_TYPES = [
   'hero_campaign',
   'hero_form_campaign',
   'hero_vehicle_offer',
+  'campaign_lead_hero',
   'vehicle_offer',
   'vehicle_features',
   'vehicle_range',

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { CAMPAIGN_LEAD_HERO_TYPE } from '../blocks/campaign-lead-hero';
 import { HERO_VEHICLE_OFFER_TYPE } from '../blocks/hero-vehicle-offer';
 import {
   getAllPremiumBlockDefinitions,
@@ -51,5 +52,17 @@ describe('premium block-registry foundation', () => {
     expect(content?.heroImage).toBeNull();
     expect(content?.layoutVariant).toBe('split-media-right');
     expect(content?.mobileImage).toBeNull();
+  });
+
+  it('registers campaign_lead_hero with defaults and export renderer', () => {
+    expect(hasPremiumBlockDefinition(CAMPAIGN_LEAD_HERO_TYPE)).toBe(true);
+
+    const definition = getPremiumBlockDefinition(CAMPAIGN_LEAD_HERO_TYPE);
+    expect(definition?.builderRenderer).toBe('CampaignLeadHeroBlockPreview');
+    expect(definition?.exportRenderer).toBe('campaign-lead-hero.render');
+    expect(definition?.defaultContent.layoutVariant).toBe('media_left_form_right');
+    expect(definition?.defaultContent.contentPlacement).toBe('hidden');
+    expect(definition?.defaultDesign.formTheme).toBe('light');
+    expect(definition?.defaultContent.formCtaLabel).toBeTruthy();
   });
 });

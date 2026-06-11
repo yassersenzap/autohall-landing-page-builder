@@ -1,7 +1,11 @@
 import type { BlockDefinition } from './block-definition.types';
+import { campaignLeadHeroDefinition } from '../blocks/campaign-lead-hero';
 import { heroVehicleOfferDefinition } from '../blocks/hero-vehicle-offer';
 
-const FOUNDATION_DEFINITIONS: BlockDefinition[] = [heroVehicleOfferDefinition];
+const FOUNDATION_DEFINITIONS: BlockDefinition[] = [
+  heroVehicleOfferDefinition,
+  campaignLeadHeroDefinition,
+];
 
 const REGISTRY = new Map<string, BlockDefinition>(
   FOUNDATION_DEFINITIONS.map((definition) => [definition.type, definition]),

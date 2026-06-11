@@ -37,6 +37,12 @@ describe('BuilderV3HtmlCompilerService all active blocks', () => {
       headline: 'Réservez votre essai en concession',
       primaryCtaLabel: 'Essai',
     },
+    campaign_lead_hero: {
+      brandId: 'chery',
+      campaignTitle: 'Réservez votre essai en concession',
+      formTitle: 'Contact',
+      formCtaLabel: 'Continuer',
+    },
     promo_autohall: { title: 'Auto Hall', formTitle: 'Offre', submitText: 'Envoyer' },
     lead_form: { title: 'Contact', submitText: 'Envoyer' },
     cta_band: { title: 'Essai gratuit', buttonText: 'Réserver' },
@@ -76,7 +82,7 @@ describe('BuilderV3HtmlCompilerService all active blocks', () => {
   };
 
   it('routes every active V3 block through landing render', () => {
-    expect(ACTIVE_V3_BLOCK_TYPES.length).toBe(21);
+    expect(ACTIVE_V3_BLOCK_TYPES.length).toBe(22);
     const html = compiler.compile({
       ...baseInput,
       blocks: ACTIVE_V3_BLOCK_TYPES.map((type, index) => ({

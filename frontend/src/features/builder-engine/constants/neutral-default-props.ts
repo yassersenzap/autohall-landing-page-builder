@@ -25,6 +25,10 @@ import {
   buildVehicleOfferDefaults,
 } from './campaign-block-defaults';
 import {
+  campaignLeadHeroDefaultContent,
+  campaignLeadHeroDefaultDesign,
+} from '@/features/builder/blocks/campaign-lead-hero';
+import {
   heroVehicleOfferDefaultContent,
   heroVehicleOfferDefaultDesign,
 } from '@/features/builder/blocks/hero-vehicle-offer';
@@ -35,6 +39,10 @@ export const BUILDER_NEUTRAL_DEFAULT_PROPS: Record<string, Record<string, unknow
   hero_vehicle_offer: {
     ...heroVehicleOfferDefaultContent,
     design: { ...heroVehicleOfferDefaultDesign },
+  },
+  campaign_lead_hero: {
+    ...campaignLeadHeroDefaultContent,
+    design: { ...campaignLeadHeroDefaultDesign },
   },
   vehicle_offer: buildVehicleOfferDefaults('image_right_offer_left'),
   hero: {

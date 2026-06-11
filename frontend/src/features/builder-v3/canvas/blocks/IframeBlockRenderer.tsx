@@ -21,6 +21,7 @@ import {
   VehicleOfferBlockPreview,
   VehicleRangeBlockPreview,
 } from './MarketingBlockPreviews';
+import { CampaignLeadHeroBlockPreview } from './CampaignLeadHeroBlockPreview';
 import { HeroVehicleOfferBlockPreview } from './HeroVehicleOfferBlockPreview';
 
 type IframeBlockRendererProps = {
@@ -59,6 +60,8 @@ export function IframeBlockRenderer({ block }: IframeBlockRendererProps) {
       return <HeroFormCampaignBlockPreview propsJson={block.propsJson} />;
     case 'hero_vehicle_offer':
       return <HeroVehicleOfferBlockPreview propsJson={block.propsJson} />;
+    case 'campaign_lead_hero':
+      return <CampaignLeadHeroBlockPreview propsJson={block.propsJson} />;
     case 'lead_form':
       return <LeadFormBlockPreview propsJson={block.propsJson} />;
     case 'vehicle_offer':

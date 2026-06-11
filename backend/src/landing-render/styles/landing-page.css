@@ -2623,3 +2623,450 @@
   color: color-mix(in srgb, #fff 85%, transparent);
 }
 
+/* Campaign lead hero — SI Digital campaign landing sections */
+.lp-campaign-lead-hero {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  color: #111827;
+  background: #f3f4f6;
+}
+.lp-campaign-lead-hero--tone-light {
+  background: #f3f4f6;
+  color: #111827;
+}
+.lp-campaign-lead-hero--tone-brand {
+  background: color-mix(in srgb, var(--lp-brand-primary, #2563eb) 6%, #f8fafc);
+  color: var(--lp-brand-text, #111827);
+}
+.lp-campaign-lead-hero--tone-dark {
+  background: color-mix(in srgb, var(--lp-brand-secondary, #111827) 94%, #000);
+  color: #f9fafb;
+}
+.lp-campaign-lead-hero__inner {
+  position: relative;
+  z-index: 1;
+  width: min(100%, var(--lp-container, 76rem));
+  margin-inline: auto;
+  padding: clamp(1rem, 2.5vw, 1.5rem) var(--lp-gutter, clamp(1rem, 4vw, 2rem));
+  min-height: clamp(680px, 78vh, 760px);
+  display: grid;
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+  align-items: center;
+}
+.lp-campaign-lead-hero__media-stage {
+  position: relative;
+  min-height: clamp(18rem, 62vh, 42rem);
+  height: 100%;
+  border-radius: var(--lp-radius-xl, 1rem);
+  overflow: hidden;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12);
+}
+.lp-campaign-lead-hero__media {
+  position: absolute;
+  inset: 0;
+  min-height: 100%;
+}
+.lp-campaign-lead-hero__img,
+.lp-campaign-lead-hero__img-desktop,
+.lp-campaign-lead-hero__img-desktop img,
+.lp-campaign-lead-hero__img-mobile img,
+.lp-campaign-lead-hero__media-primary img,
+.lp-campaign-lead-hero__media-secondary img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--lp-hero-focal-x, 50%) var(--lp-hero-focal-y, 50%);
+  display: block;
+}
+.lp-campaign-lead-hero--position-left .lp-campaign-lead-hero__img,
+.lp-campaign-lead-hero--position-left .lp-campaign-lead-hero__img-desktop img,
+.lp-campaign-lead-hero--position-left .lp-campaign-lead-hero__media-primary img,
+.lp-campaign-lead-hero--position-left .lp-campaign-lead-hero__media-secondary img {
+  object-position: left var(--lp-hero-focal-y, 50%);
+}
+.lp-campaign-lead-hero--position-right .lp-campaign-lead-hero__img,
+.lp-campaign-lead-hero--position-right .lp-campaign-lead-hero__img-desktop img,
+.lp-campaign-lead-hero--position-right .lp-campaign-lead-hero__media-primary img,
+.lp-campaign-lead-hero--position-right .lp-campaign-lead-hero__media-secondary img {
+  object-position: right var(--lp-hero-focal-y, 50%);
+}
+.lp-campaign-lead-hero--fit-contain .lp-campaign-lead-hero__img,
+.lp-campaign-lead-hero--fit-contain .lp-campaign-lead-hero__img-desktop img,
+.lp-campaign-lead-hero--fit-contain .lp-campaign-lead-hero__img-mobile img,
+.lp-campaign-lead-hero--fit-contain .lp-campaign-lead-hero__media-primary img,
+.lp-campaign-lead-hero--fit-contain .lp-campaign-lead-hero__media-secondary img {
+  object-fit: contain;
+  background: #0f172a;
+}
+.lp-campaign-lead-hero__img-desktop,
+.lp-campaign-lead-hero__media-primary,
+.lp-campaign-lead-hero__media-secondary {
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+}
+.lp-campaign-lead-hero__img-mobile {
+  display: none;
+}
+.lp-campaign-lead-hero__dual-media {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  padding: 0.65rem;
+  box-sizing: border-box;
+}
+.lp-campaign-lead-hero__media-primary,
+.lp-campaign-lead-hero__media-secondary {
+  border-radius: calc(var(--lp-radius-lg, 0.75rem) - 0.15rem);
+  overflow: hidden;
+  min-height: 0;
+}
+.lp-campaign-lead-hero__overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    color-mix(in srgb, var(--lp-brand-secondary, #0f172a) 20%, transparent) 0%,
+    color-mix(in srgb, var(--lp-brand-secondary, #0f172a) 8%, transparent) 45%,
+    color-mix(in srgb, var(--lp-brand-secondary, #0f172a) 55%, transparent) 100%
+  );
+}
+.lp-campaign-lead-hero--overlay-none .lp-campaign-lead-hero__overlay { opacity: 0; }
+.lp-campaign-lead-hero--overlay-light .lp-campaign-lead-hero__overlay { opacity: 0.28; }
+.lp-campaign-lead-hero--overlay-medium .lp-campaign-lead-hero__overlay { opacity: 0.48; }
+.lp-campaign-lead-hero--overlay-heavy .lp-campaign-lead-hero__overlay { opacity: 0.68; }
+.lp-campaign-lead-hero__media-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--lp-brand-primary, #2563eb) 18%, #e5e7eb),
+    #f8fafc
+  );
+  border: 1px dashed color-mix(in srgb, var(--lp-brand-primary, #2563eb) 35%, #cbd5e1);
+  color: #475569;
+}
+.lp-campaign-lead-hero__campaign--overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  pointer-events: none;
+}
+.lp-campaign-lead-hero__campaign--beside {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 36rem;
+}
+.lp-campaign-lead-hero__brand {
+  margin: 0 0 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lp-brand-primary, #2563eb);
+}
+.lp-campaign-lead-hero__campaign--overlay .lp-campaign-lead-hero__brand {
+  color: rgba(255, 255, 255, 0.82);
+}
+.lp-campaign-lead-hero__badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 0.28rem 0.7rem;
+  margin-bottom: 0.75rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: var(--lp-brand-primary, #2563eb);
+  color: var(--lp-brand-cta-primary-text, #fff);
+}
+.lp-campaign-lead-hero__campaign--overlay .lp-campaign-lead-hero__badge {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+.lp-campaign-lead-hero__title {
+  margin: 0 0 0.65rem;
+  font-family: var(--lp-display-font, inherit);
+  font-size: clamp(1.85rem, 4.2vw, 2.85rem);
+  line-height: 1.06;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.lp-campaign-lead-hero__campaign--overlay .lp-campaign-lead-hero__title {
+  color: #fff;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.35);
+}
+.lp-campaign-lead-hero__subtitle {
+  margin: 0;
+  font-size: clamp(0.98rem, 2vw, 1.125rem);
+  line-height: 1.55;
+  max-width: 42ch;
+  color: #4b5563;
+}
+.lp-campaign-lead-hero__campaign--overlay .lp-campaign-lead-hero__subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.28);
+}
+.lp-campaign-lead-hero__form {
+  width: 100%;
+  max-width: 26rem;
+  justify-self: center;
+}
+.lp-campaign-lead-hero__form-card {
+  border-radius: var(--lp-radius-xl, 1rem);
+  padding: clamp(1.35rem, 3vw, 2rem);
+}
+.lp-campaign-lead-hero--form-theme-light .lp-campaign-lead-hero__form-card {
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 22px 50px rgba(15, 23, 42, 0.14);
+}
+.lp-campaign-lead-hero--form-theme-dark .lp-campaign-lead-hero__form-card {
+  background: #111827;
+  color: #f9fafb;
+  border: 1px solid #374151;
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.35);
+}
+.lp-campaign-lead-hero--form-theme-glass .lp-campaign-lead-hero__form-card {
+  background: rgba(255, 255, 255, 0.92);
+  color: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 22px 50px rgba(15, 23, 42, 0.16);
+  backdrop-filter: blur(14px);
+}
+.lp-campaign-lead-hero__progress-track {
+  width: 100%;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+  margin-bottom: 0.45rem;
+}
+.lp-campaign-lead-hero--form-theme-dark .lp-campaign-lead-hero__progress-track {
+  background: #374151;
+}
+.lp-campaign-lead-hero__progress-fill {
+  display: block;
+  width: 33%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--lp-brand-primary, #2563eb);
+}
+.lp-campaign-lead-hero__step-label {
+  margin: 0 0 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+.lp-campaign-lead-hero--form-theme-dark .lp-campaign-lead-hero__step-label {
+  color: #d1d5db;
+}
+.lp-campaign-lead-hero__form-title {
+  margin: 0 0 0.4rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.lp-campaign-lead-hero__form-subtitle {
+  margin: 0 0 1.1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #6b7280;
+}
+.lp-campaign-lead-hero--form-theme-dark .lp-campaign-lead-hero__form-subtitle {
+  color: #d1d5db;
+}
+.lp-campaign-lead-hero__field-shell {
+  margin-bottom: 1rem;
+}
+.lp-campaign-lead-hero__field-label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.lp-campaign-lead-hero__field-control {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #d1d5db;
+  border-radius: var(--lp-radius-md, 0.5rem);
+  background: #fff;
+  color: #111827;
+  font: inherit;
+}
+.lp-campaign-lead-hero--form-theme-dark .lp-campaign-lead-hero__field-control {
+  background: #1f2937;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+.lp-campaign-lead-hero__cta {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border: none;
+  border-radius: var(--lp-radius-md, 0.5rem);
+  font: inherit;
+  font-weight: 700;
+  cursor: not-allowed;
+  background: var(--lp-brand-primary, #2563eb);
+  color: var(--lp-brand-cta-primary-text, #fff);
+}
+.lp-campaign-lead-hero__legal,
+.lp-campaign-lead-hero__footer {
+  margin: 0.75rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: #6b7280;
+}
+.lp-campaign-lead-hero--form-theme-dark .lp-campaign-lead-hero__legal,
+.lp-campaign-lead-hero--form-theme-dark .lp-campaign-lead-hero__footer {
+  color: #9ca3af;
+}
+@media (max-width: 959px) {
+  .lp-campaign-lead-hero__inner {
+    min-height: auto;
+    padding-block: 1.25rem;
+  }
+  .lp-campaign-lead-hero__media-stage {
+    min-height: clamp(16rem, 48vh, 24rem);
+  }
+  .lp-campaign-lead-hero__form {
+    max-width: none;
+  }
+  .lp-campaign-lead-hero__img-desktop { display: none; }
+  .lp-campaign-lead-hero__img-mobile {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+  }
+  .lp-campaign-lead-hero:has(.lp-campaign-lead-hero__img-mobile) .lp-campaign-lead-hero__img-desktop {
+    display: none;
+  }
+  .lp-campaign-lead-hero__dual-media {
+    grid-template-columns: 1fr;
+  }
+}
+@media (min-width: 960px) {
+  .lp-campaign-lead-hero__inner {
+    grid-template-columns: minmax(0, 1.95fr) minmax(18rem, 1fr);
+  }
+  .lp-campaign-lead-hero--layout-media_left_form_right .lp-campaign-lead-hero__media-stage {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .lp-campaign-lead-hero--layout-media_left_form_right .lp-campaign-lead-hero__form {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    align-self: center;
+  }
+  .lp-campaign-lead-hero--layout-form_left_media_right .lp-campaign-lead-hero__inner {
+    grid-template-columns: minmax(18rem, 1fr) minmax(0, 1.95fr);
+  }
+  .lp-campaign-lead-hero--layout-form_left_media_right .lp-campaign-lead-hero__form {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+    align-self: center;
+  }
+  .lp-campaign-lead-hero--layout-form_left_media_right .lp-campaign-lead-hero__media-stage {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .lp-campaign-lead-hero--layout-dual_media_form_right .lp-campaign-lead-hero__media-stage {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .lp-campaign-lead-hero--layout-dual_media_form_right .lp-campaign-lead-hero__form {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    align-self: center;
+  }
+  .lp-campaign-lead-hero--layout-dual_media_form_left .lp-campaign-lead-hero__inner {
+    grid-template-columns: minmax(18rem, 1fr) minmax(0, 1.95fr);
+  }
+  .lp-campaign-lead-hero--layout-dual_media_form_left .lp-campaign-lead-hero__form {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+    align-self: center;
+  }
+  .lp-campaign-lead-hero--layout-dual_media_form_left .lp-campaign-lead-hero__media-stage {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .lp-campaign-lead-hero--layout-background_media_form_right .lp-campaign-lead-hero__inner,
+  .lp-campaign-lead-hero--layout-background_media_form_left .lp-campaign-lead-hero__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 26rem);
+    min-height: clamp(680px, 82vh, 760px);
+  }
+  .lp-campaign-lead-hero--layout-background_media_form_right .lp-campaign-lead-hero__campaign--beside {
+    grid-column: 1;
+    align-self: center;
+  }
+  .lp-campaign-lead-hero--layout-background_media_form_right .lp-campaign-lead-hero__form {
+    grid-column: 2;
+    justify-self: end;
+    align-self: center;
+  }
+  .lp-campaign-lead-hero--layout-background_media_form_left .lp-campaign-lead-hero__inner {
+    grid-template-columns: minmax(18rem, 26rem) minmax(0, 1fr);
+  }
+  .lp-campaign-lead-hero--layout-background_media_form_left .lp-campaign-lead-hero__form {
+    grid-column: 1;
+    justify-self: start;
+    align-self: center;
+  }
+  .lp-campaign-lead-hero--layout-background_media_form_left .lp-campaign-lead-hero__campaign--beside {
+    grid-column: 2;
+    align-self: center;
+  }
+}
+.lp-campaign-lead-hero--layout-background_media_form_right > .lp-campaign-lead-hero__media,
+.lp-campaign-lead-hero--layout-background_media_form_left > .lp-campaign-lead-hero__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.lp-campaign-lead-hero--layout-background_media_form_right,
+.lp-campaign-lead-hero--layout-background_media_form_left {
+  min-height: clamp(680px, 82vh, 760px);
+  display: flex;
+  align-items: stretch;
+  color: #fff;
+}
+.lp-campaign-lead-hero--layout-background_media_form_right .lp-campaign-lead-hero__campaign--beside .lp-campaign-lead-hero__title,
+.lp-campaign-lead-hero--layout-background_media_form_left .lp-campaign-lead-hero__campaign--beside .lp-campaign-lead-hero__title,
+.lp-campaign-lead-hero--layout-background_media_form_right .lp-campaign-lead-hero__campaign--beside .lp-campaign-lead-hero__subtitle,
+.lp-campaign-lead-hero--layout-background_media_form_left .lp-campaign-lead-hero__campaign--beside .lp-campaign-lead-hero__subtitle,
+.lp-campaign-lead-hero--layout-background_media_form_right .lp-campaign-lead-hero__campaign--beside .lp-campaign-lead-hero__brand,
+.lp-campaign-lead-hero--layout-background_media_form_left .lp-campaign-lead-hero__campaign--beside .lp-campaign-lead-hero__brand {
+  color: #fff;
+}
+.lp-campaign-lead-hero--content-hidden .lp-campaign-lead-hero__campaign {
+  display: none;
+}
+

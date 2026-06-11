@@ -26,6 +26,10 @@ import {
   MarketingBlockInspectorFields,
 } from './MarketingBlockInspectorFields';
 import {
+  CampaignLeadHeroInspectorFields,
+  isCampaignLeadHeroBlock,
+} from './CampaignLeadHeroInspectorFields';
+import {
   HeroVehicleOfferInspectorFields,
   isHeroVehicleOfferBlock,
 } from './HeroVehicleOfferInspectorFields';
@@ -129,6 +133,7 @@ export function BlockInspectorPanel({
   const isFAQ = block.type === 'faq';
   const isTestimonials = block.type === 'testimonials';
   const isHeroVehicleOffer = isHeroVehicleOfferBlock(block.type);
+  const isCampaignLeadHero = isCampaignLeadHeroBlock(block.type);
   const isMarketingBlock = isMarketingInspectorBlock(block.type);
   const isPremiumDesignBlock = INSPECTOR_DESIGN_BLOCKS.has(block.type);
   const supportsBackground = isPromo || isHero;
@@ -310,6 +315,10 @@ export function BlockInspectorPanel({
 
                 {isHeroVehicleOffer && (
                   <HeroVehicleOfferInspectorFields block={block} patch={patch} />
+                )}
+
+                {isCampaignLeadHero && (
+                  <CampaignLeadHeroInspectorFields block={block} patch={patch} />
                 )}
 
                 {isMarketingBlock && (
