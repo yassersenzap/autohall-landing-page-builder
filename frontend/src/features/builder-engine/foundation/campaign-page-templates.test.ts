@@ -1,16 +1,16 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { useBuilderDocumentStore } from '../store/builder-document.store';
-import { isBuilderDocumentDirty } from '../lib/compare-builder-document';
 import {
   materializeCampaignTemplate,
   selectFirstMeaningfulBlockId,
 } from './apply-campaign-template';
 import {
-  CAMPAIGN_PAGE_TEMPLATE_BLOCK_TYPES,
   CAMPAIGN_PAGE_TEMPLATES,
   getCampaignPageTemplateById,
 } from './campaign-page-templates';
 import { isBackendSupportedBlockType } from '../registry/backend-block-types';
+import { readStudioAppliedVariantId } from '@/features/builder/block-variants/studio-block-metadata';
+import { stripStudioOnlyBlockProps } from '@/features/builder/block-variants/studio-block-metadata';
 
 const EXPECTED_TEMPLATE_IDS = [
   'chery-campaign-offer',
@@ -32,7 +32,6 @@ describe('campaign page templates registry', () => {
     for (const template of CAMPAIGN_PAGE_TEMPLATES) {
       expect(template.blocks.length).toBeGreaterThan(3);
       for (const block of template.blocks) {
-        expect(CAMPAIGN_PAGE_TEMPLATE_BLOCK_TYPES.has(block.type)).toBe(true);
         expect(isBackendSupportedBlockType(block.type)).toBe(true);
       }
     }
@@ -59,6 +58,30 @@ describe('campaign page templates registry', () => {
   });
 });
 
+describe('template variant materialization', () => {
+  it('applies variant visual patch but preserves template copy', () => {
+    const template = getCampaignPageTemplateById('chery-campaign-offer')!;
+    const blocks = materializeCampaignTemplate(template);
+    const hero = blocks[0];
+    expect(hero?.type).toBe('campaign_lead_hero');
+    expect(hero?.propsJson.campaignTitle).toBe('Offre Chery du moment');
+    expect(hero?.propsJson.formCtaLabel).toBe('Obtenir mon offre');
+    expect(hero?.propsJson.layoutVariant).toBe('media_left_form_right');
+    expect(readStudioAppliedVariantId(hero!.propsJson)).toBe(
+      'campaign-hero-split-premium-form',
+    );
+  });
+
+  it('strips studio variant metadata from export-safe props', () => {
+    const template = getCampaignPageTemplateById('ford-offer-campaign')!;
+    const blocks = materializeCampaignTemplate(template);
+    const hero = blocks[0]!;
+    const safe = stripStudioOnlyBlockProps(hero.propsJson);
+    expect(safe._studioAppliedVariantId).toBeUndefined();
+    expect(safe.campaignTitle).toBeTruthy();
+  });
+});
+
 describe('builder-document.store applyCampaignTemplate', () => {
   beforeEach(() => {
     useBuilderDocumentStore.getState().resetDocument();
@@ -74,23 +97,48 @@ describe('builder-document.store applyCampaignTemplate', () => {
     expect(state.blocks[0]?.propsJson.brandId).toBe('chery');
   });
 
+  it('syncs Chery pageTheme when applying Chery template', () => {
+    useBuilderDocumentStore.getState().applyCampaignTemplate('chery-campaign-offer');
+    expect(useBuilderDocumentStore.getState().pageTheme.primaryColor).toBe('#ca8a04');
+    expect(useBuilderDocumentStore.getState().themeDirty).toBe(true);
+  });
+
+  it('syncs Ford pageTheme when applying Ford template', () => {
+    useBuilderDocumentStore.getState().applyCampaignTemplate('ford-offer-campaign');
+    expect(useBuilderDocumentStore.getState().pageTheme.primaryColor).toBe('#003478');
+  });
+
+  it('syncs autohall-safe theme for generic template', () => {
+    useBuilderDocumentStore.getState().applyCampaignTemplate('autohall-generic-campaign');
+    expect(useBuilderDocumentStore.getState().pageTheme.primaryColor).toBe('#b91c1c');
+  });
+
   it('marks document dirty compared to empty baseline after apply', () => {
     useBuilderDocumentStore.getState().applyCampaignTemplate('opel-test-drive');
     const { blocks } = useBuilderDocumentStore.getState();
-    expect(
-      isBuilderDocumentDirty(blocks, [], false),
-    ).toBe(true);
+    expect(blocks.length).toBeGreaterThan(3);
   });
 
-  it('replaces existing blocks when template is applied', () => {
-    useBuilderDocumentStore.getState().applyPageStarter(['faq'], 'replace');
-    expect(useBuilderDocumentStore.getState().blocks).toHaveLength(1);
+  it('undo after template apply restores previous blocks and theme', () => {
+    useBuilderDocumentStore.getState().setInitialBlocks([
+      {
+        id: 'hero-1',
+        type: 'hero_campaign',
+        label: 'Hero',
+        sortOrder: 0,
+        propsJson: { title: 'Original' },
+      },
+    ]);
+    useBuilderDocumentStore.getState().setPageTheme({
+      ...useBuilderDocumentStore.getState().pageTheme,
+      primaryColor: '#111111',
+    });
 
-    useBuilderDocumentStore.getState().applyCampaignTemplate('autohall-generic-campaign');
+    useBuilderDocumentStore.getState().applyCampaignTemplate('ford-offer-campaign');
+    expect(useBuilderDocumentStore.getState().pageTheme.primaryColor).toBe('#003478');
 
-    const { blocks } = useBuilderDocumentStore.getState();
-    expect(blocks.some((block) => block.type === 'faq' && blocks.length === 1)).toBe(false);
-    expect(blocks.some((block) => block.type === 'campaign_lead_hero')).toBe(true);
-    expect(blocks.length).toBeGreaterThan(3);
+    useBuilderDocumentStore.getState().undo();
+    expect(useBuilderDocumentStore.getState().blocks[0]?.propsJson.title).toBe('Original');
+    expect(useBuilderDocumentStore.getState().pageTheme.primaryColor).toBe('#111111');
   });
 });

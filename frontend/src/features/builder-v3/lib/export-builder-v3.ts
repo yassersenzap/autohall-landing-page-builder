@@ -11,6 +11,7 @@ import {
   forcePersistBuilderDocument,
   useBuilderDocumentStore,
 } from '@/features/builder-engine/store/builder-document.store';
+import { stripStudioOnlyBlockProps } from '@/features/builder/block-variants/studio-block-metadata';
 import { saveBuilderDocumentDesign } from './save-builder-v3';
 
 const API_BASE_URL =
@@ -53,7 +54,10 @@ export async function exportBuilderV3Zip(pageVersionId: string): Promise<void> {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify({
-      blocks: freshState.blocks,
+      blocks: freshState.blocks.map((block) => ({
+        ...block,
+        propsJson: stripStudioOnlyBlockProps(block.propsJson),
+      })),
       pageTheme: freshState.pageTheme,
       pageSettings: freshState.pageSettings,
     }),

@@ -14,6 +14,8 @@ import {
   selectFirstMeaningfulBlockId,
 } from '../foundation/apply-campaign-template';
 import { getCampaignPageTemplateById } from '../foundation/campaign-page-templates';
+import { buildPageThemeFromTemplateBrand } from '@/features/builder/brand-presets/brand-theme-presets';
+import { withStudioAppliedVariantId } from '@/features/builder/block-variants/studio-block-metadata';
 import {
   applyBlockVariantSafely,
   mergeVariantPatchIntoProps,
@@ -539,7 +541,10 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
           if (item.id !== blockId) return item;
           return {
             ...item,
-            propsJson: mergeVariantPatchIntoProps(item.propsJson, patch),
+            propsJson: withStudioAppliedVariantId(
+              mergeVariantPatchIntoProps(item.propsJson, patch),
+              variantId,
+            ),
           };
         });
 
@@ -726,11 +731,14 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
         if (blocks.length === 0) return;
 
         const history = withHistoryBeforeMutation(get, 'apply_campaign_template');
+        const pageTheme = buildPageThemeFromTemplateBrand(template.brandId, get().pageTheme);
         set({
           blocks: normalizeSortOrder(blocks),
           selectedBlockId: selectFirstMeaningfulBlockId(blocks),
           hoveredBlockId: null,
+          pageTheme,
           themeDirty: true,
+          documentRevision: get().documentRevision + 1,
           ...(history ?? {}),
         });
       },

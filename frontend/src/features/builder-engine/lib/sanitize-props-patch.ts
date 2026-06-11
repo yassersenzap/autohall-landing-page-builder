@@ -86,6 +86,7 @@ export function sanitizePropsPatch(
     if (value === undefined || value === null) continue;
 
     if (typeof key !== 'string' || key.length === 0 || key.length > 64) continue;
+    if (key.startsWith('_studio')) continue;
 
     if (
       key === 'design' &&

@@ -98,6 +98,7 @@ describe('exportBuilderV3Zip', () => {
     const body = fetchMock.mock.calls[0]?.[1]?.body as string;
     expect(body).not.toContain('historyPast');
     expect(body).not.toContain('historyFuture');
+    expect(body).not.toContain('_studioAppliedVariantId');
     vi.unstubAllGlobals();
   });
 });

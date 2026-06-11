@@ -124,7 +124,7 @@ describe('viewport and section style V1', () => {
       .getState()
       .blocks.find((b) => b.type === 'campaign_lead_hero');
     expect(hero).toBeTruthy();
-    expect(parseSectionStyle(hero!.propsJson).sectionPaddingY).toBe('md');
+    expect(parseSectionStyle(hero!.propsJson).sectionPaddingY).toBe('lg');
   });
 
   it('studio route still loads', () => {

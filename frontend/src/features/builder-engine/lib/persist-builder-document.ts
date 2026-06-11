@@ -9,6 +9,7 @@ import { getActivePaletteBlocks } from '../registry/block-registry';
 import type { BuilderDocumentBlock } from '../types';
 import { apiBlocksToBuilderBlocks } from './api-block-mapper';
 import { assertNoBlobUrlsInBlocks } from './blob-url-guard';
+import { stripStudioOnlyBlockProps } from '@/features/builder/block-variants/studio-block-metadata';
 
 const VALID_BLOCK_TYPES = new Set(getActivePaletteBlocks().map((entry) => entry.type));
 
@@ -51,13 +52,13 @@ export async function persistBuilderDocument(
     if (baselineIds.has(block.id)) {
       await updateEditorBlock(pageVersionId, block.id, {
         blockType,
-        propsJson: block.propsJson,
+        propsJson: stripStudioOnlyBlockProps(block.propsJson),
         sortOrder,
       });
     } else {
       await createEditorBlock(pageVersionId, {
         blockType,
-        propsJson: block.propsJson,
+        propsJson: stripStudioOnlyBlockProps(block.propsJson),
         sortOrder,
         blockKey: toBlockKey(block.id),
       });

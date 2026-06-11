@@ -26,7 +26,20 @@ describe('TemplatesPanel campaign presets', () => {
     const state = useBuilderDocumentStore.getState();
     expect(state.blocks.length).toBeGreaterThan(4);
     expect(state.blocks[0]?.type).toBe('hero_vehicle_offer');
+    expect(state.pageTheme.primaryColor).toBe('#ca8a04');
     expect(screen.queryByTestId('campaign-template-replace-warning')).not.toBeInTheDocument();
+  });
+
+  it('renders premium thumbnails with brand badges and block counts', () => {
+    render(<TemplatesPanel />);
+
+    expect(screen.getByTestId('template-thumbnail-chery-campaign-offer')).toBeInTheDocument();
+    expect(screen.getByTestId('template-brand-badge-chery-campaign-offer')).toBeInTheDocument();
+    expect(screen.getByTestId('template-block-count-ford-offer-campaign')).toHaveTextContent(
+      /Blocs inclus · \d+/,
+    );
+    expect(screen.getAllByText(/Usage recommandé ·/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Thème appliqué ·/).length).toBeGreaterThan(0);
   });
 
   it('shows replace warning before wiping existing blocks', () => {

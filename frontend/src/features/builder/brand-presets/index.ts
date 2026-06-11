@@ -28,3 +28,12 @@ export {
   getBrandPreset,
   isBrandPresetId,
 } from './brand-presets';
+export {
+  PAGE_BRAND_THEME_IDS,
+  PAGE_BRAND_THEME_PRESETS,
+  buildPageThemeFromTemplateBrand,
+  getPageBrandTheme,
+  resolvePageBrandThemeId,
+  type PageBrandThemeId,
+  type PageBrandThemeTokens,
+} from './brand-theme-presets';

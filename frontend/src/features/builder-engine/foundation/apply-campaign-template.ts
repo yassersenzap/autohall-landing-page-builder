@@ -1,4 +1,9 @@
 import { createSafeRandomId } from '@/lib/create-safe-random-id';
+import {
+  applyBlockVariantSafely,
+  mergeVariantPatchIntoProps,
+} from '@/features/builder/block-variants';
+import { withStudioAppliedVariantId } from '@/features/builder/block-variants/studio-block-metadata';
 import { getDefaultBlockProps } from '../constants/default-block-props';
 import { isBackendSupportedBlockType } from '../registry/backend-block-types';
 import { getRegistryEntry } from '../registry/block-registry';
@@ -41,7 +46,16 @@ export function materializeTemplateBlock(
   if (!isBackendSupportedBlockType(spec.type)) return null;
 
   const base = getDefaultBlockProps(spec.type);
-  const propsJson = spec.props ? mergeTemplateProps(base, spec.props) : base;
+  let propsJson = spec.props ? mergeTemplateProps(base, spec.props) : base;
+
+  if (spec.variant?.variantId) {
+    const patch = applyBlockVariantSafely(spec.type, propsJson, spec.variant.variantId);
+    if (patch) {
+      propsJson = mergeVariantPatchIntoProps(propsJson, patch);
+      propsJson = withStudioAppliedVariantId(propsJson, spec.variant.variantId);
+    }
+  }
+
   const entry = getRegistryEntry(spec.type);
 
   return {

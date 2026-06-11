@@ -14,8 +14,13 @@ import {
   getSectionStarters,
 } from '@/features/builder-engine/foundation/page-starters';
 import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
+import { getPageBrandTheme, resolvePageBrandThemeId } from '@/features/builder/brand-presets/brand-theme-presets';
 import { ScrollArea, Separator, ShadButton } from '@/components/ui/primitives';
 import { cn } from '@/lib/utils';
+import {
+  TemplateThumbnailPreview,
+  templateCategoryLabel,
+} from './template-thumbnail';
 
 function TierHeader({ title, description }: { title: string; description: string }) {
   return (
@@ -64,6 +69,10 @@ function brandBadgeLabel(brandId: CampaignPageTemplate['brandId']): string {
   return brandId.charAt(0).toUpperCase() + brandId.slice(1).replace('_', ' ');
 }
 
+function countTemplateVariants(template: CampaignPageTemplate): number {
+  return template.blocks.filter((block) => block.variant?.variantId).length;
+}
+
 function CampaignTemplateCard({
   template,
   onUse,
@@ -71,30 +80,52 @@ function CampaignTemplateCard({
   template: CampaignPageTemplate;
   onUse: () => void;
 }) {
+  const theme = getPageBrandTheme(resolvePageBrandThemeId(template.brandId));
+  const variantCount = countTemplateVariants(template);
+
   return (
     <article
-      className="overflow-hidden rounded-xl border border-neutral-800/90 bg-neutral-950/60 shadow-sm"
+      className="overflow-hidden rounded-xl border border-neutral-800/90 bg-neutral-950/60 shadow-sm transition hover:border-neutral-700"
       data-testid={`campaign-template-card-${template.id}`}
     >
-      <div className="flex items-start gap-3 border-b border-neutral-800/80 p-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-neutral-800 bg-neutral-900 text-[0.625rem] font-semibold uppercase tracking-wide text-neutral-400">
-          {template.previewLabel.split('·')[0]?.trim().slice(0, 3) ?? 'LP'}
-        </div>
-        <div className="min-w-0 flex-1 space-y-1">
+      <div className="space-y-3 p-3">
+        <TemplateThumbnailPreview template={template} />
+
+        <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-1.5">
             <h4 className="text-sm font-medium text-neutral-100">{template.name}</h4>
-            <span className="rounded-full bg-neutral-800 px-2 py-0.5 text-[0.625rem] text-neutral-400">
-              {brandBadgeLabel(template.brandId)}
+            <span
+              className="rounded-full px-2 py-0.5 text-[0.625rem] font-medium"
+              style={{ backgroundColor: theme.primarySoft, color: theme.primaryColor }}
+              data-testid={`template-brand-badge-${template.id}`}
+            >
+              Marque · {brandBadgeLabel(template.brandId)}
             </span>
           </div>
           <p className="text-xs leading-relaxed text-neutral-500">{template.description}</p>
-          <p className="text-[0.6875rem] text-neutral-600">{template.recommendedUse}</p>
+          <p className="text-[0.6875rem] text-neutral-600">
+            <span className="font-medium text-neutral-500">Usage recommandé · </span>
+            {template.recommendedUse}
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-2 text-[0.625rem] text-neutral-500">
+          <span className="rounded-md border border-neutral-800 px-2 py-1">
+            Structure · {templateCategoryLabel(template.category)}
+          </span>
+          <span className="rounded-md border border-neutral-800 px-2 py-1" data-testid={`template-block-count-${template.id}`}>
+            Blocs inclus · {template.blocks.length}
+          </span>
+          {variantCount > 0 ? (
+            <span className="rounded-md border border-neutral-800 px-2 py-1">
+              Styles rapides appliqués · {variantCount}
+            </span>
+          ) : null}
         </div>
       </div>
-      <div className="flex items-center justify-between gap-2 px-3 py-2.5">
-        <span className="text-[0.625rem] text-neutral-600">
-          {template.blocks.length} blocs · {template.previewLabel}
-        </span>
+
+      <div className="flex items-center justify-between gap-2 border-t border-neutral-800/80 px-3 py-2.5">
+        <span className="text-[0.625rem] text-neutral-600">Thème appliqué · {theme.label}</span>
         <ShadButton
           type="button"
           size="sm"

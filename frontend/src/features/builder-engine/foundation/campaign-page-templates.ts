@@ -57,6 +57,7 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
       {
         type: 'campaign_lead_hero',
         label: 'Hero campagne Chery',
+        variant: { variantId: 'campaign-hero-split-premium-form' },
         props: {
           brandId: 'chery',
           campaignTitle: 'Offre Chery du moment',
@@ -177,6 +178,7 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
       {
         type: 'hero_vehicle_offer',
         label: 'Hero modèle Chery',
+        variant: { variantId: 'vehicle-hero-focus-split' },
         props: {
           brandId: 'chery',
           modelName: 'Chery Tiggo 7 Pro',
@@ -277,6 +279,7 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
       {
         type: 'campaign_lead_hero',
         label: 'Hero campagne Ford',
+        variant: { variantId: 'campaign-hero-background-image' },
         props: {
           brandId: 'ford',
           campaignTitle: 'L’aventure Ford commence ici',
@@ -318,6 +321,7 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
       },
       {
         type: 'cta_band',
+        variant: { variantId: 'cta-band-dark-conversion' },
         props: buildCTABandDefaults({
           title: 'Une question sur l’offre Ford ?',
           buttonText: 'Parler à un conseiller',
@@ -346,6 +350,7 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
       {
         type: 'campaign_lead_hero',
         label: 'Hero essai Opel',
+        variant: { variantId: 'campaign-hero-compact-lead' },
         props: {
           brandId: 'opel',
           campaignTitle: 'Réservez votre essai Opel',
@@ -424,6 +429,7 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
       {
         type: 'campaign_lead_hero',
         label: 'Hero campagne',
+        variant: { variantId: 'campaign-hero-minimal-offer' },
         props: {
           brandId: 'ford',
           campaignTitle: 'Votre mobilité, notre expertise',
