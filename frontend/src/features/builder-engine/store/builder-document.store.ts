@@ -18,6 +18,19 @@ import {
   applyBlockVariantSafely,
   mergeVariantPatchIntoProps,
 } from '@/features/builder/block-variants';
+import {
+  appendHistoryCheckpoint,
+  beginPropsEditSession,
+  computeRedo,
+  computeUndo,
+  createBuilderDocumentCheckpoint,
+  emptyDocumentHistoryState,
+  resetPropsEditSession,
+  runWithHistoryApply,
+  shouldSkipHistoryPush,
+  type BuilderDocumentCheckpoint,
+  type HistoryCheckpointReason,
+} from '../history';
 
 const PERSIST_STORAGE_PREFIX = 'autohall-builder-storage:';
 const LEGACY_STORAGE_PREFIX = 'autohall-builder-v3:';
@@ -131,6 +144,16 @@ type BuilderDocumentState = {
   /** Bumped on successful save — used to sync preview without stale API reads. */
   documentRevision: number;
   lastSavedAt: number;
+  /** Studio-only undo stacks — not persisted or exported. */
+  historyPast: BuilderDocumentCheckpoint[];
+  historyFuture: BuilderDocumentCheckpoint[];
+
+  canUndo: () => boolean;
+  canRedo: () => boolean;
+  pushHistoryCheckpoint: (reason?: HistoryCheckpointReason) => void;
+  clearHistory: () => void;
+  undo: () => boolean;
+  redo: () => boolean;
 
   addBlock: (type: string, index?: number) => void;
   /** Insert a block at a specific index (alias for addBlock with index). */
@@ -172,6 +195,50 @@ type BuilderDocumentState = {
   resetDocument: () => void;
 };
 
+function snapshotFromState(state: BuilderDocumentState): BuilderDocumentCheckpoint {
+  return createBuilderDocumentCheckpoint({
+    blocks: state.blocks,
+    selectedBlockId: state.selectedBlockId,
+    pageTheme: state.pageTheme,
+    pageSettings: state.pageSettings,
+    themeDirty: state.themeDirty,
+  });
+}
+
+function checkpointToDocumentPatch(
+  checkpoint: BuilderDocumentCheckpoint,
+): Pick<
+  BuilderDocumentState,
+  'blocks' | 'selectedBlockId' | 'pageTheme' | 'pageSettings' | 'themeDirty'
+> {
+  return {
+    blocks: checkpoint.blocks,
+    selectedBlockId: checkpoint.selectedBlockId,
+    pageTheme: { ...checkpoint.pageTheme },
+    pageSettings: { ...checkpoint.pageSettings },
+    themeDirty: checkpoint.themeDirty,
+  };
+}
+
+function withHistoryBeforeMutation(
+  get: () => BuilderDocumentState,
+  reason: HistoryCheckpointReason,
+): Pick<BuilderDocumentState, 'historyPast' | 'historyFuture'> | null {
+  if (shouldSkipHistoryPush()) return null;
+  const checkpoint = createBuilderDocumentCheckpoint({
+    blocks: get().blocks,
+    selectedBlockId: get().selectedBlockId,
+    pageTheme: get().pageTheme,
+    pageSettings: get().pageSettings,
+    themeDirty: get().themeDirty,
+    reason,
+  });
+  return {
+    historyPast: appendHistoryCheckpoint(get().historyPast, checkpoint),
+    historyFuture: [],
+  };
+}
+
 export const useBuilderDocumentStore = create<BuilderDocumentState>()(
   persist(
     (set, get) => ({
@@ -184,6 +251,74 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
       themeDirty: false,
       documentRevision: 0,
       lastSavedAt: 0,
+      historyPast: [],
+      historyFuture: [],
+
+      canUndo: () => get().historyPast.length > 0,
+      canRedo: () => get().historyFuture.length > 0,
+
+      pushHistoryCheckpoint: (reason = 'manual') => {
+        if (shouldSkipHistoryPush()) return;
+        const checkpoint = createBuilderDocumentCheckpoint({
+          blocks: get().blocks,
+          selectedBlockId: get().selectedBlockId,
+          pageTheme: get().pageTheme,
+          pageSettings: get().pageSettings,
+          themeDirty: get().themeDirty,
+          reason,
+        });
+        set({
+          historyPast: appendHistoryCheckpoint(get().historyPast, checkpoint),
+          historyFuture: [],
+        });
+      },
+
+      clearHistory: () => {
+        resetPropsEditSession();
+        set(emptyDocumentHistoryState());
+      },
+
+      undo: () => {
+        const state = get();
+        const result = computeUndo(
+          { past: state.historyPast, future: state.historyFuture },
+          snapshotFromState(state),
+        );
+        if (!result) return false;
+
+        runWithHistoryApply(() => {
+          resetPropsEditSession();
+          set({
+            ...checkpointToDocumentPatch(result.snapshot),
+            historyPast: result.past,
+            historyFuture: result.future,
+            themeDirty: true,
+            documentRevision: state.documentRevision + 1,
+          });
+        });
+        return true;
+      },
+
+      redo: () => {
+        const state = get();
+        const result = computeRedo(
+          { past: state.historyPast, future: state.historyFuture },
+          snapshotFromState(state),
+        );
+        if (!result) return false;
+
+        runWithHistoryApply(() => {
+          resetPropsEditSession();
+          set({
+            ...checkpointToDocumentPatch(result.snapshot),
+            historyPast: result.past,
+            historyFuture: result.future,
+            themeDirty: true,
+            documentRevision: state.documentRevision + 1,
+          });
+        });
+        return true;
+      },
 
       addBlock: (type, index) => {
         const activeTypes = new Set(getActivePaletteBlocks().map((b) => b.type));
@@ -195,10 +330,12 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
         const newBlock = createBlockFromType(type, insertAt);
         const next = [...blocks];
         next.splice(insertAt, 0, newBlock);
+        const history = withHistoryBeforeMutation(get, 'add_block');
         set({
           blocks: normalizeSortOrder(next),
           selectedBlockId: newBlock.id,
           themeDirty: true,
+          ...(history ?? {}),
         });
       },
 
@@ -220,10 +357,12 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
           insertAt += 1;
         }
 
+        const history = withHistoryBeforeMutation(get, 'add_block');
         set({
           blocks: normalizeSortOrder(blocks),
           selectedBlockId: firstId,
           themeDirty: true,
+          ...(history ?? {}),
         });
       },
 
@@ -238,10 +377,12 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
           get().hoveredBlockId,
         );
 
+        const history = withHistoryBeforeMutation(get, 'delete_block');
         set({
           blocks,
           themeDirty: true,
           ...selection,
+          ...(history ?? {}),
         });
       },
 
@@ -263,11 +404,13 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
 
         const next = [...blocks];
         next.splice(sourceIndex + 1, 0, copy);
+        const history = withHistoryBeforeMutation(get, 'duplicate_block');
         set({
           blocks: normalizeSortOrder(next),
           selectedBlockId: copy.id,
           hoveredBlockId: copy.id,
           themeDirty: true,
+          ...(history ?? {}),
         });
       },
 
@@ -297,7 +440,12 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
 
         const [moved] = blocks.splice(oldIndex, 1);
         blocks.splice(newIndex, 0, moved);
-        set({ blocks: normalizeSortOrder(blocks), themeDirty: true });
+        const history = withHistoryBeforeMutation(get, 'reorder_blocks');
+        set({
+          blocks: normalizeSortOrder(blocks),
+          themeDirty: true,
+          ...(history ?? {}),
+        });
       },
 
       moveBlockToIndex: (blockId, newIndex) => {
@@ -305,9 +453,15 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
         const oldIndex = blocks.findIndex((b) => b.id === blockId);
         if (oldIndex < 0) return;
         const clamped = Math.max(0, Math.min(newIndex, blocks.length - 1));
+        if (oldIndex === clamped) return;
         const [moved] = blocks.splice(oldIndex, 1);
         blocks.splice(clamped, 0, moved);
-        set({ blocks: normalizeSortOrder(blocks), themeDirty: true });
+        const history = withHistoryBeforeMutation(get, 'move_block');
+        set({
+          blocks: normalizeSortOrder(blocks),
+          themeDirty: true,
+          ...(history ?? {}),
+        });
       },
 
       moveBlockUp: (blockId) => {
@@ -328,6 +482,11 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
 
         const safe = sanitizePropsPatch(patch);
         if (Object.keys(safe).length === 0) return;
+
+        beginPropsEditSession((reason) => {
+          const history = withHistoryBeforeMutation(get, reason);
+          if (history) set(history);
+        });
 
         let changed = false;
         const blocks = get().blocks.map((block) => {
@@ -365,7 +524,7 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
         });
 
         if (!changed) return;
-        set({ blocks });
+        set({ blocks, themeDirty: true, documentRevision: get().documentRevision + 1 });
       },
 
       applyBlockVariant: (blockId, variantId) => {
@@ -375,6 +534,7 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
         const patch = applyBlockVariantSafely(block.type, block.propsJson, variantId);
         if (!patch) return false;
 
+        const history = withHistoryBeforeMutation(get, 'apply_block_variant');
         const blocks = get().blocks.map((item) => {
           if (item.id !== blockId) return item;
           return {
@@ -387,28 +547,36 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
           blocks,
           themeDirty: true,
           documentRevision: get().documentRevision + 1,
+          ...(history ?? {}),
         });
         return true;
       },
 
       setInitialBlocks: (blocks) => {
         const ordered = normalizeSortOrder([...blocks]);
+        resetPropsEditSession();
         set({
           blocks: ordered,
           selectedBlockId: ordered[0]?.id ?? null,
           hoveredBlockId: null,
+          ...emptyDocumentHistoryState(),
         });
       },
 
       setDeviceMode: (mode) => set({ deviceMode: mode }),
 
-      setPageTheme: (patch) =>
+      setPageTheme: (patch) => {
+        const history = withHistoryBeforeMutation(get, 'edit_page_theme');
         set((state) => ({
           pageTheme: { ...state.pageTheme, ...patch },
           themeDirty: true,
-        })),
+          documentRevision: state.documentRevision + 1,
+          ...(history ?? {}),
+        }));
+      },
 
-      setPageSettings: (patch) =>
+      setPageSettings: (patch) => {
+        const history = withHistoryBeforeMutation(get, 'edit_page_settings');
         set((state) => {
           const pageSettings = { ...state.pageSettings, ...patch };
           return {
@@ -419,8 +587,11 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
               seoDescription: pageSettings.metaDescription,
             },
             themeDirty: true,
+            documentRevision: state.documentRevision + 1,
+            ...(history ?? {}),
           };
-        }),
+        });
+      },
 
       setInitialPageTheme: (theme) =>
         set({ pageTheme: theme, themeDirty: false }),
@@ -442,6 +613,7 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
           payload.selectedBlockId,
           null,
         );
+        resetPropsEditSession();
         set({
           blocks,
           pageTheme: payload.pageTheme,
@@ -453,18 +625,21 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
           },
           themeDirty: payload.themeDirty,
           ...selection,
+          ...emptyDocumentHistoryState(),
         });
       },
 
       applyServerSnapshot: (payload) => {
         const blocks = normalizeSortOrder([...payload.blocks]);
         const selection = sanitizeBlockSelection(blocks, get().selectedBlockId, null);
+        resetPropsEditSession();
         set({
           blocks,
           pageTheme: payload.pageTheme,
           pageSettings: payload.pageSettings,
           themeDirty: false,
           ...selection,
+          ...emptyDocumentHistoryState(),
         });
       },
 
@@ -517,9 +692,12 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
         if (starterBlocks.length === 0) return;
 
         if (mode === 'replace') {
+          const history = withHistoryBeforeMutation(get, 'apply_page_starter');
           set({
             blocks: normalizeSortOrder(starterBlocks),
             selectedBlockId: starterBlocks[0]?.id ?? null,
+            themeDirty: true,
+            ...(history ?? {}),
           });
           return;
         }
@@ -531,9 +709,12 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
           insertAt += 1;
         }
 
+        const history = withHistoryBeforeMutation(get, 'apply_page_starter');
         set({
           blocks: normalizeSortOrder(blocks),
           selectedBlockId: starterBlocks[0]?.id ?? null,
+          themeDirty: true,
+          ...(history ?? {}),
         });
       },
 
@@ -544,14 +725,18 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
         const blocks = materializeCampaignTemplate(template);
         if (blocks.length === 0) return;
 
+        const history = withHistoryBeforeMutation(get, 'apply_campaign_template');
         set({
           blocks: normalizeSortOrder(blocks),
           selectedBlockId: selectFirstMeaningfulBlockId(blocks),
           hoveredBlockId: null,
+          themeDirty: true,
+          ...(history ?? {}),
         });
       },
 
-      resetDocument: () =>
+      resetDocument: () => {
+        resetPropsEditSession();
         set({
           blocks: [],
           selectedBlockId: null,
@@ -562,7 +747,9 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
           themeDirty: false,
           documentRevision: 0,
           lastSavedAt: 0,
-        }),
+          ...emptyDocumentHistoryState(),
+        });
+      },
     }),
     {
       name: BUILDER_PERSIST_NAME,
@@ -701,4 +888,12 @@ export function forcePersistBuilderDocument(): void {
 export function selectActiveBlock(state: BuilderDocumentState) {
   if (!state.selectedBlockId) return null;
   return state.blocks.find((b) => b.id === state.selectedBlockId) ?? null;
+}
+
+export function selectCanUndo(state: BuilderDocumentState): boolean {
+  return state.historyPast.length > 0;
+}
+
+export function selectCanRedo(state: BuilderDocumentState): boolean {
+  return state.historyFuture.length > 0;
 }

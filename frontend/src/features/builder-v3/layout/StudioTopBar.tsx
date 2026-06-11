@@ -1,8 +1,21 @@
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Check, DownloadCloud, Eye, Loader2, Monitor, Save, Settings, Smartphone } from 'lucide-react';
+import {
+  ArrowLeft,
+  Check,
+  DownloadCloud,
+  Eye,
+  Loader2,
+  Monitor,
+  Redo2,
+  Save,
+  Settings,
+  Smartphone,
+  Undo2,
+} from 'lucide-react';
 import { ShadButton } from '@/components/ui/primitives';
 import { cn } from '@/lib/utils';
 import type { BuilderDeviceMode } from '@/features/builder-engine/lib/block-design-props';
+import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
 
 export type StudioV3SaveStatus = 'saved' | 'dirty' | 'saving' | 'loading';
 
@@ -70,6 +83,10 @@ export function StudioTopBar({
   documentLoading = false,
 }: StudioTopBarProps) {
   const actionsDisabled = documentLoading || saveStatus === 'loading' || saveStatus === 'saving';
+  const canUndo = useBuilderDocumentStore((s) => s.historyPast.length > 0);
+  const canRedo = useBuilderDocumentStore((s) => s.historyFuture.length > 0);
+  const undo = useBuilderDocumentStore((s) => s.undo);
+  const redo = useBuilderDocumentStore((s) => s.redo);
 
   return (
     <header
@@ -93,6 +110,47 @@ export function StudioTopBar({
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
+        <div
+          className="flex rounded-lg border border-neutral-800 bg-neutral-900/80 p-0.5"
+          role="group"
+          aria-label="Historique"
+        >
+          <button
+            type="button"
+            className={cn(
+              'inline-flex h-8 items-center gap-1 rounded-md px-2 text-xs font-medium transition-colors',
+              canUndo && !actionsDisabled
+                ? 'text-neutral-200 hover:bg-neutral-800'
+                : 'cursor-not-allowed text-neutral-600',
+            )}
+            disabled={!canUndo || actionsDisabled}
+            onClick={() => undo()}
+            title="Annuler (Ctrl+Z)"
+            aria-label="Annuler"
+            data-testid="studio-undo"
+          >
+            <Undo2 className="h-3.5 w-3.5" aria-hidden />
+            Annuler
+          </button>
+          <button
+            type="button"
+            className={cn(
+              'inline-flex h-8 items-center gap-1 rounded-md px-2 text-xs font-medium transition-colors',
+              canRedo && !actionsDisabled
+                ? 'text-neutral-200 hover:bg-neutral-800'
+                : 'cursor-not-allowed text-neutral-600',
+            )}
+            disabled={!canRedo || actionsDisabled}
+            onClick={() => redo()}
+            title="Rétablir (Ctrl+Shift+Z)"
+            aria-label="Rétablir"
+            data-testid="studio-redo"
+          >
+            <Redo2 className="h-3.5 w-3.5" aria-hidden />
+            Rétablir
+          </button>
+        </div>
+
         <div
           className="flex rounded-lg border border-neutral-800 bg-neutral-900/80 p-0.5"
           role="group"

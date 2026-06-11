@@ -8,15 +8,35 @@ function isEditableTarget(target: EventTarget | null): boolean {
   return target.isContentEditable;
 }
 
-/** Studio keyboard shortcuts for canvas block editing. */
+/** Studio keyboard shortcuts for canvas block editing and undo/redo. */
 export function useStudioCanvasShortcuts(enabled = true) {
   useEffect(() => {
     if (!enabled) return;
 
     function onKeyDown(event: KeyboardEvent) {
-      if (isEditableTarget(event.target)) return;
-
       const state = useBuilderDocumentStore.getState();
+      const inEditable = isEditableTarget(event.target);
+
+      if ((event.metaKey || event.ctrlKey) && !inEditable) {
+        const key = event.key.toLowerCase();
+        if (key === 'z') {
+          event.preventDefault();
+          if (event.shiftKey) {
+            state.redo();
+          } else {
+            state.undo();
+          }
+          return;
+        }
+        if (key === 'y') {
+          event.preventDefault();
+          state.redo();
+          return;
+        }
+      }
+
+      if (inEditable) return;
+
       const selectedId = state.selectedBlockId;
 
       if (event.key === 'Escape') {
