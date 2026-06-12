@@ -32,7 +32,23 @@ export const SECTION_STYLE_SUPPORTED_BLOCKS = [
   'cta_band',
   'footer_legal',
   'trust_bar',
+  'premium_bento_features',
+  'animated_stats_strip',
+  'premium_testimonials',
+  'vehicle_showcase_split',
+  'sticky_lead_cta',
+  'campaign_timeline_steps',
 ] as const;
+
+const PREMIUM_SECTION_STYLE_CAPS: SectionStyleCapabilities = {
+  sectionPaddingY: true,
+  sectionPaddingX: true,
+  containerWidth: true,
+  sectionBackground: true,
+  verticalDensity: true,
+  contentAlignment: true,
+  visibility: true,
+};
 
 export type SectionStyleSupportedBlock = (typeof SECTION_STYLE_SUPPORTED_BLOCKS)[number];
 
@@ -94,6 +110,12 @@ export const SECTION_STYLE_CAPABILITIES: Record<
     contentAlignment: true,
     visibility: true,
   },
+  premium_bento_features: PREMIUM_SECTION_STYLE_CAPS,
+  animated_stats_strip: PREMIUM_SECTION_STYLE_CAPS,
+  premium_testimonials: PREMIUM_SECTION_STYLE_CAPS,
+  vehicle_showcase_split: PREMIUM_SECTION_STYLE_CAPS,
+  sticky_lead_cta: PREMIUM_SECTION_STYLE_CAPS,
+  campaign_timeline_steps: PREMIUM_SECTION_STYLE_CAPS,
 };
 
 function pickEnum<T extends string>(

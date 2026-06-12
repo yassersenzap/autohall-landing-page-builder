@@ -11,10 +11,13 @@ import {
   Quote,
   Scale,
   Sparkles,
+  Timer,
   Type,
   Video,
   Wrench,
+  Zap,
 } from 'lucide-react';
+import { PREMIUM_ANIMATED_BLOCK_TYPES } from '@/features/builder/block-motion';
 import {
   getActivePaletteBlocks,
   getRegistryEntry,
@@ -30,6 +33,9 @@ export type CatalogBlockItem = Omit<BlockRegistryEntry, 'icon'> & {
   businessCategory: BuilderBusinessCategoryId;
   icon: LucideIcon;
   sidebarLabel: string;
+  isPremium?: boolean;
+  motionReady?: boolean;
+  businessUseCase?: string;
 };
 
 const BLOCK_ICONS: Record<string, LucideIcon> = {
@@ -55,6 +61,21 @@ const BLOCK_ICONS: Record<string, LucideIcon> = {
   media_only: ImageIcon,
   spacer_divider: Minus,
   video_embed: Video,
+  premium_bento_features: Sparkles,
+  animated_stats_strip: Zap,
+  premium_testimonials: Quote,
+  vehicle_showcase_split: Car,
+  sticky_lead_cta: Megaphone,
+  campaign_timeline_steps: Timer,
+};
+
+const PREMIUM_USE_CASES: Record<string, string> = {
+  premium_bento_features: 'Avantages campagne & highlights véhicule',
+  animated_stats_strip: 'Chiffres clés & réassurance',
+  premium_testimonials: 'Preuve sociale client',
+  vehicle_showcase_split: 'Mise en avant modèle automotive',
+  sticky_lead_cta: 'Conversion persistante',
+  campaign_timeline_steps: 'Parcours offre en étapes',
 };
 
 /** Libellés orientés métier (évite le jargon technique registry). */
@@ -81,14 +102,24 @@ const SIDEBAR_LABELS: Record<string, string> = {
   media_only: 'Visuel pleine largeur',
   spacer_divider: 'Espacement / séparateur',
   video_embed: 'Vidéo intégrée',
+  premium_bento_features: 'Bento avantages premium',
+  animated_stats_strip: 'Chiffres animés',
+  premium_testimonials: 'Témoignages premium',
+  vehicle_showcase_split: 'Showcase véhicule split',
+  sticky_lead_cta: 'CTA sticky lead',
+  campaign_timeline_steps: 'Timeline campagne',
 };
 
 function toCatalogItem(entry: BlockRegistryEntry): CatalogBlockItem {
+  const isPremium = (PREMIUM_ANIMATED_BLOCK_TYPES as readonly string[]).includes(entry.type);
   return {
     ...entry,
     businessCategory: getBusinessCategoryForBlock(entry.type),
     icon: BLOCK_ICONS[entry.type] ?? LayoutTemplate,
     sidebarLabel: SIDEBAR_LABELS[entry.type] ?? entry.label,
+    isPremium,
+    motionReady: isPremium,
+    businessUseCase: PREMIUM_USE_CASES[entry.type],
   };
 }
 
@@ -116,4 +147,8 @@ export function getCatalogByBusinessCategory(): Array<{
 
 export function countCatalogBlocks(): number {
   return getBuilderCatalog().length;
+}
+
+export function getPremiumAnimatedCatalog(): CatalogBlockItem[] {
+  return getBuilderCatalog().filter((item) => item.isPremium);
 }

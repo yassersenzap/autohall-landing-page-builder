@@ -1,5 +1,6 @@
 import {
   getBuilderCatalog,
+  getPremiumAnimatedCatalog,
   type CatalogBlockItem,
 } from './builder-catalog';
 
@@ -23,6 +24,12 @@ export const COMPLETE_SECTION_BLOCK_TYPES = new Set([
   'trust_bar',
   'faq',
   'footer_legal',
+  'premium_bento_features',
+  'animated_stats_strip',
+  'premium_testimonials',
+  'vehicle_showcase_split',
+  'sticky_lead_cta',
+  'campaign_timeline_steps',
 ]);
 
 /** Blocs atomiques — texte, visuel, espacement. */
@@ -58,6 +65,11 @@ export const CATALOG_TIER_META = {
     description:
       'Pages complètes prêtes à personnaliser — marque, copy et visuels éditables.',
   },
+  premiumAnimated: {
+    title: 'Blocs premium 2026',
+    description:
+      'Sections animées export-safe — CSS + runtime vanilla, sans React dans le ZIP.',
+  },
 } as const;
 
 export function getCompleteSectionCatalog(): CatalogBlockItem[] {
@@ -70,15 +82,20 @@ export function getBasicBlockCatalog(): CatalogBlockItem[] {
   return getBuilderCatalog().filter((item) => BASIC_BLOCK_TYPES.has(item.type));
 }
 
+export function getPremiumAnimatedSectionCatalog(): CatalogBlockItem[] {
+  return getPremiumAnimatedCatalog();
+}
+
 export function getCompleteSectionsByCategory(): Array<{
   categoryId: string;
   categoryLabel: string;
   blocks: CatalogBlockItem[];
 }> {
-  const blocks = getCompleteSectionCatalog();
+  const blocks = getCompleteSectionCatalog().filter((block) => !block.isPremium);
   const order = [
     'acquisition',
     'vehicle',
+    'premium_animated',
     'sav',
     'financing',
     'event',
@@ -111,6 +128,7 @@ function labelForCategory(id: string): string {
     event: 'Événement & essai',
     social_proof: 'Réassurance',
     faq_legal: 'FAQ & légal',
+    premium_animated: 'Sections premium animées',
   };
   return labels[id] ?? id;
 }

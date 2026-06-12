@@ -40,6 +40,11 @@ export const BUILDER_BUSINESS_CATEGORIES = [
     label: 'Mise en page',
     description: 'Texte, visuels, vidéo et espacements.',
   },
+  {
+    id: 'premium_animated',
+    label: 'Sections premium animées',
+    description: 'Blocs modernes avec animations CSS export-safe.',
+  },
 ] as const;
 
 export type BuilderBusinessCategoryId =
@@ -69,6 +74,12 @@ export const BLOCK_BUSINESS_CATEGORY: Record<string, BuilderBusinessCategoryId> 
   media_only: 'layout',
   spacer_divider: 'layout',
   video_embed: 'layout',
+  premium_bento_features: 'premium_animated',
+  animated_stats_strip: 'premium_animated',
+  premium_testimonials: 'premium_animated',
+  vehicle_showcase_split: 'premium_animated',
+  sticky_lead_cta: 'premium_animated',
+  campaign_timeline_steps: 'premium_animated',
 };
 
 export function getBusinessCategoryForBlock(

@@ -13,6 +13,14 @@ import {
   buildFAQDefaults,
   buildTestimonialsDefaults,
 } from '../constants/conversion-block-defaults';
+import {
+  buildAnimatedStatsDefaults,
+  buildCampaignTimelineDefaults,
+  buildPremiumBentoDefaults,
+  buildPremiumTestimonialsDefaults,
+  buildStickyLeadCtaDefaults,
+  buildVehicleShowcaseDefaults,
+} from '@/features/builder/blocks/premium-animated/premium-block-defaults';
 import type { CampaignPageTemplate } from './campaign-page-templates.types';
 
 const GENERIC_FOOTER = buildFooterLegalDefaults({
@@ -41,6 +49,12 @@ export const CAMPAIGN_PAGE_TEMPLATE_BLOCK_TYPES = new Set([
   'testimonials',
   'faq',
   'footer_legal',
+  'premium_bento_features',
+  'animated_stats_strip',
+  'premium_testimonials',
+  'vehicle_showcase_split',
+  'sticky_lead_cta',
+  'campaign_timeline_steps',
 ]);
 
 export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
@@ -93,6 +107,26 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
             { title: 'Financement flexible', description: 'Solutions adaptées à votre budget.' },
           ],
         },
+      },
+      {
+        type: 'premium_bento_features',
+        label: 'Bento avantages Chery',
+        props: buildPremiumBentoDefaults({
+          eyebrow: 'Offre Chery',
+          title: 'Les atouts de la gamme Tiggo',
+          subtitle: 'Technologie, confort et rapport qualité-prix pour votre quotidien.',
+        }),
+      },
+      {
+        type: 'animated_stats_strip',
+        label: 'Chiffres clés Chery',
+        props: buildAnimatedStatsDefaults({
+          metrics: [
+            { value: '5 ans', label: 'Garantie', helper: 'Selon conditions constructeur' },
+            { value: '24h', label: 'Réponse lead', helper: 'Réseau Auto Hall' },
+            { value: '50+', label: 'Concessions', helper: 'Au Maroc' },
+          ],
+        }),
       },
       {
         type: 'vehicle_range',
@@ -317,6 +351,27 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
         }),
       },
       {
+        type: 'vehicle_showcase_split',
+        label: 'Showcase Ranger',
+        props: buildVehicleShowcaseDefaults({
+          brand: 'Ford',
+          model: 'Ranger',
+          headline: 'L’utilitaire premium pour tous vos défis',
+          subtitle: 'Capacités tout-terrain, technologies embarquées et finitions haut de gamme.',
+          price: 'À partir de — DH',
+          layout: 'image_right',
+          visualStyle: 'dark_card',
+        }),
+      },
+      {
+        type: 'premium_bento_features',
+        label: 'Bento offre Ford',
+        props: buildPremiumBentoDefaults({
+          title: 'Pourquoi choisir Ford chez Auto Hall',
+          subtitle: 'Un accompagnement complet pour votre projet pick-up ou SUV.',
+        }),
+      },
+      {
         type: 'vehicle_features',
         props: buildVehicleFeaturesDefaults({
           heading: 'Points forts Ranger',
@@ -399,6 +454,18 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
         }),
       },
       {
+        type: 'campaign_timeline_steps',
+        label: 'Parcours essai',
+        props: buildCampaignTimelineDefaults({
+          title: 'Votre essai en 3 étapes',
+          steps: [
+            { title: 'Choisissez votre Opel', description: 'Corsa, Mokka ou Grandland — comparez en ligne.' },
+            { title: 'Réservez un créneau', description: 'Formulaire rapide, confirmation par un conseiller.' },
+            { title: 'Essayez en concession', description: 'Accompagnement personnalisé le jour J.' },
+          ],
+        }),
+      },
+      {
         type: 'benefits',
         props: buildBenefitsDefaults({
           heading: 'Pourquoi essayer chez Auto Hall',
@@ -431,6 +498,16 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
               answer: 'Votre conseiller peut organiser plusieurs essais selon les disponibilités.',
             },
           ],
+        }),
+      },
+      {
+        type: 'sticky_lead_cta',
+        label: 'CTA essai sticky',
+        props: buildStickyLeadCtaDefaults({
+          label: 'Essai Opel',
+          title: 'Réservez votre créneau dès maintenant',
+          primaryCtaLabel: 'Réserver un essai',
+          stickyMode: 'bottom',
         }),
       },
       {
@@ -500,6 +577,18 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
           heading: 'Ils nous font confiance',
           subtitle: 'Retours clients à adapter avec vos témoignages réels.',
         }),
+      },
+      {
+        type: 'premium_testimonials',
+        label: 'Témoignages premium',
+        props: buildPremiumTestimonialsDefaults({
+          title: 'Expériences clients Auto Hall',
+        }),
+      },
+      {
+        type: 'animated_stats_strip',
+        label: 'Indicateurs réseau',
+        props: buildAnimatedStatsDefaults(),
       },
       {
         type: 'faq',

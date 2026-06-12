@@ -38,6 +38,14 @@ import {
   renderSpacerDividerHtml,
   renderVideoEmbedHtml,
 } from './v3-content-blocks.render';
+import {
+  renderAnimatedStatsStripHtml,
+  renderCampaignTimelineStepsHtml,
+  renderPremiumBentoFeaturesHtml,
+  renderPremiumTestimonialsHtml,
+  renderStickyLeadCtaHtml,
+  renderVehicleShowcaseSplitHtml,
+} from './premium-animated-blocks.render';
 
 export type RenderBlockInput = {
   blockType: string;
@@ -1079,6 +1087,30 @@ export function renderBlockHtml(
 
   if (type === 'vehicle_features') {
     return renderFeaturesHtml(props, context);
+  }
+
+  if (type === 'premium_bento_features') {
+    return renderPremiumBentoFeaturesHtml(props);
+  }
+
+  if (type === 'animated_stats_strip') {
+    return renderAnimatedStatsStripHtml(props);
+  }
+
+  if (type === 'premium_testimonials') {
+    return renderPremiumTestimonialsHtml(props);
+  }
+
+  if (type === 'vehicle_showcase_split') {
+    return renderVehicleShowcaseSplitHtml(props, context);
+  }
+
+  if (type === 'sticky_lead_cta') {
+    return renderStickyLeadCtaHtml(props);
+  }
+
+  if (type === 'campaign_timeline_steps') {
+    return renderCampaignTimelineStepsHtml(props);
   }
 
   return `

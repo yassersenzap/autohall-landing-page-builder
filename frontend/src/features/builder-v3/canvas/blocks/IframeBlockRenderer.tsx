@@ -23,6 +23,14 @@ import {
 } from './MarketingBlockPreviews';
 import { CampaignLeadHeroBlockPreview } from './CampaignLeadHeroBlockPreview';
 import { HeroVehicleOfferBlockPreview } from './HeroVehicleOfferBlockPreview';
+import {
+  AnimatedStatsStripBlockPreview,
+  CampaignTimelineStepsBlockPreview,
+  PremiumBentoFeaturesBlockPreview,
+  PremiumTestimonialsBlockPreview,
+  StickyLeadCtaBlockPreview,
+  VehicleShowcaseSplitBlockPreview,
+} from './PremiumAnimatedBlockPreviews';
 
 type IframeBlockRendererProps = {
   block: BuilderDocumentBlock;
@@ -74,6 +82,18 @@ export function IframeBlockRenderer({ block }: IframeBlockRendererProps) {
       return <TrustBarBlockPreview propsJson={block.propsJson} />;
     case 'final_cta':
       return <FinalCtaBlockPreview propsJson={block.propsJson} />;
+    case 'premium_bento_features':
+      return <PremiumBentoFeaturesBlockPreview propsJson={block.propsJson} />;
+    case 'animated_stats_strip':
+      return <AnimatedStatsStripBlockPreview propsJson={block.propsJson} />;
+    case 'premium_testimonials':
+      return <PremiumTestimonialsBlockPreview propsJson={block.propsJson} />;
+    case 'vehicle_showcase_split':
+      return <VehicleShowcaseSplitBlockPreview propsJson={block.propsJson} />;
+    case 'sticky_lead_cta':
+      return <StickyLeadCtaBlockPreview propsJson={block.propsJson} />;
+    case 'campaign_timeline_steps':
+      return <CampaignTimelineStepsBlockPreview propsJson={block.propsJson} />;
     default:
       return (
         <section className="lp-section" style={{ padding: '2rem', background: '#f8fafc' }}>

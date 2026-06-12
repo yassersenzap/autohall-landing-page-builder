@@ -1,5 +1,7 @@
 import { campaignLeadHeroInspectorControls } from '../blocks/campaign-lead-hero/campaign-lead-hero.inspector-controls';
 import { heroVehicleOfferInspectorControls } from '../blocks/hero-vehicle-offer/hero-vehicle-offer.inspector-controls';
+import { PREMIUM_BLOCK_INSPECTOR_CONTROLS } from '../blocks/premium-animated/premium-blocks.inspector-controls';
+import { getBlockMotionInspectorControls } from '../block-motion/block-motion.inspector-controls';
 import { getBlockTypographyInspectorControls } from '../block-typography/block-typography.inspector-controls';
 import { getBlockVisualInspectorControls } from '../block-visual/block-visual.inspector-controls';
 import { buildSectionStyleInspectorControls } from '../section-style/section-style.inspector-controls';
@@ -8,14 +10,22 @@ import type { InspectorControl, InspectorTab } from './inspector-control.types';
 const INSPECTOR_CONTROLS_BY_TYPE = new Map<string, InspectorControl[]>([
   ['hero_vehicle_offer', heroVehicleOfferInspectorControls],
   ['campaign_lead_hero', campaignLeadHeroInspectorControls],
+  ...Object.entries(PREMIUM_BLOCK_INSPECTOR_CONTROLS),
 ]);
 
 export function getInspectorControlsForBlock(blockType: string): InspectorControl[] {
   const blockControls = INSPECTOR_CONTROLS_BY_TYPE.get(blockType) ?? [];
+  const motionControls = getBlockMotionInspectorControls(blockType);
   const visualControls = getBlockVisualInspectorControls(blockType);
   const typographyControls = getBlockTypographyInspectorControls(blockType);
   const styleControls = buildSectionStyleInspectorControls(blockType);
-  return [...blockControls, ...typographyControls, ...visualControls, ...styleControls];
+  return [
+    ...blockControls,
+    ...motionControls,
+    ...typographyControls,
+    ...visualControls,
+    ...styleControls,
+  ];
 }
 
 export function hasDefinitionDrivenInspector(blockType: string): boolean {

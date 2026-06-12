@@ -15,5 +15,8 @@ describe('buildBuilderV3ZipEntries', () => {
     expect(
       entries.find((e) => e.kind === 'text' && e.path === 'assets/style.css')?.content,
     ).toContain('.lp-promo-autohall');
+    expect(entries.some((e) => e.kind === 'text' && e.path === 'js/motion-runtime.js')).toBe(
+      true,
+    );
   });
 });

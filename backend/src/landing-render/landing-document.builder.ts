@@ -34,7 +34,8 @@ export function buildLandingDocumentHtml(
   const scripts = input.includeScripts
     ? `
   <script src="js/landing-config.js"></script>
-  <script src="js/lead-form.js"></script>`
+  <script src="js/lead-form.js"></script>
+  <script src="js/motion-runtime.js"></script>`
     : '';
 
   return `<!DOCTYPE html>

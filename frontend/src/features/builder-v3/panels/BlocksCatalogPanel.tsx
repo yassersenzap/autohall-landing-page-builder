@@ -1,6 +1,6 @@
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical } from 'lucide-react';
+import { GripVertical, Sparkles, Zap } from 'lucide-react';
 import {
   countCatalogBlocks,
   type CatalogBlockItem,
@@ -9,6 +9,7 @@ import {
   CATALOG_TIER_META,
   getBasicBlockCatalog,
   getCompleteSectionsByCategory,
+  getPremiumAnimatedSectionCatalog,
 } from '@/features/builder-engine/foundation/catalog-tiers';
 import { paletteDragId } from '@/features/builder-engine/constants/palette';
 import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
@@ -61,7 +62,23 @@ function DraggableBlockCard({
               <GripVertical className="h-4 w-4" />
             </button>
           </div>
-          <CardDescription className="text-xs text-neutral-500">{block.description}</CardDescription>
+          <CardDescription className="text-xs text-neutral-500">
+            {block.businessUseCase ?? block.description}
+          </CardDescription>
+          {block.isPremium ? (
+            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+              <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[0.625rem] font-semibold uppercase tracking-wide text-amber-200">
+                <Sparkles className="h-3 w-3" aria-hidden />
+                Premium
+              </span>
+              {block.motionReady ? (
+                <span className="inline-flex items-center gap-1 rounded-full border border-sky-500/30 bg-sky-500/10 px-2 py-0.5 text-[0.625rem] font-medium text-sky-200">
+                  <Zap className="h-3 w-3" aria-hidden />
+                  Motion
+                </span>
+              ) : null}
+            </div>
+          ) : null}
         </CardHeader>
         <CardContent className="p-3 pt-2">
           <ShadButton
@@ -88,9 +105,31 @@ function CatalogTierHeader({ title, description }: { title: string; description:
   );
 }
 
+function PremiumAnimatedTier({
+  blocks,
+  onAdd,
+}: {
+  blocks: CatalogBlockItem[];
+  onAdd: (blockType: string) => void;
+}) {
+  if (blocks.length === 0) return null;
+  return (
+    <div className="space-y-2" data-testid="catalog-premium-animated-group">
+      <CatalogTierHeader
+        title={CATALOG_TIER_META.premiumAnimated.title}
+        description={CATALOG_TIER_META.premiumAnimated.description}
+      />
+      {blocks.map((block) => (
+        <DraggableBlockCard key={block.type} block={block} onAdd={onAdd} />
+      ))}
+    </div>
+  );
+}
+
 export function BlocksCatalogPanel() {
   const addBlock = useBuilderDocumentStore((s) => s.addBlock);
   const sectionGroups = getCompleteSectionsByCategory();
+  const premiumBlocks = getPremiumAnimatedSectionCatalog();
   const basicBlocks = getBasicBlockCatalog();
 
   return (
@@ -116,6 +155,10 @@ export function BlocksCatalogPanel() {
             ))}
           </Accordion>
         </div>
+
+        <Separator className="bg-neutral-800" />
+
+        <PremiumAnimatedTier blocks={premiumBlocks} onAdd={addBlock} />
 
         <Separator className="bg-neutral-800" />
 

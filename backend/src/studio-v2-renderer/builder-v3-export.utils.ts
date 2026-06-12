@@ -1,5 +1,9 @@
 import type { RenderAssetMap } from '../landing-render/render-asset.types';
-import { STATIC_LEAD_FORM_JS, STATIC_STYLE_CSS } from '../page-export/static-export.builder';
+import {
+  STATIC_LEAD_FORM_JS,
+  STATIC_MOTION_JS,
+  STATIC_STYLE_CSS,
+} from '../page-export/static-export.builder';
 
 export type BuilderV3ZipTextEntry = {
   kind: 'text';
@@ -30,6 +34,7 @@ export function buildBuilderV3ZipEntries(input: {
       content: input.landingConfigJs,
     },
     { kind: 'text', path: 'js/lead-form.js', content: STATIC_LEAD_FORM_JS },
+    { kind: 'text', path: 'js/motion-runtime.js', content: STATIC_MOTION_JS },
     {
       kind: 'text',
       path: 'README_DEPLOYMENT.txt',

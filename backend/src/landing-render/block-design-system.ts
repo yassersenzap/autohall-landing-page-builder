@@ -179,4 +179,10 @@ export const ACTIVE_V3_BLOCK_TYPES = [
   'media_only',
   'spacer_divider',
   'video_embed',
+  'premium_bento_features',
+  'animated_stats_strip',
+  'premium_testimonials',
+  'vehicle_showcase_split',
+  'sticky_lead_cta',
+  'campaign_timeline_steps',
 ] as const;

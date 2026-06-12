@@ -30,6 +30,12 @@ const DELIVERABLE_TYPES = [
   'faq',
   'final_cta',
   'footer_legal',
+  'premium_bento_features',
+  'animated_stats_strip',
+  'premium_testimonials',
+  'vehicle_showcase_split',
+  'sticky_lead_cta',
+  'campaign_timeline_steps',
 ];
 
 describe('block-registry deliverable palette', () => {

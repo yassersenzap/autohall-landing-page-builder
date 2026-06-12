@@ -68,6 +68,7 @@ describe('premium landing export', () => {
       null,
     );
     expect(html).toContain('js/lead-form.js');
+    expect(html).toContain('js/motion-runtime.js');
     expect(html).toContain('js/landing-config.js');
     expect(html).toContain('assets/style.css');
     expect(html).toContain('data-section-spacing');

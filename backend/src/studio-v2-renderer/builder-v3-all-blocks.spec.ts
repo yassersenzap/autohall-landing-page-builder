@@ -79,10 +79,34 @@ describe('BuilderV3HtmlCompilerService all active blocks', () => {
     media_only: {},
     spacer_divider: { type: 'solid', hauteur: 'M' },
     video_embed: {},
+    premium_bento_features: {
+      title: 'Avantages',
+      cards: [{ title: 'Réseau', description: 'National' }],
+    },
+    animated_stats_strip: {
+      metrics: [{ value: '50+', label: 'Concessions' }],
+    },
+    premium_testimonials: {
+      title: 'Avis',
+      testimonials: [{ quote: 'Excellent', author: 'Karim B.' }],
+    },
+    vehicle_showcase_split: {
+      headline: 'Modèle phare',
+      brand: 'Ford',
+      model: 'Ranger',
+    },
+    sticky_lead_cta: {
+      title: 'Contact',
+      primaryCtaLabel: 'Appeler',
+    },
+    campaign_timeline_steps: {
+      title: 'Étapes',
+      steps: [{ title: 'Choix', description: 'Modèle' }],
+    },
   };
 
   it('routes every active V3 block through landing render', () => {
-    expect(ACTIVE_V3_BLOCK_TYPES.length).toBe(22);
+    expect(ACTIVE_V3_BLOCK_TYPES.length).toBe(28);
     const html = compiler.compile({
       ...baseInput,
       blocks: ACTIVE_V3_BLOCK_TYPES.map((type, index) => ({
