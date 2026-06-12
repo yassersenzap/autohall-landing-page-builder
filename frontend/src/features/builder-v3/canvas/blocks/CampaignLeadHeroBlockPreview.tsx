@@ -156,10 +156,13 @@ export function CampaignLeadHeroBlockPreview({ propsJson }: CampaignLeadHeroBloc
   const props = parseCampaignLeadHeroProps(propsJson);
   const brand = resolveBrandPreset(props.brandId);
   const placement = props.contentPlacement || props.resolvedContentPlacement;
-  const baseSectionClass = buildCampaignLeadHeroSectionClasses({
-    ...props,
-    resolvedContentPlacement: placement,
-  });
+  const baseSectionClass = buildCampaignLeadHeroSectionClasses(
+    {
+      ...props,
+      resolvedContentPlacement: placement,
+    },
+    propsJson,
+  );
   const { className: sectionClass, style: sectionStyle } = mergeBlockSectionPresentation(
     baseSectionClass,
     'campaign_lead_hero',

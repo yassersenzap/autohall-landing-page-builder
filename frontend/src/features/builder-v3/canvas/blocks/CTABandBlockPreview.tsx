@@ -1,5 +1,6 @@
 import { asPropString } from '@/features/builder-engine/lib/block-props';
 import { buildBlockCtaClass, buildBlockDesignClasses, normalizeSectionDesign } from '@/features/builder-engine/lib/block-design-system';
+import { appendBlockVisualToClass } from '@/features/builder/block-visual';
 import { mergeBlockSectionPresentation } from '@/features/builder/section-style';
 import { useBuilderPreviewContext } from '../../context/BuilderPreviewContext';
 import { CanvasCtaLink } from './CanvasCtaLink';
@@ -17,7 +18,11 @@ export function CTABandBlockPreview({
   const interactive = interactiveProp ?? previewContext.interactive;
   const design = normalizeSectionDesign('cta_band', propsJson);
   const { className: sectionClass } = mergeBlockSectionPresentation(
-    `lp-block ${buildBlockDesignClasses('lp-cta-band', design)}`,
+    appendBlockVisualToClass(
+      'cta_band',
+      `lp-block ${buildBlockDesignClasses('lp-cta-band', design)}`,
+      propsJson,
+    ),
     'cta_band',
     propsJson,
   );

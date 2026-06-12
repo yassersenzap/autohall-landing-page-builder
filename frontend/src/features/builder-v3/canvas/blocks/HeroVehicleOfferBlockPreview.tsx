@@ -31,7 +31,7 @@ export function HeroVehicleOfferBlockPreview({ propsJson }: HeroVehicleOfferBloc
   const props = parseHeroVehicleOfferProps(propsJson);
   const brand = resolveBrandPreset(props.brandId);
   const { className: sectionClass, style: sectionStyle } = mergeBlockSectionPresentation(
-    buildHeroVehicleOfferSectionClasses(props),
+    buildHeroVehicleOfferSectionClasses(props, propsJson),
     'hero_vehicle_offer',
     propsJson,
     buildHeroVehicleOfferSectionStyle(

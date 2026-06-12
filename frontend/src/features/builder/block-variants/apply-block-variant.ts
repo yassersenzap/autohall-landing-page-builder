@@ -1,4 +1,5 @@
 import { sanitizeSectionStylePatch } from '@/features/builder/section-style/section-style.registry';
+import { sanitizeBlockVisualPatch } from '@/features/builder/block-visual';
 import type { BlockVariantDefinition } from './block-variant.types';
 import { getBlockVariantById } from './block-variant.registry';
 
@@ -170,6 +171,18 @@ function sanitizeVisualPropsPatch(
 
   for (const [key, value] of Object.entries(raw)) {
     if (EXPORT_FORBIDDEN_KEYS.has(key) || MEDIA_URL_KEYS.has(key)) continue;
+    if (key === 'blockVisual') {
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        const sanitized = sanitizeBlockVisualPatch(
+          blockType,
+          value as Record<string, unknown>,
+        );
+        if (Object.keys(sanitized).length > 0) {
+          out.blockVisual = sanitized;
+        }
+      }
+      continue;
+    }
     if (safeApplyMode !== 'content_optional' && contentKeys.has(key)) continue;
     if (!visualKeys.has(key)) continue;
 
@@ -237,6 +250,13 @@ export function buildVariantPatchFromDefinition(
     }
   }
 
+  if (variant.blockVisualPatch) {
+    const blockVisual = sanitizeBlockVisualPatch(variant.blockType, variant.blockVisualPatch);
+    if (Object.keys(blockVisual).length > 0) {
+      patch.blockVisual = blockVisual;
+    }
+  }
+
   return patch;
 }
 
@@ -268,6 +288,20 @@ export function mergeVariantPatchIntoProps(
         ? (currentProps.sectionStyle as Record<string, unknown>)
         : {};
     merged.sectionStyle = { ...prev, ...(patch.sectionStyle as Record<string, unknown>) };
+  }
+
+  if (
+    patch.blockVisual &&
+    typeof patch.blockVisual === 'object' &&
+    !Array.isArray(patch.blockVisual)
+  ) {
+    const prev =
+      currentProps.blockVisual &&
+      typeof currentProps.blockVisual === 'object' &&
+      !Array.isArray(currentProps.blockVisual)
+        ? (currentProps.blockVisual as Record<string, unknown>)
+        : {};
+    merged.blockVisual = { ...prev, ...(patch.blockVisual as Record<string, unknown>) };
   }
 
   return merged;

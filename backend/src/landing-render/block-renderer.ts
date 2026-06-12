@@ -22,6 +22,7 @@ import {
   normalizeSectionDesign,
 } from './block-design-system';
 import { appendSectionStyleToClass } from './section-style/section-style.classes';
+import { appendBlockVisualToClass } from './block-visual/block-visual.classes';
 import {
   buildPremiumCtaClass,
   buildPremiumSectionClasses,
@@ -382,7 +383,11 @@ function renderHeroHtml(
 function renderTrustBarHtml(props: Record<string, unknown>): string {
   const design = normalizeSectionDesign('trust_bar', props);
   const sectionClass = appendSectionStyleToClass(
-    `lp-block ${buildBlockDesignClasses('lp-trust-bar', design)}`,
+    appendBlockVisualToClass(
+      'trust_bar',
+      `lp-block ${buildBlockDesignClasses('lp-trust-bar', design)}`,
+      props,
+    ),
     props,
   );
   const metrics = parseMetrics(props);
@@ -808,7 +813,11 @@ function renderTestimonialsHtml(props: Record<string, unknown>): string {
 function renderFaqHtml(props: Record<string, unknown>): string {
   const design = normalizeSectionDesign('faq', props);
   const sectionClass = appendSectionStyleToClass(
-    `lp-block ${buildBlockDesignClasses('lp-faq', design)}`,
+    appendBlockVisualToClass(
+      'faq',
+      `lp-block ${buildBlockDesignClasses('lp-faq', design)}`,
+      props,
+    ),
     props,
   );
   const heading = propString(props, 'heading', 'title');

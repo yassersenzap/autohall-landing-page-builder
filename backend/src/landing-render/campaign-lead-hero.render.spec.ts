@@ -162,4 +162,42 @@ describe('campaign-lead-hero.render', () => {
     expect(html).toContain('lp-campaign-lead-hero');
     expect(html).toContain('Demandez votre offre');
   });
+
+  it('reflects blockVisual heroHeight, formWidth, mediaRatio and formCardStyle in export', () => {
+    const html = renderCampaignLeadHeroHtml({
+      ...baseProps,
+      blockVisual: {
+        heroHeight: 'tall',
+        formWidth: 'lg',
+        mediaRatio: 'cinematic',
+        formCardStyle: 'bordered',
+        formPosition: 'right',
+        mediaEmphasis: 'balanced',
+        contentMaxWidth: 'md',
+        verticalAlignment: 'center',
+      },
+    });
+
+    expect(html).toContain('lp-campaign-lead-hero--bv-height-tall');
+    expect(html).toContain('lp-campaign-lead-hero--bv-form-width-lg');
+    expect(html).toContain('lp-campaign-lead-hero--bv-media-ratio-cinematic');
+    expect(html).toContain('lp-campaign-lead-hero--bv-form-card-bordered');
+  });
+
+  it('sanitizes invalid blockVisual values to safe defaults in export HTML', () => {
+    const html = renderCampaignLeadHeroHtml({
+      ...baseProps,
+      blockVisual: {
+        heroHeight: '<script>',
+        formWidth: 'INVALID',
+        formCardStyle: 'neon',
+      },
+    });
+
+    expect(html).toContain('lp-campaign-lead-hero--bv-height-default');
+    expect(html).toContain('lp-campaign-lead-hero--bv-form-width-md');
+    expect(html).toContain('lp-campaign-lead-hero--bv-form-card-elevated');
+    expect(html).not.toContain('<script>');
+    expect(html).not.toContain('neon');
+  });
 });

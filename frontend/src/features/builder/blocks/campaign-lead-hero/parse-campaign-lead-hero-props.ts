@@ -1,4 +1,5 @@
 import { asPropString } from '@/features/builder-engine/lib/block-props';
+import { appendBlockVisualToClass } from '@/features/builder/block-visual';
 import { parseCampaignLeadHeroFormIntegration } from '../../export-contracts';
 import {
   buildHeroFocalStyleVars,
@@ -172,9 +173,10 @@ export function buildCampaignLeadHeroSectionClasses(
     | 'resolvedContentPlacement'
     | 'design'
   >,
+  propsJson?: Record<string, unknown>,
 ): string {
   const { design } = props;
-  return [
+  const base = [
     'lp-campaign-lead-hero',
     `lp-campaign-lead-hero--layout-${props.layoutVariant}`,
     `lp-campaign-lead-hero--fit-${props.imageFit}`,
@@ -189,6 +191,9 @@ export function buildCampaignLeadHeroSectionClasses(
       ? 'lp-campaign-lead-hero--has-progress'
       : 'lp-campaign-lead-hero--no-progress',
   ].join(' ');
+
+  if (!propsJson) return base;
+  return appendBlockVisualToClass('campaign_lead_hero', base, propsJson);
 }
 
 export function buildCampaignLeadHeroSectionStyle(

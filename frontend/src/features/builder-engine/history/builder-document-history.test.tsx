@@ -65,6 +65,32 @@ describe('builder document history engine', () => {
     expect(useBuilderDocumentStore.getState().blocks[0]?.propsJson.title).toBe('After');
   });
 
+  it('blockVisual edit then undo/redo restores previous visual state', () => {
+    useBuilderDocumentStore.getState().setInitialBlocks([campaignHero('clh-1')]);
+    useBuilderDocumentStore.getState().updateBlockProps('clh-1', {
+      blockVisual: { heroHeight: 'tall', formWidth: 'lg' },
+    });
+
+    const after = useBuilderDocumentStore.getState().blocks[0]?.propsJson.blockVisual as Record<
+      string,
+      unknown
+    >;
+    expect(after?.heroHeight).toBe('tall');
+    expect(after?.formWidth).toBe('lg');
+
+    useBuilderDocumentStore.getState().undo();
+    expect(useBuilderDocumentStore.getState().blocks[0]?.propsJson.blockVisual).toBeUndefined();
+
+    useBuilderDocumentStore.getState().redo();
+    const restored = useBuilderDocumentStore.getState().blocks[0]?.propsJson.blockVisual as Record<
+      string,
+      unknown
+    >;
+    expect(restored?.heroHeight).toBe('tall');
+    expect(restored?.formWidth).toBe('lg');
+    expect(useBuilderDocumentStore.getState().blocks[0]?.propsJson.campaignTitle).toBe('Titre custom');
+  });
+
   it('add block then undo/redo', () => {
     useBuilderDocumentStore.getState().setInitialBlocks([heroBlock('hero-1')]);
     useBuilderDocumentStore.getState().addBlock('faq');

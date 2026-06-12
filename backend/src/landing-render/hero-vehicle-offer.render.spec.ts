@@ -142,6 +142,26 @@ describe('hero-vehicle-offer.render', () => {
     expect(html).toContain('Découvrez le nouveau Ranger');
   });
 
+  it('reflects blockVisual image scale, offer card and price emphasis in export', () => {
+    const html = renderHeroVehicleOfferHtml({
+      ...baseProps,
+      blockVisual: {
+        vehicleImageScale: 'xl',
+        offerCardStyle: 'elevated',
+        priceEmphasis: 'strong',
+        heroHeight: 'tall',
+        vehicleImagePosition: 'right',
+        layoutEmphasis: 'vehicle_focus',
+        badgePlacement: 'top',
+      },
+    });
+
+    expect(html).toContain('lp-hero-vehicle-offer--bv-image-scale-xl');
+    expect(html).toContain('lp-hero-vehicle-offer--bv-offer-card-elevated');
+    expect(html).toContain('lp-hero-vehicle-offer--bv-price-emphasis-strong');
+    expect(html).toContain('lp-hero-vehicle-offer--bv-height-tall');
+  });
+
   it('resolveBrandPresetTokens falls back to Auto Hall neutral', () => {
     const fallback = resolveBrandPresetTokens('unknown_brand');
     expect(fallback.primaryColor).toBe('#b91c1c');

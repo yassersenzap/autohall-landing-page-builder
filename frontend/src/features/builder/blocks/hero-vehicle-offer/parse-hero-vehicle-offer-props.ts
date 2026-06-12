@@ -1,4 +1,5 @@
 import { asPropString } from '@/features/builder-engine/lib/block-props';
+import { appendBlockVisualToClass } from '@/features/builder/block-visual';
 import {
   buildHeroFocalStyleVars,
   resolveHeroFocalPoint,
@@ -135,9 +136,10 @@ export function buildHeroVehicleOfferSectionClasses(
     | 'overlayIntensity'
     | 'design'
   >,
+  propsJson?: Record<string, unknown>,
 ): string {
   const { design } = props;
-  return [
+  const base = [
     'lp-hero-vehicle-offer',
     `lp-hero-vehicle-offer--layout-${props.layoutVariant}`,
     `lp-hero-vehicle-offer--fit-${props.imageFit}`,
@@ -150,6 +152,9 @@ export function buildHeroVehicleOfferSectionClasses(
     `lp-hero-vehicle-offer--align-${design.alignContent}`,
     design.showOfferBadge ? 'lp-hero-vehicle-offer--has-badge' : 'lp-hero-vehicle-offer--no-badge',
   ].join(' ');
+
+  if (!propsJson) return base;
+  return appendBlockVisualToClass('hero_vehicle_offer', base, propsJson);
 }
 
 export function buildHeroVehicleOfferSectionStyle(

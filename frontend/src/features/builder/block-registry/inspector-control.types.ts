@@ -1,7 +1,7 @@
 /** Inspector tab targets — mirrors Studio shell tabs. */
 export type InspectorTab = 'content' | 'design' | 'layout' | 'media' | 'advanced';
 
-export type InspectorPropStore = 'content' | 'design' | 'sectionStyle';
+export type InspectorPropStore = 'content' | 'design' | 'sectionStyle' | 'blockVisual';
 
 export type InspectorControlOption<T extends string = string> = {
   value: T;

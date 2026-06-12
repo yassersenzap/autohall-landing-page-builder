@@ -27,6 +27,8 @@ export type BlockVariantDefinition = {
   designPatch?: Record<string, unknown>;
   /** Nested sectionStyle patch — sanitized before apply. */
   sectionStylePatch?: Record<string, unknown>;
+  /** Nested blockVisual patch — per-block visual adjustments. */
+  blockVisualPatch?: Record<string, unknown>;
   safeApplyMode: BlockVariantSafeApplyMode;
 };
 

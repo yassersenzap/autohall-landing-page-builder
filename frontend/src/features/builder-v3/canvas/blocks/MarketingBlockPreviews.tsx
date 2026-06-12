@@ -5,6 +5,7 @@ import {
   normalizeSectionDesign,
 } from '@/features/builder-engine/lib/block-design-system';
 import { mergeBlockSectionPresentation } from '@/features/builder/section-style';
+import { appendBlockVisualToClass } from '@/features/builder/block-visual';
 import {
   buildButtonClasses,
   buildCanvasInlineStyle,
@@ -237,7 +238,11 @@ type TrustBarBlockPreviewProps = {
 export function TrustBarBlockPreview({ propsJson }: TrustBarBlockPreviewProps) {
   const design = normalizeSectionDesign('trust_bar', propsJson);
   const { className: sectionClass } = mergeBlockSectionPresentation(
-    `lp-block ${buildBlockDesignClasses('lp-trust-bar', design)}`,
+    appendBlockVisualToClass(
+      'trust_bar',
+      `lp-block ${buildBlockDesignClasses('lp-trust-bar', design)}`,
+      propsJson,
+    ),
     'trust_bar',
     propsJson,
   );

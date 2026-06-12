@@ -480,9 +480,10 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
       },
 
       updateBlockProps: (blockId, patch) => {
-        if (!findBlockById(get().blocks, blockId)) return;
+        const block = findBlockById(get().blocks, blockId);
+        if (!block) return;
 
-        const safe = sanitizePropsPatch(patch);
+        const safe = sanitizePropsPatch(patch, block.type);
         if (Object.keys(safe).length === 0) return;
 
         beginPropsEditSession((reason) => {
@@ -521,6 +522,15 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
                 ? (block.propsJson.sectionStyle as Record<string, unknown>)
                 : {};
             merged.sectionStyle = { ...prev, ...(safe.sectionStyle as Record<string, unknown>) };
+          }
+          if (safe.blockVisual && typeof safe.blockVisual === 'object' && !Array.isArray(safe.blockVisual)) {
+            const prev =
+              block.propsJson.blockVisual &&
+              typeof block.propsJson.blockVisual === 'object' &&
+              !Array.isArray(block.propsJson.blockVisual)
+                ? (block.propsJson.blockVisual as Record<string, unknown>)
+                : {};
+            merged.blockVisual = { ...prev, ...(safe.blockVisual as Record<string, unknown>) };
           }
           return { ...block, propsJson: merged };
         });

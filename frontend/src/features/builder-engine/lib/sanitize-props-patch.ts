@@ -1,4 +1,5 @@
 import { sanitizeSectionStylePatch } from '@/features/builder/section-style/section-style.registry';
+import { sanitizeBlockVisualPatch, sanitizeBlockVisualPatchUnion } from '@/features/builder/block-visual';
 import { sanitizeBlockDesignProps } from './block-design-props';
 
 /**
@@ -79,6 +80,7 @@ function sanitizeDesignObject(value: Record<string, unknown>): Record<string, un
 
 export function sanitizePropsPatch(
   patch: Record<string, unknown>,
+  blockType?: string,
 ): Record<string, unknown> {
   const out: Record<string, unknown> = {};
 
@@ -121,6 +123,21 @@ export function sanitizePropsPatch(
       !Array.isArray(value)
     ) {
       const sanitized = sanitizeSectionStylePatch(value as Record<string, unknown>);
+      if (Object.keys(sanitized).length > 0) {
+        out[key] = sanitized;
+      }
+      continue;
+    }
+
+    if (
+      key === 'blockVisual' &&
+      value !== null &&
+      typeof value === 'object' &&
+      !Array.isArray(value)
+    ) {
+      const sanitized = blockType
+        ? sanitizeBlockVisualPatch(blockType, value as Record<string, unknown>)
+        : sanitizeBlockVisualPatchUnion(value as Record<string, unknown>);
       if (Object.keys(sanitized).length > 0) {
         out[key] = sanitized;
       }

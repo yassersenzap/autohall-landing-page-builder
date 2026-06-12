@@ -52,6 +52,12 @@ const CAMPAIGN_LEAD_HERO_VARIANTS: BlockVariantDefinition[] = [
       sectionBackground: 'dark',
       sectionPaddingY: 'xl',
     },
+    blockVisualPatch: {
+      heroHeight: 'viewport',
+      mediaRatio: 'cinematic',
+      formCardStyle: 'glass',
+      mediaEmphasis: 'media_focus',
+    },
   },
   {
     id: 'campaign-hero-dual-media',
@@ -102,6 +108,12 @@ const CAMPAIGN_LEAD_HERO_VARIANTS: BlockVariantDefinition[] = [
       sectionPaddingY: 'sm',
       sectionPaddingX: 'sm',
       verticalDensity: 'compact',
+    },
+    blockVisualPatch: {
+      heroHeight: 'compact',
+      formWidth: 'sm',
+      formCardStyle: 'flat',
+      verticalAlignment: 'center',
     },
   },
   {
@@ -183,6 +195,12 @@ const HERO_VEHICLE_OFFER_VARIANTS: BlockVariantDefinition[] = [
       sectionBackground: 'muted',
       contentAlignment: 'left',
     },
+    blockVisualPatch: {
+      offerCardStyle: 'elevated',
+      priceEmphasis: 'strong',
+      layoutEmphasis: 'offer_focus',
+      vehicleImageScale: 'lg',
+    },
   },
   {
     id: 'vehicle-hero-centered-premium',
@@ -260,6 +278,12 @@ const HERO_VEHICLE_OFFER_VARIANTS: BlockVariantDefinition[] = [
       sectionPaddingY: 'sm',
       verticalDensity: 'compact',
     },
+    blockVisualPatch: {
+      heroHeight: 'compact',
+      vehicleImageScale: 'md',
+      priceEmphasis: 'subtle',
+      offerCardStyle: 'flat',
+    },
   },
 ];
 
@@ -302,6 +326,11 @@ const FAQ_VARIANTS: BlockVariantDefinition[] = [
     sectionStylePatch: {
       sectionPaddingY: 'sm',
       verticalDensity: 'compact',
+    },
+    blockVisualPatch: {
+      faqStyle: 'divided',
+      faqDensity: 'compact',
+      iconStyle: 'plus',
     },
   },
   {

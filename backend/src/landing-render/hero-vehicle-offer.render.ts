@@ -3,6 +3,7 @@ import {
   appendSectionStyleToClass,
   appendSectionStyleToInlineStyle,
 } from './section-style/section-style.classes';
+import { appendBlockVisualToClass } from './block-visual/block-visual.classes';
 import { buildBrandInlineStyle, resolveBrandPresetTokens } from './brand-presets';
 import {
   buildHeroFocalInlineStyle,
@@ -99,7 +100,10 @@ function buildSectionClasses(props: Record<string, unknown>): string {
     showOfferBadge ? 'lp-hero-vehicle-offer--has-badge' : 'lp-hero-vehicle-offer--no-badge',
   ].join(' ');
 
-  return appendSectionStyleToClass(base, props);
+  return appendSectionStyleToClass(
+    appendBlockVisualToClass('hero_vehicle_offer', base, props),
+    props,
+  );
 }
 
 function buildSectionInlineStyle(props: Record<string, unknown>, brandId: unknown): string {

@@ -3,6 +3,7 @@ import {
   appendSectionStyleToClass,
   appendSectionStyleToInlineStyle,
 } from './section-style/section-style.classes';
+import { appendBlockVisualToClass } from './block-visual/block-visual.classes';
 import {
   parseCampaignLeadHeroFormIntegration,
   SYMFONY_FORM_STATIC_EXPORT_NOTE,
@@ -157,7 +158,10 @@ function buildSectionClasses(props: Record<string, unknown>): string {
     showProgressBar ? 'lp-campaign-lead-hero--has-progress' : 'lp-campaign-lead-hero--no-progress',
   ].join(' ');
 
-  return appendSectionStyleToClass(base, props);
+  return appendSectionStyleToClass(
+    appendBlockVisualToClass('campaign_lead_hero', base, props),
+    props,
+  );
 }
 
 function buildSectionInlineStyle(props: Record<string, unknown>, brandId: unknown): string {
