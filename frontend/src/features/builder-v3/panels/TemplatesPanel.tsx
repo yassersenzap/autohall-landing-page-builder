@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { AlertTriangle, LayoutTemplate, Sparkles, Wand2 } from 'lucide-react';
+import { AlertTriangle, LayoutTemplate, Sparkles, Wand2, Zap } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { CATALOG_TIER_META } from '@/features/builder-engine/foundation/catalog-tiers';
 import {
-  CATALOG_TIER_META,
-} from '@/features/builder-engine/foundation/catalog-tiers';
-import {
-  getCampaignPageTemplates,
+  countPremiumBlocks,
   getCampaignPageTemplateById,
+  getCampaignPageTemplates,
+  getGroupedCampaignPageTemplates,
+  templateHasMotion,
 } from '@/features/builder-engine/foundation/campaign-page-templates';
 import type { CampaignPageTemplate } from '@/features/builder-engine/foundation/campaign-page-templates.types';
 import {
@@ -82,6 +83,8 @@ function CampaignTemplateCard({
 }) {
   const theme = getPageBrandTheme(resolvePageBrandThemeId(template.brandId));
   const variantCount = countTemplateVariants(template);
+  const premiumCount = countPremiumBlocks(template);
+  const motionReady = templateHasMotion(template);
 
   return (
     <article
@@ -113,12 +116,33 @@ function CampaignTemplateCard({
           <span className="rounded-md border border-neutral-800 px-2 py-1">
             Structure · {templateCategoryLabel(template.category)}
           </span>
-          <span className="rounded-md border border-neutral-800 px-2 py-1" data-testid={`template-block-count-${template.id}`}>
+          <span
+            className="rounded-md border border-neutral-800 px-2 py-1"
+            data-testid={`template-block-count-${template.id}`}
+          >
             Blocs inclus · {template.blocks.length}
           </span>
+          {premiumCount > 0 ? (
+            <span
+              className="inline-flex items-center gap-1 rounded-md border border-amber-500/25 bg-amber-500/5 px-2 py-1 text-amber-200/90"
+              data-testid={`template-premium-count-${template.id}`}
+            >
+              <Sparkles className="h-3 w-3" aria-hidden />
+              Premium · {premiumCount}
+            </span>
+          ) : null}
+          {motionReady ? (
+            <span
+              className="inline-flex items-center gap-1 rounded-md border border-sky-500/25 bg-sky-500/5 px-2 py-1 text-sky-200/90"
+              data-testid={`template-motion-ready-${template.id}`}
+            >
+              <Zap className="h-3 w-3" aria-hidden />
+              Motion
+            </span>
+          ) : null}
           {variantCount > 0 ? (
             <span className="rounded-md border border-neutral-800 px-2 py-1">
-              Styles rapides appliqués · {variantCount}
+              Styles rapides · {variantCount}
             </span>
           ) : null}
         </div>
@@ -149,6 +173,8 @@ export function TemplatesPanel() {
   const pendingTemplate = pendingTemplateId
     ? getCampaignPageTemplateById(pendingTemplateId)
     : undefined;
+
+  const templateGroups = getGroupedCampaignPageTemplates();
 
   function requestCampaignTemplate(templateId: string) {
     if (blocks.length > 0) {
@@ -207,18 +233,30 @@ export function TemplatesPanel() {
           </div>
         ) : null}
 
-        <div className="space-y-2.5">
+        <div className="space-y-4" data-testid="campaign-templates-by-use-case">
           <TierHeader
             title={CATALOG_TIER_META.campaignTemplates.title}
             description={CATALOG_TIER_META.campaignTemplates.description}
           />
-          {getCampaignPageTemplates().map((template) => (
-            <CampaignTemplateCard
-              key={template.id}
-              template={template}
-              onUse={() => requestCampaignTemplate(template.id)}
-            />
+          {templateGroups.map(({ group, templates }) => (
+            <section
+              key={group.id}
+              className="space-y-2.5"
+              data-testid={`template-use-case-group-${group.id}`}
+            >
+              <TierHeader title={group.label} description={group.description} />
+              {templates.map((template) => (
+                <CampaignTemplateCard
+                  key={template.id}
+                  template={template}
+                  onUse={() => requestCampaignTemplate(template.id)}
+                />
+              ))}
+            </section>
           ))}
+          <p className="px-1 text-[0.625rem] text-neutral-600">
+            {getCampaignPageTemplates().length} templates · export HTML statique compatible cPanel
+          </p>
         </div>
 
         <Separator className="bg-neutral-800" />

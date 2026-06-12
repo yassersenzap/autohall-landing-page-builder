@@ -9,6 +9,9 @@ const CATEGORY_LABELS: Record<CampaignPageTemplate['category'], string> = {
   model: 'Modèle',
   'test-drive': 'Essai',
   generic: 'Générique',
+  brand: 'Marque',
+  'vehicle-offer': 'Offre véhicule',
+  service: 'Service',
 };
 
 type TemplateThumbnailProps = {
@@ -29,7 +32,9 @@ function LayoutMiniature({ template }: { template: CampaignPageTemplate }) {
     >
       {slice.map((block, index) => {
         const isHero =
-          block.type === 'campaign_lead_hero' || block.type === 'hero_vehicle_offer';
+          block.type === 'campaign_lead_hero' ||
+          block.type === 'hero_vehicle_offer' ||
+          block.type === 'vehicle_showcase_split';
         const height = isHero ? 'h-5' : index === slice.length - 1 ? 'h-2' : 'h-3';
         const opacity = isHero ? 'opacity-100' : 'opacity-70';
         return (

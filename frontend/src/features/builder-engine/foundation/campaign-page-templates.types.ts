@@ -17,7 +17,17 @@ export type CampaignPageTemplateCategory =
   | 'campaign'
   | 'model'
   | 'test-drive'
-  | 'generic';
+  | 'generic'
+  | 'brand'
+  | 'vehicle-offer'
+  | 'service';
+
+/** Studio grouping for TemplatesPanel — production page recipes. */
+export type CampaignPageTemplateUseCase =
+  | 'brand-page'
+  | 'vehicle-offer'
+  | 'conversion'
+  | 'service';
 
 export type CampaignPageTemplateBrandId = BrandPresetId | 'autohall';
 
@@ -28,6 +38,8 @@ export type CampaignPageTemplate = {
   description: string;
   brandId: CampaignPageTemplateBrandId;
   category: CampaignPageTemplateCategory;
+  /** Panel grouping — marque, offre, conversion, service. */
+  useCase: CampaignPageTemplateUseCase;
   /** Short label for cards / future thumbnail slot */
   previewLabel: string;
   recommendedUse: string;

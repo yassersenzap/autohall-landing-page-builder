@@ -13,6 +13,11 @@ import { readStudioAppliedVariantId } from '@/features/builder/block-variants/st
 import { stripStudioOnlyBlockProps } from '@/features/builder/block-variants/studio-block-metadata';
 
 const EXPECTED_TEMPLATE_IDS = [
+  'ford-brand-showcase',
+  'opel-brand-showcase',
+  'vehicle-offer-page',
+  'test-drive-conversion',
+  'sav-service-campaign',
   'chery-campaign-offer',
   'chery-model-landing',
   'ford-offer-campaign',
@@ -21,8 +26,8 @@ const EXPECTED_TEMPLATE_IDS = [
 ] as const;
 
 describe('campaign page templates registry', () => {
-  it('contains the five premium SI Digital templates', () => {
-    expect(CAMPAIGN_PAGE_TEMPLATES).toHaveLength(5);
+  it('contains brand page recipes and legacy campaign templates', () => {
+    expect(CAMPAIGN_PAGE_TEMPLATES).toHaveLength(10);
     for (const id of EXPECTED_TEMPLATE_IDS) {
       expect(getCampaignPageTemplateById(id)).toBeDefined();
     }

@@ -21,7 +21,18 @@ import {
   buildStickyLeadCtaDefaults,
   buildVehicleShowcaseDefaults,
 } from '@/features/builder/blocks/premium-animated/premium-block-defaults';
+import { BRAND_PAGE_TEMPLATES } from './brand-page-templates';
+import {
+  getCampaignPageTemplatesByUseCase,
+  TEMPLATE_USE_CASE_GROUPS,
+} from './brand-page-template-recipes';
 import type { CampaignPageTemplate } from './campaign-page-templates.types';
+
+export { getCampaignPageTemplatesByUseCase, TEMPLATE_USE_CASE_GROUPS };
+export {
+  countPremiumBlocks,
+  templateHasMotion,
+} from './brand-page-template-recipes';
 
 const GENERIC_FOOTER = buildFooterLegalDefaults({
   legalText:
@@ -58,6 +69,7 @@ export const CAMPAIGN_PAGE_TEMPLATE_BLOCK_TYPES = new Set([
 ]);
 
 export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
+  ...BRAND_PAGE_TEMPLATES,
   {
     id: 'chery-campaign-offer',
     name: 'Campagne offre Chery',
@@ -65,6 +77,7 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
       'Landing acquisition complète : hero lead, points forts offre, gamme modèles, réassurance SAV et FAQ.',
     brandId: 'chery',
     category: 'campaign',
+    useCase: 'conversion',
     previewLabel: 'Chery · Campagne',
     recommendedUse: 'Promotions Tiggo / Tigo — capture lead rapide avec preuves de confiance.',
     blocks: [
@@ -217,6 +230,7 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
       'Page modèle premium : hero véhicule, caractéristiques, galerie, finitions, formulaire et CTA.',
     brandId: 'chery',
     category: 'model',
+    useCase: 'vehicle-offer',
     previewLabel: 'Chery · Modèle',
     recommendedUse: 'Lancement ou mise en avant d’un modèle précis (ex. Tiggo 7 Pro).',
     blocks: [
@@ -318,6 +332,7 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
       'Parcours conversion Ford : hero lead, fiche offre, caractéristiques, galerie, CTA et FAQ.',
     brandId: 'ford',
     category: 'campaign',
+    useCase: 'conversion',
     previewLabel: 'Ford · Offre',
     recommendedUse: 'Opérations commerciales Ranger, Puma ou Mustang — lead + preuve produit.',
     blocks: [
@@ -418,6 +433,7 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
       'Landing essai / test-drive : hero lead Opel, formulaire dédié, avantages, confiance et FAQ.',
     brandId: 'opel',
     category: 'test-drive',
+    useCase: 'conversion',
     previewLabel: 'Opel · Essai',
     recommendedUse: 'Campagnes essai Corsa, Mokka ou Grandland — conversion formulaire prioritaire.',
     blocks: [
@@ -523,6 +539,7 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
       'Gabarit marque neutre : hero lead, highlights offre, formulaire, témoignages et FAQ.',
     brandId: 'autohall',
     category: 'generic',
+    useCase: 'conversion',
     previewLabel: 'Auto Hall · Générique',
     recommendedUse: 'Opérations multi-marques ou pages réseau à personnaliser rapidement.',
     blocks: [
@@ -608,4 +625,8 @@ export function getCampaignPageTemplateById(id: string): CampaignPageTemplate | 
 
 export function getCampaignPageTemplates(): CampaignPageTemplate[] {
   return CAMPAIGN_PAGE_TEMPLATES;
+}
+
+export function getGroupedCampaignPageTemplates() {
+  return getCampaignPageTemplatesByUseCase(CAMPAIGN_PAGE_TEMPLATES);
 }

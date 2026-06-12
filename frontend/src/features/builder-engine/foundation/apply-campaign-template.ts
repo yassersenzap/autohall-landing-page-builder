@@ -81,6 +81,7 @@ export function materializeCampaignTemplate(
 const MEANINGFUL_HERO_TYPES = [
   'campaign_lead_hero',
   'hero_vehicle_offer',
+  'vehicle_showcase_split',
   'promo_autohall',
   'hero_campaign',
   'hero_form_campaign',

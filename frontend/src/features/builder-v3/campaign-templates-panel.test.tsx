@@ -8,14 +8,17 @@ describe('TemplatesPanel campaign presets', () => {
     useBuilderDocumentStore.getState().resetDocument();
   });
 
-  it('renders premium campaign templates', () => {
+  it('renders premium campaign templates grouped by use case', () => {
     render(<TemplatesPanel />);
 
     expect(screen.getByTestId('studio-templates-panel')).toBeInTheDocument();
+    expect(screen.getByTestId('campaign-templates-by-use-case')).toBeInTheDocument();
+    expect(screen.getByTestId('template-use-case-group-brand-page')).toBeInTheDocument();
+    expect(screen.getByTestId('template-use-case-group-vehicle-offer')).toBeInTheDocument();
+    expect(screen.getByTestId('campaign-template-card-ford-brand-showcase')).toBeInTheDocument();
+    expect(screen.getByTestId('campaign-template-card-opel-brand-showcase')).toBeInTheDocument();
     expect(screen.getByTestId('campaign-template-card-chery-campaign-offer')).toBeInTheDocument();
-    expect(screen.getByTestId('campaign-template-card-ford-offer-campaign')).toBeInTheDocument();
-    expect(screen.getByText('Campagne offre Chery')).toBeInTheDocument();
-    expect(screen.getByText('Essai Opel')).toBeInTheDocument();
+    expect(screen.getByText('Page marque Ford')).toBeInTheDocument();
   });
 
   it('applies template directly on empty page without confirmation', () => {
@@ -30,14 +33,16 @@ describe('TemplatesPanel campaign presets', () => {
     expect(screen.queryByTestId('campaign-template-replace-warning')).not.toBeInTheDocument();
   });
 
-  it('renders premium thumbnails with brand badges and block counts', () => {
+  it('renders premium thumbnails with brand badges, block counts and motion indicators', () => {
     render(<TemplatesPanel />);
 
-    expect(screen.getByTestId('template-thumbnail-chery-campaign-offer')).toBeInTheDocument();
-    expect(screen.getByTestId('template-brand-badge-chery-campaign-offer')).toBeInTheDocument();
-    expect(screen.getByTestId('template-block-count-ford-offer-campaign')).toHaveTextContent(
+    expect(screen.getByTestId('template-thumbnail-ford-brand-showcase')).toBeInTheDocument();
+    expect(screen.getByTestId('template-brand-badge-ford-brand-showcase')).toBeInTheDocument();
+    expect(screen.getByTestId('template-block-count-ford-brand-showcase')).toHaveTextContent(
       /Blocs inclus · \d+/,
     );
+    expect(screen.getByTestId('template-motion-ready-ford-brand-showcase')).toBeInTheDocument();
+    expect(screen.getByTestId('template-premium-count-ford-brand-showcase')).toBeInTheDocument();
     expect(screen.getAllByText(/Usage recommandé ·/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Thème appliqué ·/).length).toBeGreaterThan(0);
   });
