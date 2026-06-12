@@ -16,9 +16,11 @@ import {
   groupControlsBySection,
   readControlValue,
 } from './inspector-control-utils';
+import { RepeaterControl } from './RepeaterControl';
 
 type InspectorControlRendererProps = {
   controls: InspectorControl[];
+  blockType: string;
   propsJson: Record<string, unknown>;
   blockId: string;
   onPatch: (patch: Record<string, unknown>) => void;
@@ -27,11 +29,13 @@ type InspectorControlRendererProps = {
 
 function InspectorField({
   control,
+  blockType,
   propsJson,
   blockId,
   onPatch,
 }: {
   control: InspectorControl;
+  blockType: string;
   propsJson: Record<string, unknown>;
   blockId: string;
   onPatch: (patch: Record<string, unknown>) => void;
@@ -41,6 +45,18 @@ function InspectorField({
   const apply = (next: string | number | boolean) => {
     onPatch(buildControlPatch(propsJson, control, next));
   };
+
+  if (control.type === 'repeater') {
+    return (
+      <RepeaterControl
+        control={control}
+        blockType={blockType}
+        propsJson={propsJson}
+        blockId={blockId}
+        onPatch={onPatch}
+      />
+    );
+  }
 
   if (control.type === 'brand') {
     return (
@@ -289,6 +305,7 @@ function InspectorField({
 
 export function InspectorControlRenderer({
   controls,
+  blockType,
   propsJson,
   blockId,
   onPatch,
@@ -324,6 +341,7 @@ export function InspectorControlRenderer({
               <InspectorField
                 key={control.key}
                 control={control}
+                blockType={blockType}
                 propsJson={propsJson}
                 blockId={blockId}
                 onPatch={onPatch}

@@ -7,6 +7,7 @@ import { appendSectionStyleToClass } from './section-style/section-style.classes
 import { buildHeroFocalInlineStyle, resolveHeroFocalPoint } from './hero-image-controls';
 import { resolveHeroImageSrc } from './render-asset.resolve';
 import type { LandingRenderContext } from './render-asset.types';
+import { sanitizeExportHref } from './safe-export-link';
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, '&amp;')
@@ -238,7 +239,7 @@ export function renderVehicleShowcaseSplitHtml(
   const ctas = parseObjectList(props, 'ctas')
     .map((c) => ({
       label: propString(c, 'label') ?? '',
-      href: propString(c, 'href', 'target') ?? '#lead-form',
+      href: sanitizeExportHref(propString(c, 'href', 'target')),
       variant: propString(c, 'variant') === 'secondary' ? 'secondary' : 'primary',
     }))
     .filter((c) => c.label);
@@ -312,16 +313,15 @@ export function renderStickyLeadCtaHtml(props: Record<string, unknown>): string 
 
   const primaryLabel =
     propString(props, 'primaryCtaLabel') ?? propString(primary, 'label');
-  const primaryHref =
-    propString(props, 'primaryCtaHref') ??
-    propString(primary, 'href', 'target') ??
-    '#lead-form';
+  const primaryHref = sanitizeExportHref(
+    propString(props, 'primaryCtaHref') ?? propString(primary, 'href', 'target'),
+  );
   const secondaryLabel =
     propString(props, 'secondaryCtaLabel') ?? propString(secondary, 'label');
-  const secondaryHref =
-    propString(props, 'secondaryCtaHref') ??
-    propString(secondary, 'href', 'target') ??
-    '#offer';
+  const secondaryHref = sanitizeExportHref(
+    propString(props, 'secondaryCtaHref') ?? propString(secondary, 'href', 'target'),
+    '#offer',
+  );
 
   const sectionClass = buildPremiumSectionClass('sticky_lead_cta', 'lp-sticky-cta', props);
   const motionAttrs = buildMotionDataAttributes(props);

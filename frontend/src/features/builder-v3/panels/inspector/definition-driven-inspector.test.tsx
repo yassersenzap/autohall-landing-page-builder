@@ -76,6 +76,7 @@ describe('definition-driven inspector', () => {
     render(
       <InspectorControlRenderer
         controls={controls}
+        blockType="hero_vehicle_offer"
         propsJson={block.propsJson}
         blockId={block.id}
         onPatch={() => {}}
@@ -98,6 +99,7 @@ describe('definition-driven inspector', () => {
     render(
       <InspectorControlRenderer
         controls={[headlineControl]}
+        blockType="hero_vehicle_offer"
         propsJson={block.propsJson}
         blockId={block.id}
         onPatch={onPatch}
@@ -132,6 +134,7 @@ describe('definition-driven inspector', () => {
     render(
       <InspectorControlRenderer
         controls={mediaControls}
+        blockType="hero_vehicle_offer"
         propsJson={block.propsJson}
         blockId={block.id}
         onPatch={() => {}}

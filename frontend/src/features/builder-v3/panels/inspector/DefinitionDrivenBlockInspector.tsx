@@ -31,6 +31,7 @@ export function DefinitionDrivenBlockInspector({
   return (
     <InspectorControlRenderer
       controls={controls}
+      blockType={block.type}
       propsJson={block.propsJson}
       blockId={block.id}
       onPatch={onPatch}

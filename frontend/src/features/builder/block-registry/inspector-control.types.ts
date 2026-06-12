@@ -1,3 +1,5 @@
+import type { CollectionItemField } from '../collection-editor/collection-field.types';
+
 /** Inspector tab targets — mirrors Studio shell tabs. */
 export type InspectorTab = 'content' | 'design' | 'layout' | 'media' | 'advanced';
 
@@ -60,6 +62,19 @@ export type InspectorSpacingControl = InspectorControlBase & {
   options: InspectorControlOption[];
 };
 
+export type InspectorRepeaterControl = InspectorControlBase & {
+  type: 'repeater';
+  itemLabel: string;
+  previewField: string;
+  minItems?: number;
+  maxItems?: number;
+  addItemLabel?: string;
+  emptyState?: string;
+  reorder?: boolean;
+  duplicate?: boolean;
+  itemFields: CollectionItemField[];
+};
+
 export type InspectorControl =
   | InspectorTextControl
   | InspectorNumberControl
@@ -68,4 +83,5 @@ export type InspectorControl =
   | InspectorColorControl
   | InspectorBrandControl
   | InspectorImageControl
-  | InspectorSpacingControl;
+  | InspectorSpacingControl
+  | InspectorRepeaterControl;

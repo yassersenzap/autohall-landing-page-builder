@@ -250,6 +250,7 @@ describe('studio media workflow', () => {
     render(
       <InspectorControlRenderer
         controls={controls}
+        blockType="hero_vehicle_offer"
         propsJson={propsJson}
         blockId="block-hvo"
         onPatch={() => {}}
@@ -270,6 +271,7 @@ describe('studio media workflow', () => {
     render(
       <InspectorControlRenderer
         controls={controls}
+        blockType="hero_vehicle_offer"
         propsJson={propsJson}
         blockId="block-hvo"
         onPatch={() => {}}
@@ -284,6 +286,7 @@ describe('studio media workflow', () => {
     render(
       <InspectorControlRenderer
         controls={getInspectorControlsForBlock('hero_vehicle_offer').filter((c) => c.tab === 'media')}
+        blockType="hero_vehicle_offer"
         propsJson={heroBlock().propsJson}
         blockId="block-hvo"
         onPatch={() => {}}

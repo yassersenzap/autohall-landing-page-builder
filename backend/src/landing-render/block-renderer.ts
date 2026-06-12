@@ -8,6 +8,7 @@ import {
 } from './block-style';
 import { resolveHeroImageSrc } from './render-asset.resolve';
 import type { LandingRenderContext } from './render-asset.types';
+import { sanitizeExportHref } from './safe-export-link';
 import {
   renderLeadFormConsentHtml,
   renderLeadFormFieldsHtml,
@@ -571,8 +572,9 @@ function parseVehicleRangeItems(
         imageSrc: resolveHeroImageSrc(merged, context),
         imageAlt: propString(item, 'alt') ?? '',
         ctaText: propString(item, 'ctaText', 'buttonText') ?? 'Découvrir',
-        ctaTarget:
-          propString(item, 'ctaTarget', 'buttonTarget') ?? '#lead-form',
+        ctaTarget: sanitizeExportHref(
+          propString(item, 'ctaTarget', 'buttonTarget'),
+        ),
       };
     })
     .filter((item) => item.name);

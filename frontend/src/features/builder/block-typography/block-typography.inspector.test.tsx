@@ -19,6 +19,7 @@ describe('block typography inspector', () => {
       const { unmount } = render(
         <InspectorControlRenderer
           controls={controls}
+          blockType={blockType}
           propsJson={{}}
           blockId={`block-${blockType}`}
           onPatch={() => {}}
@@ -43,6 +44,7 @@ describe('block typography inspector', () => {
     render(
       <InspectorControlRenderer
         controls={controls}
+        blockType="campaign_lead_hero"
         propsJson={{}}
         blockId="block-clh"
         onPatch={onPatch}

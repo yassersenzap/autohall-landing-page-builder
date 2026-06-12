@@ -1,5 +1,6 @@
 import type { LandingRenderContext } from './render-asset.types';
 import { resolveHeroImageSrc } from './render-asset.resolve';
+import { sanitizeExportHref } from './safe-export-link';
 import {
   buildBlockCtaClass,
   buildBlockDesignClasses,
@@ -211,7 +212,9 @@ export function renderPricingTrimHtml(props: Record<string, unknown>): string {
       const name = propString(trim, 'name') ?? '';
       const price = propString(trim, 'price') ?? '';
       const buttonText = propString(trim, 'buttonText') ?? 'Choisir';
-      const buttonHref = propString(trim, 'buttonHref', 'buttonTarget') ?? '#lead-form';
+      const buttonHref = sanitizeExportHref(
+        propString(trim, 'buttonHref', 'buttonTarget'),
+      );
       const features = Array.isArray(trim.features)
         ? trim.features.filter((f): f is string => typeof f === 'string' && f.trim().length > 0)
         : [];

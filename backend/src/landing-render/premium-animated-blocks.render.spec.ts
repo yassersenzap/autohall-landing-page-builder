@@ -70,6 +70,67 @@ describe('premium animated blocks render', () => {
     expect(css).toContain('.lp-motion');
   });
 
+  it('escapes repeated item text in premium blocks', () => {
+    const html = renderBlockHtml({
+      blockType: 'premium_testimonials',
+      sortOrder: 0,
+      propsJson: {
+        testimonials: [
+          {
+            quote: '<script>alert(1)</script>',
+            author: 'Client & Co',
+            role: 'Casablanca',
+          },
+        ],
+      },
+    });
+    expect(html).toContain('&lt;script&gt;');
+    expect(html).not.toContain('<script>alert');
+    expect(html).toContain('Client &amp; Co');
+  });
+
+  it('renders edited vehicle showcase specs and ctas safely', () => {
+    const html = renderBlockHtml({
+      blockType: 'vehicle_showcase_split',
+      sortOrder: 0,
+      propsJson: {
+        headline: 'Ranger',
+        specs: [{ label: 'Puissance', value: '200 ch' }],
+        ctas: [
+          { label: 'Essai', href: 'javascript:evil()', variant: 'primary' },
+          { label: 'Offre', href: '#lead-form', variant: 'secondary' },
+        ],
+      },
+    });
+    expect(html).toContain('Puissance');
+    expect(html).toContain('href="#lead-form"');
+    expect(html).not.toContain('javascript:');
+  });
+
+  it('handles empty repeated arrays without broken markup', () => {
+    const html = renderBlockHtml({
+      blockType: 'campaign_timeline_steps',
+      sortOrder: 0,
+      propsJson: {
+        title: 'Parcours',
+        steps: [],
+      },
+    });
+    expect(html).toContain('lp-campaign-timeline');
+    expect(html).not.toContain('undefined');
+  });
+
+  it('export html does not contain studio metadata keys', () => {
+    const html = renderBlockHtml({
+      blockType: 'animated_stats_strip',
+      sortOrder: 0,
+      propsJson: {
+        metrics: [{ value: '10', label: 'Villes', _studioRowId: 'x' }],
+      },
+    });
+    expect(html).not.toContain('_studio');
+  });
+
   it('index.html includes motion runtime once', () => {
     const html = buildIndexHtml(
       { title: 'LP', campaignName: 'Camp', brand: 'Auto Hall' },

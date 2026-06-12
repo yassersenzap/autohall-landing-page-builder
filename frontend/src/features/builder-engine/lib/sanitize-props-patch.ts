@@ -2,6 +2,8 @@ import { clampFocalPercent } from '@/features/builder/blocks/hero-vehicle-offer/
 import { sanitizeBlockTypographyPatch } from '@/features/builder/block-typography';
 import { sanitizeSectionStylePatch } from '@/features/builder/section-style/section-style.registry';
 import { sanitizeBlockVisualPatch, sanitizeBlockVisualPatchUnion } from '@/features/builder/block-visual';
+import { sanitizeCollectionArray } from '@/features/builder/collection-editor/collection-sanitizer';
+import { getCollectionSchema } from '@/features/builder/collection-editor/collection-schemas';
 import { sanitizeBlockDesignProps } from './block-design-props';
 
 /**
@@ -186,8 +188,11 @@ export function sanitizePropsPatch(
     }
 
     if (Array.isArray(value)) {
-      const sanitized = sanitizeArrayValue(value);
-      if (sanitized.length > 0) {
+      const schema = blockType ? getCollectionSchema(blockType, key) : undefined;
+      const sanitized = schema
+        ? sanitizeCollectionArray(blockType!, key, value)
+        : sanitizeArrayValue(value);
+      if (sanitized.length > 0 || (schema && (schema.minItems ?? 0) === 0)) {
         out[key] = sanitized;
       }
     }

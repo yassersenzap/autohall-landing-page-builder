@@ -34,4 +34,24 @@ describe('sanitizePropsPatch', () => {
       showMessage: true,
     });
   });
+
+  it('sanitizes collection arrays with schema when blockType is provided', () => {
+    const patch = sanitizePropsPatch(
+      {
+        steps: [
+          { title: 'Étape 1', description: 'Détail', extra: 'drop' },
+          { title: '', description: '' },
+        ],
+      },
+      'campaign_timeline_steps',
+    );
+
+    expect(patch.steps).toHaveLength(1);
+    expect(patch.steps?.[0]).toEqual({ title: 'Étape 1', description: 'Détail' });
+  });
+
+  it('persists empty specs array for vehicle showcase', () => {
+    const patch = sanitizePropsPatch({ specs: [] }, 'vehicle_showcase_split');
+    expect(patch.specs).toEqual([]);
+  });
 });
