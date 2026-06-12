@@ -1,5 +1,10 @@
 /** Block-specific visual adjustment props — render + export safe. */
 
+import {
+  normalizeFormPosition,
+  shouldEmitFormPositionVisualClass,
+} from '../blocks/campaign-lead-hero/campaign-lead-hero-layout';
+
 export type CampaignLeadHeroBlockVisual = {
   heroHeight: 'compact' | 'default' | 'tall' | 'viewport';
   formWidth: 'sm' | 'md' | 'lg';
@@ -135,10 +140,14 @@ export function parseCampaignLeadHeroBlockVisual(
 ): CampaignLeadHeroBlockVisual {
   const raw = readBlockVisualRaw(propsJson);
   const d = campaignLeadHeroBlockVisualDefaults;
+  const layoutVariant =
+    typeof propsJson.layoutVariant === 'string' ? propsJson.layoutVariant : 'media_left_form_right';
+  const formPosition = normalizeFormPosition(layoutVariant, raw.formPosition ?? d.formPosition);
+
   return {
     heroHeight: pickEnum(raw.heroHeight, ['compact', 'default', 'tall', 'viewport'], d.heroHeight),
     formWidth: pickEnum(raw.formWidth, ['sm', 'md', 'lg'], d.formWidth),
-    formPosition: pickEnum(raw.formPosition, ['left', 'right'], d.formPosition),
+    formPosition,
     mediaRatio: pickEnum(
       raw.mediaRatio,
       ['portrait', 'square', 'landscape', 'cinematic', 'full'],
@@ -224,18 +233,23 @@ function visualMod(prefix: string, key: string, value: string): string | null {
 
 export function buildCampaignLeadHeroBlockVisualClasses(
   visual: CampaignLeadHeroBlockVisual,
+  layoutVariant = 'media_left_form_right',
 ): string[] {
   const prefix = 'lp-campaign-lead-hero';
-  return [
+  const classes = [
     visualMod(prefix, 'height', visual.heroHeight),
     visualMod(prefix, 'form-width', visual.formWidth),
-    visualMod(prefix, 'form-position', visual.formPosition),
+    shouldEmitFormPositionVisualClass(layoutVariant)
+      ? visualMod(prefix, 'form-position', visual.formPosition)
+      : null,
     visualMod(prefix, 'media-ratio', visual.mediaRatio),
     visualMod(prefix, 'media-emphasis', visual.mediaEmphasis),
     visualMod(prefix, 'content-max-width', visual.contentMaxWidth),
     visualMod(prefix, 'form-card', visual.formCardStyle),
     visualMod(prefix, 'vertical-align', visual.verticalAlignment),
   ].filter((c): c is string => c !== null);
+
+  return classes;
 }
 
 export function buildHeroVehicleOfferBlockVisualClasses(
@@ -286,7 +300,10 @@ export function buildBlockVisualClasses(
 ): string[] {
   switch (blockType) {
     case 'campaign_lead_hero':
-      return buildCampaignLeadHeroBlockVisualClasses(parseCampaignLeadHeroBlockVisual(propsJson));
+      return buildCampaignLeadHeroBlockVisualClasses(
+        parseCampaignLeadHeroBlockVisual(propsJson),
+        typeof propsJson.layoutVariant === 'string' ? propsJson.layoutVariant : undefined,
+      );
     case 'hero_vehicle_offer':
       return buildHeroVehicleOfferBlockVisualClasses(parseHeroVehicleOfferBlockVisual(propsJson));
     case 'faq':
@@ -313,6 +330,7 @@ export function appendBlockVisualToClass(
 export function sanitizeBlockVisualPatch(
   blockType: string,
   patch: Record<string, unknown> | undefined,
+  contextProps?: Record<string, unknown>,
 ): Record<string, unknown> {
   if (!patch || typeof patch !== 'object' || Array.isArray(patch)) return {};
 
@@ -320,9 +338,18 @@ export function sanitizeBlockVisualPatch(
   if (!allowed) return {};
 
   const out: Record<string, unknown> = {};
+  const mergeProps = contextProps
+    ? {
+        ...contextProps,
+        blockVisual: {
+          ...readBlockVisualRaw(contextProps),
+          ...patch,
+        },
+      }
+    : { blockVisual: patch };
 
   if (blockType === 'campaign_lead_hero') {
-    const parsed = parseCampaignLeadHeroBlockVisual({ blockVisual: patch });
+    const parsed = parseCampaignLeadHeroBlockVisual(mergeProps);
     for (const key of allowed) {
       if (key in patch) {
         out[key] = parsed[key as keyof CampaignLeadHeroBlockVisual];

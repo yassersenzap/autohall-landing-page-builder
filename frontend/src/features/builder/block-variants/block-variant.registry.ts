@@ -26,6 +26,11 @@ const CAMPAIGN_LEAD_HERO_VARIANTS: BlockVariantDefinition[] = [
       containerWidth: 'default',
       sectionBackground: 'default',
     },
+    blockVisualPatch: {
+      formCardStyle: 'elevated',
+      mediaEmphasis: 'balanced',
+      heroHeight: 'default',
+    },
   },
   {
     id: 'campaign-hero-background-image',

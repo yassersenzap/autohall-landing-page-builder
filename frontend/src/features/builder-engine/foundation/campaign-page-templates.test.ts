@@ -67,9 +67,21 @@ describe('template variant materialization', () => {
     expect(hero?.propsJson.campaignTitle).toBe('Offre Chery du moment');
     expect(hero?.propsJson.formCtaLabel).toBe('Obtenir mon offre');
     expect(hero?.propsJson.layoutVariant).toBe('media_left_form_right');
+    expect(hero?.propsJson.contentPlacement).toBe('beside_form');
     expect(readStudioAppliedVariantId(hero!.propsJson)).toBe(
       'campaign-hero-split-premium-form',
     );
+  });
+
+  it('materializes templates with sectionStyle and blockVisual rhythm defaults', () => {
+    const chery = materializeCampaignTemplate(getCampaignPageTemplateById('chery-campaign-offer')!);
+    const faq = chery.find((b) => b.type === 'faq');
+    expect(faq?.propsJson.sectionStyle).toMatchObject({ sectionPaddingY: 'xl' });
+    expect(faq?.propsJson.blockVisual).toMatchObject({ faqStyle: 'boxed' });
+
+    const ford = materializeCampaignTemplate(getCampaignPageTemplateById('ford-offer-campaign')!);
+    const fordFaq = ford.find((b) => b.type === 'faq');
+    expect(fordFaq?.propsJson.blockVisual).toMatchObject({ faqStyle: 'divided' });
   });
 
   it('strips studio variant metadata from export-safe props', () => {

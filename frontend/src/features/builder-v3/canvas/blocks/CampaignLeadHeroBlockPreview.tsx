@@ -260,6 +260,16 @@ export function CampaignLeadHeroBlockPreview({ propsJson }: CampaignLeadHeroBloc
     <CampaignContent props={props} brandName={brand.name} mode="beside" />
   ) : null;
 
+  const formColumn =
+    showBeside && !background ? (
+      <div className="lp-campaign-lead-hero__form-column">
+        {besideCampaign}
+        {formBlock}
+      </div>
+    ) : (
+      formBlock
+    );
+
   if (background) {
     return (
       <section className={sectionClass} style={sectionStyle}>
@@ -284,10 +294,9 @@ export function CampaignLeadHeroBlockPreview({ propsJson }: CampaignLeadHeroBloc
   return (
     <section className={sectionClass} style={sectionStyle}>
       <div className="lp-campaign-lead-hero__inner">
-        {formFirst ? formBlock : null}
+        {formFirst ? formColumn : null}
         {mediaStage}
-        {formFirst ? null : formBlock}
-        {!background && showBeside ? besideCampaign : null}
+        {formFirst ? null : formColumn}
       </div>
     </section>
   );

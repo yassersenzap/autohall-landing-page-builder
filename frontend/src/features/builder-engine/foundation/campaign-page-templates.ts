@@ -75,6 +75,7 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
         type: 'offer_highlights',
         label: 'Points forts offre',
         props: {
+          sectionStyle: { sectionPaddingY: 'lg', sectionBackground: 'default' },
           heading: 'Les avantages de l’offre',
           subtitle: 'Un pack valeur pensé pour faciliter votre projet automobile.',
           modelName: 'Chery Tiggo',
@@ -96,7 +97,8 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
       {
         type: 'vehicle_range',
         label: 'Gamme Chery',
-        props: buildVehicleRangeDefaults({
+        props: {
+          ...buildVehicleRangeDefaults({
           heading: 'Explorez la gamme Chery',
           subtitle: 'SUV urbains et familiaux — comparez les motorisations disponibles.',
           vehicles: [
@@ -132,11 +134,14 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
             },
           ],
         }),
+          sectionStyle: { sectionPaddingY: 'xl', sectionBackground: 'muted' },
+        },
       },
       {
         type: 'benefits',
         label: 'Réassurance SAV',
-        props: buildBenefitsDefaults({
+        props: {
+          ...buildBenefitsDefaults({
           heading: 'Un accompagnement Auto Hall',
           subtitle: 'Vente, financement et après-vente dans le même réseau.',
           items: [
@@ -154,10 +159,16 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
             },
           ],
         }),
+          sectionStyle: { sectionPaddingY: 'lg', sectionBackground: 'muted' },
+        },
       },
       {
         type: 'faq',
-        props: GENERIC_FAQ,
+        props: {
+          ...GENERIC_FAQ,
+          blockVisual: { faqStyle: 'boxed', faqDensity: 'comfortable', iconStyle: 'chevron' },
+          sectionStyle: { sectionPaddingY: 'xl', sectionBackground: 'default' },
+        },
       },
       {
         type: 'footer_legal',
@@ -322,14 +333,22 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
       {
         type: 'cta_band',
         variant: { variantId: 'cta-band-dark-conversion' },
-        props: buildCTABandDefaults({
+        props: {
+          ...buildCTABandDefaults({
           title: 'Une question sur l’offre Ford ?',
           buttonText: 'Parler à un conseiller',
         }),
+          blockVisual: { ctaLayout: 'split', ctaIntensity: 'dark', ctaAlignment: 'left' },
+          sectionStyle: { sectionPaddingY: 'lg' },
+        },
       },
       {
         type: 'faq',
-        props: GENERIC_FAQ,
+        props: {
+          ...GENERIC_FAQ,
+          blockVisual: { faqStyle: 'divided', faqDensity: 'comfortable' },
+          sectionStyle: { sectionPaddingY: 'xl', sectionBackground: 'muted' },
+        },
       },
       {
         type: 'footer_legal',
@@ -388,7 +407,11 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
       },
       {
         type: 'trust_bar',
-        props: buildTrustBarDefaults(),
+        props: {
+          ...buildTrustBarDefaults(),
+          blockVisual: { trustLayout: 'grid', trustDensity: 'comfortable', trustStyle: 'cards' },
+          sectionStyle: { sectionPaddingY: 'md', sectionBackground: 'muted' },
+        },
       },
       {
         type: 'faq',

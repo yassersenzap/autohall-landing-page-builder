@@ -878,12 +878,11 @@ function renderFinalCtaHtml(props: Record<string, unknown>): string {
 }
 
 function renderFooterLegalHtml(props: Record<string, unknown>): string {
-  const design = normalizeBlockDesign('footer_legal', props);
+  const design = normalizeSectionDesign('footer_legal', props);
   const sectionClass = appendSectionStyleToClass(
-    buildBlockSectionClasses('footer_legal', 'lp-footer-legal', design),
+    `lp-block ${buildBlockDesignClasses('lp-footer-legal', design)}`,
     props,
   );
-  const inlineVars = buildInlineStyleVars(design);
 
   const legalText = propString(props, 'legalText', 'text');
   const links = parseLinks(props);
@@ -896,12 +895,12 @@ function renderFooterLegalHtml(props: Record<string, unknown>): string {
     .join('');
 
   return `
-    <section class="${sectionClass}"${inlineVars}>
+    <footer class="${sectionClass}">
       <div class="lp-section">
         ${legalText ? `<p class="lp-footer-legal__text">${escapeHtml(legalText)}</p>` : ''}
-        ${linksHtml ? `<div class="lp-footer-legal__links">${linksHtml}</div>` : ''}
+        ${linksHtml ? `<nav class="lp-footer-legal__links" aria-label="Liens légaux">${linksHtml}</nav>` : ''}
       </div>
-    </section>`;
+    </footer>`;
 }
 
 export function renderBlockHtml(

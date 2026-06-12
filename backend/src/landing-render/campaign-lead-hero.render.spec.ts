@@ -73,6 +73,34 @@ describe('campaign-lead-hero.render', () => {
     expect(html).toContain('Nouvelle Chery Tiggo 8');
   });
 
+  it('split layout with beside_form renders campaign copy in form column for export parity', () => {
+    const html = renderCampaignLeadHeroHtml({
+      ...baseProps,
+      layoutVariant: 'media_left_form_right',
+      contentPlacement: 'beside_form',
+      campaignTitle: 'Titre à côté du formulaire',
+      campaignSubtitle: 'Sous-titre visible en export',
+    });
+
+    expect(html).toContain('lp-campaign-lead-hero--content-beside_form');
+    expect(html).toContain('lp-campaign-lead-hero__form-column');
+    expect(html).toContain('lp-campaign-lead-hero__campaign--beside');
+    expect(html).toContain('Titre à côté du formulaire');
+    expect(html).toContain('Sous-titre visible en export');
+    expect(html).toMatch(/lp-campaign-lead-hero__form-column[\s\S]*lp-campaign-lead-hero__campaign--beside/);
+  });
+
+  it('sanitizes impossible formPosition against layout in export classes', () => {
+    const html = renderCampaignLeadHeroHtml({
+      ...baseProps,
+      layoutVariant: 'media_left_form_right',
+      blockVisual: { formPosition: 'left', formWidth: 'md' },
+    });
+
+    expect(html).not.toContain('lp-campaign-lead-hero--bv-form-position-left');
+    expect(html).toContain('lp-campaign-lead-hero--bv-form-width-md');
+  });
+
   it('supports dual media layout with both images safely', () => {
     const html = renderCampaignLeadHeroHtml({
       ...baseProps,

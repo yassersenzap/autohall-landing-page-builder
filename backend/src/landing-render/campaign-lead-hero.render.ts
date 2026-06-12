@@ -320,6 +320,11 @@ function renderFormShellHtml(props: Record<string, unknown>): string {
     </aside>`;
 }
 
+function renderFormColumnHtml(besideCampaignHtml: string, formHtml: string): string {
+  if (!besideCampaignHtml) return formHtml;
+  return `<div class="lp-campaign-lead-hero__form-column">${besideCampaignHtml}${formHtml}</div>`;
+}
+
 export function renderCampaignLeadHeroHtml(
   props: Record<string, unknown>,
   context?: LandingRenderContext,
@@ -339,6 +344,8 @@ export function renderCampaignLeadHeroHtml(
   const besideCampaign =
     placement === 'beside_form' ? renderCampaignHtml(props, brand.name, 'beside') : '';
 
+  const formColumnHtml = renderFormColumnHtml(besideCampaign, formHtml);
+
   if (background) {
     return `
     <section class="${sectionClass}" style="${inlineStyle}">
@@ -350,13 +357,14 @@ export function renderCampaignLeadHeroHtml(
   }
 
   const mediaStage = `<div class="lp-campaign-lead-hero__media-stage">${mediaHtml}${overlayCampaign}</div>`;
+  const columnHtml = placement === 'beside_form' ? formColumnHtml : formHtml;
 
   return `
     <section class="${sectionClass}" style="${inlineStyle}">
       <div class="lp-campaign-lead-hero__inner">
-        ${formFirst ? formHtml : ''}
+        ${formFirst ? columnHtml : ''}
         ${mediaStage}
-        ${formFirst ? '' : formHtml}
+        ${formFirst ? '' : columnHtml}
       </div>
     </section>`;
 }

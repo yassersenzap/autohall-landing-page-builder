@@ -3,6 +3,8 @@
  * Keep in sync with frontend/src/features/builder/block-visual/block-visual.registry.ts
  */
 
+import { normalizeFormPosition } from '../campaign-lead-hero-layout';
+
 const SAFE_CLASS_TOKEN = /^[a-z0-9_]+$/;
 
 function pickEnum<T extends string>(
@@ -29,11 +31,14 @@ function visualMod(prefix: string, key: string, value: string): string | null {
   return `${prefix}--bv-${key}-${value}`;
 }
 
-function parseCampaignLeadHeroBlockVisual(raw: Record<string, unknown>) {
+function parseCampaignLeadHeroBlockVisual(propsJson: Record<string, unknown>) {
+  const raw = readBlockVisualRaw(propsJson);
+  const layoutVariant =
+    typeof propsJson.layoutVariant === 'string' ? propsJson.layoutVariant : 'media_left_form_right';
   return {
     heroHeight: pickEnum(raw.heroHeight, ['compact', 'default', 'tall', 'viewport'] as const, 'default'),
     formWidth: pickEnum(raw.formWidth, ['sm', 'md', 'lg'] as const, 'md'),
-    formPosition: pickEnum(raw.formPosition, ['left', 'right'] as const, 'right'),
+    formPosition: normalizeFormPosition(layoutVariant, raw.formPosition),
     mediaRatio: pickEnum(
       raw.mediaRatio,
       ['portrait', 'square', 'landscape', 'cinematic', 'full'] as const,
@@ -102,12 +107,13 @@ function parseTrustBarBlockVisual(raw: Record<string, unknown>) {
   };
 }
 
-function buildCampaignLeadHeroClasses(visual: ReturnType<typeof parseCampaignLeadHeroBlockVisual>): string[] {
+function buildCampaignLeadHeroClasses(
+  visual: ReturnType<typeof parseCampaignLeadHeroBlockVisual>,
+): string[] {
   const prefix = 'lp-campaign-lead-hero';
   return [
     visualMod(prefix, 'height', visual.heroHeight),
     visualMod(prefix, 'form-width', visual.formWidth),
-    visualMod(prefix, 'form-position', visual.formPosition),
     visualMod(prefix, 'media-ratio', visual.mediaRatio),
     visualMod(prefix, 'media-emphasis', visual.mediaEmphasis),
     visualMod(prefix, 'content-max-width', visual.contentMaxWidth),
@@ -163,7 +169,7 @@ export function buildBlockVisualClasses(
   const raw = readBlockVisualRaw(propsJson);
   switch (blockType) {
     case 'campaign_lead_hero':
-      return buildCampaignLeadHeroClasses(parseCampaignLeadHeroBlockVisual(raw));
+      return buildCampaignLeadHeroClasses(parseCampaignLeadHeroBlockVisual(propsJson));
     case 'hero_vehicle_offer':
       return buildHeroVehicleOfferClasses(parseHeroVehicleOfferBlockVisual(raw));
     case 'faq':

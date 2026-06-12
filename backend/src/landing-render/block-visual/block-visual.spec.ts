@@ -61,5 +61,24 @@ describe('block-visual export parity (content blocks)', () => {
 
     expect(html).not.toContain('_studio');
     expect(html).not.toContain('campaign-hero-split');
+    expect(html).not.toContain('data-studio');
+  });
+
+  it('footer_legal export uses V3 design classes and footer element', () => {
+    const html = renderBlockHtml({
+      blockType: 'footer_legal',
+      sortOrder: 99,
+      propsJson: {
+        legalText: '© Auto Hall — Exemple.',
+        links: [{ label: 'Mentions légales', href: '#mentions' }],
+        design: { variant: 'standard', tone: 'neutral', alignment: 'center' },
+      },
+    });
+
+    expect(html).toContain('<footer class=');
+    expect(html).toContain('lp-footer-legal');
+    expect(html).toContain('lp-footer-legal--tone-neutral');
+    expect(html).toContain('© Auto Hall — Exemple.');
+    expect(html).toContain('<nav class="lp-footer-legal__links"');
   });
 });

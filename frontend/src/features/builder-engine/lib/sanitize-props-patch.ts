@@ -81,6 +81,7 @@ function sanitizeDesignObject(value: Record<string, unknown>): Record<string, un
 export function sanitizePropsPatch(
   patch: Record<string, unknown>,
   blockType?: string,
+  contextProps?: Record<string, unknown>,
 ): Record<string, unknown> {
   const out: Record<string, unknown> = {};
 
@@ -136,7 +137,7 @@ export function sanitizePropsPatch(
       !Array.isArray(value)
     ) {
       const sanitized = blockType
-        ? sanitizeBlockVisualPatch(blockType, value as Record<string, unknown>)
+        ? sanitizeBlockVisualPatch(blockType, value as Record<string, unknown>, contextProps)
         : sanitizeBlockVisualPatchUnion(value as Record<string, unknown>);
       if (Object.keys(sanitized).length > 0) {
         out[key] = sanitized;

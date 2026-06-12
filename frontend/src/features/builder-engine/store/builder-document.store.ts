@@ -483,7 +483,7 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
         const block = findBlockById(get().blocks, blockId);
         if (!block) return;
 
-        const safe = sanitizePropsPatch(patch, block.type);
+        const safe = sanitizePropsPatch(patch, block.type, block.propsJson);
         if (Object.keys(safe).length === 0) return;
 
         beginPropsEditSession((reason) => {
