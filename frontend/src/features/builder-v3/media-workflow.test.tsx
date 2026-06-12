@@ -256,8 +256,8 @@ describe('studio media workflow', () => {
       />,
     );
 
-    expect(screen.queryByLabelText('Point focal horizontal (%)')).not.toBeInTheDocument();
-    expect(screen.queryByLabelText('Point focal vertical (%)')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Horizontal')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Vertical')).not.toBeInTheDocument();
   });
 
   it('shows focal controls when crop preset is custom', () => {
@@ -276,9 +276,8 @@ describe('studio media workflow', () => {
       />,
     );
 
-    expect(screen.getByLabelText('Point focal horizontal (%)')).toBeInTheDocument();
-    expect(screen.getByLabelText('Point focal vertical (%)')).toBeInTheDocument();
-    expect(screen.getAllByText('Utilisé quand recadrage personnalisé est actif.')).toHaveLength(2);
+    expect(screen.getByLabelText('Horizontal')).toBeInTheDocument();
+    expect(screen.getByLabelText('Vertical')).toBeInTheDocument();
   });
 
   it('hero_vehicle_offer Media tab groups Visuels, Responsive and Recadrage', () => {

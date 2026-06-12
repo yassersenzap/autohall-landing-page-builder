@@ -1,4 +1,5 @@
 import { asPropString } from '@/features/builder-engine/lib/block-props';
+import { appendBlockTypographyToClass } from '@/features/builder/block-typography';
 import { appendBlockVisualToClass } from '@/features/builder/block-visual';
 import {
   buildHeroFocalStyleVars,
@@ -154,7 +155,8 @@ export function buildHeroVehicleOfferSectionClasses(
   ].join(' ');
 
   if (!propsJson) return base;
-  return appendBlockVisualToClass('hero_vehicle_offer', base, propsJson);
+  const withVisual = appendBlockVisualToClass('hero_vehicle_offer', base, propsJson);
+  return appendBlockTypographyToClass(withVisual, 'hero_vehicle_offer', propsJson);
 }
 
 export function buildHeroVehicleOfferSectionStyle(

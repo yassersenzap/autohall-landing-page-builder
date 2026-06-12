@@ -91,6 +91,32 @@ describe('builder document history engine', () => {
     expect(useBuilderDocumentStore.getState().blocks[0]?.propsJson.campaignTitle).toBe('Titre custom');
   });
 
+  it('typography and focal edits then undo/redo restore previous values', () => {
+    useBuilderDocumentStore.getState().setInitialBlocks([campaignHero('clh-1')]);
+    useBuilderDocumentStore.getState().updateBlockProps('clh-1', {
+      typography: { titleScale: 'display', titleWeight: 'black' },
+      cropPreset: 'custom',
+      focalPointX: 25,
+      focalPointY: 75,
+    });
+
+    const after = useBuilderDocumentStore.getState().blocks[0]?.propsJson;
+    expect(after?.typography).toMatchObject({ titleScale: 'display', titleWeight: 'black' });
+    expect(after?.focalPointX).toBe(25);
+    expect(after?.focalPointY).toBe(75);
+
+    useBuilderDocumentStore.getState().undo();
+    const undone = useBuilderDocumentStore.getState().blocks[0]?.propsJson;
+    expect(undone?.typography).toBeUndefined();
+    expect(undone?.focalPointX).toBeUndefined();
+
+    useBuilderDocumentStore.getState().redo();
+    const restored = useBuilderDocumentStore.getState().blocks[0]?.propsJson;
+    expect(restored?.typography).toMatchObject({ titleScale: 'display', titleWeight: 'black' });
+    expect(restored?.focalPointX).toBe(25);
+    expect(restored?.focalPointY).toBe(75);
+  });
+
   it('add block then undo/redo', () => {
     useBuilderDocumentStore.getState().setInitialBlocks([heroBlock('hero-1')]);
     useBuilderDocumentStore.getState().addBlock('faq');

@@ -4,6 +4,7 @@ import {
   appendSectionStyleToInlineStyle,
 } from './section-style/section-style.classes';
 import { appendBlockVisualToClass } from './block-visual/block-visual.classes';
+import { appendBlockTypographyToClass } from './block-typography/block-typography.classes';
 import { buildBrandInlineStyle, resolveBrandPresetTokens } from './brand-presets';
 import {
   buildHeroFocalInlineStyle,
@@ -101,7 +102,11 @@ function buildSectionClasses(props: Record<string, unknown>): string {
   ].join(' ');
 
   return appendSectionStyleToClass(
-    appendBlockVisualToClass('hero_vehicle_offer', base, props),
+    appendBlockTypographyToClass(
+      appendBlockVisualToClass('hero_vehicle_offer', base, props),
+      'hero_vehicle_offer',
+      props,
+    ),
     props,
   );
 }

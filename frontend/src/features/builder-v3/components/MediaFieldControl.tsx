@@ -5,7 +5,9 @@ import { getBuilderPersistPageVersionId } from '@/features/builder-engine/store/
 import { assetPublicFileUrl } from '@/lib/page-assets-api';
 import { Label, ShadButton } from '@/components/ui/primitives';
 import { cn } from '@/lib/utils';
+import { clampFocalPercent } from '@/features/builder/blocks/hero-vehicle-offer/hero-image-controls';
 import { sanitizePersistedMediaUrl } from '../lib/media-url-safety';
+import { FocalPointPicker } from './FocalPointPicker';
 import { clearMediaValuePatch } from './media-field-utils';
 
 export type MediaFieldValue = {
@@ -26,6 +28,10 @@ type MediaFieldControlProps = {
   allowBlobFallback?: boolean;
   showAlt?: boolean;
   showObjectFit?: boolean;
+  /** Block-level focal point (0–100 %) when crop/object-fit implies cropping. */
+  focalPoint?: { x: number; y: number };
+  onFocalChange?: (x: number, y: number) => void;
+  showFocalPicker?: boolean;
 };
 
 function resolvePreviewUrl(value: MediaFieldValue): string {
@@ -52,6 +58,9 @@ export function MediaFieldControl({
   allowBlobFallback = false,
   showAlt = true,
   showObjectFit = true,
+  focalPoint,
+  onFocalChange,
+  showFocalPicker = false,
 }: MediaFieldControlProps) {
   const pageVersionId = getBuilderPersistPageVersionId();
   const { assets, uploading, upload } = usePageAssets(pageVersionId || null);
@@ -60,6 +69,11 @@ export function MediaFieldControl({
   const previewUrl = resolvePreviewUrl(value);
   const hasMedia = Boolean(previewUrl);
   const refLabel = formatAssetRef(value);
+  const objectFit = value.objectFit ?? 'cover';
+  const focalEnabled =
+    showFocalPicker && hasMedia && objectFit === 'cover' && Boolean(onFocalChange);
+  const focalX = clampFocalPercent(focalPoint?.x, 50);
+  const focalY = clampFocalPercent(focalPoint?.y, 50);
 
   const patch = useCallback(
     (partial: Partial<MediaFieldValue>) => {
@@ -113,14 +127,25 @@ export function MediaFieldControl({
         {hasMedia ? (
           <>
             <div className="relative">
-              <img
-                src={previewUrl}
-                alt={value.alt || label}
-                className={cn(
-                  'h-40 w-full bg-neutral-950',
-                  value.objectFit === 'contain' ? 'object-contain p-3' : 'object-cover',
-                )}
-              />
+              {focalEnabled ? (
+                <FocalPointPicker
+                  imageUrl={previewUrl}
+                  imageAlt={value.alt || label}
+                  x={focalX}
+                  y={focalY}
+                  objectFit={objectFit}
+                  onChange={onFocalChange!}
+                />
+              ) : (
+                <img
+                  src={previewUrl}
+                  alt={value.alt || label}
+                  className={cn(
+                    'h-40 w-full bg-neutral-950',
+                    objectFit === 'contain' ? 'object-contain p-3' : 'object-cover',
+                  )}
+                />
+              )}
               <div className="absolute inset-x-0 bottom-0 flex items-center justify-end gap-1 bg-linear-to-t from-neutral-950/90 via-neutral-950/50 to-transparent px-2 pb-2 pt-8">
                 <ShadButton
                   type="button"
@@ -263,6 +288,49 @@ export function MediaFieldControl({
                 </button>
               );
             })}
+          </div>
+        </div>
+      ) : null}
+
+      {focalEnabled ? (
+        <div className="space-y-2 rounded-lg border border-neutral-800/80 bg-neutral-950/40 p-3" data-testid="focal-point-fields">
+          <p className="text-xs font-medium text-neutral-400">Point focal</p>
+          <p className="text-xs text-neutral-500">
+            Cliquez sur l&apos;image pour choisir la zone importante
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <Label htmlFor={`focal-x-${label}`} className="text-xs text-neutral-500">
+                Horizontal
+              </Label>
+              <input
+                id={`focal-x-${label}`}
+                type="number"
+                min={0}
+                max={100}
+                value={focalX}
+                onChange={(e) =>
+                  onFocalChange?.(clampFocalPercent(Number(e.target.value), focalX), focalY)
+                }
+                className="w-full rounded-lg border border-neutral-800 bg-neutral-900/80 px-2 py-1.5 text-sm text-neutral-200"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor={`focal-y-${label}`} className="text-xs text-neutral-500">
+                Vertical
+              </Label>
+              <input
+                id={`focal-y-${label}`}
+                type="number"
+                min={0}
+                max={100}
+                value={focalY}
+                onChange={(e) =>
+                  onFocalChange?.(focalX, clampFocalPercent(Number(e.target.value), focalY))
+                }
+                className="w-full rounded-lg border border-neutral-800 bg-neutral-900/80 px-2 py-1.5 text-sm text-neutral-200"
+              />
+            </div>
           </div>
         </div>
       ) : null}

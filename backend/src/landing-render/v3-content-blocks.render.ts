@@ -7,6 +7,7 @@ import {
 } from './block-design-system';
 import { appendSectionStyleToClass } from './section-style/section-style.classes';
 import { appendBlockVisualToClass } from './block-visual/block-visual.classes';
+import { appendBlockTypographyToClass } from './block-typography/block-typography.classes';
 
 function escapeHtml(value: string): string {
   return value
@@ -51,9 +52,13 @@ function renderTextParagraphs(content: string): string {
 export function renderCtaBandHtml(props: Record<string, unknown>): string {
   const design = normalizeSectionDesign('cta_band', props);
   const sectionClass = appendSectionStyleToClass(
-    appendBlockVisualToClass(
+    appendBlockTypographyToClass(
+      appendBlockVisualToClass(
+        'cta_band',
+        `lp-block ${buildBlockDesignClasses('lp-cta-band', design)}`,
+        props,
+      ),
       'cta_band',
-      `lp-block ${buildBlockDesignClasses('lp-cta-band', design)}`,
       props,
     ),
     props,

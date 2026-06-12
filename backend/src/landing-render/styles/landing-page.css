@@ -2531,7 +2531,7 @@
   min-height: inherit;
   max-width: 100%;
   object-fit: cover;
-  object-position: var(--lp-hero-focal-x, 50%) var(--lp-hero-focal-y, 50%);
+  object-position: var(--lp-media-focal-x, var(--lp-hero-focal-x, 50%)) var(--lp-media-focal-y, var(--lp-hero-focal-y, 50%));
 }
 .lp-hero-vehicle-offer--fit-contain .lp-hero-vehicle-offer__img {
   object-fit: contain;
@@ -2676,20 +2676,20 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: var(--lp-hero-focal-x, 50%) var(--lp-hero-focal-y, 50%);
+  object-position: var(--lp-media-focal-x, var(--lp-hero-focal-x, 50%)) var(--lp-media-focal-y, var(--lp-hero-focal-y, 50%));
   display: block;
 }
 .lp-campaign-lead-hero--position-left .lp-campaign-lead-hero__img,
 .lp-campaign-lead-hero--position-left .lp-campaign-lead-hero__img-desktop img,
 .lp-campaign-lead-hero--position-left .lp-campaign-lead-hero__media-primary img,
 .lp-campaign-lead-hero--position-left .lp-campaign-lead-hero__media-secondary img {
-  object-position: left var(--lp-hero-focal-y, 50%);
+  object-position: left var(--lp-media-focal-y, var(--lp-hero-focal-y, 50%));
 }
 .lp-campaign-lead-hero--position-right .lp-campaign-lead-hero__img,
 .lp-campaign-lead-hero--position-right .lp-campaign-lead-hero__img-desktop img,
 .lp-campaign-lead-hero--position-right .lp-campaign-lead-hero__media-primary img,
 .lp-campaign-lead-hero--position-right .lp-campaign-lead-hero__media-secondary img {
-  object-position: right var(--lp-hero-focal-y, 50%);
+  object-position: right var(--lp-media-focal-y, var(--lp-hero-focal-y, 50%));
 }
 .lp-campaign-lead-hero--fit-contain .lp-campaign-lead-hero__img,
 .lp-campaign-lead-hero--fit-contain .lp-campaign-lead-hero__img-desktop img,
@@ -3341,6 +3341,126 @@ details.lp-faq__item[open] .lp-faq__question::after { transform: rotate(180deg);
   font-size: clamp(1.45rem, 2.8vw, 2.1rem);
   line-height: 1.15;
   letter-spacing: -0.02em;
+}
+
+/* ── Block typography presets (export-safe token classes) ── */
+.lp-typo-title-sm .lp-campaign-lead-hero__title,
+.lp-typo-title-sm .lp-hero-vehicle-offer__headline,
+.lp-typo-title-sm .lp-section-title,
+.lp-typo-title-sm .lp-cta-band__text {
+  font-size: clamp(1.35rem, 2.8vw, 1.85rem);
+}
+.lp-typo-title-md .lp-campaign-lead-hero__title,
+.lp-typo-title-md .lp-hero-vehicle-offer__headline,
+.lp-typo-title-md .lp-section-title,
+.lp-typo-title-md .lp-cta-band__text {
+  font-size: clamp(1.55rem, 3.2vw, 2.2rem);
+}
+.lp-typo-title-lg .lp-campaign-lead-hero__title,
+.lp-typo-title-lg .lp-hero-vehicle-offer__headline,
+.lp-typo-title-lg .lp-section-title,
+.lp-typo-title-lg .lp-cta-band__text {
+  font-size: clamp(1.75rem, 3.8vw, 2.75rem);
+}
+.lp-typo-title-xl .lp-campaign-lead-hero__title,
+.lp-typo-title-xl .lp-hero-vehicle-offer__headline,
+.lp-typo-title-xl .lp-section-title,
+.lp-typo-title-xl .lp-cta-band__text {
+  font-size: clamp(2rem, 4.5vw, 3.1rem);
+}
+.lp-typo-title-display .lp-campaign-lead-hero__title,
+.lp-typo-title-display .lp-hero-vehicle-offer__headline,
+.lp-typo-title-display .lp-section-title,
+.lp-typo-title-display .lp-cta-band__text {
+  font-size: clamp(2.35rem, 5.5vw, 3.75rem);
+  line-height: 1.02;
+}
+.lp-typo-subtitle-sm .lp-campaign-lead-hero__subtitle,
+.lp-typo-subtitle-sm .lp-hero-vehicle-offer__subheadline,
+.lp-typo-subtitle-sm .lp-section-subtitle {
+  font-size: 0.9rem;
+}
+.lp-typo-subtitle-md .lp-campaign-lead-hero__subtitle,
+.lp-typo-subtitle-md .lp-hero-vehicle-offer__subheadline,
+.lp-typo-subtitle-md .lp-section-subtitle {
+  font-size: 1rem;
+}
+.lp-typo-subtitle-lg .lp-campaign-lead-hero__subtitle,
+.lp-typo-subtitle-lg .lp-hero-vehicle-offer__subheadline,
+.lp-typo-subtitle-lg .lp-section-subtitle {
+  font-size: 1.125rem;
+}
+.lp-typo-body-sm .lp-faq__answer,
+.lp-typo-body-sm .lp-hero-vehicle-offer__price {
+  font-size: 0.875rem;
+}
+.lp-typo-body-md .lp-faq__answer,
+.lp-typo-body-md .lp-hero-vehicle-offer__price {
+  font-size: 1rem;
+}
+.lp-typo-body-lg .lp-faq__answer,
+.lp-typo-body-lg .lp-hero-vehicle-offer__price {
+  font-size: 1.125rem;
+}
+.lp-typo-weight-medium .lp-campaign-lead-hero__title,
+.lp-typo-weight-medium .lp-hero-vehicle-offer__headline,
+.lp-typo-weight-medium .lp-section-title,
+.lp-typo-weight-medium .lp-cta-band__text { font-weight: 500; }
+.lp-typo-weight-semibold .lp-campaign-lead-hero__title,
+.lp-typo-weight-semibold .lp-hero-vehicle-offer__headline,
+.lp-typo-weight-semibold .lp-section-title,
+.lp-typo-weight-semibold .lp-cta-band__text { font-weight: 600; }
+.lp-typo-weight-bold .lp-campaign-lead-hero__title,
+.lp-typo-weight-bold .lp-hero-vehicle-offer__headline,
+.lp-typo-weight-bold .lp-section-title,
+.lp-typo-weight-bold .lp-cta-band__text { font-weight: 700; }
+.lp-typo-weight-black .lp-campaign-lead-hero__title,
+.lp-typo-weight-black .lp-hero-vehicle-offer__headline,
+.lp-typo-weight-black .lp-section-title,
+.lp-typo-weight-black .lp-cta-band__text { font-weight: 900; }
+.lp-typo-max-sm .lp-campaign-lead-hero__campaign,
+.lp-typo-max-sm .lp-hero-vehicle-offer__content,
+.lp-typo-max-sm .lp-section-head,
+.lp-typo-max-sm .lp-cta-band__inner { max-width: 28rem; }
+.lp-typo-max-md .lp-campaign-lead-hero__campaign,
+.lp-typo-max-md .lp-hero-vehicle-offer__content,
+.lp-typo-max-md .lp-section-head,
+.lp-typo-max-md .lp-cta-band__inner { max-width: 36rem; }
+.lp-typo-max-lg .lp-campaign-lead-hero__campaign,
+.lp-typo-max-lg .lp-hero-vehicle-offer__content,
+.lp-typo-max-lg .lp-section-head,
+.lp-typo-max-lg .lp-cta-band__inner { max-width: 44rem; }
+.lp-typo-max-xl .lp-campaign-lead-hero__campaign,
+.lp-typo-max-xl .lp-hero-vehicle-offer__content,
+.lp-typo-max-xl .lp-section-head,
+.lp-typo-max-xl .lp-cta-band__inner { max-width: 52rem; }
+.lp-typo-eyebrow-hidden .lp-campaign-lead-hero__badge,
+.lp-typo-eyebrow-hidden .lp-hero-vehicle-offer__badge { display: none; }
+.lp-typo-eyebrow-subtle .lp-campaign-lead-hero__badge,
+.lp-typo-eyebrow-subtle .lp-hero-vehicle-offer__badge {
+  background: transparent;
+  border: 1px solid rgb(255 255 255 / 25%);
+  font-weight: 500;
+}
+.lp-typo-eyebrow-uppercase .lp-campaign-lead-hero__badge,
+.lp-typo-eyebrow-uppercase .lp-hero-vehicle-offer__badge {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+}
+@media (max-width: 767px) {
+  .lp-typo-mobile-title-sm .lp-campaign-lead-hero__title,
+  .lp-typo-mobile-title-sm .lp-hero-vehicle-offer__headline {
+    font-size: clamp(1.25rem, 5vw, 1.6rem);
+  }
+  .lp-typo-mobile-title-md .lp-campaign-lead-hero__title,
+  .lp-typo-mobile-title-md .lp-hero-vehicle-offer__headline {
+    font-size: clamp(1.45rem, 5.5vw, 1.9rem);
+  }
+  .lp-typo-mobile-title-lg .lp-campaign-lead-hero__title,
+  .lp-typo-mobile-title-lg .lp-hero-vehicle-offer__headline {
+    font-size: clamp(1.65rem, 6vw, 2.15rem);
+  }
 }
 .lp-btn--lg { padding: 0.85rem 1.35rem; font-size: 0.95rem; }
 .lp-btn--md { padding: 0.72rem 1.15rem; font-size: 0.9rem; }

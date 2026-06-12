@@ -1,7 +1,7 @@
 /** Inspector tab targets — mirrors Studio shell tabs. */
 export type InspectorTab = 'content' | 'design' | 'layout' | 'media' | 'advanced';
 
-export type InspectorPropStore = 'content' | 'design' | 'sectionStyle' | 'blockVisual';
+export type InspectorPropStore = 'content' | 'design' | 'sectionStyle' | 'blockVisual' | 'typography';
 
 export type InspectorControlOption<T extends string = string> = {
   value: T;
@@ -52,6 +52,8 @@ export type InspectorImageControl = InspectorControlBase & {
   assetKey: string;
   urlKey: string;
   altKey?: string;
+  /** Enables shared hero focal picker on thumbnail when imageFit is cover. */
+  enableFocalPicker?: boolean;
 };
 export type InspectorSpacingControl = InspectorControlBase & {
   type: 'spacing';

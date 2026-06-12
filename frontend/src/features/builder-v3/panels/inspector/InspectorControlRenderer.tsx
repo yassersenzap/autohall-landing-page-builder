@@ -1,4 +1,5 @@
 import { asPropString } from '@/features/builder-engine/lib/block-props';
+import { resolveHeroFocalPoint } from '@/features/builder/blocks/hero-vehicle-offer/hero-image-controls';
 import { BRAND_PRESETS } from '@/features/builder/brand-presets';
 import type { BrandPresetId } from '@/features/builder/brand-presets';
 import type { InspectorControl } from '@/features/builder/block-registry/inspector-control.types';
@@ -250,6 +251,9 @@ function InspectorField({
       control.urlKey,
       control.altKey,
     );
+    const imageFit = asPropString(propsJson.imageFit) || 'cover';
+    const focal = control.enableFocalPicker ? resolveHeroFocalPoint(propsJson) : null;
+    const showFocalPicker = Boolean(control.enableFocalPicker && imageFit === 'cover');
     return (
       <MediaFieldControl
         label={control.label}
@@ -259,6 +263,18 @@ function InspectorField({
         helperText={control.description}
         showAlt={!control.altKey}
         showObjectFit={false}
+        showFocalPicker={showFocalPicker}
+        focalPoint={focal ? { x: focal.x, y: focal.y } : undefined}
+        onFocalChange={
+          showFocalPicker
+            ? (x, y) =>
+                onPatch({
+                  cropPreset: 'custom',
+                  focalPointX: x,
+                  focalPointY: y,
+                })
+            : undefined
+        }
         onChange={(next) =>
           onPatch(
             buildMediaValuePatch(control.assetKey, control.urlKey, control.altKey, next),

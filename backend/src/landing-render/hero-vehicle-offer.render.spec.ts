@@ -65,7 +65,34 @@ describe('hero-vehicle-offer.render', () => {
 
     expect(html).toContain('--lp-hero-focal-x: 15%');
     expect(html).toContain('--lp-hero-focal-y: 85%');
+    expect(html).toContain('--lp-media-focal-x: 15%');
+    expect(html).toContain('--lp-media-focal-y: 85%');
     expect(html).toContain('lp-hero-vehicle-offer--crop-custom');
+  });
+
+  it('emits typography classes when presets are set', () => {
+    const html = renderHeroVehicleOfferHtml({
+      ...baseProps,
+      typography: { titleScale: 'display', titleWeight: 'black' },
+    });
+
+    expect(html).toContain('lp-typo-title-display');
+    expect(html).toContain('lp-typo-weight-black');
+    expect(html).not.toContain('_studio');
+  });
+
+  it('sanitizes invalid typography and focal values in export HTML', () => {
+    const html = renderHeroVehicleOfferHtml({
+      ...baseProps,
+      typography: { titleScale: 'invalid-scale' },
+      cropPreset: 'custom',
+      focalPointX: 999,
+      focalPointY: -40,
+    });
+
+    expect(html).not.toContain('lp-typo-title-invalid');
+    expect(html).toContain('--lp-media-focal-x: 100%');
+    expect(html).toContain('--lp-media-focal-y: 0%');
   });
 
   it('exports mobile image safely with relative path', () => {

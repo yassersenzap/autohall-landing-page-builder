@@ -39,10 +39,20 @@ describe('hero-image-controls', () => {
     expect(buildHeroFocalStyleVars(25, 75)).toEqual({
       '--lp-hero-focal-x': '25%',
       '--lp-hero-focal-y': '75%',
+      '--lp-media-focal-x': '25%',
+      '--lp-media-focal-y': '75%',
     });
     expect(buildHeroFocalInlineStyle(25, 75)).toBe(
-      '--lp-hero-focal-x: 25%; --lp-hero-focal-y: 75%',
+      '--lp-hero-focal-x: 25%; --lp-hero-focal-y: 75%; --lp-media-focal-x: 25%; --lp-media-focal-y: 75%',
     );
+  });
+
+  it('clamps focal values to 0–100', () => {
+    expect(resolveHeroFocalPoint({ cropPreset: 'custom', focalPointX: 150, focalPointY: -5 })).toEqual({
+      cropPreset: 'custom',
+      x: 100,
+      y: 0,
+    });
   });
 
   it('resolves hero image alt with fallback chain', () => {

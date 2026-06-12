@@ -1,3 +1,4 @@
+import { sanitizeBlockTypographyPatch } from '@/features/builder/block-typography';
 import { sanitizeSectionStylePatch } from '@/features/builder/section-style/section-style.registry';
 import { sanitizeBlockVisualPatch } from '@/features/builder/block-visual';
 import type { BlockVariantDefinition } from './block-variant.types';
@@ -183,6 +184,18 @@ function sanitizeVisualPropsPatch(
       }
       continue;
     }
+    if (key === 'typography') {
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        const sanitized = sanitizeBlockTypographyPatch(
+          blockType,
+          value as Record<string, unknown>,
+        );
+        if (Object.keys(sanitized).length > 0) {
+          out.typography = sanitized;
+        }
+      }
+      continue;
+    }
     if (safeApplyMode !== 'content_optional' && contentKeys.has(key)) continue;
     if (!visualKeys.has(key)) continue;
 
@@ -257,6 +270,13 @@ export function buildVariantPatchFromDefinition(
     }
   }
 
+  if (variant.typographyPatch) {
+    const typography = sanitizeBlockTypographyPatch(variant.blockType, variant.typographyPatch);
+    if (Object.keys(typography).length > 0) {
+      patch.typography = typography;
+    }
+  }
+
   return patch;
 }
 
@@ -302,6 +322,20 @@ export function mergeVariantPatchIntoProps(
         ? (currentProps.blockVisual as Record<string, unknown>)
         : {};
     merged.blockVisual = { ...prev, ...(patch.blockVisual as Record<string, unknown>) };
+  }
+
+  if (
+    patch.typography &&
+    typeof patch.typography === 'object' &&
+    !Array.isArray(patch.typography)
+  ) {
+    const prev =
+      currentProps.typography &&
+      typeof currentProps.typography === 'object' &&
+      !Array.isArray(currentProps.typography)
+        ? (currentProps.typography as Record<string, unknown>)
+        : {};
+    merged.typography = { ...prev, ...(patch.typography as Record<string, unknown>) };
   }
 
   return merged;

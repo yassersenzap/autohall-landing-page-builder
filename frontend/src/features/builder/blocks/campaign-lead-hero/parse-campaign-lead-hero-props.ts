@@ -1,4 +1,5 @@
 import { asPropString } from '@/features/builder-engine/lib/block-props';
+import { appendBlockTypographyToClass } from '@/features/builder/block-typography';
 import { appendBlockVisualToClass } from '@/features/builder/block-visual';
 import { parseCampaignLeadHeroFormIntegration } from '../../export-contracts';
 import {
@@ -193,7 +194,8 @@ export function buildCampaignLeadHeroSectionClasses(
   ].join(' ');
 
   if (!propsJson) return base;
-  return appendBlockVisualToClass('campaign_lead_hero', base, propsJson);
+  const withVisual = appendBlockVisualToClass('campaign_lead_hero', base, propsJson);
+  return appendBlockTypographyToClass(withVisual, 'campaign_lead_hero', propsJson);
 }
 
 export function buildCampaignLeadHeroSectionStyle(

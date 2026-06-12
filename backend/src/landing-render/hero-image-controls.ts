@@ -62,7 +62,9 @@ export function resolveHeroFocalPoint(input: {
 }
 
 export function buildHeroFocalInlineStyle(x: number, y: number): string {
-  return `--lp-hero-focal-x: ${x}%; --lp-hero-focal-y: ${y}%`;
+  const sx = clampFocalPercent(x, 50);
+  const sy = clampFocalPercent(y, 50);
+  return `--lp-hero-focal-x: ${sx}%; --lp-hero-focal-y: ${sy}%; --lp-media-focal-x: ${sx}%; --lp-media-focal-y: ${sy}%`;
 }
 
 function readPropString(props: Record<string, unknown>, ...keys: string[]): string | null {

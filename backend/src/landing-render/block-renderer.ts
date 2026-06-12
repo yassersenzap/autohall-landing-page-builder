@@ -23,6 +23,7 @@ import {
 } from './block-design-system';
 import { appendSectionStyleToClass } from './section-style/section-style.classes';
 import { appendBlockVisualToClass } from './block-visual/block-visual.classes';
+import { appendBlockTypographyToClass } from './block-typography/block-typography.classes';
 import {
   buildPremiumCtaClass,
   buildPremiumSectionClasses,
@@ -813,9 +814,13 @@ function renderTestimonialsHtml(props: Record<string, unknown>): string {
 function renderFaqHtml(props: Record<string, unknown>): string {
   const design = normalizeSectionDesign('faq', props);
   const sectionClass = appendSectionStyleToClass(
-    appendBlockVisualToClass(
+    appendBlockTypographyToClass(
+      appendBlockVisualToClass(
+        'faq',
+        `lp-block ${buildBlockDesignClasses('lp-faq', design)}`,
+        props,
+      ),
       'faq',
-      `lp-block ${buildBlockDesignClasses('lp-faq', design)}`,
       props,
     ),
     props,

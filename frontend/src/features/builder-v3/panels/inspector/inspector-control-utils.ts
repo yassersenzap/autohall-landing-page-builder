@@ -1,5 +1,6 @@
 import { asPropString } from '@/features/builder-engine/lib/block-props';
 import { readBlockVisualRaw } from '@/features/builder/block-visual';
+import { readBlockTypographyRaw } from '@/features/builder/block-typography';
 import { readSectionStyleRaw } from '@/features/builder/section-style';
 import type {
   InspectorControl,
@@ -27,7 +28,9 @@ export function readControlValue(
         ? readSectionStyleRaw(propsJson)
         : store === 'blockVisual'
           ? readBlockVisualRaw(propsJson)
-          : propsJson;
+          : store === 'typography'
+            ? readBlockTypographyRaw(propsJson)
+            : propsJson;
   const raw = source[control.propKey];
 
   if (control.type === 'boolean') {
@@ -81,6 +84,15 @@ export function buildControlPatch(
     };
   }
 
+  if (control.store === 'typography') {
+    return {
+      typography: {
+        ...readBlockTypographyRaw(propsJson),
+        [control.propKey]: value,
+      },
+    };
+  }
+
   return { [control.propKey]: value };
 }
 
@@ -98,7 +110,9 @@ export function isControlVisible(
         ? readSectionStyleRaw(propsJson)
         : store === 'blockVisual'
           ? readBlockVisualRaw(propsJson)
-          : propsJson;
+          : store === 'typography'
+            ? readBlockTypographyRaw(propsJson)
+            : propsJson;
   const raw = source[condition.prop];
   const value =
     typeof raw === 'boolean' || typeof raw === 'number'

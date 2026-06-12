@@ -1,5 +1,6 @@
 import { asPropString } from '@/features/builder-engine/lib/block-props';
 import { buildBlockDesignClasses, normalizeSectionDesign } from '@/features/builder-engine/lib/block-design-system';
+import { appendBlockTypographyToClass } from '@/features/builder/block-typography';
 import { appendBlockVisualToClass } from '@/features/builder/block-visual';
 import { mergeBlockSectionPresentation } from '@/features/builder/section-style';
 
@@ -15,7 +16,11 @@ type FAQBlockPreviewProps = {
 export function FAQBlockPreview({ propsJson }: FAQBlockPreviewProps) {
   const design = normalizeSectionDesign('faq', propsJson);
   const { className: sectionClass } = mergeBlockSectionPresentation(
-    appendBlockVisualToClass('faq', `lp-block ${buildBlockDesignClasses('lp-faq', design)}`, propsJson),
+    appendBlockTypographyToClass(
+      appendBlockVisualToClass('faq', `lp-block ${buildBlockDesignClasses('lp-faq', design)}`, propsJson),
+      'faq',
+      propsJson,
+    ),
     'faq',
     propsJson,
   );

@@ -228,4 +228,30 @@ describe('campaign-lead-hero.render', () => {
     expect(html).not.toContain('<script>');
     expect(html).not.toContain('neon');
   });
+
+  it('exports safe focal CSS variables when custom focal is set', () => {
+    const html = renderCampaignLeadHeroHtml({
+      ...baseProps,
+      cropPreset: 'custom',
+      focalPointX: 22,
+      focalPointY: 78,
+    });
+
+    expect(html).toContain('--lp-hero-focal-x: 22%');
+    expect(html).toContain('--lp-hero-focal-y: 78%');
+    expect(html).toContain('--lp-media-focal-x: 22%');
+    expect(html).toContain('--lp-media-focal-y: 78%');
+  });
+
+  it('emits typography classes for supported presets', () => {
+    const html = renderCampaignLeadHeroHtml({
+      ...baseProps,
+      typography: { titleScale: 'display', textMaxWidth: 'sm', mobileTitleScale: 'md' },
+    });
+
+    expect(html).toContain('lp-typo-title-display');
+    expect(html).toContain('lp-typo-max-sm');
+    expect(html).toContain('lp-typo-mobile-title-md');
+    expect(html).not.toContain('_studio');
+  });
 });

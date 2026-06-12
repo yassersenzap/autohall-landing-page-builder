@@ -4,6 +4,7 @@ import {
   appendSectionStyleToInlineStyle,
 } from './section-style/section-style.classes';
 import { appendBlockVisualToClass } from './block-visual/block-visual.classes';
+import { appendBlockTypographyToClass } from './block-typography/block-typography.classes';
 import {
   parseCampaignLeadHeroFormIntegration,
   SYMFONY_FORM_STATIC_EXPORT_NOTE,
@@ -159,7 +160,11 @@ function buildSectionClasses(props: Record<string, unknown>): string {
   ].join(' ');
 
   return appendSectionStyleToClass(
-    appendBlockVisualToClass('campaign_lead_hero', base, props),
+    appendBlockTypographyToClass(
+      appendBlockVisualToClass('campaign_lead_hero', base, props),
+      'campaign_lead_hero',
+      props,
+    ),
     props,
   );
 }

@@ -31,6 +31,11 @@ const CAMPAIGN_LEAD_HERO_VARIANTS: BlockVariantDefinition[] = [
       mediaEmphasis: 'balanced',
       heroHeight: 'default',
     },
+    typographyPatch: {
+      titleScale: 'display',
+      subtitleScale: 'lg',
+      titleWeight: 'bold',
+    },
   },
   {
     id: 'campaign-hero-background-image',
@@ -119,6 +124,11 @@ const CAMPAIGN_LEAD_HERO_VARIANTS: BlockVariantDefinition[] = [
       formWidth: 'sm',
       formCardStyle: 'flat',
       verticalAlignment: 'center',
+    },
+    typographyPatch: {
+      titleScale: 'sm',
+      mobileTitleScale: 'sm',
+      subtitleScale: 'sm',
     },
   },
   {
@@ -337,6 +347,11 @@ const FAQ_VARIANTS: BlockVariantDefinition[] = [
       faqDensity: 'compact',
       iconStyle: 'plus',
     },
+    typographyPatch: {
+      titleScale: 'md',
+      subtitleScale: 'sm',
+      bodyScale: 'sm',
+    },
   },
   {
     id: 'faq-spacious-reassurance',
@@ -402,6 +417,11 @@ const CTA_BAND_VARIANTS: BlockVariantDefinition[] = [
     sectionStylePatch: {
       sectionBackground: 'dark',
       sectionPaddingY: 'lg',
+    },
+    typographyPatch: {
+      titleScale: 'xl',
+      titleWeight: 'bold',
+      textMaxWidth: 'md',
     },
   },
   {

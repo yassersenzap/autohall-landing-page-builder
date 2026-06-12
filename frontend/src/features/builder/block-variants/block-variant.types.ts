@@ -29,6 +29,8 @@ export type BlockVariantDefinition = {
   sectionStylePatch?: Record<string, unknown>;
   /** Nested blockVisual patch — per-block visual adjustments. */
   blockVisualPatch?: Record<string, unknown>;
+  /** Nested typography patch — token-based text presets. */
+  typographyPatch?: Record<string, unknown>;
   safeApplyMode: BlockVariantSafeApplyMode;
 };
 

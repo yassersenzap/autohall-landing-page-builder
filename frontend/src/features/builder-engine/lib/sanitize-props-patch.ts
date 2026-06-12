@@ -1,3 +1,5 @@
+import { clampFocalPercent } from '@/features/builder/blocks/hero-vehicle-offer/hero-image-controls';
+import { sanitizeBlockTypographyPatch } from '@/features/builder/block-typography';
 import { sanitizeSectionStylePatch } from '@/features/builder/section-style/section-style.registry';
 import { sanitizeBlockVisualPatch, sanitizeBlockVisualPatchUnion } from '@/features/builder/block-visual';
 import { sanitizeBlockDesignProps } from './block-design-props';
@@ -145,6 +147,21 @@ export function sanitizePropsPatch(
       continue;
     }
 
+    if (
+      key === 'typography' &&
+      value !== null &&
+      typeof value === 'object' &&
+      !Array.isArray(value)
+    ) {
+      const sanitized = blockType
+        ? sanitizeBlockTypographyPatch(blockType, value as Record<string, unknown>)
+        : {};
+      if (Object.keys(sanitized).length > 0) {
+        out[key] = sanitized;
+      }
+      continue;
+    }
+
     if (typeof value === 'string') {
       const trimmed = trimString(value, MAX_STRING_LENGTH);
       if (trimmed.toLowerCase().startsWith('data:')) {
@@ -155,7 +172,11 @@ export function sanitizePropsPatch(
     }
 
     if (typeof value === 'number' && Number.isFinite(value)) {
-      out[key] = value;
+      if (key === 'focalPointX' || key === 'focalPointY') {
+        out[key] = clampFocalPercent(value, 50);
+      } else {
+        out[key] = value;
+      }
       continue;
     }
 
