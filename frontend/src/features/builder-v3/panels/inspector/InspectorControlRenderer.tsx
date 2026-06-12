@@ -312,14 +312,12 @@ export function InspectorControlRenderer({
           className={cn(
             'space-y-3',
             group
-              ? 'rounded-xl border border-neutral-800/90 bg-neutral-950/50 p-3.5'
+              ? 'space-y-2.5 rounded-lg bg-neutral-950/30 p-2.5'
               : undefined,
           )}
         >
           {group ? (
-            <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">
-              {group}
-            </p>
+            <p className="text-[0.6875rem] font-medium text-neutral-500">{group}</p>
           ) : null}
           <div className="space-y-3">
             {sectionControls.map((control) => (

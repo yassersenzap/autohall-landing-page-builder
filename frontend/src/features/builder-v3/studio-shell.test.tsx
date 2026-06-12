@@ -115,6 +115,8 @@ describe('Studio shell foundation', () => {
     expect(screen.getByRole('tab', { name: 'Contenu' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Layout' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Media' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Avancé' })).toBeInTheDocument();
+    expect(screen.getByTestId('studio-scrollable-tabs')).toBeInTheDocument();
   });
 
   it('shows campaign_lead_hero inspector fields on content tab', () => {

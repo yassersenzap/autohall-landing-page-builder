@@ -123,7 +123,7 @@ export function MediaFieldControl({
     <div className={cn('space-y-2', className)} data-testid="media-field-control">
       <Label className="text-xs font-medium text-neutral-400">{label}</Label>
 
-      <div className="overflow-hidden rounded-xl border border-neutral-800/90 bg-neutral-950/50">
+      <div className="max-w-full overflow-hidden rounded-xl border border-neutral-800/90 bg-neutral-950/50">
         {hasMedia ? (
           <>
             <div className="relative">

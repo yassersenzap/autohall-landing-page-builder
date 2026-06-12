@@ -170,9 +170,9 @@ export function BlockInspectorPanel({
 
       <div className="flex min-h-0 flex-1 flex-col px-4 pb-4 pt-1">
         <Card className="flex min-h-0 flex-1 flex-col overflow-hidden border-neutral-800 bg-neutral-900/50 text-neutral-100">
-          <CardHeader className="shrink-0 gap-2 border-b border-neutral-800/80 p-4 pb-3">
-            <CardTitle className="text-sm text-neutral-200">{block.label}</CardTitle>
-            <CardDescription className="text-xs text-neutral-500">
+          <CardHeader className="shrink-0 gap-1.5 border-b border-neutral-800/80 p-3 pb-2">
+            <CardTitle className="truncate text-sm text-neutral-200">{block.label}</CardTitle>
+            <CardDescription className="truncate text-xs text-neutral-500">
               {entry?.label ?? block.type}
             </CardDescription>
             <div data-testid="block-inspector-tabs">
@@ -186,6 +186,7 @@ export function BlockInspectorPanel({
                 ]}
                 value={tab}
                 onChange={setTab}
+                layout="scroll"
                 ariaLabel="Propriétés du bloc"
                 className="border-neutral-800 bg-neutral-950/80"
               />
@@ -193,7 +194,7 @@ export function BlockInspectorPanel({
           </CardHeader>
 
           <ScrollArea className="h-full min-h-0 flex-1" data-testid="block-inspector-scroll">
-            <CardContent className="space-y-4 p-4 pb-6">
+            <CardContent className="space-y-3 p-3 pb-10">
             {tab === 'content' && (
               <div className="space-y-4">
                 {(isPromo || isHero || isForm || isVehicleFeatures) && (

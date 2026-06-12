@@ -11,7 +11,6 @@ import {
   CardTitle,
   Label,
   ScrollArea,
-  Separator,
   ShadInput,
   Tabs,
 } from '@/components/ui/primitives';
@@ -226,10 +225,6 @@ export function RightInspector() {
         )}
       </div>
 
-      <Separator className="shrink-0 bg-neutral-800" />
-      <p className="shrink-0 px-4 py-2 text-[0.625rem] text-neutral-600">
-        Contenu · Design · Layout · Media · Avancé
-      </p>
     </aside>
   );
 }
