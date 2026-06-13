@@ -2,7 +2,10 @@ import { clampFocalPercent } from '@/features/builder/blocks/hero-vehicle-offer/
 import { sanitizeBlockTypographyPatch } from '@/features/builder/block-typography';
 import { sanitizeSectionStylePatch } from '@/features/builder/section-style/section-style.registry';
 import { sanitizeBlockVisualPatch, sanitizeBlockVisualPatchUnion } from '@/features/builder/block-visual';
-import { sanitizeCollectionArray } from '@/features/builder/collection-editor/collection-sanitizer';
+import {
+  sanitizeCollectionArray,
+  sanitizeSafeUrl,
+} from '@/features/builder/collection-editor/collection-sanitizer';
 import { getCollectionSchema } from '@/features/builder/collection-editor/collection-schemas';
 import { sanitizeBlockDesignProps } from './block-design-props';
 
@@ -80,6 +83,24 @@ function sanitizeFormConfigObject(value: Record<string, unknown>): Record<string
 
 function sanitizeDesignObject(value: Record<string, unknown>): Record<string, unknown> {
   return sanitizeBlockDesignProps(value);
+}
+
+const URL_LIKE_PROP_KEYS = new Set([
+  'buttonTarget',
+  'buttonHref',
+  'ctaTarget',
+  'ctaHref',
+  'href',
+  'target',
+  'primaryCtaHref',
+  'secondaryCtaHref',
+]);
+
+function sanitizeUrlLikeProp(key: string, value: string, fallback = '#lead-form'): string {
+  if (!URL_LIKE_PROP_KEYS.has(key) && !key.toLowerCase().endsWith('href') && !key.toLowerCase().endsWith('target')) {
+    return value;
+  }
+  return sanitizeSafeUrl(value, fallback);
 }
 
 export function sanitizePropsPatch(
@@ -169,7 +190,7 @@ export function sanitizePropsPatch(
       if (trimmed.toLowerCase().startsWith('data:')) {
         continue;
       }
-      out[key] = trimmed;
+      out[key] = sanitizeUrlLikeProp(key, trimmed);
       continue;
     }
 

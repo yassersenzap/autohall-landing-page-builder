@@ -6,6 +6,26 @@ import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder
 import type { BuilderDocumentBlock } from '@/features/builder-engine/types';
 import { InspectorControlRenderer } from './InspectorControlRenderer';
 
+vi.mock('@/features/builder-engine/hooks/use-page-assets', () => ({
+  usePageAssets: () => ({
+    assets: [{ id: 'asset-gallery-1', mimeType: 'image/png', originalName: 'photo.png' }],
+    loading: false,
+    uploading: false,
+    error: null,
+    reload: vi.fn(),
+    upload: vi.fn(),
+    setAssets: vi.fn(),
+  }),
+}));
+
+vi.mock('@/features/builder-engine/store/builder-document.store', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/builder-engine/store/builder-document.store')>();
+  return {
+    ...actual,
+    getBuilderPersistPageVersionId: () => 'page-version-test',
+  };
+});
+
 function bentoBlock(cards = [{ title: 'Carte 1', description: 'Desc', icon: 'star' }]): BuilderDocumentBlock {
   return {
     id: 'block-bento',
@@ -189,6 +209,114 @@ describe('RepeaterControl', () => {
     expect(useBuilderDocumentStore.getState().blocks[0]?.propsJson.cards).toEqual(before);
     useBuilderDocumentStore.getState().redo();
     expect(useBuilderDocumentStore.getState().blocks[0]?.propsJson.cards).toHaveLength(2);
+  });
+
+  it('renders media field for gallery repeater items', () => {
+    const block: BuilderDocumentBlock = {
+      id: 'block-gallery',
+      type: 'gallery',
+      label: 'Galerie',
+      sortOrder: 0,
+      propsJson: {
+        images: [{ imageAssetId: 'asset-gallery-1', alt: 'Vue avant' }],
+      },
+    };
+    const control = repeaterControl('gallery', 'images');
+
+    render(
+      <InspectorControlRenderer
+        controls={[control]}
+        blockType="gallery"
+        propsJson={block.propsJson}
+        blockId={block.id}
+        onPatch={() => {}}
+      />,
+    );
+
+    expect(screen.getByText('Image')).toBeInTheDocument();
+    expect(screen.getByText('Visuel enregistré dans la bibliothèque')).toBeInTheDocument();
+  });
+
+  it('FAQ repeater add/edit/delete works', () => {
+    const onPatch = vi.fn();
+    const block: BuilderDocumentBlock = {
+      id: 'block-faq',
+      type: 'faq',
+      label: 'FAQ',
+      sortOrder: 0,
+      propsJson: {
+        heading: 'FAQ',
+        items: [
+          { question: 'Q1', answer: 'A1' },
+          { question: 'Q2', answer: 'A2' },
+        ],
+      },
+    };
+    const control = repeaterControl('faq', 'items');
+
+    render(
+      <InspectorControlRenderer
+        controls={[control]}
+        blockType="faq"
+        propsJson={block.propsJson}
+        blockId={block.id}
+        onPatch={onPatch}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId(`repeater-add-${control.key}`));
+    expect(onPatch.mock.calls[0]![0].items).toHaveLength(3);
+
+    fireEvent.click(screen.getByTestId(`repeater-delete-${control.key}-0`));
+    expect(onPatch.mock.calls[1]![0].items).toHaveLength(1);
+  });
+
+  it('benefits repeater updates items array', () => {
+    const onPatch = vi.fn();
+    const control = repeaterControl('benefits', 'items');
+
+    render(
+      <InspectorControlRenderer
+        controls={[control]}
+        blockType="benefits"
+        propsJson={{
+          items: [
+            { title: 'Service', description: 'SAV national' },
+            { title: 'Garantie', description: 'Constructeur' },
+          ],
+        }}
+        blockId="block-benefits"
+        onPatch={onPatch}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId(`repeater-duplicate-${control.key}-0`));
+    expect(onPatch.mock.calls[0]![0].items).toHaveLength(3);
+  });
+
+  it('undo/redo works after FAQ repeater edit via store', () => {
+    const faqBlock: BuilderDocumentBlock = {
+      id: 'block-faq-undo',
+      type: 'faq',
+      label: 'FAQ',
+      sortOrder: 0,
+      propsJson: {
+        items: [{ question: 'Avant', answer: 'Réponse' }],
+      },
+    };
+    useBuilderDocumentStore.getState().setInitialBlocks([faqBlock]);
+
+    useBuilderDocumentStore.getState().updateBlockProps('block-faq-undo', {
+      items: [
+        { question: 'Après', answer: 'Nouvelle réponse' },
+        { question: 'Deux', answer: 'Encore' },
+      ],
+    });
+
+    useBuilderDocumentStore.getState().undo();
+    expect(useBuilderDocumentStore.getState().blocks[0]?.propsJson.items).toEqual([
+      { question: 'Avant', answer: 'Réponse' },
+    ]);
   });
 
   it('exposes repeater controls for stats, timeline and vehicle showcase', () => {

@@ -108,7 +108,8 @@ function renderBtn(
   variant: 'primary' | 'secondary' | 'ghost' = 'primary',
   size: 'lg' | 'md' = 'lg',
 ): string {
-  return `<a class="lp-btn lp-btn--${variant} lp-btn--${size}" href="${escapeHtml(href)}">${escapeHtml(label)}</a>`;
+  const safeHref = sanitizeExportHref(href);
+  return `<a class="lp-btn lp-btn--${variant} lp-btn--${size}" href="${escapeHtml(safeHref)}">${escapeHtml(label)}</a>`;
 }
 
 function parseObjectList(
@@ -175,7 +176,7 @@ function parseLinks(props: Record<string, unknown>): LinkItem[] {
   return parseObjectList(props, 'links')
     .map((item) => ({
       label: propString(item, 'label') ?? '',
-      href: propString(item, 'href', 'url') ?? '#',
+      href: sanitizeExportHref(propString(item, 'href', 'url'), '#'),
     }))
     .filter((item) => item.label);
 }
@@ -311,16 +312,16 @@ function renderHeroHtml(
   const subtitle = propString(props, 'subtitle');
   const eyebrow = propString(props, 'eyebrow', 'kicker', 'badge');
   const buttonText = propString(props, 'buttonText');
-  const buttonTarget =
-    propString(props, 'buttonTarget', 'href') ?? '#lead-form';
+  const buttonTarget = sanitizeExportHref(propString(props, 'buttonTarget', 'href'));
   const secondaryText = propString(
     props,
     'secondaryButtonText',
     'secondaryCtaText',
   );
-  const secondaryTarget =
-    propString(props, 'secondaryButtonTarget', 'secondaryCtaTarget') ??
-    '#offer';
+  const secondaryTarget = sanitizeExportHref(
+    propString(props, 'secondaryButtonTarget', 'secondaryCtaTarget'),
+    '#offer',
+  );
   const imageSrc = resolveHeroImageSrc(props, context);
   const imageAlt = propString(props, 'alt', 'imageAlt') ?? '';
 
@@ -465,8 +466,9 @@ function renderOfferHighlightsHtml(
   const priceValue = propString(props, 'priceValue', 'price');
   const monthlyValue = propString(props, 'monthlyValue', 'monthlyFrom');
   const buttonText = propString(props, 'buttonText', 'ctaLabel');
-  const buttonTarget =
-    propString(props, 'buttonTarget', 'ctaTarget') ?? '#lead-form';
+  const buttonTarget = sanitizeExportHref(
+    propString(props, 'buttonTarget', 'ctaTarget'),
+  );
   const legalNote = propString(props, 'legalNote');
   const imageSrc = resolveHeroImageSrc(props, context);
   const imageAlt = propString(props, 'alt') ?? '';
@@ -734,8 +736,7 @@ function renderFinancingHtml(props: Record<string, unknown>): string {
   const subtitle = propString(props, 'subtitle');
   const ctaLabel =
     propString(props, 'ctaLabel', 'buttonText') ?? 'Simuler mon financement';
-  const ctaTarget =
-    propString(props, 'ctaTarget', 'buttonTarget') ?? '#lead-form';
+  const ctaTarget = sanitizeExportHref(propString(props, 'ctaTarget', 'buttonTarget'));
   const paymentExample = propString(props, 'paymentExample', 'monthlyFrom');
   const bullets = parseStringList(props, 'bullets');
 
@@ -873,8 +874,7 @@ function renderFinalCtaHtml(props: Record<string, unknown>): string {
   const title = propString(props, 'title', 'heading');
   const subtitle = propString(props, 'subtitle', 'description');
   const buttonText = propString(props, 'buttonText', 'label');
-  const buttonTarget =
-    propString(props, 'buttonTarget', 'target') ?? '#lead-form';
+  const buttonTarget = sanitizeExportHref(propString(props, 'buttonTarget', 'target'));
 
   const buttonHtml = buttonText
     ? `<a class="${btnClass}" href="${escapeHtml(buttonTarget)}">${escapeHtml(buttonText)}</a>`
@@ -1003,7 +1003,7 @@ export function renderBlockHtml(
   if (type === 'button') {
     const label =
       propString(props, 'label', 'text', 'buttonText') ?? 'En savoir plus';
-    const target = propString(props, 'target', 'href', 'buttonTarget') ?? '#';
+    const target = sanitizeExportHref(propString(props, 'target', 'href', 'buttonTarget'), '#');
     const description = propString(props, 'description', 'subtitle');
 
     return `

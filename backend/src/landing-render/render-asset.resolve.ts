@@ -13,11 +13,13 @@ function propString(
   return null;
 }
 
-function isUnsafeExportImageUrl(url: string): boolean {
+function isUnsafeImageUrl(url: string): boolean {
   const lower = url.toLowerCase();
-  if (lower.startsWith('data:')) return true;
-  if (lower.includes('/api/assets/')) return true;
-  if (/\/api\/assets\//i.test(url)) return true;
+  if (lower.startsWith('data:') || lower.startsWith('blob:') || lower.startsWith('javascript:')) {
+    return true;
+  }
+  if (lower.includes('/studio') || lower.includes('localhost:5173')) return true;
+  if (lower.includes('/api/assets/') || /\/api\/assets\//i.test(url)) return true;
   return false;
 }
 
@@ -40,7 +42,7 @@ export function resolveHeroImageSrc(
     return null;
   }
 
-  if (context?.mode === 'export' && isUnsafeExportImageUrl(imageUrl)) {
+  if (isUnsafeImageUrl(imageUrl)) {
     return null;
   }
 

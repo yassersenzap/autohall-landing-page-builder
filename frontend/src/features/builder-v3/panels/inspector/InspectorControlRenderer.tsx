@@ -81,6 +81,34 @@ function InspectorField({
     );
   }
 
+  if (control.type === 'string-list') {
+    const lines = Array.isArray(propsJson[control.propKey])
+      ? (propsJson[control.propKey] as string[]).join('\n')
+      : asPropString(value);
+    return (
+      <div className="space-y-1.5">
+        <Label htmlFor={fieldId} className="text-neutral-400">
+          {control.label}
+        </Label>
+        <ShadTextarea
+          id={fieldId}
+          rows={3}
+          value={lines}
+          placeholder={control.placeholder}
+          onChange={(e) => {
+            const next = e.target.value
+              .split('\n')
+              .map((line) => line.trim())
+              .filter(Boolean);
+            onPatch({ [control.propKey]: next });
+          }}
+          className="border-neutral-700 bg-neutral-900 text-neutral-200"
+        />
+        {control.description ? <FieldHint>{control.description}</FieldHint> : null}
+      </div>
+    );
+  }
+
   if (control.type === 'textarea') {
     return (
       <div className="space-y-1.5">

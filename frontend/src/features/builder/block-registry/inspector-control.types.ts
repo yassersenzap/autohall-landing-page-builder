@@ -62,6 +62,10 @@ export type InspectorSpacingControl = InspectorControlBase & {
   options: InspectorControlOption[];
 };
 
+export type InspectorStringListControl = InspectorControlBase & {
+  type: 'string-list';
+};
+
 export type InspectorRepeaterControl = InspectorControlBase & {
   type: 'repeater';
   itemLabel: string;
@@ -84,4 +88,5 @@ export type InspectorControl =
   | InspectorBrandControl
   | InspectorImageControl
   | InspectorSpacingControl
+  | InspectorStringListControl
   | InspectorRepeaterControl;

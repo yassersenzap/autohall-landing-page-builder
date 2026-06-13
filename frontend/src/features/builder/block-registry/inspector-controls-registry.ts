@@ -5,6 +5,7 @@ import { getBlockMotionInspectorControls } from '../block-motion/block-motion.in
 import { getBlockTypographyInspectorControls } from '../block-typography/block-typography.inspector-controls';
 import { getBlockVisualInspectorControls } from '../block-visual/block-visual.inspector-controls';
 import { getCollectionRepeaterControlsForBlock } from '../collection-editor/collection.inspector-controls';
+import { getMarketingContentInspectorControls } from '../collection-editor/marketing-content.inspector-controls';
 import { buildSectionStyleInspectorControls } from '../section-style/section-style.inspector-controls';
 import type { InspectorControl, InspectorTab } from './inspector-control.types';
 
@@ -16,6 +17,7 @@ const INSPECTOR_CONTROLS_BY_TYPE = new Map<string, InspectorControl[]>([
 
 export function getInspectorControlsForBlock(blockType: string): InspectorControl[] {
   const blockControls = INSPECTOR_CONTROLS_BY_TYPE.get(blockType) ?? [];
+  const marketingContentControls = getMarketingContentInspectorControls(blockType);
   const collectionControls = getCollectionRepeaterControlsForBlock(blockType);
   const motionControls = getBlockMotionInspectorControls(blockType);
   const visualControls = getBlockVisualInspectorControls(blockType);
@@ -23,6 +25,7 @@ export function getInspectorControlsForBlock(blockType: string): InspectorContro
   const styleControls = buildSectionStyleInspectorControls(blockType);
   return [
     ...blockControls,
+    ...marketingContentControls,
     ...collectionControls,
     ...motionControls,
     ...typographyControls,

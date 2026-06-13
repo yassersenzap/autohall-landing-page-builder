@@ -8,6 +8,11 @@ import {
 import { getCollectionSchema } from '@/features/builder/collection-editor/collection-schemas';
 import type { CollectionItemField } from '@/features/builder/collection-editor/collection-field.types';
 import type { InspectorRepeaterControl } from '@/features/builder/block-registry/inspector-control.types';
+import { MediaFieldControl } from '../../components/MediaFieldControl';
+import {
+  buildMediaValuePatch,
+  mediaValueFromKeys,
+} from '../../components/media-field-utils';
 import { Label, ShadButton, ShadInput, ShadTextarea } from '@/components/ui/primitives';
 import { cn } from '@/lib/utils';
 
@@ -26,13 +31,31 @@ function readItemPreview(item: Record<string, unknown>, previewField: string, fa
 
 function CollectionItemFieldInput({
   field,
-  value,
-  onChange,
+  item,
+  onItemPatch,
 }: {
   field: CollectionItemField;
-  value: unknown;
-  onChange: (next: unknown) => void;
+  item: Record<string, unknown>;
+  onItemPatch: (patch: Record<string, unknown>) => void;
 }) {
+  const value = field.type === 'asset' ? item : item[field.key];
+
+  if (field.type === 'asset') {
+    return (
+      <MediaFieldControl
+        label={field.label}
+        value={mediaValueFromKeys(item, field.assetKey, field.urlKey, field.altKey)}
+        onChange={(next) =>
+          onItemPatch(buildMediaValuePatch(field.assetKey, field.urlKey, field.altKey, next))
+        }
+        showObjectFit={false}
+        className="rounded-md border border-neutral-800/80 bg-neutral-950/30 p-2"
+      />
+    );
+  }
+
+  const onChange = (next: unknown) => onItemPatch({ [field.key]: next });
+
   if (field.type === 'boolean') {
     return (
       <label className="flex items-center justify-between gap-2 rounded-md border border-neutral-800 bg-neutral-950/40 px-2.5 py-2">
@@ -297,8 +320,8 @@ export function RepeaterControl({
                       <CollectionItemFieldInput
                         key={field.key}
                         field={field}
-                        value={item[field.key]}
-                        onChange={(next) => updateItem(index, { [field.key]: next })}
+                        item={item}
+                        onItemPatch={(patch) => updateItem(index, patch)}
                       />
                     ))}
                   </div>

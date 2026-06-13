@@ -197,7 +197,7 @@ export function BlockInspectorPanel({
             <CardContent className="space-y-3 p-3 pb-10">
             {tab === 'content' && (
               <div className="space-y-4">
-                {(isPromo || isHero || isForm || isVehicleFeatures) && (
+                {(isPromo || isHero || isForm || (isVehicleFeatures && !usesDefinitionInspector)) && (
                   <div className="space-y-1.5">
                     <Label htmlFor="v3-inspector-title" className="text-neutral-400">
                       {isForm ? 'Titre formulaire' : isVehicleFeatures ? 'Titre section' : 'Titre'}
@@ -224,7 +224,7 @@ export function BlockInspectorPanel({
                   </div>
                 )}
 
-                {(isPromo || isHero || isForm || isVehicleFeatures) && (
+                {(isPromo || isHero || isForm || (isVehicleFeatures && !usesDefinitionInspector)) && (
                   <div className="space-y-1.5">
                     <Label htmlFor="v3-inspector-subtitle" className="text-neutral-400">
                       Sous-titre
@@ -370,7 +370,7 @@ export function BlockInspectorPanel({
                   </div>
                 )}
 
-                {isGallery && (
+                {isGallery && !usesDefinitionInspector && (
                   <div className="space-y-1.5">
                     <Label htmlFor="v3-inspector-gallery-title" className="text-neutral-400">
                       Titre galerie
@@ -483,7 +483,7 @@ export function BlockInspectorPanel({
                   </>
                 )}
 
-                {isPricingTrim && (
+                {isPricingTrim && !usesDefinitionInspector && (
                   <>
                     <div className="space-y-1.5">
                       <Label htmlFor="v3-inspector-pricing-heading" className="text-neutral-400">
@@ -584,7 +584,7 @@ export function BlockInspectorPanel({
                   </>
                 )}
 
-                {isFAQ && (
+                {isFAQ && !usesDefinitionInspector && (
                   <>
                     <div className="space-y-1.5">
                       <Label htmlFor="v3-inspector-faq-heading" className="text-neutral-400">
@@ -636,7 +636,7 @@ export function BlockInspectorPanel({
                   </>
                 )}
 
-                {isTestimonials && (
+                {isTestimonials && !usesDefinitionInspector && (
                   <>
                     <div className="space-y-1.5">
                       <Label htmlFor="v3-inspector-test-heading" className="text-neutral-400">
@@ -886,6 +886,7 @@ export function BlockInspectorPanel({
                 )}
 
                 {isGallery &&
+                  !usesDefinitionInspector &&
                   [0, 1, 2].map((index) => {
                     const images = Array.isArray(block.propsJson.images)
                       ? [

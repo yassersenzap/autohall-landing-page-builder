@@ -68,7 +68,9 @@ export function renderCtaBandHtml(props: Record<string, unknown>): string {
 
   const title = propString(props, 'title', 'heading');
   const buttonText = propString(props, 'buttonText', 'label');
-  const buttonHref = propString(props, 'buttonHref', 'buttonTarget', 'target') ?? '#lead-form';
+  const buttonHref = sanitizeExportHref(
+    propString(props, 'buttonHref', 'buttonTarget', 'target'),
+  );
 
   if (!title && !buttonText) return '';
 

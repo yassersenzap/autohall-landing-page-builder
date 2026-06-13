@@ -65,4 +65,33 @@ describe('collection sanitizer', () => {
     expect(images[0]?.imageAssetId).toBe('asset-1');
     expect(images[0]?.alt).toBe('Test');
   });
+
+  it('sanitizes FAQ items and strips nested studio keys', () => {
+    const items = sanitizeCollectionArray('faq', 'items', [
+      {
+        question: 'Garantie ?',
+        answer: '3 ans',
+        _studioRow: 'drop',
+      },
+      { question: '', answer: '' },
+    ]);
+
+    expect(items).toHaveLength(1);
+    expect(items[0]).toEqual({ question: 'Garantie ?', answer: '3 ans' });
+    expect(items[0]).not.toHaveProperty('_studioRow');
+  });
+
+  it('sanitizes nested pricing trim features', () => {
+    const trims = sanitizeCollectionArray('pricing_trim', 'trims', [
+      {
+        name: 'Style',
+        price: '200k',
+        features: ['  GPS  ', '', 'Caméra'],
+        buttonHref: 'javascript:alert(1)',
+      },
+    ]);
+
+    expect(trims[0]?.features).toEqual(['GPS', 'Caméra']);
+    expect(trims[0]?.buttonHref).toBe('#lead-form');
+  });
 });
