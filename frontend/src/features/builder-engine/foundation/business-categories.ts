@@ -1,6 +1,11 @@
 /** Catégories métier du catalogue builder (orientées marketing Auto Hall). */
 export const BUILDER_BUSINESS_CATEGORIES = [
   {
+    id: 'core_landing',
+    label: 'Landing métier',
+    description: 'Visuel campagne ou véhicule avec formulaire intégré.',
+  },
+  {
     id: 'acquisition',
     label: 'Acquisition / lead capture',
     description: 'Hero, formulaires et bandeaux de conversion.',
@@ -52,6 +57,7 @@ export type BuilderBusinessCategoryId =
 
 /** Mapping bloc → catégorie métier (source unique pour le catalogue UI). */
 export const BLOCK_BUSINESS_CATEGORY: Record<string, BuilderBusinessCategoryId> = {
+  core_campaign_form_landing: 'core_landing',
   promo_autohall: 'acquisition',
   hero_campaign: 'acquisition',
   hero_form_campaign: 'acquisition',

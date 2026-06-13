@@ -1,5 +1,12 @@
 import { asPropString } from '@/features/builder-engine/lib/block-props';
 import { resolveHeroFocalPoint } from '@/features/builder/blocks/hero-vehicle-offer/hero-image-controls';
+import {
+  patchCoreFormModeFields,
+} from '@/features/builder/blocks/core-campaign-form-landing/core-campaign-form-landing.inspector-controls';
+import type {
+  CoreFieldsPreset,
+  CoreFormMode,
+} from '@/features/builder/blocks/core-campaign-form-landing/core-campaign-form-landing.defaults';
 import { BRAND_PRESETS } from '@/features/builder/brand-presets';
 import type { BrandPresetId } from '@/features/builder/brand-presets';
 import type { InspectorControl } from '@/features/builder/block-registry/inspector-control.types';
@@ -43,7 +50,19 @@ function InspectorField({
   const fieldId = `inspector-${blockId}-${control.key}`;
   const value = readControlValue(propsJson, control);
   const apply = (next: string | number | boolean) => {
-    onPatch(buildControlPatch(propsJson, control, next));
+    let patch = buildControlPatch(propsJson, control, next);
+    if (blockType === 'core_campaign_form_landing') {
+      if (control.propKey === 'formMode') {
+        patch = { ...patch, ...patchCoreFormModeFields(next as CoreFormMode) };
+      } else if (control.propKey === 'fieldsPreset') {
+        const formMode = (asPropString(propsJson.formMode) || 'test_drive') as CoreFormMode;
+        patch = {
+          ...patch,
+          ...patchCoreFormModeFields(formMode, next as CoreFieldsPreset),
+        };
+      }
+    }
+    onPatch(patch);
   };
 
   if (control.type === 'repeater') {

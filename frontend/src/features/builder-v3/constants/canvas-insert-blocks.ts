@@ -3,12 +3,9 @@ import { getRegistryEntry } from '@/features/builder-engine/registry/block-regis
 
 /** Curated blocks for quick insert from the canvas toolbar. */
 export const CANVAS_INSERT_BLOCK_TYPES = [
-  'campaign_lead_hero',
-  'hero_vehicle_offer',
-  'vehicle_offer',
-  'faq',
-  'cta_band',
+  'core_campaign_form_landing',
   'footer_legal',
+  'faq',
 ] as const;
 
 export type CanvasInsertBlockType = (typeof CANVAS_INSERT_BLOCK_TYPES)[number];

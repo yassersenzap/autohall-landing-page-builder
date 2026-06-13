@@ -8,6 +8,7 @@ import {
 
 /** Types stables exposés via getActivePaletteBlocks (store.addBlock). */
 const DELIVERABLE_TYPES = [
+  'core_campaign_form_landing',
   'hero_vehicle_offer',
   'campaign_lead_hero',
   'promo_autohall',

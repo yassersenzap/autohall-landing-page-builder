@@ -19,6 +19,15 @@ export type BlockRegistryEntry = BuilderPaletteItem & {
 /** Blocs campagne Auto Hall — palette utilisateur uniquement. */
 export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
   {
+    type: 'core_campaign_form_landing',
+    label: 'Landing campagne + formulaire',
+    description:
+      'Pattern métier Auto Hall — visuel campagne ou véhicule avec formulaire multistep intégré.',
+    category: 'hero',
+    availability: 'stable',
+    icon: '⊞',
+  },
+  {
     type: 'promo_autohall',
     label: 'Promo Auto Hall',
     description: 'Hero plein écran + formulaire flottant — layout référence.',

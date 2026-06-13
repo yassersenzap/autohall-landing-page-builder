@@ -13,9 +13,11 @@ function propString(
   return null;
 }
 
-function isUnsafeExportImageUrl(url: string): boolean {
-  const lower = url.toLowerCase();
+function isBlockedImageUrl(url: string): boolean {
+  const lower = url.trim().toLowerCase();
+  if (lower.startsWith('javascript:')) return true;
   if (lower.startsWith('data:')) return true;
+  if (lower.startsWith('blob:')) return true;
   if (lower.includes('/api/assets/')) return true;
   if (/\/api\/assets\//i.test(url)) return true;
   return false;
@@ -40,7 +42,7 @@ export function resolveHeroImageSrc(
     return null;
   }
 
-  if (context?.mode === 'export' && isUnsafeExportImageUrl(imageUrl)) {
+  if (isBlockedImageUrl(imageUrl)) {
     return null;
   }
 

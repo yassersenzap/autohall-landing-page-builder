@@ -1,3 +1,4 @@
+import { CORE_CAMPAIGN_FORM_LANDING_INSPECTOR_CONTROLS } from '../blocks/core-campaign-form-landing/core-campaign-form-landing.inspector-controls';
 import { campaignLeadHeroInspectorControls } from '../blocks/campaign-lead-hero/campaign-lead-hero.inspector-controls';
 import { heroVehicleOfferInspectorControls } from '../blocks/hero-vehicle-offer/hero-vehicle-offer.inspector-controls';
 import { PREMIUM_BLOCK_INSPECTOR_CONTROLS } from '../blocks/premium-animated/premium-blocks.inspector-controls';
@@ -9,6 +10,7 @@ import { buildSectionStyleInspectorControls } from '../section-style/section-sty
 import type { InspectorControl, InspectorTab } from './inspector-control.types';
 
 const INSPECTOR_CONTROLS_BY_TYPE = new Map<string, InspectorControl[]>([
+  ['core_campaign_form_landing', CORE_CAMPAIGN_FORM_LANDING_INSPECTOR_CONTROLS],
   ['hero_vehicle_offer', heroVehicleOfferInspectorControls],
   ['campaign_lead_hero', campaignLeadHeroInspectorControls],
   ...Object.entries(PREMIUM_BLOCK_INSPECTOR_CONTROLS),

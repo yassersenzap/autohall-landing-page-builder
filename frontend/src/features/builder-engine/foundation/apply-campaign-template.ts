@@ -79,6 +79,7 @@ export function materializeCampaignTemplate(
 }
 
 const MEANINGFUL_HERO_TYPES = [
+  'core_campaign_form_landing',
   'campaign_lead_hero',
   'hero_vehicle_offer',
   'vehicle_showcase_split',

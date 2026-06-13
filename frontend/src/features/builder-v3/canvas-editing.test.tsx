@@ -144,11 +144,11 @@ describe('Canvas editing layer V1', () => {
     renderWithDnd(<CanvasDocument />);
 
     fireEvent.click(screen.getByTestId('canvas-insert-slot-trigger-1'));
-    fireEvent.click(screen.getByTestId('canvas-insert-slot-cta_band-1'));
+    fireEvent.click(screen.getByTestId('canvas-insert-slot-core_campaign_form_landing-1'));
 
     const state = useBuilderDocumentStore.getState();
     expect(state.blocks).toHaveLength(3);
-    expect(state.blocks[1]?.type).toBe('cta_band');
+    expect(state.blocks[1]?.type).toBe('core_campaign_form_landing');
   });
 
   it('toolbar is studio-only and not part of block preview content', () => {

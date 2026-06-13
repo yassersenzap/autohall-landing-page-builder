@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertTriangle, LayoutTemplate, Sparkles, Wand2, Zap } from 'lucide-react';
+import { AlertTriangle, LayoutTemplate, Sparkles, Wand2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { CATALOG_TIER_META } from '@/features/builder-engine/foundation/catalog-tiers';
 import {
@@ -10,6 +10,7 @@ import {
   templateHasMotion,
 } from '@/features/builder-engine/foundation/campaign-page-templates';
 import type { CampaignPageTemplate } from '@/features/builder-engine/foundation/campaign-page-templates.types';
+import { getCoreCampaignTemplates } from '@/features/builder-engine/foundation/core-campaign-templates';
 import {
   getFullPageStarters,
   getSectionStarters,
@@ -70,11 +71,7 @@ function brandBadgeLabel(brandId: CampaignPageTemplate['brandId']): string {
   return brandId.charAt(0).toUpperCase() + brandId.slice(1).replace('_', ' ');
 }
 
-function countTemplateVariants(template: CampaignPageTemplate): number {
-  return template.blocks.filter((block) => block.variant?.variantId).length;
-}
-
-function CampaignTemplateCard({
+function CoreTemplateCard({
   template,
   onUse,
 }: {
@@ -82,7 +79,55 @@ function CampaignTemplateCard({
   onUse: () => void;
 }) {
   const theme = getPageBrandTheme(resolvePageBrandThemeId(template.brandId));
-  const variantCount = countTemplateVariants(template);
+
+  return (
+    <article
+      className="overflow-hidden rounded-xl border border-blue-500/20 bg-neutral-950/60 shadow-sm transition hover:border-blue-500/40"
+      data-testid={`core-template-card-${template.id}`}
+    >
+      <div className="space-y-3 p-3">
+        <TemplateThumbnailPreview template={template} />
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <h4 className="text-sm font-medium text-neutral-100">{template.name}</h4>
+            <span
+              className="rounded-full px-2 py-0.5 text-[0.625rem] font-medium"
+              style={{ backgroundColor: theme.primarySoft, color: theme.primaryColor }}
+            >
+              {brandBadgeLabel(template.brandId)}
+            </span>
+          </div>
+          <p className="text-xs leading-relaxed text-neutral-500">{template.description}</p>
+          <p className="text-[0.6875rem] text-neutral-600">
+            <span className="font-medium text-neutral-500">Usage · </span>
+            {template.recommendedUse}
+          </p>
+        </div>
+      </div>
+      <div className="flex items-center justify-between gap-2 border-t border-neutral-800/80 px-3 py-2.5">
+        <span className="text-[0.625rem] text-neutral-600">Image + formulaire · {template.blocks.length} blocs</span>
+        <ShadButton
+          type="button"
+          size="sm"
+          className="h-7 shrink-0 px-2.5 text-xs"
+          onClick={onUse}
+          data-testid={`core-template-use-${template.id}`}
+        >
+          Utiliser
+        </ShadButton>
+      </div>
+    </article>
+  );
+}
+
+function ExtendedTemplateCard({
+  template,
+  onUse,
+}: {
+  template: CampaignPageTemplate;
+  onUse: () => void;
+}) {
+  const theme = getPageBrandTheme(resolvePageBrandThemeId(template.brandId));
   const premiumCount = countPremiumBlocks(template);
   const motionReady = templateHasMotion(template);
 
@@ -93,71 +138,47 @@ function CampaignTemplateCard({
     >
       <div className="space-y-3 p-3">
         <TemplateThumbnailPreview template={template} />
-
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-1.5">
             <h4 className="text-sm font-medium text-neutral-100">{template.name}</h4>
             <span
               className="rounded-full px-2 py-0.5 text-[0.625rem] font-medium"
               style={{ backgroundColor: theme.primarySoft, color: theme.primaryColor }}
-              data-testid={`template-brand-badge-${template.id}`}
             >
               Marque · {brandBadgeLabel(template.brandId)}
             </span>
           </div>
           <p className="text-xs leading-relaxed text-neutral-500">{template.description}</p>
-          <p className="text-[0.6875rem] text-neutral-600">
-            <span className="font-medium text-neutral-500">Usage recommandé · </span>
-            {template.recommendedUse}
-          </p>
         </div>
-
         <div className="flex flex-wrap gap-2 text-[0.625rem] text-neutral-500">
           <span className="rounded-md border border-neutral-800 px-2 py-1">
-            Structure · {templateCategoryLabel(template.category)}
+            {templateCategoryLabel(template.category)}
           </span>
-          <span
-            className="rounded-md border border-neutral-800 px-2 py-1"
-            data-testid={`template-block-count-${template.id}`}
-          >
-            Blocs inclus · {template.blocks.length}
+          <span className="rounded-md border border-neutral-800 px-2 py-1">
+            {template.blocks.length} blocs
           </span>
           {premiumCount > 0 ? (
-            <span
-              className="inline-flex items-center gap-1 rounded-md border border-amber-500/25 bg-amber-500/5 px-2 py-1 text-amber-200/90"
-              data-testid={`template-premium-count-${template.id}`}
-            >
-              <Sparkles className="h-3 w-3" aria-hidden />
-              Premium · {premiumCount}
+            <span className="rounded-md border border-neutral-800 px-2 py-1 text-neutral-600">
+              +{premiumCount} premium
             </span>
           ) : null}
           {motionReady ? (
-            <span
-              className="inline-flex items-center gap-1 rounded-md border border-sky-500/25 bg-sky-500/5 px-2 py-1 text-sky-200/90"
-              data-testid={`template-motion-ready-${template.id}`}
-            >
-              <Zap className="h-3 w-3" aria-hidden />
+            <span className="rounded-md border border-neutral-800 px-2 py-1 text-neutral-600">
               Motion
-            </span>
-          ) : null}
-          {variantCount > 0 ? (
-            <span className="rounded-md border border-neutral-800 px-2 py-1">
-              Styles rapides · {variantCount}
             </span>
           ) : null}
         </div>
       </div>
-
-      <div className="flex items-center justify-between gap-2 border-t border-neutral-800/80 px-3 py-2.5">
-        <span className="text-[0.625rem] text-neutral-600">Thème appliqué · {theme.label}</span>
+      <div className="flex items-center justify-end border-t border-neutral-800/80 px-3 py-2.5">
         <ShadButton
           type="button"
           size="sm"
-          className="h-7 shrink-0 px-2.5 text-xs"
+          variant="secondary"
+          className="h-7 shrink-0 px-2.5 text-xs border-neutral-700"
           onClick={onUse}
           data-testid={`campaign-template-use-${template.id}`}
         >
-          Utiliser ce template
+          Utiliser
         </ShadButton>
       </div>
     </article>
@@ -174,6 +195,7 @@ export function TemplatesPanel() {
     ? getCampaignPageTemplateById(pendingTemplateId)
     : undefined;
 
+  const coreTemplates = getCoreCampaignTemplates();
   const templateGroups = getGroupedCampaignPageTemplates();
 
   function requestCampaignTemplate(templateId: string) {
@@ -204,8 +226,7 @@ export function TemplatesPanel() {
                 <p className="text-sm font-medium text-amber-100">Remplacer le contenu actuel ?</p>
                 <p className="text-xs leading-relaxed text-amber-200/80">
                   Le template « {pendingTemplate.name} » remplacera les {blocks.length} bloc
-                  {blocks.length > 1 ? 's' : ''} du canevas. Cette action est réversible via
-                  l’historique local tant que vous n’avez pas sauvegardé.
+                  {blocks.length > 1 ? 's' : ''} du canevas.
                 </p>
               </div>
             </div>
@@ -233,6 +254,22 @@ export function TemplatesPanel() {
           </div>
         ) : null}
 
+        <div className="space-y-2.5" data-testid="core-campaign-templates">
+          <TierHeader
+            title={CATALOG_TIER_META.coreTemplates.title}
+            description={CATALOG_TIER_META.coreTemplates.description}
+          />
+          {coreTemplates.map((template) => (
+            <CoreTemplateCard
+              key={template.id}
+              template={template}
+              onUse={() => requestCampaignTemplate(template.id)}
+            />
+          ))}
+        </div>
+
+        <Separator className="bg-neutral-800" />
+
         <div className="space-y-4" data-testid="campaign-templates-by-use-case">
           <TierHeader
             title={CATALOG_TIER_META.campaignTemplates.title}
@@ -246,7 +283,7 @@ export function TemplatesPanel() {
             >
               <TierHeader title={group.label} description={group.description} />
               {templates.map((template) => (
-                <CampaignTemplateCard
+                <ExtendedTemplateCard
                   key={template.id}
                   template={template}
                   onUse={() => requestCampaignTemplate(template.id)}
@@ -255,7 +292,7 @@ export function TemplatesPanel() {
             </section>
           ))}
           <p className="px-1 text-[0.625rem] text-neutral-600">
-            {getCampaignPageTemplates().length} templates · export HTML statique compatible cPanel
+            {getCampaignPageTemplates().length} templates étendus disponibles
           </p>
         </div>
 
@@ -302,7 +339,7 @@ export function TemplatesPanel() {
             data-testid="templates-empty-page-hint"
           >
             <Wand2 className="h-3.5 w-3.5 shrink-0" aria-hidden />
-            Page vide — choisissez un template premium pour démarrer rapidement.
+            Page vide — choisissez une landing métier image + formulaire pour démarrer.
           </p>
         ) : null}
       </div>

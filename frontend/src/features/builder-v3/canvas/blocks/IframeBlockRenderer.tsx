@@ -1,4 +1,5 @@
 import type { BuilderDocumentBlock } from '@/features/builder-engine/types';
+import { CoreCampaignFormLandingBlockPreview } from './CoreCampaignFormLandingBlockPreview';
 import { HeroBlockPreview } from './HeroBlockPreview';
 import { HeroFormCampaignBlockPreview } from './HeroFormCampaignBlockPreview';
 import { LeadFormBlockPreview } from './LeadFormBlockPreview';
@@ -38,6 +39,8 @@ type IframeBlockRendererProps = {
 
 export function IframeBlockRenderer({ block }: IframeBlockRendererProps) {
   switch (block.type) {
+    case 'core_campaign_form_landing':
+      return <CoreCampaignFormLandingBlockPreview propsJson={block.propsJson} />;
     case 'promo_autohall':
       return <PromoAutoHallBlockPreview propsJson={block.propsJson} />;
     case 'vehicle_features':

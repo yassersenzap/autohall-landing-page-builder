@@ -54,6 +54,24 @@ describe('getPageReadinessIssues', () => {
     expect(getPageReadinessStatus(issues)).toBe('blocked');
   });
 
+  it('core_campaign_form_landing satisfies form requirement', () => {
+    const issues = getPageReadinessIssues(
+      [
+        {
+          type: 'core_campaign_form_landing',
+          propsJson: {
+            title: 'Campagne',
+            submitText: 'Envoyer',
+            consentLabel: 'J’accepte.',
+            formConfig: { showConsent: true },
+          },
+        },
+      ],
+      { seoTitle: 'T', seoDescription: 'D' },
+    );
+    expect(issues.some((i) => i.code === 'lead-form-missing')).toBe(false);
+  });
+
   it('hero_form_campaign satisfies form requirement', () => {
     const issues = getPageReadinessIssues(
       [

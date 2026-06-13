@@ -3,9 +3,15 @@ import {
   getPremiumAnimatedCatalog,
   type CatalogBlockItem,
 } from './builder-catalog';
+import {
+  COMPLEMENTARY_SECTION_BLOCK_TYPES,
+  CORE_BUSINESS_BLOCK_TYPES,
+  isMainCatalogHidden,
+} from './catalog-visibility';
 
 /** Blocs marketing complets — une section entière prête à personnaliser. */
 export const COMPLETE_SECTION_BLOCK_TYPES = new Set([
+  'core_campaign_form_landing',
   'promo_autohall',
   'hero_campaign',
   'hero_form_campaign',
@@ -41,15 +47,24 @@ export const BASIC_BLOCK_TYPES = new Set([
 ]);
 
 export const CATALOG_TIER_META = {
+  coreBusiness: {
+    title: 'Landing métier',
+    description:
+      'Pattern principal Auto Hall — visuel campagne ou véhicule avec formulaire intégré.',
+  },
+  complementary: {
+    title: 'Sections complémentaires',
+    description: 'FAQ, footer, réassurance et contenus optionnels autour de la landing.',
+  },
+  advanced: {
+    title: 'Avancé',
+    description:
+      'Blocs premium animés et sections legacy — pour pages existantes ou enrichissement ponctuel.',
+  },
   starters: {
     title: 'Modèles de page',
     description:
       'Structure complète prête à publier — remplace le contenu du canvas.',
-  },
-  sections: {
-    title: 'Sections complètes',
-    description:
-      'Blocs marketing autonomes (hero, offre, formulaire…) à insérer ou glisser-déposer.',
   },
   basics: {
     title: 'Blocs de contenu',
@@ -60,15 +75,25 @@ export const CATALOG_TIER_META = {
     description:
       'Séquences pré-assemblées à ajouter sous vos sections existantes.',
   },
-  campaignTemplates: {
-    title: 'Templates campagne premium',
+  coreTemplates: {
+    title: 'Landings métier',
     description:
-      'Pages complètes prêtes à personnaliser — marque, copy et visuels éditables.',
+      'Modèles focalisés image + formulaire — campagne, modèle véhicule ou gamme.',
   },
-  premiumAnimated: {
-    title: 'Blocs premium 2026',
+  campaignTemplates: {
+    title: 'Templates étendus',
     description:
-      'Sections animées export-safe — CSS + runtime vanilla, sans React dans le ZIP.',
+      'Pages complètes avec sections optionnelles — usage avancé ou legacy.',
+  },
+  /** @deprecated use advanced */
+  premiumAnimated: {
+    title: 'Sections complémentaires / Avancé',
+    description: 'Blocs premium animés — hors parcours principal.',
+  },
+  /** @deprecated use complementary */
+  sections: {
+    title: 'Sections complètes',
+    description: 'Blocs marketing autonomes.',
   },
 } as const;
 
@@ -82,6 +107,26 @@ export function getBasicBlockCatalog(): CatalogBlockItem[] {
   return getBuilderCatalog().filter((item) => BASIC_BLOCK_TYPES.has(item.type));
 }
 
+export function getCoreBusinessCatalog(): CatalogBlockItem[] {
+  return getBuilderCatalog().filter((item) => CORE_BUSINESS_BLOCK_TYPES.has(item.type));
+}
+
+export function getComplementarySectionCatalog(): CatalogBlockItem[] {
+  return getBuilderCatalog().filter(
+    (item) =>
+      COMPLEMENTARY_SECTION_BLOCK_TYPES.has(item.type) && !isMainCatalogHidden(item.type),
+  );
+}
+
+export function getAdvancedSectionCatalog(): CatalogBlockItem[] {
+  return getBuilderCatalog().filter(
+    (item) =>
+      (item.isPremium || isMainCatalogHidden(item.type)) &&
+      !CORE_BUSINESS_BLOCK_TYPES.has(item.type),
+  );
+}
+
+/** @deprecated use getAdvancedSectionCatalog */
 export function getPremiumAnimatedSectionCatalog(): CatalogBlockItem[] {
   return getPremiumAnimatedCatalog();
 }
@@ -91,17 +136,8 @@ export function getCompleteSectionsByCategory(): Array<{
   categoryLabel: string;
   blocks: CatalogBlockItem[];
 }> {
-  const blocks = getCompleteSectionCatalog().filter((block) => !block.isPremium);
-  const order = [
-    'acquisition',
-    'vehicle',
-    'premium_animated',
-    'sav',
-    'financing',
-    'event',
-    'social_proof',
-    'faq_legal',
-  ] as const;
+  const blocks = getComplementarySectionCatalog();
+  const order = ['vehicle', 'sav', 'financing', 'social_proof', 'faq_legal'] as const;
 
   const grouped = new Map<string, CatalogBlockItem[]>();
   for (const block of blocks) {
@@ -121,14 +157,11 @@ export function getCompleteSectionsByCategory(): Array<{
 
 function labelForCategory(id: string): string {
   const labels: Record<string, string> = {
-    acquisition: 'Acquisition & conversion',
     vehicle: 'Véhicule & offre',
     sav: 'SAV & services',
     financing: 'Financement',
-    event: 'Événement & essai',
     social_proof: 'Réassurance',
     faq_legal: 'FAQ & légal',
-    premium_animated: 'Sections premium animées',
   };
   return labels[id] ?? id;
 }

@@ -103,6 +103,46 @@ export function getPageReadinessIssues(
   }
 
   for (const [index, block] of blocks.entries()) {
+    if (block.type !== 'core_campaign_form_landing') continue;
+    const props = propsOf(block);
+    const fp = formPropsFromBlock(props);
+    if (!asPropString(props.title).trim()) {
+      issues.push({
+        code: `core-landing-title-${index}`,
+        severity: 'critical',
+        message: 'Landing métier : titre principal manquant.',
+        blockId: block.id,
+      });
+    }
+    if (!asPropString(fp.submitText).trim() && !asPropString(props.submitText).trim()) {
+      issues.push({
+        code: `core-landing-submit-${index}`,
+        severity: 'critical',
+        message: 'Landing métier : texte du bouton d’envoi manquant.',
+        blockId: block.id,
+      });
+    }
+    const formConfig = fp.formConfig as Record<string, unknown> | undefined;
+    if (formConfig?.showConsent !== false && !asPropString(fp.consentLabel).trim()) {
+      issues.push({
+        code: `core-landing-consent-${index}`,
+        severity: 'critical',
+        message: 'Landing métier : consentement manquant.',
+        blockId: block.id,
+      });
+    }
+    const suggestsImage = asPropString(props.coreLayout) !== 'background_image_form_card';
+    if (suggestsImage && !hasHeroImage(props)) {
+      issues.push({
+        code: `core-landing-image-${index}`,
+        severity: 'warning',
+        message: 'Landing métier : visuel campagne ou véhicule manquant.',
+        blockId: block.id,
+      });
+    }
+  }
+
+  for (const [index, block] of blocks.entries()) {
     if (block.type !== 'hero_form_campaign') continue;
     const props = propsOf(block);
     const fp = formPropsFromBlock(props);
@@ -135,7 +175,8 @@ export function getPageReadinessIssues(
 
   const hasLeadForm =
     blocks.some((b) => b.type === 'lead_form') ||
-    blocks.some((b) => b.type === 'hero_form_campaign');
+    blocks.some((b) => b.type === 'hero_form_campaign') ||
+    blocks.some((b) => b.type === 'core_campaign_form_landing');
   if (!hasLeadForm) {
     issues.push({
       code: 'lead-form-missing',

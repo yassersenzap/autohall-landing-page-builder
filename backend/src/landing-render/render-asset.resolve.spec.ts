@@ -55,6 +55,11 @@ describe('render-asset.resolve', () => {
     expect(src).toBe('https://cdn.example.com/car.jpg');
   });
 
+  it('rejects javascript URLs', () => {
+    const src = resolveHeroImageSrc({ imageUrl: 'javascript:alert(1)' }, buildContext('export'));
+    expect(src).toBeNull();
+  });
+
   it('rejects data URLs in export mode', () => {
     const src = resolveHeroImageSrc(
       { imageUrl: 'data:image/png;base64,abc' },

@@ -39,6 +39,7 @@ export type CatalogBlockItem = Omit<BlockRegistryEntry, 'icon'> & {
 };
 
 const BLOCK_ICONS: Record<string, LucideIcon> = {
+  core_campaign_form_landing: LayoutTemplate,
   promo_autohall: Sparkles,
   hero_campaign: LayoutTemplate,
   hero_form_campaign: LayoutTemplate,
@@ -80,12 +81,13 @@ const PREMIUM_USE_CASES: Record<string, string> = {
 
 /** Libellés orientés métier (évite le jargon technique registry). */
 const SIDEBAR_LABELS: Record<string, string> = {
-  promo_autohall: 'Hero acquisition (split + lead)',
+  core_campaign_form_landing: 'Landing image + formulaire',
+  promo_autohall: 'Hero acquisition (legacy)',
   hero_campaign: 'Bannière campagne',
-  hero_form_campaign: 'Section hero + formulaire lead',
+  hero_form_campaign: 'Hero + formulaire (legacy)',
   hero_vehicle_offer: 'Hero offre véhicule (marque)',
-  campaign_lead_hero: 'Hero campagne + formulaire lead',
-  lead_form: 'Formulaire de capture',
+  campaign_lead_hero: 'Hero campagne (legacy)',
+  lead_form: 'Formulaire seul (legacy)',
   vehicle_offer: 'Section offre véhicule complète',
   vehicle_features: 'Caractéristiques véhicule',
   vehicle_range: 'Gamme véhicules',

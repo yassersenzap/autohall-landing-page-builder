@@ -1,5 +1,6 @@
 /** Types de blocs réellement rendus par landing-render (preview + export). */
 export const BACKEND_SUPPORTED_BLOCK_TYPES = new Set([
+  'core_campaign_form_landing',
   'promo_autohall',
   'vehicle_features',
   'gallery',

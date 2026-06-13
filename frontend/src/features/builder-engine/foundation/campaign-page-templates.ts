@@ -22,6 +22,7 @@ import {
   buildVehicleShowcaseDefaults,
 } from '@/features/builder/blocks/premium-animated/premium-block-defaults';
 import { BRAND_PAGE_TEMPLATES } from './brand-page-templates';
+import { CORE_CAMPAIGN_TEMPLATES } from './core-campaign-templates';
 import {
   getCampaignPageTemplatesByUseCase,
   TEMPLATE_USE_CASE_GROUPS,
@@ -45,6 +46,7 @@ const GENERIC_FAQ = buildFAQDefaults({
 });
 
 export const CAMPAIGN_PAGE_TEMPLATE_BLOCK_TYPES = new Set([
+  'core_campaign_form_landing',
   'campaign_lead_hero',
   'hero_vehicle_offer',
   'lead_form',
@@ -620,7 +622,10 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
 ];
 
 export function getCampaignPageTemplateById(id: string): CampaignPageTemplate | undefined {
-  return CAMPAIGN_PAGE_TEMPLATES.find((template) => template.id === id);
+  return (
+    CORE_CAMPAIGN_TEMPLATES.find((template) => template.id === id) ??
+    CAMPAIGN_PAGE_TEMPLATES.find((template) => template.id === id)
+  );
 }
 
 export function getCampaignPageTemplates(): CampaignPageTemplate[] {

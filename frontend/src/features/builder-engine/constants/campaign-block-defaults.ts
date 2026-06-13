@@ -24,6 +24,7 @@ import {
   buildTestimonialsDefaults,
   buildVideoEmbedDefaults,
 } from './conversion-block-defaults';
+import { buildCoreCampaignFormLandingDefaults } from '@/features/builder/blocks/core-campaign-form-landing/core-campaign-form-landing.defaults';
 
 export type HeroCampaignVariant =
   | 'promo_image_right'
@@ -413,6 +414,7 @@ export function buildVehicleRangeDefaults(
 
 /** Defaults neutres pour palette (contenu vide). */
 export const CAMPAIGN_BLOCK_NEUTRAL_DEFAULTS: Record<string, Record<string, unknown>> = {
+  core_campaign_form_landing: buildCoreCampaignFormLandingDefaults(),
   promo_autohall: buildPromoAutoHallDefaults(),
   hero_campaign: buildHeroCampaignDefaults('promo_image_right'),
   hero_form_campaign: buildHeroFormCampaignDefaults('text_left_form_right'),

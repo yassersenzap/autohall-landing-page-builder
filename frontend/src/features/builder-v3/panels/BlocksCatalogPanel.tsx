@@ -1,15 +1,16 @@
+import { useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Sparkles, Zap } from 'lucide-react';
+import { ChevronDown, GripVertical } from 'lucide-react';
 import {
   countCatalogBlocks,
   type CatalogBlockItem,
 } from '@/features/builder-engine/foundation/builder-catalog';
 import {
   CATALOG_TIER_META,
+  getAdvancedSectionCatalog,
   getBasicBlockCatalog,
-  getCompleteSectionsByCategory,
-  getPremiumAnimatedSectionCatalog,
+  getCoreBusinessCatalog,
 } from '@/features/builder-engine/foundation/catalog-tiers';
 import { paletteDragId } from '@/features/builder-engine/constants/palette';
 import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
@@ -28,6 +29,7 @@ import {
   ShadButton,
 } from '@/components/ui/primitives';
 import { cn } from '@/lib/utils';
+import { getCompleteSectionsByCategory } from '@/features/builder-engine/foundation/catalog-tiers';
 
 function DraggableBlockCard({
   block,
@@ -49,7 +51,7 @@ function DraggableBlockCard({
         <CardHeader className="gap-1 p-3 pb-0">
           <div className="flex items-start justify-between gap-2">
             <CardTitle className="flex items-center gap-2 text-sm font-medium">
-              <Icon className="h-3.5 w-3.5 shrink-0 text-neutral-400" aria-hidden />
+              <Icon className="h-3.5 w-3.5 shrink-0 text-blue-400" aria-hidden />
               {block.sidebarLabel}
             </CardTitle>
             <button
@@ -62,23 +64,7 @@ function DraggableBlockCard({
               <GripVertical className="h-4 w-4" />
             </button>
           </div>
-          <CardDescription className="text-xs text-neutral-500">
-            {block.businessUseCase ?? block.description}
-          </CardDescription>
-          {block.isPremium ? (
-            <div className="flex flex-wrap items-center gap-1.5 pt-1">
-              <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[0.625rem] font-semibold uppercase tracking-wide text-amber-200">
-                <Sparkles className="h-3 w-3" aria-hidden />
-                Premium
-              </span>
-              {block.motionReady ? (
-                <span className="inline-flex items-center gap-1 rounded-full border border-sky-500/30 bg-sky-500/10 px-2 py-0.5 text-[0.625rem] font-medium text-sky-200">
-                  <Zap className="h-3 w-3" aria-hidden />
-                  Motion
-                </span>
-              ) : null}
-            </div>
-          ) : null}
+          <CardDescription className="text-xs text-neutral-500">{block.description}</CardDescription>
         </CardHeader>
         <CardContent className="p-3 pt-2">
           <ShadButton
@@ -105,40 +91,64 @@ function CatalogTierHeader({ title, description }: { title: string; description:
   );
 }
 
-function PremiumAnimatedTier({
+function AdvancedTier({
   blocks,
   onAdd,
 }: {
   blocks: CatalogBlockItem[];
   onAdd: (blockType: string) => void;
 }) {
+  const [open, setOpen] = useState(false);
   if (blocks.length === 0) return null;
+
   return (
-    <div className="space-y-2" data-testid="catalog-premium-animated-group">
-      <CatalogTierHeader
-        title={CATALOG_TIER_META.premiumAnimated.title}
-        description={CATALOG_TIER_META.premiumAnimated.description}
-      />
-      {blocks.map((block) => (
-        <DraggableBlockCard key={block.type} block={block} onAdd={onAdd} />
-      ))}
+    <div className="space-y-2" data-testid="catalog-advanced-group">
+      <button
+        type="button"
+        className="flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-xs font-semibold uppercase tracking-wider text-neutral-500 hover:bg-neutral-900/80 hover:text-neutral-300"
+        onClick={() => setOpen((v) => !v)}
+      >
+        <span>{CATALOG_TIER_META.advanced.title}</span>
+        <ChevronDown className={cn('h-4 w-4 transition', open && 'rotate-180')} aria-hidden />
+      </button>
+      {open ? (
+        <div className="space-y-2">
+          <p className="px-1 text-[0.625rem] text-neutral-600">{CATALOG_TIER_META.advanced.description}</p>
+          {blocks.map((block) => (
+            <DraggableBlockCard key={block.type} block={block} onAdd={onAdd} />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
 
 export function BlocksCatalogPanel() {
   const addBlock = useBuilderDocumentStore((s) => s.addBlock);
+  const coreBlocks = getCoreBusinessCatalog();
   const sectionGroups = getCompleteSectionsByCategory();
-  const premiumBlocks = getPremiumAnimatedSectionCatalog();
+  const advancedBlocks = getAdvancedSectionCatalog();
   const basicBlocks = getBasicBlockCatalog();
 
   return (
     <ScrollArea className="h-full min-h-0" data-testid="studio-blocks-panel">
       <div className="space-y-4 p-3 pb-6">
+        <div className="space-y-2" data-testid="catalog-core-business-group">
+          <CatalogTierHeader
+            title={CATALOG_TIER_META.coreBusiness.title}
+            description={CATALOG_TIER_META.coreBusiness.description}
+          />
+          {coreBlocks.map((block) => (
+            <DraggableBlockCard key={block.type} block={block} onAdd={addBlock} />
+          ))}
+        </div>
+
+        <Separator className="bg-neutral-800" />
+
         <div className="space-y-2">
           <CatalogTierHeader
-            title={CATALOG_TIER_META.sections.title}
-            description={CATALOG_TIER_META.sections.description}
+            title={CATALOG_TIER_META.complementary.title}
+            description={CATALOG_TIER_META.complementary.description}
           />
           <Accordion type="multiple" defaultValue={sectionGroups.map((g) => g.categoryId)}>
             {sectionGroups.map(({ categoryId, categoryLabel, blocks }) => (
@@ -158,7 +168,7 @@ export function BlocksCatalogPanel() {
 
         <Separator className="bg-neutral-800" />
 
-        <PremiumAnimatedTier blocks={premiumBlocks} onAdd={addBlock} />
+        <AdvancedTier blocks={advancedBlocks} onAdd={addBlock} />
 
         <Separator className="bg-neutral-800" />
 

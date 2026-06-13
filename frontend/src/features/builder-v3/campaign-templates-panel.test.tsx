@@ -33,18 +33,15 @@ describe('TemplatesPanel campaign presets', () => {
     expect(screen.queryByTestId('campaign-template-replace-warning')).not.toBeInTheDocument();
   });
 
-  it('renders premium thumbnails with brand badges, block counts and motion indicators', () => {
+  it('renders core métier templates first then extended templates', () => {
     render(<TemplatesPanel />);
 
+    expect(screen.getByTestId('core-campaign-templates')).toBeInTheDocument();
+    expect(screen.getByTestId('core-template-card-core-campaign-visual-form')).toBeInTheDocument();
     expect(screen.getByTestId('template-thumbnail-ford-brand-showcase')).toBeInTheDocument();
-    expect(screen.getByTestId('template-brand-badge-ford-brand-showcase')).toBeInTheDocument();
-    expect(screen.getByTestId('template-block-count-ford-brand-showcase')).toHaveTextContent(
-      /Blocs inclus · \d+/,
-    );
-    expect(screen.getByTestId('template-motion-ready-ford-brand-showcase')).toBeInTheDocument();
-    expect(screen.getByTestId('template-premium-count-ford-brand-showcase')).toBeInTheDocument();
-    expect(screen.getAllByText(/Usage recommandé ·/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Thème appliqué ·/).length).toBeGreaterThan(0);
+    expect(screen.getByTestId('campaign-template-card-ford-brand-showcase')).toBeInTheDocument();
+    expect(screen.getByText(/Landings métier/)).toBeInTheDocument();
+    expect(screen.getByText(/Templates étendus/)).toBeInTheDocument();
   });
 
   it('shows replace warning before wiping existing blocks', () => {

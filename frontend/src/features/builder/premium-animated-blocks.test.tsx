@@ -10,12 +10,14 @@ import {
 import { stripStudioOnlyBlockProps } from './block-variants/studio-block-metadata';
 import { CAMPAIGN_PAGE_TEMPLATES } from '@/features/builder-engine/foundation/campaign-page-templates';
 import { BlocksCatalogPanel } from '@/features/builder-v3/panels/BlocksCatalogPanel';
+import { getAdvancedSectionCatalog } from '@/features/builder-engine/foundation/catalog-tiers';
 
 describe('premium animated blocks library', () => {
-  it('catalog renders premium animated group', () => {
+  it('catalog no longer shows premium as primary tier', () => {
     render(<BlocksCatalogPanel />);
-    expect(screen.getByTestId('catalog-premium-animated-group')).toBeTruthy();
-    expect(getPremiumAnimatedCatalog().length).toBe(PREMIUM_ANIMATED_BLOCK_TYPES.length);
+    expect(screen.queryByTestId('catalog-premium-animated-group')).toBeNull();
+    expect(screen.getByTestId('catalog-core-business-group')).toBeTruthy();
+    expect(getAdvancedSectionCatalog().length).toBeGreaterThan(PREMIUM_ANIMATED_BLOCK_TYPES.length);
   });
 
   it.each(PREMIUM_ANIMATED_BLOCK_TYPES)('block %s can be inserted with defaults', (type) => {
@@ -60,19 +62,16 @@ describe('premium animated blocks library', () => {
     expect(safe.motionPreset).toBe('fade_up');
   });
 
-  it('campaign templates include premium blocks', () => {
+  it('premium blocks remain available in advanced catalog', () => {
+    const advancedTypes = getAdvancedSectionCatalog().map((b) => b.type);
+    expect(advancedTypes).toEqual(expect.arrayContaining([...PREMIUM_ANIMATED_BLOCK_TYPES]));
+    expect(getPremiumAnimatedCatalog().length).toBe(PREMIUM_ANIMATED_BLOCK_TYPES.length);
+  });
+
+  it('extended campaign templates still include premium blocks', () => {
     const chery = CAMPAIGN_PAGE_TEMPLATES.find((t) => t.id === 'chery-campaign-offer')!;
     const ford = CAMPAIGN_PAGE_TEMPLATES.find((t) => t.id === 'ford-offer-campaign')!;
-    const opel = CAMPAIGN_PAGE_TEMPLATES.find((t) => t.id === 'opel-test-drive')!;
-    const generic = CAMPAIGN_PAGE_TEMPLATES.find((t) => t.id === 'autohall-generic-campaign')!;
-
     expect(chery.blocks.some((b) => b.type === 'premium_bento_features')).toBe(true);
-    expect(chery.blocks.some((b) => b.type === 'animated_stats_strip')).toBe(true);
     expect(ford.blocks.some((b) => b.type === 'vehicle_showcase_split')).toBe(true);
-    expect(ford.blocks.some((b) => b.type === 'premium_bento_features')).toBe(true);
-    expect(opel.blocks.some((b) => b.type === 'campaign_timeline_steps')).toBe(true);
-    expect(opel.blocks.some((b) => b.type === 'sticky_lead_cta')).toBe(true);
-    expect(generic.blocks.some((b) => b.type === 'premium_testimonials')).toBe(true);
-    expect(generic.blocks.some((b) => b.type === 'animated_stats_strip')).toBe(true);
   });
 });
