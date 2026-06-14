@@ -1,21 +1,29 @@
 import type { CSSProperties } from 'react';
 import { useEffect, useMemo } from 'react';
 import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
+import { shouldOmitBlockFromPublishedOutput } from '@/features/builder-engine/lib/block-visibility';
 import { resolveThemeFonts } from '../constants/google-fonts';
 import { applyPageSeoToDocument } from '../lib/apply-page-seo';
 import { injectGoogleFonts } from './inject-google-fonts';
 import { IframeBlockRenderer } from './blocks/IframeBlockRenderer';
 
+type PreviewDocumentProps = {
+  viewport?: 'desktop' | 'tablet' | 'mobile';
+};
+
 /** Rendu lecture seule — même source que l'éditeur (store Zustand hydraté). */
-export function PreviewDocument() {
+export function PreviewDocument({ viewport = 'desktop' }: PreviewDocumentProps) {
   const blocks = useBuilderDocumentStore((s) => s.blocks);
   const pageTheme = useBuilderDocumentStore((s) => s.pageTheme);
   const pageSettings = useBuilderDocumentStore((s) => s.pageSettings);
   const { headingFont, bodyFont } = resolveThemeFonts(pageTheme);
 
   const sorted = useMemo(
-    () => [...blocks].sort((a, b) => a.sortOrder - b.sortOrder),
-    [blocks],
+    () =>
+      [...blocks]
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .filter((block) => !shouldOmitBlockFromPublishedOutput(block.propsJson, viewport)),
+    [blocks, viewport],
   );
 
   useEffect(() => {

@@ -103,15 +103,50 @@ export async function injectIframeStyles(doc: Document): Promise<void> {
     #root, [data-builder-v3-root] { min-height: 100%; }
     .v3-block-shell { position: relative; cursor: pointer; }
     .v3-block-shell[data-selected="true"] {
-      outline: 2px solid #3b82f6;
+      outline: 2px solid var(--lp-primary, #3b82f6);
       outline-offset: -2px;
-      box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.25), 0 0 0 1px rgba(59, 130, 246, 0.15);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lp-primary, #3b82f6) 28%, transparent),
+        0 0 0 1px color-mix(in srgb, var(--lp-primary, #3b82f6) 18%, transparent);
     }
     .v3-block-shell:hover:not([data-selected="true"]) {
-      outline: 1px dashed rgba(59, 130, 246, 0.5);
+      outline: 1px dashed color-mix(in srgb, var(--lp-primary, #3b82f6) 45%, transparent);
       outline-offset: -1px;
     }
-    .v3-block-shell--over { outline: 1px solid rgba(59, 130, 246, 0.6); outline-offset: -1px; }
+    .v3-block-shell--over { outline: 1px solid color-mix(in srgb, var(--lp-primary, #3b82f6) 55%, transparent); outline-offset: -1px; }
+    .v3-block-shell--studio-hidden {
+      opacity: 0.42;
+    }
+    .v3-block-shell--studio-hidden::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 12;
+      pointer-events: none;
+      border: 2px dashed color-mix(in srgb, var(--lp-text-muted, #737373) 55%, transparent);
+      border-radius: 2px;
+    }
+    .v3-block-hidden-badge {
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5rem;
+      z-index: 45;
+      padding: 0.2rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      color: #e2e8f0;
+      font-size: 0.625rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      pointer-events: none;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    [data-studio-canvas-root] .v3-block-shell[data-studio-hidden="true"] .lp-section-style--hide-desktop,
+    [data-studio-canvas-root] .v3-block-shell[data-studio-hidden="true"] .lp-section-style--hide-tablet,
+    [data-studio-canvas-root] .v3-block-shell[data-studio-hidden="true"] .lp-section-style--hide-mobile {
+      display: block !important;
+    }
     .v3-block-drop-indicator {
       position: absolute;
       top: -2px;

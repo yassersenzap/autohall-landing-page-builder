@@ -1,12 +1,14 @@
 import {
+  getArchivedBuilderCatalog,
   getBuilderCatalog,
   getPremiumAnimatedCatalog,
   type CatalogBlockItem,
 } from './builder-catalog';
 import {
+  ARCHIVED_BASIC_BLOCK_TYPES,
   COMPLEMENTARY_SECTION_BLOCK_TYPES,
   CORE_BUSINESS_BLOCK_TYPES,
-  isMainCatalogHidden,
+  isLegacyBlockType,
 } from './catalog-visibility';
 
 /** Blocs marketing complets — une section entière prête à personnaliser. */
@@ -70,6 +72,11 @@ export const CATALOG_TIER_META = {
     title: 'Blocs de contenu',
     description: 'Texte, image, vidéo ou espacement pour compléter une section.',
   },
+  archived: {
+    title: 'Blocs archivés',
+    description:
+      'Sections legacy, premium et atomiques — rétrocompatibilité et usage avancé.',
+  },
   sectionStarters: {
     title: 'Ensembles de sections',
     description:
@@ -98,32 +105,44 @@ export const CATALOG_TIER_META = {
 } as const;
 
 export function getCompleteSectionCatalog(): CatalogBlockItem[] {
-  return getBuilderCatalog().filter((item) =>
+  return [...getBuilderCatalog(), ...getArchivedBuilderCatalog()].filter((item) =>
     COMPLETE_SECTION_BLOCK_TYPES.has(item.type),
   );
 }
 
 export function getBasicBlockCatalog(): CatalogBlockItem[] {
-  return getBuilderCatalog().filter((item) => BASIC_BLOCK_TYPES.has(item.type));
+  return getArchivedBuilderCatalog().filter((item) => ARCHIVED_BASIC_BLOCK_TYPES.has(item.type));
 }
 
 export function getCoreBusinessCatalog(): CatalogBlockItem[] {
-  return getBuilderCatalog().filter((item) => CORE_BUSINESS_BLOCK_TYPES.has(item.type));
+  return getArchivedBuilderCatalog().filter((item) => CORE_BUSINESS_BLOCK_TYPES.has(item.type));
 }
 
 export function getComplementarySectionCatalog(): CatalogBlockItem[] {
-  return getBuilderCatalog().filter(
-    (item) =>
-      COMPLEMENTARY_SECTION_BLOCK_TYPES.has(item.type) && !isMainCatalogHidden(item.type),
+  return getArchivedBuilderCatalog().filter((item) =>
+    COMPLEMENTARY_SECTION_BLOCK_TYPES.has(item.type),
   );
 }
 
+export function getArchivedBlockCatalog(): CatalogBlockItem[] {
+  return getArchivedBuilderCatalog();
+}
+
+export function countArchivedBlockCatalog(): number {
+  return getArchivedBlockCatalog().length;
+}
+
 export function getAdvancedSectionCatalog(): CatalogBlockItem[] {
-  return getBuilderCatalog().filter(
-    (item) =>
-      (item.isPremium || isMainCatalogHidden(item.type)) &&
-      !CORE_BUSINESS_BLOCK_TYPES.has(item.type),
-  );
+  const archived = getArchivedBuilderCatalog();
+  const premium = archived.filter((item) => item.isPremium);
+  const legacyHeroes = archived.filter((item) => isLegacyBlockType(item.type));
+  const seen = new Set<string>();
+  return [...premium, ...legacyHeroes].filter((item) => {
+    if (CORE_BUSINESS_BLOCK_TYPES.has(item.type)) return false;
+    if (seen.has(item.type)) return false;
+    seen.add(item.type);
+    return item.isPremium || isLegacyBlockType(item.type);
+  });
 }
 
 /** @deprecated use getAdvancedSectionCatalog */

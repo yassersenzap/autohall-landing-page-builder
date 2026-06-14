@@ -3,6 +3,8 @@ import {
   ArrowDown,
   ArrowUp,
   Copy,
+  Eye,
+  EyeOff,
   PanelRight,
   Plus,
   Sparkles,
@@ -14,6 +16,7 @@ import { getRegistryEntry } from '@/features/builder-engine/registry/block-regis
 import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
 import type { BuilderDocumentBlock } from '@/features/builder-engine/types';
 import { getCanvasInsertBlockOptions } from '../constants/canvas-insert-blocks';
+import { isBlockGloballyHidden } from '@/features/builder-engine/lib/block-visibility';
 
 type CanvasBlockToolbarProps = {
   block: BuilderDocumentBlock;
@@ -42,6 +45,7 @@ export function CanvasBlockToolbar({
   const duplicateBlock = useBuilderDocumentStore((s) => s.duplicateBlock);
   const deleteBlock = useBuilderDocumentStore((s) => s.deleteBlock);
   const insertBlockAt = useBuilderDocumentStore((s) => s.insertBlockAt);
+  const toggleBlockHidden = useBuilderDocumentStore((s) => s.toggleBlockHidden);
 
   const [insertOpen, setInsertOpen] = useState<'above' | 'below' | null>(null);
 
@@ -53,6 +57,7 @@ export function CanvasBlockToolbar({
   const canMoveUp = blockIndex > 0;
   const canMoveDown = blockIndex < blockCount - 1;
   const insertOptions = getCanvasInsertBlockOptions();
+  const isHidden = isBlockGloballyHidden(block.propsJson);
 
   function handleInsert(type: string, position: 'above' | 'below') {
     const index = position === 'above' ? blockIndex : blockIndex + 1;
@@ -104,6 +109,20 @@ export function CanvasBlockToolbar({
           data-testid="canvas-toolbar-duplicate"
         >
           <Copy className="h-3.5 w-3.5" aria-hidden />
+        </button>
+        <button
+          type="button"
+          className="v3-block-toolbar__btn"
+          onClick={() => toggleBlockHidden(block.id)}
+          aria-label={isHidden ? 'Afficher le bloc' : 'Masquer le bloc'}
+          aria-pressed={isHidden}
+          data-testid="canvas-toolbar-toggle-hidden"
+        >
+          {isHidden ? (
+            <EyeOff className="h-3.5 w-3.5" aria-hidden />
+          ) : (
+            <Eye className="h-3.5 w-3.5" aria-hidden />
+          )}
         </button>
         <button
           type="button"

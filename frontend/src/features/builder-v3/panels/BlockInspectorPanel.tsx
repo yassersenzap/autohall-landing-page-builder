@@ -27,8 +27,9 @@ import {
   MarketingBlockInspectorFields,
 } from './MarketingBlockInspectorFields';
 import { BlockDesignInspectorFields } from './BlockDesignInspectorFields';
-import { hasDefinitionDrivenInspector } from '@/features/builder/block-registry/inspector-controls-registry';
+import { hasDefinitionDrivenInspector, getInspectorControlsForTab } from '@/features/builder/block-registry/inspector-controls-registry';
 import { DefinitionDrivenBlockInspector } from './inspector/DefinitionDrivenBlockInspector';
+import { BlockVisibilityInspector } from './inspector/BlockVisibilityInspector';
 import { BlockVariantPicker } from './inspector/BlockVariantPicker';
 import { INSPECTOR_DESIGN_BLOCKS } from '@/features/builder-engine/lib/block-design-system';
 import { SECTION_PADDING_OPTIONS } from '../constants/block-layout';
@@ -129,6 +130,8 @@ export function BlockInspectorPanel({
   const isFAQ = block.type === 'faq';
   const isTestimonials = block.type === 'testimonials';
   const usesDefinitionInspector = hasDefinitionDrivenInspector(block.type);
+  const hasAdvancedInspectorControls =
+    getInspectorControlsForTab(block.type, 'advanced').length > 0;
   const isMarketingBlock = isMarketingInspectorBlock(block.type);
   const isPremiumDesignBlock = INSPECTOR_DESIGN_BLOCKS.has(block.type);
   const heroBgActive =
@@ -958,9 +961,11 @@ export function BlockInspectorPanel({
 
             {tab === 'advanced' && (
               <div className="space-y-4">
-                {usesDefinitionInspector && (
+                <BlockVisibilityInspector block={block} onPatch={patch} />
+
+                {hasAdvancedInspectorControls ? (
                   <DefinitionDrivenBlockInspector block={block} tab="advanced" onPatch={patch} />
-                )}
+                ) : null}
 
                 {isPromo && (
                   <div className="rounded-lg border border-neutral-800 bg-neutral-950/50 p-3">
@@ -1022,12 +1027,6 @@ export function BlockInspectorPanel({
                     onPatch={(p) => patch(p)}
                     showFormCard={isPromo}
                   />
-                )}
-
-                {!isPromo && !isHero && (
-                  <p className="text-xs text-neutral-500">
-                    Paramètres avancés spécifiques — ancre et espacement dans Layout.
-                  </p>
                 )}
               </div>
             )}

@@ -1,16 +1,15 @@
-import { useState } from 'react';
+import { type KeyboardEvent, type MouseEvent } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { ChevronDown, GripVertical } from 'lucide-react';
+import { GripVertical, LayoutTemplate, Plus } from 'lucide-react';
 import {
+  countArchivedCatalogBlocks,
   countCatalogBlocks,
   type CatalogBlockItem,
 } from '@/features/builder-engine/foundation/builder-catalog';
 import {
   CATALOG_TIER_META,
-  getAdvancedSectionCatalog,
-  getBasicBlockCatalog,
-  getCoreBusinessCatalog,
+  getArchivedBlockCatalog,
 } from '@/features/builder-engine/foundation/catalog-tiers';
 import { paletteDragId } from '@/features/builder-engine/constants/palette';
 import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
@@ -19,17 +18,9 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
   ScrollArea,
-  Separator,
-  ShadButton,
 } from '@/components/ui/primitives';
 import { cn } from '@/lib/utils';
-import { getCompleteSectionsByCategory } from '@/features/builder-engine/foundation/catalog-tiers';
 
 function DraggableBlockCard({
   block,
@@ -45,145 +36,186 @@ function DraggableBlockCard({
   const Icon = block.icon;
   const style = transform ? { transform: CSS.Translate.toString(transform) } : undefined;
 
+  function handleInsert(event?: MouseEvent | KeyboardEvent) {
+    event?.stopPropagation();
+    onAdd(block.type);
+  }
+
   return (
-    <div ref={setNodeRef} style={style} className={cn(isDragging && 'opacity-40')}>
-      <Card className="border-neutral-800 bg-neutral-900/60 text-neutral-100 transition-colors hover:border-neutral-600">
-        <CardHeader className="gap-1 p-3 pb-0">
-          <div className="flex items-start justify-between gap-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium">
-              <Icon className="h-3.5 w-3.5 shrink-0 text-blue-400" aria-hidden />
-              {block.sidebarLabel}
-            </CardTitle>
-            <button
-              type="button"
-              className="rounded p-1 text-neutral-500 hover:bg-neutral-800 hover:text-neutral-300"
-              aria-label={`Glisser ${block.sidebarLabel}`}
-              {...listeners}
-              {...attributes}
-            >
-              <GripVertical className="h-4 w-4" />
-            </button>
-          </div>
-          <CardDescription className="text-xs text-neutral-500">{block.description}</CardDescription>
-        </CardHeader>
-        <CardContent className="p-3 pt-2">
-          <ShadButton
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        'group relative',
+        isDragging && 'z-20 scale-[0.98] opacity-50',
+      )}
+      data-catalog-block={block.type}
+    >
+      <div
+        role="button"
+        tabIndex={0}
+        aria-label={`Insérer ${block.sidebarLabel}`}
+        onClick={() => onAdd(block.type)}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onAdd(block.type);
+          }
+        }}
+        className={cn(
+          'relative flex cursor-pointer items-start gap-2.5 rounded-lg border border-transparent px-2 py-2',
+          'bg-transparent transition-all duration-150 ease-out',
+          'hover:border-zinc-700/80 hover:bg-zinc-900/50',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600/60 focus-visible:ring-offset-1 focus-visible:ring-offset-zinc-950',
+          isDragging && 'border-zinc-600/50 bg-zinc-900/60 shadow-sm',
+        )}
+      >
+        <span
+          className={cn(
+            'mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md',
+            'bg-zinc-900/60 text-zinc-500 ring-1 ring-zinc-800/60',
+            'transition-colors duration-150 group-hover:text-zinc-300 group-hover:ring-zinc-700/80',
+          )}
+          aria-hidden
+        >
+          <Icon className="h-3.5 w-3.5" />
+        </span>
+
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium leading-snug text-zinc-100">{block.sidebarLabel}</p>
+          <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-zinc-500">
+            {block.description}
+          </p>
+        </div>
+
+        <div
+          className={cn(
+            'flex shrink-0 flex-col items-center gap-0.5 opacity-0 transition-opacity duration-150',
+            'group-hover:opacity-100 group-focus-within:opacity-100',
+          )}
+        >
+          <button
             type="button"
-            size="sm"
-            variant="secondary"
-            className="w-full border-neutral-700 bg-neutral-800 text-neutral-100 hover:bg-neutral-700"
-            onClick={() => onAdd(block.type)}
+            className={cn(
+              'flex h-6 w-6 items-center justify-center rounded-md text-zinc-500',
+              'hover:bg-zinc-800 hover:text-zinc-200',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600',
+            )}
+            aria-label={`Insérer ${block.sidebarLabel}`}
+            onClick={handleInsert}
           >
-            Insérer
-          </ShadButton>
-        </CardContent>
-      </Card>
+            <Plus className="h-3.5 w-3.5" aria-hidden />
+          </button>
+          <button
+            type="button"
+            className={cn(
+              'flex h-6 w-6 cursor-grab items-center justify-center rounded-md text-zinc-600',
+              'hover:bg-zinc-800/80 hover:text-zinc-400 active:cursor-grabbing',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600',
+            )}
+            aria-label={`Glisser ${block.sidebarLabel}`}
+            onClick={(event) => event.stopPropagation()}
+            {...listeners}
+            {...attributes}
+          >
+            <GripVertical className="h-3.5 w-3.5" aria-hidden />
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
 
 function CatalogTierHeader({ title, description }: { title: string; description: string }) {
   return (
-    <div className="space-y-0.5 px-1">
-      <p className="text-[0.625rem] font-semibold uppercase tracking-wider text-neutral-500">{title}</p>
-      <p className="text-[0.625rem] leading-relaxed text-neutral-600">{description}</p>
+    <div className="px-2 pb-1.5 pt-1">
+      <p className="text-sm font-medium text-zinc-400">{title}</p>
+      <p className="mt-0.5 text-xs leading-relaxed text-zinc-500">{description}</p>
     </div>
   );
 }
 
-function AdvancedTier({
+function CatalogBlockList({
   blocks,
   onAdd,
+  className,
 }: {
   blocks: CatalogBlockItem[];
   onAdd: (blockType: string) => void;
+  className?: string;
 }) {
-  const [open, setOpen] = useState(false);
-  if (blocks.length === 0) return null;
-
   return (
-    <div className="space-y-2" data-testid="catalog-advanced-group">
-      <button
-        type="button"
-        className="flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-xs font-semibold uppercase tracking-wider text-neutral-500 hover:bg-neutral-900/80 hover:text-neutral-300"
-        onClick={() => setOpen((v) => !v)}
-      >
-        <span>{CATALOG_TIER_META.advanced.title}</span>
-        <ChevronDown className={cn('h-4 w-4 transition', open && 'rotate-180')} aria-hidden />
-      </button>
-      {open ? (
-        <div className="space-y-2">
-          <p className="px-1 text-[0.625rem] text-neutral-600">{CATALOG_TIER_META.advanced.description}</p>
-          {blocks.map((block) => (
-            <DraggableBlockCard key={block.type} block={block} onAdd={onAdd} />
-          ))}
-        </div>
-      ) : null}
+    <div className={cn('space-y-0.5', className)}>
+      {blocks.map((block) => (
+        <DraggableBlockCard key={block.type} block={block} onAdd={onAdd} />
+      ))}
     </div>
   );
 }
 
 export function BlocksCatalogPanel() {
   const addBlock = useBuilderDocumentStore((s) => s.addBlock);
-  const coreBlocks = getCoreBusinessCatalog();
-  const sectionGroups = getCompleteSectionsByCategory();
-  const advancedBlocks = getAdvancedSectionCatalog();
-  const basicBlocks = getBasicBlockCatalog();
+  const blocks = useBuilderDocumentStore((s) => s.blocks);
+  const archivedBlocks = getArchivedBlockCatalog();
+  const archivedCount = countArchivedCatalogBlocks();
 
   return (
-    <ScrollArea className="h-full min-h-0" data-testid="studio-blocks-panel">
-      <div className="space-y-4 p-3 pb-6">
-        <div className="space-y-2" data-testid="catalog-core-business-group">
+    <ScrollArea
+      className="h-full min-h-0 bg-zinc-950"
+      data-testid="studio-blocks-panel"
+    >
+      <div className="space-y-3 px-2 py-3 pb-6">
+        <div data-testid="catalog-core-business-group">
           <CatalogTierHeader
             title={CATALOG_TIER_META.coreBusiness.title}
-            description={CATALOG_TIER_META.coreBusiness.description}
+            description="Nouveau bloc métier à venir — composez votre page depuis les blocs archivés."
           />
-          {coreBlocks.map((block) => (
-            <DraggableBlockCard key={block.type} block={block} onAdd={addBlock} />
-          ))}
+          {blocks.length === 0 ? (
+            <p
+              className="mx-1 mt-1 flex items-center gap-1.5 rounded-lg border border-dashed border-zinc-800/80 px-3 py-2 text-xs text-zinc-500"
+              data-testid="blocks-empty-page-hint"
+            >
+              <LayoutTemplate className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              Page vide — ouvrez Blocs archivés pour insérer une landing.
+            </p>
+          ) : null}
         </div>
 
-        <Separator className="bg-neutral-800" />
+        {archivedBlocks.length > 0 ? (
+          <>
+            <div className="mx-2 h-px bg-zinc-800/80" aria-hidden />
 
-        <div className="space-y-2">
-          <CatalogTierHeader
-            title={CATALOG_TIER_META.complementary.title}
-            description={CATALOG_TIER_META.complementary.description}
-          />
-          <Accordion type="multiple" defaultValue={sectionGroups.map((g) => g.categoryId)}>
-            {sectionGroups.map(({ categoryId, categoryLabel, blocks }) => (
-              <AccordionItem key={categoryId} value={categoryId} className="border-none">
-                <AccordionTrigger className="rounded-md px-2 py-2 text-xs font-semibold uppercase tracking-wider text-neutral-400 hover:bg-neutral-900/80 hover:text-neutral-200 hover:no-underline">
-                  {categoryLabel}
-                </AccordionTrigger>
-                <AccordionContent className="space-y-2 pt-1">
-                  {blocks.map((block) => (
-                    <DraggableBlockCard key={block.type} block={block} onAdd={addBlock} />
-                  ))}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
+            <div data-testid="catalog-archived-blocks-section">
+              <Accordion type="single" collapsible className="space-y-0.5">
+                <AccordionItem value="archived" className="border-none">
+                  <AccordionTrigger
+                    className={cn(
+                      'rounded-md px-2 py-2 text-sm font-medium text-zinc-400',
+                      'hover:bg-zinc-900/40 hover:text-zinc-200 hover:no-underline',
+                      'data-[state=open]:text-zinc-300',
+                      '[&>svg]:transition-transform [&>svg]:duration-200 [&>svg]:ease-out',
+                      '[&[data-state=open]>svg]:rotate-180',
+                    )}
+                  >
+                    {CATALOG_TIER_META.archived.title}
+                    <span className="ml-1.5 text-xs font-normal text-zinc-600">
+                      ({archivedCount})
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-1 pt-0">
+                    <p className="mb-2 px-2 text-xs leading-relaxed text-zinc-500">
+                      {CATALOG_TIER_META.archived.description}
+                    </p>
+                    <CatalogBlockList blocks={archivedBlocks} onAdd={addBlock} />
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+          </>
+        ) : null}
 
-        <Separator className="bg-neutral-800" />
-
-        <AdvancedTier blocks={advancedBlocks} onAdd={addBlock} />
-
-        <Separator className="bg-neutral-800" />
-
-        <div className="space-y-2">
-          <CatalogTierHeader
-            title={CATALOG_TIER_META.basics.title}
-            description={CATALOG_TIER_META.basics.description}
-          />
-          {basicBlocks.map((block) => (
-            <DraggableBlockCard key={block.type} block={block} onAdd={addBlock} />
-          ))}
-        </div>
-
-        <p className="px-1 text-[0.625rem] text-neutral-600">
-          {countCatalogBlocks()} blocs disponibles · glisser-déposer ou Insérer
+        <p className="px-2 pt-1 text-xs text-zinc-600">
+          {countCatalogBlocks()} actif · {archivedCount} archivés · clic ou glisser-déposer
         </p>
       </div>
     </ScrollArea>

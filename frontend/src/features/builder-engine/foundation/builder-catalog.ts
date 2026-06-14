@@ -20,6 +20,7 @@ import {
 import { PREMIUM_ANIMATED_BLOCK_TYPES } from '@/features/builder/block-motion';
 import {
   getActivePaletteBlocks,
+  getLegacyPaletteBlocks,
   getRegistryEntry,
   type BlockRegistryEntry,
 } from '../registry/block-registry';
@@ -125,14 +126,26 @@ function toCatalogItem(entry: BlockRegistryEntry): CatalogBlockItem {
   };
 }
 
-/** Catalogue actif — palette + export + sidebar partagent cette source. */
+/** Catalogue marketeur — blocs stables uniquement (landing métier). */
 export function getBuilderCatalog(): CatalogBlockItem[] {
   return getActivePaletteBlocks().map(toCatalogItem);
 }
 
+/** Catalogue archive — legacy registry, tier « Blocs archivés ». */
+export function getArchivedBuilderCatalog(): CatalogBlockItem[] {
+  return getLegacyPaletteBlocks().map(toCatalogItem);
+}
+
+/** @deprecated use getArchivedBuilderCatalog */
+export function getLegacyBuilderCatalog(): CatalogBlockItem[] {
+  return getArchivedBuilderCatalog();
+}
+
 export function getCatalogItem(blockType: string): CatalogBlockItem | undefined {
   const entry = getRegistryEntry(blockType);
-  if (!entry || entry.availability !== 'stable') return undefined;
+  if (!entry || entry.availability === 'disabled' || entry.availability === 'experimental') {
+    return undefined;
+  }
   return toCatalogItem(entry);
 }
 
@@ -151,6 +164,10 @@ export function countCatalogBlocks(): number {
   return getBuilderCatalog().length;
 }
 
+export function countArchivedCatalogBlocks(): number {
+  return getArchivedBuilderCatalog().length;
+}
+
 export function getPremiumAnimatedCatalog(): CatalogBlockItem[] {
-  return getBuilderCatalog().filter((item) => item.isPremium);
+  return getArchivedBuilderCatalog().filter((item) => item.isPremium);
 }

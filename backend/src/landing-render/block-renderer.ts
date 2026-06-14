@@ -8,6 +8,7 @@ import {
 } from './block-style';
 import { resolveHeroImageSrc } from './render-asset.resolve';
 import type { LandingRenderContext } from './render-asset.types';
+import { isBlockHiddenForExport } from './block-visibility';
 import { sanitizeExportHref } from './safe-export-link';
 import {
   renderLeadFormConsentHtml,
@@ -924,6 +925,12 @@ export function renderBlockHtml(
   context?: LandingRenderContext,
 ): string {
   const props = propsAsRecord(block.propsJson);
+
+  // Masquage global universel — aucun HTML généré (séparateur, texte, section, landing métier…).
+  if (isBlockHiddenForExport(props)) {
+    return '';
+  }
+
   const type = block.blockType.toLowerCase();
 
   if (type === 'hero' || type === 'hero_campaign') {

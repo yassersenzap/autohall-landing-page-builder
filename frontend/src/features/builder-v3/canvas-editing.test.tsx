@@ -193,6 +193,25 @@ describe('Canvas editing layer V1', () => {
     expect(useBuilderDocumentStore.getState().blocks).toHaveLength(2);
   });
 
+  it('toggleBlockHidden flips hidden prop immutably for any block type', () => {
+    useBuilderDocumentStore.getState().setInitialBlocks([
+      {
+        id: 'rich-1',
+        type: 'rich_text',
+        label: 'Texte',
+        sortOrder: 0,
+        propsJson: { titre: 'A' },
+      },
+    ]);
+    expect(useBuilderDocumentStore.getState().blocks[0]?.propsJson.hidden).toBeUndefined();
+
+    useBuilderDocumentStore.getState().toggleBlockHidden('rich-1');
+    expect(useBuilderDocumentStore.getState().blocks[0]?.propsJson.hidden).toBe(true);
+
+    useBuilderDocumentStore.getState().toggleBlockHidden('rich-1');
+    expect(useBuilderDocumentStore.getState().blocks[0]?.propsJson.hidden).toBe(false);
+  });
+
   it('studio route shell still loads', () => {
     renderWithDnd(<StudioLayout documentHydrated />);
     expect(document.querySelector('[data-studio-shell]')).toBeInTheDocument();

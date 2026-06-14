@@ -4,8 +4,9 @@ import { createJSONStorage, persist, type StateStorage } from 'zustand/middlewar
 import { assetPublicFileUrl } from '@/lib/page-assets-api';
 import { getDefaultBlockProps } from '../constants/default-block-props';
 import { getRegistryEntry } from '../registry/block-registry';
-import { getActivePaletteBlocks } from '../registry/block-registry';
+import { getInsertablePaletteBlocks } from '../registry/block-registry';
 import type { BuilderDeviceMode } from '../lib/block-design-props';
+import { withBlockHiddenToggle } from '../types/block-props.types';
 import { sanitizePropsPatch } from '../lib/sanitize-props-patch';
 import type { BuilderDocumentBlock } from '../types';
 import { findBlockById, sanitizeBlockSelection } from './block-selection';
@@ -171,6 +172,7 @@ type BuilderDocumentState = {
   moveBlockUp: (blockId: string) => void;
   moveBlockDown: (blockId: string) => void;
   updateBlockProps: (blockId: string, patch: Record<string, unknown>) => void;
+  toggleBlockHidden: (blockId: string) => void;
   applyBlockVariant: (blockId: string, variantId: string) => boolean;
   setInitialBlocks: (blocks: BuilderDocumentBlock[]) => void;
   setDeviceMode: (mode: BuilderDeviceMode) => void;
@@ -323,7 +325,7 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
       },
 
       addBlock: (type, index) => {
-        const activeTypes = new Set(getActivePaletteBlocks().map((b) => b.type));
+        const activeTypes = new Set(getInsertablePaletteBlocks().map((b) => b.type));
         if (!activeTypes.has(type)) return;
 
         const blocks = [...get().blocks];
@@ -346,7 +348,7 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
       },
 
       addSection: (blockTypes) => {
-        const activeTypes = new Set(getActivePaletteBlocks().map((b) => b.type));
+        const activeTypes = new Set(getInsertablePaletteBlocks().map((b) => b.type));
         const blocks = [...get().blocks];
         let insertAt = blocks.length;
         let firstId: string | null = null;
@@ -422,7 +424,13 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
           return;
         }
         const exists = findBlockById(get().blocks, blockId);
-        set({ selectedBlockId: exists ? blockId : null });
+        const nextId = exists ? blockId : null;
+        set({ selectedBlockId: nextId });
+        if (nextId) {
+          window.dispatchEvent(
+            new CustomEvent('studio:scroll-to-block', { detail: { blockId: nextId } }),
+          );
+        }
       },
 
       hoverBlock: (blockId) => {
@@ -537,6 +545,12 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
 
         if (!changed) return;
         set({ blocks, themeDirty: true, documentRevision: get().documentRevision + 1 });
+      },
+
+      toggleBlockHidden: (blockId) => {
+        const block = findBlockById(get().blocks, blockId);
+        if (!block) return;
+        get().updateBlockProps(blockId, withBlockHiddenToggle(block.propsJson));
       },
 
       applyBlockVariant: (blockId, variantId) => {
@@ -699,7 +713,7 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
       },
 
       applyPageStarter: (blockTypes, mode = 'append') => {
-        const activeTypes = new Set(getActivePaletteBlocks().map((b) => b.type));
+        const activeTypes = new Set(getInsertablePaletteBlocks().map((b) => b.type));
         const starterBlocks = blockTypes
           .filter((type) => activeTypes.has(type))
           .map((type, index) => createBlockFromType(type, index));
@@ -708,12 +722,18 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
 
         if (mode === 'replace') {
           const history = withHistoryBeforeMutation(get, 'apply_page_starter');
+          const firstId = starterBlocks[0]?.id ?? null;
           set({
             blocks: normalizeSortOrder(starterBlocks),
-            selectedBlockId: starterBlocks[0]?.id ?? null,
+            selectedBlockId: firstId,
             themeDirty: true,
             ...(history ?? {}),
           });
+          if (firstId) {
+            window.dispatchEvent(
+              new CustomEvent('studio:scroll-to-block', { detail: { blockId: firstId } }),
+            );
+          }
           return;
         }
 
@@ -725,12 +745,18 @@ export const useBuilderDocumentStore = create<BuilderDocumentState>()(
         }
 
         const history = withHistoryBeforeMutation(get, 'apply_page_starter');
+        const firstId = starterBlocks[0]?.id ?? null;
         set({
           blocks: normalizeSortOrder(blocks),
-          selectedBlockId: starterBlocks[0]?.id ?? null,
+          selectedBlockId: firstId,
           themeDirty: true,
           ...(history ?? {}),
         });
+        if (firstId) {
+          window.dispatchEvent(
+            new CustomEvent('studio:scroll-to-block', { detail: { blockId: firstId } }),
+          );
+        }
       },
 
       applyCampaignTemplate: (templateId) => {

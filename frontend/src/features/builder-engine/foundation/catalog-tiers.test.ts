@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { getBuilderCatalog } from './builder-catalog';
+import { getInsertablePaletteBlocks } from '../registry/block-registry';
+import { getBuilderCatalog, getArchivedBuilderCatalog } from './builder-catalog';
+import { ARCHIVED_BASIC_BLOCK_TYPES } from './catalog-visibility';
 import {
   BASIC_BLOCK_TYPES,
   COMPLETE_SECTION_BLOCK_TYPES,
@@ -18,19 +20,17 @@ describe('catalog-tiers', () => {
     }
     for (const type of basics) {
       expect(COMPLETE_SECTION_BLOCK_TYPES.has(type)).toBe(false);
-      expect(BASIC_BLOCK_TYPES.has(type)).toBe(true);
+      expect(ARCHIVED_BASIC_BLOCK_TYPES.has(type)).toBe(true);
     }
 
     const union = new Set([...sections, ...basics]);
     expect(union.size).toBe(sections.length + basics.length);
   });
 
-  it('covers every catalog block exactly once across tiers', () => {
-    const catalogTypes = getBuilderCatalog().map((b) => b.type).sort();
-    const tierTypes = [
-      ...getCompleteSectionCatalog().map((b) => b.type),
-      ...getBasicBlockCatalog().map((b) => b.type),
-    ].sort();
-    expect(tierTypes).toEqual(catalogTypes);
+  it('covers every insertable block across active and archived tiers', () => {
+    const activeTypes = getBuilderCatalog().map((b) => b.type);
+    const archivedTypes = getArchivedBuilderCatalog().map((b) => b.type);
+    const insertableTypes = getInsertablePaletteBlocks().map((b) => b.type).sort();
+    expect([...activeTypes, ...archivedTypes].sort()).toEqual(insertableTypes);
   });
 });

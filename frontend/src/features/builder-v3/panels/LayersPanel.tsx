@@ -28,6 +28,7 @@ export function LayersPanel({ className }: LayersPanelProps) {
   const moveBlockUp = useBuilderDocumentStore((s) => s.moveBlockUp);
   const moveBlockDown = useBuilderDocumentStore((s) => s.moveBlockDown);
   const reorderBlocks = useBuilderDocumentStore((s) => s.reorderBlocks);
+  const toggleBlockHidden = useBuilderDocumentStore((s) => s.toggleBlockHidden);
 
   const sorted = useMemo(
     () => [...blocks].sort((a, b) => a.sortOrder - b.sortOrder),
@@ -75,6 +76,7 @@ export function LayersPanel({ className }: LayersPanelProps) {
                 onRemove={removeBlock}
                 onMoveUp={moveBlockUp}
                 onMoveDown={moveBlockDown}
+                onToggleHidden={toggleBlockHidden}
                 canMoveUp={index > 0}
                 canMoveDown={index < sorted.length - 1}
               />

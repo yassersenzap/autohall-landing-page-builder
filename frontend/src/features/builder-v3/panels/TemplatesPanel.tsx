@@ -1,187 +1,155 @@
-import { useState } from 'react';
+import { useState, type KeyboardEvent, type MouseEvent } from 'react';
 import { AlertTriangle, LayoutTemplate, Sparkles, Wand2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { CATALOG_TIER_META } from '@/features/builder-engine/foundation/catalog-tiers';
 import {
-  countPremiumBlocks,
+  countArchivedStudioTemplates,
+  getArchivedGroupedCampaignPageTemplates,
   getCampaignPageTemplateById,
-  getCampaignPageTemplates,
-  getGroupedCampaignPageTemplates,
-  templateHasMotion,
 } from '@/features/builder-engine/foundation/campaign-page-templates';
 import type { CampaignPageTemplate } from '@/features/builder-engine/foundation/campaign-page-templates.types';
-import { getCoreCampaignTemplates } from '@/features/builder-engine/foundation/core-campaign-templates';
+import { getArchivedCoreCampaignTemplates } from '@/features/builder-engine/foundation/core-campaign-templates';
 import {
-  getFullPageStarters,
-  getSectionStarters,
+  getArchivedFullPageStarters,
+  getArchivedSectionStarters,
 } from '@/features/builder-engine/foundation/page-starters';
 import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
-import { getPageBrandTheme, resolvePageBrandThemeId } from '@/features/builder/brand-presets/brand-theme-presets';
-import { ScrollArea, Separator, ShadButton } from '@/components/ui/primitives';
-import { cn } from '@/lib/utils';
 import {
-  TemplateThumbnailPreview,
-  templateCategoryLabel,
-} from './template-thumbnail';
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  ScrollArea,
+  ShadButton,
+} from '@/components/ui/primitives';
+import { cn } from '@/lib/utils';
 
-function TierHeader({ title, description }: { title: string; description: string }) {
+function PanelSectionHeader({ title, description }: { title: string; description: string }) {
   return (
-    <div className="space-y-0.5 px-1">
-      <p className="text-[0.625rem] font-semibold uppercase tracking-wider text-neutral-500">
-        {title}
-      </p>
-      <p className="text-[0.625rem] leading-relaxed text-neutral-600">{description}</p>
+    <div className="px-2 pb-1.5 pt-1">
+      <p className="text-sm font-medium text-zinc-400">{title}</p>
+      <p className="mt-0.5 text-xs leading-relaxed text-zinc-500">{description}</p>
     </div>
   );
 }
 
-function StarterCard({
+function ArchiveSubsectionHeader({ title }: { title: string }) {
+  return (
+    <p className="px-2 pb-1 pt-2 text-xs font-medium text-zinc-500">{title}</p>
+  );
+}
+
+function TemplateListRow({
   label,
   description,
+  meta,
   icon: Icon,
-  onClick,
-  actionLabel,
+  onApply,
+  testId,
+  applyTestId,
 }: {
   label: string;
   description: string;
+  meta?: string;
   icon: LucideIcon;
-  onClick: () => void;
-  actionLabel?: string;
+  onApply: () => void;
+  testId: string;
+  applyTestId: string;
 }) {
+  function handleApply(event?: MouseEvent | KeyboardEvent) {
+    event?.stopPropagation();
+    onApply();
+  }
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-full rounded-lg border border-neutral-800 bg-neutral-900/80 p-3 text-left transition hover:border-blue-500/40 hover:bg-neutral-900"
-    >
-      <div className="mb-1 flex items-center gap-2">
-        <Icon className="h-3.5 w-3.5 text-blue-400" aria-hidden />
-        <span className="text-sm font-medium text-neutral-200">{label}</span>
+    <div className="group relative" data-testid={testId}>
+      <div
+        role="button"
+        tabIndex={0}
+        aria-label={`Appliquer ${label}`}
+        onClick={onApply}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onApply();
+          }
+        }}
+        className={cn(
+          'relative flex cursor-pointer items-start gap-2.5 rounded-lg border border-transparent px-2 py-2',
+          'bg-transparent transition-all duration-150 ease-out',
+          'hover:border-zinc-700/80 hover:bg-zinc-900/50',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600/60 focus-visible:ring-offset-1 focus-visible:ring-offset-zinc-950',
+        )}
+      >
+        <span
+          className={cn(
+            'mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md',
+            'bg-zinc-900/60 text-zinc-500 ring-1 ring-zinc-800/60',
+            'transition-colors duration-150 group-hover:text-zinc-300 group-hover:ring-zinc-700/80',
+          )}
+          aria-hidden
+        >
+          <Icon className="h-3.5 w-3.5" />
+        </span>
+
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium leading-snug text-zinc-100">{label}</p>
+          <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-zinc-500">{description}</p>
+          {meta ? (
+            <p className="mt-1 text-[0.6875rem] leading-relaxed text-zinc-600">{meta}</p>
+          ) : null}
+        </div>
+
+        <div
+          className={cn(
+            'flex shrink-0 opacity-0 transition-opacity duration-150',
+            'group-hover:opacity-100 group-focus-within:opacity-100',
+          )}
+        >
+          <button
+            type="button"
+            className={cn(
+              'flex h-7 w-7 items-center justify-center rounded-md text-zinc-500',
+              'hover:bg-zinc-800 hover:text-zinc-200',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600',
+            )}
+            aria-label={`Appliquer ${label}`}
+            data-testid={applyTestId}
+            onClick={handleApply}
+          >
+            <Wand2 className="h-3.5 w-3.5" aria-hidden />
+          </button>
+        </div>
       </div>
-      <p className="text-xs text-neutral-500">{description}</p>
-      {actionLabel ? (
-        <p className="mt-2 text-[0.6875rem] font-medium text-blue-400/90">{actionLabel}</p>
-      ) : null}
-    </button>
+    </div>
   );
 }
 
-function brandBadgeLabel(brandId: CampaignPageTemplate['brandId']): string {
-  if (brandId === 'autohall') return 'Auto Hall';
-  return brandId.charAt(0).toUpperCase() + brandId.slice(1).replace('_', ' ');
-}
-
-function CoreTemplateCard({
+function CampaignTemplateRow({
   template,
-  onUse,
+  onApply,
 }: {
   template: CampaignPageTemplate;
-  onUse: () => void;
+  onApply: () => void;
 }) {
-  const theme = getPageBrandTheme(resolvePageBrandThemeId(template.brandId));
+  const isCore = template.id.startsWith('core-');
+  const cardTestId = isCore
+    ? `core-template-card-${template.id}`
+    : `campaign-template-card-${template.id}`;
+  const applyTestId = isCore
+    ? `core-template-use-${template.id}`
+    : `campaign-template-use-${template.id}`;
 
   return (
-    <article
-      className="overflow-hidden rounded-xl border border-blue-500/20 bg-neutral-950/60 shadow-sm transition hover:border-blue-500/40"
-      data-testid={`core-template-card-${template.id}`}
-    >
-      <div className="space-y-3 p-3">
-        <TemplateThumbnailPreview template={template} />
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <h4 className="text-sm font-medium text-neutral-100">{template.name}</h4>
-            <span
-              className="rounded-full px-2 py-0.5 text-[0.625rem] font-medium"
-              style={{ backgroundColor: theme.primarySoft, color: theme.primaryColor }}
-            >
-              {brandBadgeLabel(template.brandId)}
-            </span>
-          </div>
-          <p className="text-xs leading-relaxed text-neutral-500">{template.description}</p>
-          <p className="text-[0.6875rem] text-neutral-600">
-            <span className="font-medium text-neutral-500">Usage · </span>
-            {template.recommendedUse}
-          </p>
-        </div>
-      </div>
-      <div className="flex items-center justify-between gap-2 border-t border-neutral-800/80 px-3 py-2.5">
-        <span className="text-[0.625rem] text-neutral-600">Image + formulaire · {template.blocks.length} blocs</span>
-        <ShadButton
-          type="button"
-          size="sm"
-          className="h-7 shrink-0 px-2.5 text-xs"
-          onClick={onUse}
-          data-testid={`core-template-use-${template.id}`}
-        >
-          Utiliser
-        </ShadButton>
-      </div>
-    </article>
-  );
-}
-
-function ExtendedTemplateCard({
-  template,
-  onUse,
-}: {
-  template: CampaignPageTemplate;
-  onUse: () => void;
-}) {
-  const theme = getPageBrandTheme(resolvePageBrandThemeId(template.brandId));
-  const premiumCount = countPremiumBlocks(template);
-  const motionReady = templateHasMotion(template);
-
-  return (
-    <article
-      className="overflow-hidden rounded-xl border border-neutral-800/90 bg-neutral-950/60 shadow-sm transition hover:border-neutral-700"
-      data-testid={`campaign-template-card-${template.id}`}
-    >
-      <div className="space-y-3 p-3">
-        <TemplateThumbnailPreview template={template} />
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <h4 className="text-sm font-medium text-neutral-100">{template.name}</h4>
-            <span
-              className="rounded-full px-2 py-0.5 text-[0.625rem] font-medium"
-              style={{ backgroundColor: theme.primarySoft, color: theme.primaryColor }}
-            >
-              Marque · {brandBadgeLabel(template.brandId)}
-            </span>
-          </div>
-          <p className="text-xs leading-relaxed text-neutral-500">{template.description}</p>
-        </div>
-        <div className="flex flex-wrap gap-2 text-[0.625rem] text-neutral-500">
-          <span className="rounded-md border border-neutral-800 px-2 py-1">
-            {templateCategoryLabel(template.category)}
-          </span>
-          <span className="rounded-md border border-neutral-800 px-2 py-1">
-            {template.blocks.length} blocs
-          </span>
-          {premiumCount > 0 ? (
-            <span className="rounded-md border border-neutral-800 px-2 py-1 text-neutral-600">
-              +{premiumCount} premium
-            </span>
-          ) : null}
-          {motionReady ? (
-            <span className="rounded-md border border-neutral-800 px-2 py-1 text-neutral-600">
-              Motion
-            </span>
-          ) : null}
-        </div>
-      </div>
-      <div className="flex items-center justify-end border-t border-neutral-800/80 px-3 py-2.5">
-        <ShadButton
-          type="button"
-          size="sm"
-          variant="secondary"
-          className="h-7 shrink-0 px-2.5 text-xs border-neutral-700"
-          onClick={onUse}
-          data-testid={`campaign-template-use-${template.id}`}
-        >
-          Utiliser
-        </ShadButton>
-      </div>
-    </article>
+    <TemplateListRow
+      label={template.name}
+      description={template.description}
+      meta={`${template.blocks.length} blocs · ${template.previewLabel}`}
+      icon={LayoutTemplate}
+      onApply={onApply}
+      testId={cardTestId}
+      applyTestId={applyTestId}
+    />
   );
 }
 
@@ -195,8 +163,11 @@ export function TemplatesPanel() {
     ? getCampaignPageTemplateById(pendingTemplateId)
     : undefined;
 
-  const coreTemplates = getCoreCampaignTemplates();
-  const templateGroups = getGroupedCampaignPageTemplates();
+  const archivedCoreTemplates = getArchivedCoreCampaignTemplates();
+  const archivedTemplateGroups = getArchivedGroupedCampaignPageTemplates();
+  const archivedFullPageStarters = getArchivedFullPageStarters();
+  const archivedSectionStarters = getArchivedSectionStarters();
+  const archivedCount = countArchivedStudioTemplates();
 
   function requestCampaignTemplate(templateId: string) {
     if (blocks.length > 0) {
@@ -213,19 +184,22 @@ export function TemplatesPanel() {
   }
 
   return (
-    <ScrollArea className="h-full min-h-0" data-testid="studio-templates-panel">
-      <div className="space-y-4 p-3 pb-6">
+    <ScrollArea
+      className="h-full min-h-0 bg-zinc-950"
+      data-testid="studio-templates-panel"
+    >
+      <div className="space-y-3 px-2 py-3 pb-6">
         {pendingTemplate ? (
           <div
-            className="space-y-3 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3"
+            className="mx-1 space-y-3 rounded-lg border border-amber-500/25 bg-amber-500/5 p-3"
             data-testid="campaign-template-replace-warning"
           >
             <div className="flex gap-2">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" aria-hidden />
               <div className="space-y-1">
-                <p className="text-sm font-medium text-amber-100">Remplacer le contenu actuel ?</p>
-                <p className="text-xs leading-relaxed text-amber-200/80">
-                  Le template « {pendingTemplate.name} » remplacera les {blocks.length} bloc
+                <p className="text-sm font-medium text-zinc-200">Remplacer le contenu actuel ?</p>
+                <p className="text-xs leading-relaxed text-zinc-500">
+                  Le modèle « {pendingTemplate.name} » remplacera les {blocks.length} bloc
                   {blocks.length > 1 ? 's' : ''} du canevas.
                 </p>
               </div>
@@ -234,7 +208,8 @@ export function TemplatesPanel() {
               <ShadButton
                 type="button"
                 size="sm"
-                className="h-8 flex-1 text-xs"
+                variant="secondary"
+                className="h-8 flex-1 border-zinc-700 bg-zinc-900 text-xs text-zinc-200"
                 onClick={confirmReplaceTemplate}
                 data-testid="campaign-template-confirm-replace"
               >
@@ -244,7 +219,7 @@ export function TemplatesPanel() {
                 type="button"
                 size="sm"
                 variant="secondary"
-                className={cn('h-8 flex-1 text-xs border-neutral-700')}
+                className="h-8 flex-1 border-zinc-700 text-xs text-zinc-400"
                 onClick={() => setPendingTemplateId(null)}
                 data-testid="campaign-template-cancel-replace"
               >
@@ -254,94 +229,126 @@ export function TemplatesPanel() {
           </div>
         ) : null}
 
-        <div className="space-y-2.5" data-testid="core-campaign-templates">
-          <TierHeader
-            title={CATALOG_TIER_META.coreTemplates.title}
-            description={CATALOG_TIER_META.coreTemplates.description}
-          />
-          {coreTemplates.map((template) => (
-            <CoreTemplateCard
-              key={template.id}
-              template={template}
-              onUse={() => requestCampaignTemplate(template.id)}
-            />
-          ))}
-        </div>
-
-        <Separator className="bg-neutral-800" />
-
-        <div className="space-y-4" data-testid="campaign-templates-by-use-case">
-          <TierHeader
-            title={CATALOG_TIER_META.campaignTemplates.title}
-            description={CATALOG_TIER_META.campaignTemplates.description}
-          />
-          {templateGroups.map(({ group, templates }) => (
-            <section
-              key={group.id}
-              className="space-y-2.5"
-              data-testid={`template-use-case-group-${group.id}`}
-            >
-              <TierHeader title={group.label} description={group.description} />
-              {templates.map((template) => (
-                <ExtendedTemplateCard
-                  key={template.id}
-                  template={template}
-                  onUse={() => requestCampaignTemplate(template.id)}
-                />
-              ))}
-            </section>
-          ))}
-          <p className="px-1 text-[0.625rem] text-neutral-600">
-            {getCampaignPageTemplates().length} templates étendus disponibles
-          </p>
-        </div>
-
-        <Separator className="bg-neutral-800" />
-
-        <div className="space-y-2">
-          <TierHeader
+        <div data-testid="templates-active-section">
+          <PanelSectionHeader
             title={CATALOG_TIER_META.starters.title}
-            description={CATALOG_TIER_META.starters.description}
+            description="Nouveaux gabarits métier à venir — composez votre page depuis l’onglet Blocs."
           />
-          {getFullPageStarters().map((starter) => (
-            <StarterCard
-              key={starter.id}
-              label={starter.label}
-              description={starter.description}
-              icon={LayoutTemplate}
-              onClick={() => applyPageStarter(starter.blockTypes, 'replace')}
-            />
-          ))}
+          {blocks.length === 0 ? (
+            <p
+              className="mx-1 mt-1 flex items-center gap-1.5 rounded-lg border border-dashed border-zinc-800/80 px-3 py-2 text-xs text-zinc-500"
+              data-testid="templates-empty-page-hint"
+            >
+              <Wand2 className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              Page vide — ajoutez une landing depuis Blocs ou ouvrez les modèles archivés.
+            </p>
+          ) : null}
         </div>
 
-        <Separator className="bg-neutral-800" />
+        <div className="mx-2 h-px bg-zinc-800/80" aria-hidden />
 
-        <div className="space-y-2">
-          <TierHeader
-            title={CATALOG_TIER_META.sectionStarters.title}
-            description={CATALOG_TIER_META.sectionStarters.description}
-          />
-          {getSectionStarters().map((section) => (
-            <StarterCard
-              key={section.id}
-              label={section.label}
-              description={section.description}
-              icon={Sparkles}
-              actionLabel="Ajouter au canevas"
-              onClick={() => applyPageStarter(section.blockTypes, 'append')}
-            />
-          ))}
+        <div data-testid="templates-archived-section">
+          <Accordion type="single" collapsible className="space-y-0.5">
+            <AccordionItem value="archived" className="border-none">
+              <AccordionTrigger
+                className={cn(
+                  'rounded-md px-2 py-2 text-sm font-medium text-zinc-400',
+                  'hover:bg-zinc-900/40 hover:text-zinc-200 hover:no-underline',
+                  'data-[state=open]:text-zinc-300',
+                  '[&>svg]:transition-transform [&>svg]:duration-200 [&>svg]:ease-out',
+                  '[&[data-state=open]>svg]:rotate-180',
+                )}
+              >
+                Modèles archivés
+                <span className="ml-1.5 text-xs font-normal text-zinc-600">({archivedCount})</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-1 pt-0">
+                <p className="mb-2 px-2 text-xs leading-relaxed text-zinc-500">
+                  Gabarits legacy — toujours applicables, remplacent ou complètent le canevas.
+                </p>
+
+                {archivedCoreTemplates.length > 0 ? (
+                  <div data-testid="core-campaign-templates">
+                    <ArchiveSubsectionHeader title={CATALOG_TIER_META.coreTemplates.title} />
+                    <div className="space-y-0.5">
+                      {archivedCoreTemplates.map((template) => (
+                        <CampaignTemplateRow
+                          key={template.id}
+                          template={template}
+                          onApply={() => requestCampaignTemplate(template.id)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {archivedTemplateGroups.length > 0 ? (
+                  <div className="space-y-1" data-testid="campaign-templates-by-use-case">
+                    <ArchiveSubsectionHeader title={CATALOG_TIER_META.campaignTemplates.title} />
+                    {archivedTemplateGroups.map(({ group, templates }) => (
+                      <section
+                        key={group.id}
+                        className="space-y-0.5"
+                        data-testid={`template-use-case-group-${group.id}`}
+                      >
+                        <p className="px-2 pb-0.5 pt-1 text-[0.6875rem] text-zinc-600">
+                          {group.label}
+                        </p>
+                        {templates.map((template) => (
+                          <CampaignTemplateRow
+                            key={template.id}
+                            template={template}
+                            onApply={() => requestCampaignTemplate(template.id)}
+                          />
+                        ))}
+                      </section>
+                    ))}
+                  </div>
+                ) : null}
+
+                {archivedFullPageStarters.length > 0 ? (
+                  <div className="space-y-0.5">
+                    <ArchiveSubsectionHeader title="Pages types" />
+                    {archivedFullPageStarters.map((starter) => (
+                      <TemplateListRow
+                        key={starter.id}
+                        label={starter.label}
+                        description={starter.description}
+                        meta={`${starter.blockTypes.length} blocs · page complète`}
+                        icon={LayoutTemplate}
+                        onApply={() => applyPageStarter(starter.blockTypes, 'replace')}
+                        testId={`page-starter-card-${starter.id}`}
+                        applyTestId={`page-starter-use-${starter.id}`}
+                      />
+                    ))}
+                  </div>
+                ) : null}
+
+                {archivedSectionStarters.length > 0 ? (
+                  <div className="space-y-0.5">
+                    <ArchiveSubsectionHeader title={CATALOG_TIER_META.sectionStarters.title} />
+                    {archivedSectionStarters.map((section) => (
+                      <TemplateListRow
+                        key={section.id}
+                        label={section.label}
+                        description={section.description}
+                        meta={`${section.blockTypes.length} blocs · ajout au canevas`}
+                        icon={Sparkles}
+                        onApply={() => applyPageStarter(section.blockTypes, 'append')}
+                        testId={`section-starter-card-${section.id}`}
+                        applyTestId={`section-starter-use-${section.id}`}
+                      />
+                    ))}
+                  </div>
+                ) : null}
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
 
-        {blocks.length === 0 ? (
-          <p
-            className="flex items-center gap-1.5 rounded-lg border border-dashed border-neutral-800 px-3 py-2 text-xs text-neutral-500"
-            data-testid="templates-empty-page-hint"
-          >
-            <Wand2 className="h-3.5 w-3.5 shrink-0" aria-hidden />
-            Page vide — choisissez une landing métier image + formulaire pour démarrer.
-          </p>
-        ) : null}
+        <p className="px-2 pt-1 text-xs text-zinc-600">
+          {archivedCount} modèles archivés · clic ou icône baguette pour appliquer
+        </p>
       </div>
     </ScrollArea>
   );

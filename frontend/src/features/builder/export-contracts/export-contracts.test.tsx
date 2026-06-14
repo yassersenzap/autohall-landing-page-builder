@@ -6,7 +6,7 @@ import type { BuilderDocumentBlock } from '@/features/builder-engine/types';
 import { campaignLeadHeroDefaultContent } from '@/features/builder/blocks/campaign-lead-hero';
 import { parseCampaignLeadHeroProps } from '@/features/builder/blocks/campaign-lead-hero/parse-campaign-lead-hero-props';
 import { getInspectorControlsForBlock } from '@/features/builder/block-registry/inspector-controls-registry';
-import { CampaignLeadHeroBlockPreview } from '@/features/builder-v3/canvas/blocks/CampaignLeadHeroBlockPreview';
+import { CampaignLeadHeroBlockPreview } from '@/features/builder-v3/canvas/blocks/legacy-components/CampaignLeadHeroBlockPreview';
 import { DefinitionDrivenBlockInspector } from '@/features/builder-v3/panels/inspector/DefinitionDrivenBlockInspector';
 import {
   DEFAULT_EXPORT_TARGET,

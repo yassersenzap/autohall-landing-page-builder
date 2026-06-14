@@ -1,5 +1,6 @@
 import { asPropString } from '@/features/builder-engine/lib/block-props';
 import { buildBlockDesignClasses, normalizeSectionDesign } from '@/features/builder-engine/lib/block-design-system';
+import { mergeBlockSectionPresentation } from '@/features/builder/section-style';
 import { CanvasEmptyHint } from './CanvasEmptyHint';
 
 type RichTextBlockPreviewProps = {
@@ -8,7 +9,11 @@ type RichTextBlockPreviewProps = {
 
 export function RichTextBlockPreview({ propsJson }: RichTextBlockPreviewProps) {
   const design = normalizeSectionDesign('rich_text', propsJson);
-  const sectionClass = buildBlockDesignClasses('lp-rich-text', design);
+  const { className: sectionClass } = mergeBlockSectionPresentation(
+    `lp-block ${buildBlockDesignClasses('lp-rich-text', design)}`,
+    'rich_text',
+    propsJson,
+  );
   const titre = asPropString(propsJson.titre) || asPropString(propsJson.title);
   const contenu = asPropString(propsJson.contenu) || asPropString(propsJson.content);
   const alignClass =
@@ -17,7 +22,7 @@ export function RichTextBlockPreview({ propsJson }: RichTextBlockPreviewProps) {
       : 'lp-rich-text__inner--center';
 
   return (
-    <section className={`lp-block ${sectionClass}`}>
+    <section className={sectionClass}>
       <div className="lp-section">
         <div className={`lp-rich-text__inner ${alignClass}`}>
           {titre ? (

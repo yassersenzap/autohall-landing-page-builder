@@ -1,4 +1,5 @@
 import type { LandingRenderContext } from './render-asset.types';
+import { resolveCoreCampaignLayout } from './core-campaign-form-landing.layout';
 import { resolveHeroImageSrc } from './render-asset.resolve';
 import { sanitizeExportHref } from './safe-export-link';
 import {
@@ -6,14 +7,6 @@ import {
   renderLeadFormFieldsHtml,
   renderLeadFormRequiredNoteHtml,
 } from './lead-form-fields.render';
-import { buildButtonClasses, normalizeBlockDesign } from './block-style';
-
-const CORE_LAYOUTS = new Set([
-  'image_left_form_right',
-  'form_left_image_right',
-  'background_image_form_card',
-  'full_width_banner_form_side',
-]);
 
 function propString(props: Record<string, unknown>, ...keys: string[]): string | null {
   for (const key of keys) {
@@ -41,9 +34,7 @@ function parseFormProps(props: Record<string, unknown>): Record<string, unknown>
 }
 
 function resolveCoreLayout(props: Record<string, unknown>): string {
-  const raw = propString(props, 'coreLayout', 'layoutVariant');
-  if (raw && CORE_LAYOUTS.has(raw)) return raw;
-  return 'image_left_form_right';
+  return resolveCoreCampaignLayout(props);
 }
 
 function overlayClass(strength: string | null): string {
@@ -81,8 +72,6 @@ export function renderCoreCampaignFormLandingHtml(
   const imageAlt = propString(props, 'alt') ?? title ?? 'Campagne Auto Hall';
 
   const formProps = parseFormProps(props);
-  const formDesign = normalizeBlockDesign('lead_form', formProps);
-  const btnClass = `${buildButtonClasses(formDesign)} lp-lead-form__submit`;
   const formTitle = propString(formProps, 'formTitle', 'title') ?? propString(props, 'formTitle');
   const formSubtitle =
     propString(formProps, 'formSubtitle', 'subtitle') ?? propString(props, 'formSubtitle');
@@ -93,14 +82,13 @@ export function renderCoreCampaignFormLandingHtml(
   const consentHtml = renderLeadFormConsentHtml(formProps);
   const requiredNoteHtml = renderLeadFormRequiredNoteHtml(formProps);
 
+  const progressPct = Math.round((stepIndex / stepCount) * 100);
   const stepHtml = `
-    <div class="lp-core-campaign-landing__steps" aria-hidden="true">
-      <span class="lp-core-campaign-landing__step-label">Étape ${stepIndex}/${stepCount}</span>
-      <div class="lp-core-campaign-landing__step-dots">
-        ${Array.from({ length: stepCount }, (_, i) =>
-          `<span class="lp-core-campaign-landing__step-dot${i + 1 === stepIndex ? ' is-active' : ''}"></span>`,
-        ).join('')}
+    <div class="lp-core-campaign-landing__steps">
+      <div class="lp-core-campaign-landing__step-progress" role="progressbar" aria-valuenow="${stepIndex}" aria-valuemin="1" aria-valuemax="${stepCount}" aria-label="Étape ${stepIndex} sur ${stepCount}">
+        <span class="lp-core-campaign-landing__step-progress-fill" style="width:${progressPct}%"></span>
       </div>
+      <p class="lp-core-campaign-landing__step-label">Étape ${stepIndex}/${stepCount}</p>
     </div>`;
 
   const contentHtml = `
@@ -128,7 +116,7 @@ export function renderCoreCampaignFormLandingHtml(
           <div class="lp-lead-form__grid">${fieldsHtml}</div>
           ${consentHtml}
           <p class="lp-lead-form__feedback" role="status" aria-live="polite"></p>
-          <button type="submit" class="${btnClass}">${escapeHtml(submitText)}</button>
+          <button type="submit" class="lp-btn lp-btn--primary lp-btn--lg lp-lead-form__submit">${escapeHtml(submitText)}</button>
         </form>
       </div>
     </div>`;

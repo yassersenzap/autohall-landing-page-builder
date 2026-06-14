@@ -7,11 +7,11 @@ import {
   buildMediaImgClasses,
   getDesignFromProps,
 } from '@/features/builder-engine/lib/block-style';
-import { useBuilderPreviewContext } from '../../context/BuilderPreviewContext';
-import { BlockBackgroundLayer } from './BlockBackgroundLayer';
-import { CanvasCtaLink } from './CanvasCtaLink';
-import { ShapeDividerBottom } from './ShapeDividerBottom';
-import { CanvasEmptyHint } from './CanvasEmptyHint';
+import { useBuilderPreviewContext } from '../../../context/BuilderPreviewContext';
+import { BlockBackgroundLayer } from '../BlockBackgroundLayer';
+import { CanvasCtaLink } from '../CanvasCtaLink';
+import { ShapeDividerBottom } from '../ShapeDividerBottom';
+import { CanvasEmptyHint } from '../CanvasEmptyHint';
 
 type HeroBlockPreviewProps = {
   propsJson: Record<string, unknown>;

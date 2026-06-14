@@ -1,5 +1,6 @@
 import { asPropString } from '@/features/builder-engine/lib/block-props';
 import { buildBlockDesignClasses, normalizeSectionDesign } from '@/features/builder-engine/lib/block-design-system';
+import { mergeBlockSectionPresentation } from '@/features/builder/section-style';
 import { resolveVideoEmbedUrl } from '../../lib/video-embed-url';
 import { CanvasEmptyHint } from './CanvasEmptyHint';
 
@@ -9,13 +10,17 @@ type VideoEmbedBlockPreviewProps = {
 
 export function VideoEmbedBlockPreview({ propsJson }: VideoEmbedBlockPreviewProps) {
   const design = normalizeSectionDesign('video_embed', propsJson);
-  const sectionClass = buildBlockDesignClasses('lp-video-embed', design);
+  const { className: sectionClass } = mergeBlockSectionPresentation(
+    `lp-block ${buildBlockDesignClasses('lp-video-embed', design)}`,
+    'video_embed',
+    propsJson,
+  );
   const videoUrl = asPropString(propsJson.videoUrl);
   const title = asPropString(propsJson.title);
   const embedUrl = resolveVideoEmbedUrl(videoUrl);
 
   return (
-    <section className={`lp-block ${sectionClass}`}>
+    <section className={sectionClass}>
       <div className="lp-section">
         {title ? (
           <h2 className="lp-video-embed__title">{title}</h2>

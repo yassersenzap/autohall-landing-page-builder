@@ -1,6 +1,7 @@
 import { HeroBlockImage } from '@/features/builder-engine/components/media/HeroBlockImage';
 import { asPropString } from '@/features/builder-engine/lib/block-props';
 import { buildBlockDesignClasses, normalizeSectionDesign } from '@/features/builder-engine/lib/block-design-system';
+import { mergeBlockSectionPresentation } from '@/features/builder/section-style';
 
 type MediaOnlyBlockPreviewProps = {
   propsJson: Record<string, unknown>;
@@ -8,7 +9,11 @@ type MediaOnlyBlockPreviewProps = {
 
 export function MediaOnlyBlockPreview({ propsJson }: MediaOnlyBlockPreviewProps) {
   const design = normalizeSectionDesign('media_only', propsJson);
-  const sectionClass = buildBlockDesignClasses('lp-media-only', design);
+  const { className: sectionClass } = mergeBlockSectionPresentation(
+    `lp-block ${buildBlockDesignClasses('lp-media-only', design)}`,
+    'media_only',
+    propsJson,
+  );
   const imageUrl = asPropString(propsJson.imageUrl);
   const imageAssetId = asPropString(propsJson.imageAssetId);
   const imageAlt =
@@ -19,7 +24,7 @@ export function MediaOnlyBlockPreview({ propsJson }: MediaOnlyBlockPreviewProps)
   const hasImage = Boolean(imageAssetId || imageUrl);
 
   return (
-    <section className={`lp-block ${sectionClass} ${aspectClass}`}>
+    <section className={`${sectionClass} ${aspectClass}`}>
       <div className="lp-section">
         <figure className="lp-media-only__figure">
           {hasImage ? (

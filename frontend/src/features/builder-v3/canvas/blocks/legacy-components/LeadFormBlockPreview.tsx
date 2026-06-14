@@ -5,11 +5,11 @@ import {
   buildCanvasSectionClass,
   getDesignFromProps,
 } from '@/features/builder-engine/lib/block-style';
-import { useBuilderPreviewContext } from '../../context/BuilderPreviewContext';
-import { submitLeadFormFromDom } from '../../lib/submit-lead-form';
-import { CanvasEmptyHint } from './CanvasEmptyHint';
-import { CanvasLeadFormFields } from './CanvasLeadFormFields';
-import { FormSuccessPanel } from './FormSuccessPanel';
+import { useBuilderPreviewContext } from '../../../context/BuilderPreviewContext';
+import { submitLeadFormFromDom } from '../../../lib/submit-lead-form';
+import { CanvasEmptyHint } from '../CanvasEmptyHint';
+import { CanvasLeadFormFields } from '../CanvasLeadFormFields';
+import { FormSuccessPanel } from '../FormSuccessPanel';
 
 type LeadFormBlockPreviewProps = {
   propsJson: Record<string, unknown>;

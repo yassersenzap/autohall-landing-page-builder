@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { BuilderDocumentBlock } from '@/features/builder-engine/types';
 import { getInspectorControlsForBlock } from '@/features/builder/block-registry/inspector-controls-registry';
+import { BLOCK_STUDIO_VISIBILITY_CONTROLS } from '@/features/builder/block-registry/block-studio-controls';
 import { BlockInspectorPanel } from '../BlockInspectorPanel';
 import { DefinitionDrivenBlockInspector } from './DefinitionDrivenBlockInspector';
 import { InspectorControlRenderer } from './InspectorControlRenderer';
@@ -67,6 +68,9 @@ describe('definition-driven inspector', () => {
     expect(getInspectorControlsForBlock('hero_vehicle_offer').length).toBeGreaterThan(10);
     expect(getInspectorControlsForBlock('campaign_lead_hero').length).toBeGreaterThan(10);
     expect(getInspectorControlsForBlock('hero_campaign')).toHaveLength(0);
+    expect(BLOCK_STUDIO_VISIBILITY_CONTROLS.find((c) => c.propKey === 'hidden')?.propKey).toBe(
+      'hidden',
+    );
   });
 
   it('renders tabbed controls with groups', () => {
@@ -191,5 +195,61 @@ describe('definition-driven inspector', () => {
 
     expect(screen.queryByTestId('definition-driven-inspector')).not.toBeInTheDocument();
     expect(screen.getByLabelText('Titre')).toBeInTheDocument();
+  });
+
+  it('basic rich_text block exposes universal hide controls on advanced tab', () => {
+    const updateBlockProps = vi.fn();
+    const block: BuilderDocumentBlock = {
+      id: 'rich-1',
+      type: 'rich_text',
+      label: 'Bloc texte',
+      sortOrder: 0,
+      propsJson: { titre: 'Titre', contenu: 'Corps' },
+    };
+
+    render(
+      <BlockInspectorPanel
+        block={block}
+        updateBlockProps={updateBlockProps}
+        onMoveUp={() => {}}
+        onMoveDown={() => {}}
+        onDelete={() => {}}
+        canMoveUp={false}
+        canMoveDown={false}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Avancé' }));
+    expect(screen.getByTestId('block-visibility-inspector')).toBeInTheDocument();
+    expect(screen.getByLabelText('Masquer le bloc')).toBeInTheDocument();
+    expect(screen.getByLabelText('Masquer sur mobile')).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText('Masquer le bloc'));
+    expect(updateBlockProps).toHaveBeenCalledWith('rich-1', { hidden: true });
+  });
+
+  it('core_campaign_form_landing exposes universal hide controls on advanced tab', () => {
+    const updateBlockProps = vi.fn();
+    const block: BuilderDocumentBlock = {
+      id: 'core-1',
+      type: 'core_campaign_form_landing',
+      label: 'Landing métier',
+      sortOrder: 0,
+      propsJson: { title: 'Campagne', formTitle: 'Formulaire' },
+    };
+
+    render(
+      <BlockInspectorPanel
+        block={block}
+        updateBlockProps={updateBlockProps}
+        onMoveUp={() => {}}
+        onMoveDown={() => {}}
+        onDelete={() => {}}
+        canMoveUp={false}
+        canMoveDown={false}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Avancé' }));
+    expect(screen.getByLabelText('Masquer le bloc')).toBeInTheDocument();
   });
 });

@@ -48,16 +48,6 @@ export function CanvasDocument() {
     injectGoogleFonts(doc, headingFont, bodyFont);
   }, [headingFont, bodyFont]);
 
-  useEffect(() => {
-    if (!selectedBlockId) return;
-    const el = document.querySelector<HTMLElement>(
-      `[data-canvas-block-id="${selectedBlockId}"]`,
-    );
-    if (el && typeof el.scrollIntoView === 'function') {
-      el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-    }
-  }, [selectedBlockId]);
-
   const docStyle = useMemo(
     () =>
       ({

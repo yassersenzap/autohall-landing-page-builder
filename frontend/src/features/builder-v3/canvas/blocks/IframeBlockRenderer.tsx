@@ -1,9 +1,5 @@
 import type { BuilderDocumentBlock } from '@/features/builder-engine/types';
 import { CoreCampaignFormLandingBlockPreview } from './CoreCampaignFormLandingBlockPreview';
-import { HeroBlockPreview } from './HeroBlockPreview';
-import { HeroFormCampaignBlockPreview } from './HeroFormCampaignBlockPreview';
-import { LeadFormBlockPreview } from './LeadFormBlockPreview';
-import { PromoAutoHallBlockPreview } from './PromoAutoHallBlockPreview';
 import { VehicleFeaturesBlockPreview } from './VehicleFeaturesBlockPreview';
 import { GalleryBlockPreview } from './GalleryBlockPreview';
 import { FooterLegalBlockPreview } from './FooterLegalBlockPreview';
@@ -17,21 +13,27 @@ import { FAQBlockPreview } from './FAQBlockPreview';
 import { TestimonialBlockPreview } from './TestimonialBlockPreview';
 import {
   BenefitsBlockPreview,
-  FinalCtaBlockPreview,
   TrustBarBlockPreview,
-  VehicleOfferBlockPreview,
   VehicleRangeBlockPreview,
 } from './MarketingBlockPreviews';
-import { CampaignLeadHeroBlockPreview } from './CampaignLeadHeroBlockPreview';
-import { HeroVehicleOfferBlockPreview } from './HeroVehicleOfferBlockPreview';
 import {
   AnimatedStatsStripBlockPreview,
   CampaignTimelineStepsBlockPreview,
   PremiumBentoFeaturesBlockPreview,
   PremiumTestimonialsBlockPreview,
-  StickyLeadCtaBlockPreview,
   VehicleShowcaseSplitBlockPreview,
 } from './PremiumAnimatedBlockPreviews';
+import {
+  CampaignLeadHeroBlockPreview,
+  FinalCtaBlockPreview,
+  HeroBlockPreview,
+  HeroFormCampaignBlockPreview,
+  HeroVehicleOfferBlockPreview,
+  LeadFormBlockPreview,
+  PromoAutoHallBlockPreview,
+  StickyLeadCtaBlockPreview,
+  VehicleOfferBlockPreview,
+} from './legacy-components';
 
 type IframeBlockRendererProps = {
   block: BuilderDocumentBlock;

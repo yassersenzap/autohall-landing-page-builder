@@ -1,4 +1,6 @@
 /** Gabarit de page ou section marketing — sans nom de marque dans l’UI. */
+export type PageStarterTier = 'active' | 'archived';
+
 export type PageStarterTemplate = {
   id: string;
   label: string;
@@ -8,6 +10,8 @@ export type PageStarterTemplate = {
   blockTypes: string[];
   /** Catégorie métier pour regroupement UI */
   category: 'acquisition' | 'vehicle' | 'sav' | 'financing' | 'event';
+  /** `archived` — regroupé dans « Modèles archivés » (legacy). */
+  tier?: PageStarterTier;
 };
 
 export const PAGE_STARTER_TEMPLATES: PageStarterTemplate[] = [
@@ -15,65 +19,73 @@ export const PAGE_STARTER_TEMPLATES: PageStarterTemplate[] = [
     id: 'starter-capture-leads',
     kind: 'full-page',
     category: 'acquisition',
+    tier: 'archived',
     label: 'Page capture de leads',
-    description: 'Hero acquisition, formulaire intégré, réassurance et mentions légales.',
-    blockTypes: ['promo_autohall', 'trust_bar', 'footer_legal'],
+    description: 'Landing métier, réassurance et mentions légales.',
+    blockTypes: ['core_campaign_form_landing', 'trust_bar', 'footer_legal'],
   },
   {
     id: 'starter-vehicle-offer',
     kind: 'full-page',
     category: 'vehicle',
+    tier: 'archived',
     label: 'Page offre véhicule',
-    description: 'Bannière campagne, fiche offre, CTA final et formulaire.',
-    blockTypes: ['hero_campaign', 'vehicle_offer', 'final_cta', 'lead_form', 'footer_legal'],
+    description: 'Landing image + formulaire et pied de page légal.',
+    blockTypes: ['core_campaign_form_landing', 'vehicle_features', 'footer_legal'],
   },
   {
     id: 'starter-sav-service',
     kind: 'full-page',
     category: 'sav',
+    tier: 'archived',
     label: 'Page SAV & services',
-    description: 'Hero avec formulaire, avantages services et pied de page légal.',
-    blockTypes: ['hero_form_campaign', 'benefits', 'faq', 'footer_legal'],
+    description: 'Landing avec formulaire contact, avantages services et FAQ.',
+    blockTypes: ['core_campaign_form_landing', 'benefits', 'faq', 'footer_legal'],
   },
   {
     id: 'starter-financing',
     kind: 'full-page',
     category: 'financing',
+    tier: 'archived',
     label: 'Page financement',
-    description: 'Hero, grille finitions/prix et bandeau de conversion.',
-    blockTypes: ['hero_campaign', 'pricing_trim', 'cta_band', 'lead_form'],
+    description: 'Landing, grille finitions/prix et bandeau de conversion.',
+    blockTypes: ['core_campaign_form_landing', 'pricing_trim', 'cta_band', 'footer_legal'],
   },
   {
     id: 'starter-event',
     kind: 'full-page',
     category: 'event',
+    tier: 'archived',
     label: 'Page événement / essai',
-    description: 'Mise en avant événementielle avec capture lead.',
-    blockTypes: ['hero_campaign', 'gallery', 'lead_form', 'footer_legal'],
+    description: 'Landing événementielle avec galerie et capture lead intégrée.',
+    blockTypes: ['core_campaign_form_landing', 'gallery', 'footer_legal'],
   },
   {
     id: 'section-test-drive',
     kind: 'section',
     category: 'event',
+    tier: 'archived',
     label: 'Section essai véhicule',
-    description: 'Hero, formulaire, confiance et mentions.',
-    blockTypes: ['hero_campaign', 'lead_form', 'trust_bar', 'footer_legal'],
+    description: 'Landing métier, confiance et mentions.',
+    blockTypes: ['core_campaign_form_landing', 'trust_bar', 'footer_legal'],
   },
   {
     id: 'section-vehicle-offer',
     kind: 'section',
     category: 'vehicle',
+    tier: 'archived',
     label: 'Section offre modèle',
-    description: 'Hero, fiche offre, CTA et formulaire.',
-    blockTypes: ['hero_campaign', 'vehicle_offer', 'final_cta', 'lead_form'],
+    description: 'Landing métier et caractéristiques véhicule.',
+    blockTypes: ['core_campaign_form_landing', 'vehicle_features', 'footer_legal'],
   },
   {
     id: 'section-sav-service',
     kind: 'section',
     category: 'sav',
+    tier: 'archived',
     label: 'Section SAV',
-    description: 'Hero + formulaire, avantages et légal.',
-    blockTypes: ['hero_form_campaign', 'benefits', 'footer_legal'],
+    description: 'Landing + formulaire, avantages et légal.',
+    blockTypes: ['core_campaign_form_landing', 'benefits', 'footer_legal'],
   },
 ];
 
@@ -87,6 +99,30 @@ export function getFullPageStarters(): PageStarterTemplate[] {
 
 export function getSectionStarters(): PageStarterTemplate[] {
   return PAGE_STARTER_TEMPLATES.filter((s) => s.kind === 'section');
+}
+
+export function isArchivedPageStarter(starter: PageStarterTemplate): boolean {
+  return (starter.tier ?? 'archived') === 'archived';
+}
+
+export function getActivePageStarters(): PageStarterTemplate[] {
+  return PAGE_STARTER_TEMPLATES.filter((s) => s.tier === 'active');
+}
+
+export function getArchivedPageStarters(): PageStarterTemplate[] {
+  return PAGE_STARTER_TEMPLATES.filter(isArchivedPageStarter);
+}
+
+export function getArchivedFullPageStarters(): PageStarterTemplate[] {
+  return getArchivedPageStarters().filter((s) => s.kind === 'full-page');
+}
+
+export function getArchivedSectionStarters(): PageStarterTemplate[] {
+  return getArchivedPageStarters().filter((s) => s.kind === 'section');
+}
+
+export function countArchivedTemplates(): number {
+  return getArchivedPageStarters().length;
 }
 
 /** @deprecated Utiliser PAGE_STARTER_TEMPLATES — compat tests legacy. */

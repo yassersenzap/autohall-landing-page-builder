@@ -203,7 +203,7 @@ export default function BuilderV3PreviewPage() {
             src="about:blank"
             data-preview-revision={documentRevision}
           />
-          {mountNode ? createPortal(<PreviewDocument />, mountNode) : null}
+          {mountNode ? createPortal(<PreviewDocument viewport={viewport} />, mountNode) : null}
         </div>
       </div>
     </div>

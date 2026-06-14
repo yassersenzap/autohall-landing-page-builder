@@ -1,6 +1,8 @@
 import { useState, type FormEvent, type ReactNode } from 'react';
 import { HeroBlockImage } from '@/features/builder-engine/components/media/HeroBlockImage';
 import { asPropString } from '@/features/builder-engine/lib/block-props';
+import { resolveCoreCampaignLayout } from '@/features/builder/blocks/core-campaign-form-landing/core-campaign-form-landing.layout';
+import { mergeBlockSectionPresentation } from '@/features/builder/section-style';
 import { useBuilderPreviewContext } from '../../context/BuilderPreviewContext';
 import { submitLeadFormFromDom } from '../../lib/submit-lead-form';
 import { CanvasEmptyHint } from './CanvasEmptyHint';
@@ -22,7 +24,7 @@ export function CoreCampaignFormLandingBlockPreview({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const coreLayout = asPropString(propsJson.coreLayout) || 'image_left_form_right';
+  const coreLayout = resolveCoreCampaignLayout(propsJson);
   const visualType = asPropString(propsJson.visualType) || 'campaign_image';
   const stepCount = Number(propsJson.stepCount) === 3 ? 3 : 2;
   const stepIndex = 1;
@@ -101,21 +103,28 @@ export function CoreCampaignFormLandingBlockPreview({
     </div>
   );
 
+  const progressPct = Math.round((stepIndex / stepCount) * 100);
+
   const formBlock = (
     <div className="lp-core-campaign-landing__form" id="lead-form">
       <div className="lp-core-campaign-landing__form-card">
-        <div className="lp-core-campaign-landing__steps" aria-hidden>
-          <span className="lp-core-campaign-landing__step-label">
-            Étape {stepIndex}/{stepCount}
-          </span>
-          <div className="lp-core-campaign-landing__step-dots">
-            {Array.from({ length: stepCount }, (_, i) => (
-              <span
-                key={i}
-                className={`lp-core-campaign-landing__step-dot${i + 1 === stepIndex ? ' is-active' : ''}`}
-              />
-            ))}
+        <div className="lp-core-campaign-landing__steps">
+          <div
+            className="lp-core-campaign-landing__step-progress"
+            role="progressbar"
+            aria-valuenow={stepIndex}
+            aria-valuemin={1}
+            aria-valuemax={stepCount}
+            aria-label={`Étape ${stepIndex} sur ${stepCount}`}
+          >
+            <span
+              className="lp-core-campaign-landing__step-progress-fill"
+              style={{ width: `${progressPct}%` }}
+            />
           </div>
+          <p className="lp-core-campaign-landing__step-label">
+            Étape {stepIndex}/{stepCount}
+          </p>
         </div>
         {formTitle ? <h2 className="lp-core-campaign-landing__form-title">{formTitle}</h2> : null}
         {formSubtitle ? <p className="lp-core-campaign-landing__form-subtitle">{formSubtitle}</p> : null}
@@ -183,8 +192,18 @@ export function CoreCampaignFormLandingBlockPreview({
     return <CanvasEmptyHint>Landing campagne + formulaire</CanvasEmptyHint>;
   }
 
+  const { className: sectionClassName, style: sectionStyle } = mergeBlockSectionPresentation(
+    sectionClass,
+    'core_campaign_form_landing',
+    propsJson,
+  );
+
   return (
-    <section className={sectionClass} data-testid="core-campaign-form-landing-preview">
+    <section
+      className={sectionClassName}
+      style={sectionStyle}
+      data-testid="core-campaign-form-landing-preview"
+    >
       <div className="lp-section lp-core-campaign-landing__inner">
         {inner}
         {footerCopyright ? (

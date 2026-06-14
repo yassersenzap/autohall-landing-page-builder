@@ -5,13 +5,13 @@ import {
   updateEditorBlock,
 } from '@/features/editor/api/editorApi';
 import type { EditorPageBlock } from '@/features/editor/types/editor.types';
-import { getActivePaletteBlocks } from '../registry/block-registry';
+import { getInsertablePaletteBlocks } from '../registry/block-registry';
 import type { BuilderDocumentBlock } from '../types';
 import { apiBlocksToBuilderBlocks } from './api-block-mapper';
 import { assertNoBlobUrlsInBlocks } from './blob-url-guard';
 import { stripStudioOnlyBlockProps } from '@/features/builder/block-variants/studio-block-metadata';
 
-const VALID_BLOCK_TYPES = new Set(getActivePaletteBlocks().map((entry) => entry.type));
+const VALID_BLOCK_TYPES = new Set(getInsertablePaletteBlocks().map((entry) => entry.type));
 
 function assertBlockType(type: string): string {
   if (!VALID_BLOCK_TYPES.has(type)) {

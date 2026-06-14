@@ -1,8 +1,10 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Trash2 } from 'lucide-react';
+import { Eye, EyeOff, GripVertical, Trash2 } from 'lucide-react';
 import { getCatalogItem } from '@/features/builder-engine/foundation/builder-catalog';
 import { getRegistryEntry } from '@/features/builder-engine/registry/block-registry';
+import { isBlockGloballyHidden, isBlockHiddenInStudio } from '@/features/builder-engine/lib/block-visibility';
+import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
 import type { BuilderDocumentBlock } from '@/features/builder-engine/types';
 import { ShadButton } from '@/components/ui/primitives';
 import { cn } from '@/lib/utils';
@@ -15,6 +17,7 @@ type SortableLayerItemProps = {
   onRemove: (blockId: string) => void;
   onMoveUp: (blockId: string) => void;
   onMoveDown: (blockId: string) => void;
+  onToggleHidden: (blockId: string) => void;
   canMoveUp: boolean;
   canMoveDown: boolean;
 };
@@ -27,9 +30,11 @@ export function SortableLayerItem({
   onRemove,
   onMoveUp,
   onMoveDown,
+  onToggleHidden,
   canMoveUp,
   canMoveDown,
 }: SortableLayerItemProps) {
+  const deviceMode = useBuilderDocumentStore((s) => s.deviceMode);
   const {
     attributes,
     listeners,
@@ -48,6 +53,8 @@ export function SortableLayerItem({
   const registry = getRegistryEntry(block.type);
   const displayLabel = catalog?.sidebarLabel ?? block.label;
   const typeLabel = registry?.label ?? block.type;
+  const isHidden = isBlockHiddenInStudio(block.propsJson, deviceMode);
+  const isGloballyHidden = isBlockGloballyHidden(block.propsJson);
 
   return (
     <li
@@ -85,7 +92,10 @@ export function SortableLayerItem({
         >
           <span className="mr-1.5 font-mono text-[0.625rem] text-neutral-600">{index + 1}</span>
           <span className="block truncate text-xs font-medium text-neutral-200">{displayLabel}</span>
-          <span className="block truncate text-[0.625rem] text-neutral-500">{typeLabel}</span>
+          <span className="block truncate text-[0.625rem] text-neutral-500">
+            {typeLabel}
+            {isHidden ? ' · Masqué' : ''}
+          </span>
         </button>
 
         <ShadButton
@@ -109,6 +119,22 @@ export function SortableLayerItem({
           aria-label="Descendre"
         >
           ↓
+        </ShadButton>
+        <ShadButton
+          type="button"
+          size="sm"
+          variant="secondary"
+          className="h-6 w-6 p-0 border-neutral-700"
+          onClick={() => onToggleHidden(block.id)}
+          aria-label={isGloballyHidden ? 'Afficher le bloc' : 'Masquer le bloc'}
+          aria-pressed={isGloballyHidden}
+          data-testid={`studio-layer-toggle-hidden-${block.id}`}
+        >
+          {isGloballyHidden ? (
+            <EyeOff className="h-3 w-3" aria-hidden />
+          ) : (
+            <Eye className="h-3 w-3" aria-hidden />
+          )}
         </ShadButton>
         <ShadButton
           type="button"

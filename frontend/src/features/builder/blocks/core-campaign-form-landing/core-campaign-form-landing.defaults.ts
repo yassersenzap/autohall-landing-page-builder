@@ -6,20 +6,37 @@ import {
   type LeadFormConfig,
 } from '@/features/builder-engine/constants/autohall-lead-form';
 import { DEFAULT_FORM_DESIGN, DEFAULT_HERO_DESIGN } from '@/features/builder-engine/constants/default-block-design';
+import {
+  coreLayoutFromBusinessProps,
+} from './core-campaign-form-landing.layout';
+import type {
+  CoreCampaignLayout,
+  CoreFieldsPreset,
+  CoreFormMode,
+  CoreLayoutDirection,
+  CoreLayoutVariant,
+  CoreStepCount,
+  CoreVisualType,
+} from './core-campaign-form-landing.types';
 
-export type CoreCampaignLayout =
-  | 'image_left_form_right'
-  | 'form_left_image_right'
-  | 'background_image_form_card'
-  | 'full_width_banner_form_side';
+export type {
+  CoreCampaignFormLandingProps,
+  CoreCampaignLayout,
+  CoreFieldsPreset,
+  CoreFormMode,
+  CoreLayoutDirection,
+  CoreLayoutVariant,
+  CoreStepCount,
+  CoreVisualType,
+} from './core-campaign-form-landing.types';
 
-export type CoreVisualType = 'campaign_image' | 'vehicle_image';
-
-export type CoreFormMode = 'test_drive' | 'contact' | 'callback' | 'model_interest';
-
-export type CoreFieldsPreset = 'city_date' | 'model_city' | 'name_phone' | 'contact_preference';
-
-export type CoreStepCount = 2 | 3;
+export {
+  coreLayoutFromBusinessProps,
+  patchCoreLayoutFields,
+  resolveCoreCampaignLayout,
+  resolveCoreLayoutDirection,
+  resolveCoreLayoutVariant,
+} from './core-campaign-form-landing.layout';
 
 const FORM_CONFIG_BY_PRESET: Record<CoreFieldsPreset, Partial<LeadFormConfig>> = {
   city_date: {
@@ -83,9 +100,14 @@ export function buildCoreFormConfig(
 }
 
 export function buildCoreCampaignFormLandingDefaults(
-  overrides: Record<string, unknown> = {},
+  overrides: Partial<Record<string, unknown>> = {},
 ): Record<string, unknown> {
-  const coreLayout: CoreCampaignLayout = 'image_left_form_right';
+  const layoutDirection = 'image-left' as CoreLayoutDirection;
+  const layoutVariant = 'split' as CoreLayoutVariant;
+  const coreLayout: CoreCampaignLayout = coreLayoutFromBusinessProps(
+    layoutDirection,
+    layoutVariant,
+  );
   const visualType = 'campaign_image' as CoreVisualType;
   const formMode: CoreFormMode = 'test_drive';
   const stepCount: CoreStepCount = 2;
@@ -93,6 +115,8 @@ export function buildCoreCampaignFormLandingDefaults(
   const formConfig = buildCoreFormConfig(formMode, fieldsPreset);
 
   return {
+    layoutDirection,
+    layoutVariant,
     coreLayout,
     visualType,
     formMode,
@@ -119,7 +143,7 @@ export function buildCoreCampaignFormLandingDefaults(
     design: {
       ...DEFAULT_HERO_DESIGN,
       tone: visualType === 'vehicle_image' ? 'light' : 'dark',
-      mediaPosition: 'left',
+      mediaPosition: layoutDirection === 'image-right' ? 'right' : 'left',
       alignment: 'left',
     },
     form: {

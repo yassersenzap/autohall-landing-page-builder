@@ -44,6 +44,8 @@ describe('section-style contract', () => {
   it('exposes style controls only for supported blocks', () => {
     expect(buildSectionStyleInspectorControls('faq').length).toBeGreaterThan(0);
     expect(buildSectionStyleInspectorControls('hero_campaign')).toHaveLength(0);
+    expect(buildSectionStyleInspectorControls('rich_text')).toHaveLength(0);
+    expect(buildSectionStyleInspectorControls('core_campaign_form_landing')).toHaveLength(0);
   });
 
   it('patches section padding via sanitized merge shape', () => {

@@ -3,6 +3,8 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
+import { isBlockHiddenInStudio } from '@/features/builder-engine/lib/block-visibility';
+import { buildSectionStyleClasses, parseSectionStyle } from '@/features/builder/section-style';
 import type { BuilderDocumentBlock } from '@/features/builder-engine/types';
 import { cn } from '@/lib/utils';
 import { CanvasBlockToolbar } from './CanvasBlockToolbar';
@@ -24,7 +26,10 @@ export function SortableCanvasBlock({
   onSelect,
   children,
 }: SortableCanvasBlockProps) {
+  const deviceMode = useBuilderDocumentStore((s) => s.deviceMode);
   const hoverBlock = useBuilderDocumentStore((s) => s.hoverBlock);
+  const isStudioHidden = isBlockHiddenInStudio(block.propsJson, deviceMode);
+  const sectionStyleClasses = buildSectionStyleClasses(parseSectionStyle(block.propsJson));
   const {
     attributes,
     listeners,
@@ -48,8 +53,10 @@ export function SortableCanvasBlock({
         'v3-block-shell group relative',
         isDragging && 'z-20 opacity-95 shadow-lg',
         isOver && !isDragging && 'v3-block-shell--over',
+        isStudioHidden && 'v3-block-shell--studio-hidden',
       )}
       data-selected={selected ? 'true' : 'false'}
+      data-studio-hidden={isStudioHidden ? 'true' : 'false'}
       data-dragging={isDragging ? 'true' : 'false'}
       data-canvas-block-id={block.id}
       data-canvas-block-selected={selected ? 'true' : 'false'}
@@ -67,7 +74,7 @@ export function SortableCanvasBlock({
       }}
       role="button"
       tabIndex={0}
-      aria-label={`Sélectionner ${block.label}`}
+      aria-label={`Sélectionner ${block.label}${isStudioHidden ? ' (masqué)' : ''}`}
     >
       {isOver && !isDragging ? (
         <div className="v3-block-drop-indicator" aria-hidden />
@@ -85,6 +92,12 @@ export function SortableCanvasBlock({
         <GripVertical className="h-4 w-4" aria-hidden />
       </button>
 
+      {isStudioHidden ? (
+        <span className="v3-block-hidden-badge" data-studio-only="true">
+          Masqué
+        </span>
+      ) : null}
+
       {selected ? (
         <CanvasBlockToolbar
           block={block}
@@ -93,7 +106,7 @@ export function SortableCanvasBlock({
         />
       ) : null}
 
-      <div className="v3-block-content">{children}</div>
+      <div className={cn('v3-block-content', sectionStyleClasses)}>{children}</div>
     </div>
   );
 }

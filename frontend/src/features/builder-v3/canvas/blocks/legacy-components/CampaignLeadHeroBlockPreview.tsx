@@ -13,7 +13,7 @@ import {
 import { SYMFONY_FORM_PREVIEW_NOTE } from '@/features/builder/export-contracts';
 import { mergeBlockSectionPresentation } from '@/features/builder/section-style';
 import { HeroBlockImage } from '@/features/builder-engine/components/media/HeroBlockImage';
-import { CanvasEmptyHint } from './CanvasEmptyHint';
+import { CanvasEmptyHint } from '../CanvasEmptyHint';
 
 type CampaignLeadHeroBlockPreviewProps = {
   propsJson: Record<string, unknown>;

@@ -2,11 +2,14 @@ import { asPropString } from '@/features/builder-engine/lib/block-props';
 import { resolveHeroFocalPoint } from '@/features/builder/blocks/hero-vehicle-offer/hero-image-controls';
 import {
   patchCoreFormModeFields,
+  patchCoreLayoutInspectorFields,
 } from '@/features/builder/blocks/core-campaign-form-landing/core-campaign-form-landing.inspector-controls';
 import type {
   CoreFieldsPreset,
   CoreFormMode,
-} from '@/features/builder/blocks/core-campaign-form-landing/core-campaign-form-landing.defaults';
+  CoreLayoutDirection,
+  CoreLayoutVariant,
+} from '@/features/builder/blocks/core-campaign-form-landing/core-campaign-form-landing.types';
 import { BRAND_PRESETS } from '@/features/builder/brand-presets';
 import type { BrandPresetId } from '@/features/builder/brand-presets';
 import type { InspectorControl } from '@/features/builder/block-registry/inspector-control.types';
@@ -59,6 +62,18 @@ function InspectorField({
         patch = {
           ...patch,
           ...patchCoreFormModeFields(formMode, next as CoreFieldsPreset),
+        };
+      } else if (control.propKey === 'layoutDirection') {
+        const variant = (asPropString(propsJson.layoutVariant) || 'split') as CoreLayoutVariant;
+        patch = {
+          ...patch,
+          ...patchCoreLayoutInspectorFields(next as CoreLayoutDirection, variant),
+        };
+      } else if (control.propKey === 'layoutVariant') {
+        const direction = (asPropString(propsJson.layoutDirection) || 'image-left') as CoreLayoutDirection;
+        patch = {
+          ...patch,
+          ...patchCoreLayoutInspectorFields(direction, next as CoreLayoutVariant),
         };
       }
     }

@@ -16,7 +16,9 @@ describe('premium animated blocks library', () => {
   it('catalog no longer shows premium as primary tier', () => {
     render(<BlocksCatalogPanel />);
     expect(screen.queryByTestId('catalog-premium-animated-group')).toBeNull();
+    expect(screen.queryByTestId('catalog-advanced-group')).toBeNull();
     expect(screen.getByTestId('catalog-core-business-group')).toBeTruthy();
+    expect(screen.getByTestId('catalog-archived-blocks-section')).toBeTruthy();
     expect(getAdvancedSectionCatalog().length).toBeGreaterThan(PREMIUM_ANIMATED_BLOCK_TYPES.length);
   });
 
@@ -62,10 +64,11 @@ describe('premium animated blocks library', () => {
     expect(safe.motionPreset).toBe('fade_up');
   });
 
-  it('premium blocks remain available in advanced catalog', () => {
+  it('premium blocks remain available in archived catalog', () => {
     const advancedTypes = getAdvancedSectionCatalog().map((b) => b.type);
     expect(advancedTypes).toEqual(expect.arrayContaining([...PREMIUM_ANIMATED_BLOCK_TYPES]));
     expect(getPremiumAnimatedCatalog().length).toBe(PREMIUM_ANIMATED_BLOCK_TYPES.length);
+    expect(advancedTypes).toContain('sticky_lead_cta');
   });
 
   it('extended campaign templates still include premium blocks', () => {

@@ -31,6 +31,8 @@ export type CampaignPageTemplateUseCase =
 
 export type CampaignPageTemplateBrandId = BrandPresetId | 'autohall';
 
+export type CampaignPageTemplateTier = 'active' | 'archived';
+
 /** Data-driven full-page preset for SI Digital campaign landings. */
 export type CampaignPageTemplate = {
   id: string;
@@ -44,4 +46,6 @@ export type CampaignPageTemplate = {
   previewLabel: string;
   recommendedUse: string;
   blocks: CampaignTemplateBlockSpec[];
+  /** `archived` — masqué par défaut dans le panneau Modèles (legacy). */
+  tier?: CampaignPageTemplateTier;
 };

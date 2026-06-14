@@ -22,7 +22,8 @@ import {
   buildVehicleShowcaseDefaults,
 } from '@/features/builder/blocks/premium-animated/premium-block-defaults';
 import { BRAND_PAGE_TEMPLATES } from './brand-page-templates';
-import { CORE_CAMPAIGN_TEMPLATES } from './core-campaign-templates';
+import { CORE_CAMPAIGN_TEMPLATES, getArchivedCoreCampaignTemplates } from './core-campaign-templates';
+import { getArchivedPageStarters } from './page-starters';
 import {
   getCampaignPageTemplatesByUseCase,
   TEMPLATE_USE_CASE_GROUPS,
@@ -70,7 +71,7 @@ export const CAMPAIGN_PAGE_TEMPLATE_BLOCK_TYPES = new Set([
   'campaign_timeline_steps',
 ]);
 
-export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
+export const CAMPAIGN_PAGE_TEMPLATE_ENTRIES: CampaignPageTemplate[] = [
   ...BRAND_PAGE_TEMPLATES,
   {
     id: 'chery-campaign-offer',
@@ -620,6 +621,34 @@ export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = [
     ],
   },
 ];
+
+export const CAMPAIGN_PAGE_TEMPLATES: CampaignPageTemplate[] = CAMPAIGN_PAGE_TEMPLATE_ENTRIES.map(
+  (template) => ({ ...template, tier: template.tier ?? 'archived' }),
+);
+
+export function isArchivedCampaignPageTemplate(template: CampaignPageTemplate): boolean {
+  return (template.tier ?? 'archived') === 'archived';
+}
+
+export function getActiveCampaignPageTemplates(): CampaignPageTemplate[] {
+  return CAMPAIGN_PAGE_TEMPLATES.filter((t) => t.tier === 'active');
+}
+
+export function getArchivedCampaignPageTemplates(): CampaignPageTemplate[] {
+  return CAMPAIGN_PAGE_TEMPLATES.filter(isArchivedCampaignPageTemplate);
+}
+
+export function getArchivedGroupedCampaignPageTemplates() {
+  return getCampaignPageTemplatesByUseCase(getArchivedCampaignPageTemplates());
+}
+
+export function countArchivedStudioTemplates(): number {
+  return (
+    getArchivedCoreCampaignTemplates().length +
+    getArchivedCampaignPageTemplates().length +
+    getArchivedPageStarters().length
+  );
+}
 
 export function getCampaignPageTemplateById(id: string): CampaignPageTemplate | undefined {
   return (

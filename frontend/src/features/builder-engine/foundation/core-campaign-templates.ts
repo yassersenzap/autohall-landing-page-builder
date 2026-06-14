@@ -10,6 +10,7 @@ const FOOTER = buildFooterLegalDefaults({
 export const CORE_CAMPAIGN_TEMPLATES: CampaignPageTemplate[] = [
   {
     id: 'core-campaign-visual-form',
+    tier: 'archived',
     name: 'Campagne visuel + formulaire',
     description:
       'Landing type campagne Auto Hall — visuel fort et formulaire latéral pour capture lead.',
@@ -23,7 +24,8 @@ export const CORE_CAMPAIGN_TEMPLATES: CampaignPageTemplate[] = [
         type: 'core_campaign_form_landing',
         label: 'Landing campagne',
         props: buildCoreCampaignFormLandingDefaults({
-          coreLayout: 'full_width_banner_form_side',
+          layoutDirection: 'image-left',
+          layoutVariant: 'banner',
           visualType: 'campaign_image',
           formMode: 'contact',
           stepCount: 3,
@@ -39,6 +41,7 @@ export const CORE_CAMPAIGN_TEMPLATES: CampaignPageTemplate[] = [
   },
   {
     id: 'core-vehicle-test-drive',
+    tier: 'archived',
     name: 'Modèle véhicule + essai',
     description:
       'Page modèle type Chery — visuel véhicule, contenu modèle et formulaire essai.',
@@ -52,7 +55,8 @@ export const CORE_CAMPAIGN_TEMPLATES: CampaignPageTemplate[] = [
         type: 'core_campaign_form_landing',
         label: 'Landing modèle',
         props: buildCoreCampaignFormLandingDefaults({
-          coreLayout: 'image_left_form_right',
+          layoutDirection: 'image-left',
+          layoutVariant: 'split',
           visualType: 'vehicle_image',
           formMode: 'test_drive',
           stepCount: 2,
@@ -70,6 +74,7 @@ export const CORE_CAMPAIGN_TEMPLATES: CampaignPageTemplate[] = [
   },
   {
     id: 'core-range-offer-form',
+    tier: 'archived',
     name: 'Gamme / offre + formulaire',
     description:
       'Landing gamme thermique — bannière campagne, sélection modèle et formulaire en 3 étapes.',
@@ -83,7 +88,8 @@ export const CORE_CAMPAIGN_TEMPLATES: CampaignPageTemplate[] = [
         type: 'core_campaign_form_landing',
         label: 'Landing gamme',
         props: buildCoreCampaignFormLandingDefaults({
-          coreLayout: 'background_image_form_card',
+          layoutDirection: 'image-left',
+          layoutVariant: 'background',
           visualType: 'campaign_image',
           formMode: 'model_interest',
           stepCount: 3,
@@ -102,6 +108,18 @@ export const CORE_CAMPAIGN_TEMPLATES: CampaignPageTemplate[] = [
 
 export function getCoreCampaignTemplates(): CampaignPageTemplate[] {
   return CORE_CAMPAIGN_TEMPLATES;
+}
+
+export function isArchivedCampaignTemplate(template: CampaignPageTemplate): boolean {
+  return (template.tier ?? 'archived') === 'archived';
+}
+
+export function getActiveCoreCampaignTemplates(): CampaignPageTemplate[] {
+  return CORE_CAMPAIGN_TEMPLATES.filter((t) => t.tier === 'active');
+}
+
+export function getArchivedCoreCampaignTemplates(): CampaignPageTemplate[] {
+  return CORE_CAMPAIGN_TEMPLATES.filter(isArchivedCampaignTemplate);
 }
 
 export function getCoreCampaignTemplateById(id: string): CampaignPageTemplate | undefined {

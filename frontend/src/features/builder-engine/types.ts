@@ -7,13 +7,15 @@ export type BuilderDocumentBlock = {
   propsJson: Record<string, unknown>;
 };
 
+export type { BaseBlockProps, BlockSectionStyleProps } from './types/block-props.types';
+
 export type BuilderPaletteItem = {
   type: string;
   label: string;
   description: string;
 };
 
-export type HeroBlockProps = {
+export type HeroBlockProps = import('./types/block-props.types').BaseBlockProps & {
   eyebrow?: string;
   title?: string;
   subtitle?: string;
@@ -27,7 +29,7 @@ export type HeroBlockProps = {
   alt?: string;
 };
 
-export type LeadFormBlockProps = {
+export type LeadFormBlockProps = import('./types/block-props.types').BaseBlockProps & {
   title?: string;
   subtitle?: string;
   submitText?: string;

@@ -3,15 +3,22 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { useBuilderDocumentStore } from '@/features/builder-engine/store/builder-document.store';
 import { TemplatesPanel } from './panels/TemplatesPanel';
 
+function expandArchivedTemplates() {
+  fireEvent.click(screen.getByRole('button', { name: /Modèles archivés/i }));
+}
+
 describe('TemplatesPanel campaign presets', () => {
   beforeEach(() => {
     useBuilderDocumentStore.getState().resetDocument();
   });
 
-  it('renders premium campaign templates grouped by use case', () => {
+  it('renders premium campaign templates grouped by use case inside archive', () => {
     render(<TemplatesPanel />);
 
     expect(screen.getByTestId('studio-templates-panel')).toBeInTheDocument();
+    expect(screen.getByTestId('templates-archived-section')).toBeInTheDocument();
+    expandArchivedTemplates();
+
     expect(screen.getByTestId('campaign-templates-by-use-case')).toBeInTheDocument();
     expect(screen.getByTestId('template-use-case-group-brand-page')).toBeInTheDocument();
     expect(screen.getByTestId('template-use-case-group-vehicle-offer')).toBeInTheDocument();
@@ -23,6 +30,7 @@ describe('TemplatesPanel campaign presets', () => {
 
   it('applies template directly on empty page without confirmation', () => {
     render(<TemplatesPanel />);
+    expandArchivedTemplates();
 
     fireEvent.click(screen.getByTestId('campaign-template-use-chery-model-landing'));
 
@@ -33,21 +41,21 @@ describe('TemplatesPanel campaign presets', () => {
     expect(screen.queryByTestId('campaign-template-replace-warning')).not.toBeInTheDocument();
   });
 
-  it('renders core métier templates first then extended templates', () => {
+  it('renders archived core métier templates in collapsed archive section', () => {
     render(<TemplatesPanel />);
 
+    expandArchivedTemplates();
     expect(screen.getByTestId('core-campaign-templates')).toBeInTheDocument();
     expect(screen.getByTestId('core-template-card-core-campaign-visual-form')).toBeInTheDocument();
-    expect(screen.getByTestId('template-thumbnail-ford-brand-showcase')).toBeInTheDocument();
     expect(screen.getByTestId('campaign-template-card-ford-brand-showcase')).toBeInTheDocument();
-    expect(screen.getByText(/Landings métier/)).toBeInTheDocument();
-    expect(screen.getByText(/Templates étendus/)).toBeInTheDocument();
+    expect(screen.getByTestId('templates-active-section')).toBeInTheDocument();
   });
 
   it('shows replace warning before wiping existing blocks', () => {
     useBuilderDocumentStore.getState().applyPageStarter(['faq'], 'replace');
 
     render(<TemplatesPanel />);
+    expandArchivedTemplates();
 
     fireEvent.click(screen.getByTestId('campaign-template-use-ford-offer-campaign'));
 
@@ -64,6 +72,7 @@ describe('TemplatesPanel campaign presets', () => {
     const beforeId = useBuilderDocumentStore.getState().blocks[0]?.id;
 
     render(<TemplatesPanel />);
+    expandArchivedTemplates();
     fireEvent.click(screen.getByTestId('campaign-template-use-opel-test-drive'));
     fireEvent.click(screen.getByTestId('campaign-template-cancel-replace'));
 

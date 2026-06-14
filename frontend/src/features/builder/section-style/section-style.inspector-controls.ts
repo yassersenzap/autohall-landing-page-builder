@@ -172,38 +172,5 @@ export function buildSectionStyleInspectorControls(blockType: string): Inspector
     });
   }
 
-  if (caps.visibility) {
-    controls.push({
-      key: 'ss-hide-desktop',
-      propKey: 'hideOnDesktop',
-      type: 'boolean',
-      label: 'Masquer sur desktop',
-      tab,
-      group: 'Visibilité responsive',
-      store,
-      defaultValue: false,
-    });
-    controls.push({
-      key: 'ss-hide-tablet',
-      propKey: 'hideOnTablet',
-      type: 'boolean',
-      label: 'Masquer sur tablette',
-      tab,
-      group: 'Visibilité responsive',
-      store,
-      defaultValue: false,
-    });
-    controls.push({
-      key: 'ss-hide-mobile',
-      propKey: 'hideOnMobile',
-      type: 'boolean',
-      label: 'Masquer sur mobile',
-      tab,
-      group: 'Visibilité responsive',
-      store,
-      defaultValue: false,
-    });
-  }
-
   return controls;
 }

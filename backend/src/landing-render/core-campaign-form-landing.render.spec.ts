@@ -27,7 +27,7 @@ describe('core-campaign-form-landing.render', () => {
     },
   };
 
-  it.each(LAYOUTS)('renders layout variant %s', (coreLayout) => {
+  it.each(LAYOUTS)('renders layout variant %s (legacy coreLayout)', (coreLayout) => {
     const html = renderCoreCampaignFormLandingHtml({
       ...baseProps,
       coreLayout,
@@ -36,6 +36,35 @@ describe('core-campaign-form-landing.render', () => {
     expect(html).toContain(`lp-core-campaign-landing--${coreLayout}`);
     expect(html).toContain('lp-lead-form');
     expect(html).toContain('Demandez votre offre');
+  });
+
+  it('derives CSS layout from layoutDirection + layoutVariant', () => {
+    const banner = renderCoreCampaignFormLandingHtml({
+      ...baseProps,
+      layoutDirection: 'image-left',
+      layoutVariant: 'banner',
+    });
+    expect(banner).toContain('lp-core-campaign-landing--full_width_banner_form_side');
+
+    const splitRight = renderCoreCampaignFormLandingHtml({
+      ...baseProps,
+      layoutDirection: 'image-right',
+      layoutVariant: 'split',
+    });
+    expect(splitRight).toContain('lp-core-campaign-landing--form_left_image_right');
+  });
+
+  it('renders multi-step indicator with progress bar', () => {
+    const html = renderCoreCampaignFormLandingHtml({
+      ...baseProps,
+      stepCount: 3,
+      stepIndex: 2,
+    });
+    expect(html).toContain('lp-core-campaign-landing__step-progress');
+    expect(html).toContain('lp-core-campaign-landing__step-progress-fill');
+    expect(html).toContain('Étape 2/3');
+    expect(html).toContain('style="width:67%"');
+    expect(html).toContain('lp-btn--primary');
   });
 
   it('renders test_drive fields with city', () => {

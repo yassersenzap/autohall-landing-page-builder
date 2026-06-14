@@ -8,6 +8,7 @@ import {
   buildSectionStyleInspectorControls,
   parseSectionStyle,
 } from '@/features/builder/section-style';
+import { BLOCK_STUDIO_VISIBILITY_CONTROLS } from '@/features/builder/block-registry/block-studio-controls';
 import { CanvasToolbar } from './layout/CanvasToolbar';
 import { DefinitionDrivenBlockInspector } from './panels/inspector/DefinitionDrivenBlockInspector';
 import { StudioLayout } from './layout/StudioLayout';
@@ -94,7 +95,7 @@ describe('viewport and section style V1', () => {
     const widthControl = buildSectionStyleInspectorControls('cta_band').find(
       (c) => c.propKey === 'containerWidth',
     )!;
-    const hideControl = buildSectionStyleInspectorControls('cta_band').find(
+    const hideControl = BLOCK_STUDIO_VISIBILITY_CONTROLS.find(
       (c) => c.propKey === 'hideOnMobile',
     )!;
 

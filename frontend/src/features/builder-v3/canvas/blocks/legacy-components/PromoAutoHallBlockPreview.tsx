@@ -1,11 +1,11 @@
 import { useState, type FormEvent } from 'react';
 import { asPropString } from '@/features/builder-engine/lib/block-props';
-import { useBuilderPreviewContext } from '../../context/BuilderPreviewContext';
-import { submitLeadFormFromDom } from '../../lib/submit-lead-form';
-import { BlockBackgroundLayer } from './BlockBackgroundLayer';
-import { CanvasLeadFormFields } from './CanvasLeadFormFields';
-import { FormSuccessPanel } from './FormSuccessPanel';
-import { ShapeDividerBottom } from './ShapeDividerBottom';
+import { useBuilderPreviewContext } from '../../../context/BuilderPreviewContext';
+import { submitLeadFormFromDom } from '../../../lib/submit-lead-form';
+import { BlockBackgroundLayer } from '../BlockBackgroundLayer';
+import { CanvasLeadFormFields } from '../CanvasLeadFormFields';
+import { FormSuccessPanel } from '../FormSuccessPanel';
+import { ShapeDividerBottom } from '../ShapeDividerBottom';
 
 type PromoAutoHallBlockPreviewProps = {
   propsJson: Record<string, unknown>;

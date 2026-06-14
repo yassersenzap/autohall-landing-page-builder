@@ -8,6 +8,11 @@ import { STUDIO_VIEWPORT_WIDTHS } from '../constants/studio-viewport';
 import { StudioCanvasPlaceholder } from '../layout/StudioCanvasPlaceholder';
 import { CanvasDocument } from './CanvasDocument';
 import { injectIframeStyles } from './inject-iframe-styles';
+import {
+  STUDIO_SCROLL_TO_BLOCK_EVENT,
+  scrollStudioIframeToBlock,
+  type StudioScrollToBlockDetail,
+} from './scroll-studio-canvas';
 
 type IframeCanvasProps = {
   /** Overlay transparent au-dessus de l’iframe pendant un drag palette → canvas. */
@@ -24,6 +29,7 @@ export function IframeCanvas({
   const [mountNode, setMountNode] = useState<HTMLElement | null>(null);
   const [stylesReady, setStylesReady] = useState(false);
   const deviceMode = useBuilderDocumentStore((s) => s.deviceMode);
+  const selectedBlockId = useBuilderDocumentStore((s) => s.selectedBlockId);
   const viewportWidth = STUDIO_VIEWPORT_WIDTHS[deviceMode];
 
   const { setNodeRef, isOver } = useDroppable({
@@ -70,6 +76,28 @@ export function IframeCanvas({
     iframe.addEventListener('load', handleLoad);
     return () => iframe.removeEventListener('load', handleLoad);
   }, [bootIframe, handleLoad]);
+
+  const scrollToSelectedBlock = useCallback(
+    (blockId: string) => {
+      if (!stylesReady || !documentHydrated) return;
+      scrollStudioIframeToBlock(iframeRef.current, blockId);
+    },
+    [documentHydrated, stylesReady],
+  );
+
+  useEffect(() => {
+    if (!selectedBlockId) return;
+    scrollToSelectedBlock(selectedBlockId);
+  }, [selectedBlockId, scrollToSelectedBlock]);
+
+  useEffect(() => {
+    function handleScrollRequest(event: Event) {
+      const blockId = (event as CustomEvent<StudioScrollToBlockDetail>).detail?.blockId;
+      if (blockId) scrollToSelectedBlock(blockId);
+    }
+    window.addEventListener(STUDIO_SCROLL_TO_BLOCK_EVENT, handleScrollRequest);
+    return () => window.removeEventListener(STUDIO_SCROLL_TO_BLOCK_EVENT, handleScrollRequest);
+  }, [scrollToSelectedBlock]);
 
   return (
     <div

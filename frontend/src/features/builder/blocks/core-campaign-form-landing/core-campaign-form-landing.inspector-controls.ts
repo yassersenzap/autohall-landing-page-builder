@@ -6,12 +6,18 @@ import {
   type CoreFieldsPreset,
   type CoreFormMode,
 } from './core-campaign-form-landing.defaults';
+import type { CoreLayoutDirection, CoreLayoutVariant } from './core-campaign-form-landing.types';
+import { patchCoreLayoutFields } from './core-campaign-form-landing.layout';
 
-const LAYOUT_OPTIONS = [
-  { value: 'image_left_form_right', label: 'Visuel à gauche · formulaire à droite' },
-  { value: 'form_left_image_right', label: 'Formulaire à gauche · visuel à droite' },
-  { value: 'background_image_form_card', label: 'Image de fond · carte formulaire' },
-  { value: 'full_width_banner_form_side', label: 'Bannière pleine largeur · formulaire latéral' },
+const LAYOUT_DIRECTION_OPTIONS = [
+  { value: 'image-left', label: 'Visuel à gauche · formulaire à droite' },
+  { value: 'image-right', label: 'Visuel à droite · formulaire à gauche' },
+];
+
+const LAYOUT_VARIANT_OPTIONS = [
+  { value: 'split', label: 'Split visuel + formulaire' },
+  { value: 'background', label: 'Image de fond · carte formulaire' },
+  { value: 'banner', label: 'Bannière pleine largeur · formulaire latéral' },
 ];
 
 const VISUAL_OPTIONS = [
@@ -172,14 +178,24 @@ export const CORE_CAMPAIGN_FORM_LANDING_INSPECTOR_CONTROLS: InspectorControl[] =
     group: 'Formulaire',
   },
   {
-    key: 'core-layout',
-    propKey: 'coreLayout',
+    key: 'core-layout-direction',
+    propKey: 'layoutDirection',
     type: 'select',
-    label: 'Disposition',
+    label: 'Orientation visuel / formulaire',
     tab: 'layout',
     group: 'Mise en page',
-    options: LAYOUT_OPTIONS,
-    defaultValue: 'image_left_form_right',
+    options: LAYOUT_DIRECTION_OPTIONS,
+    defaultValue: 'image-left',
+  },
+  {
+    key: 'core-layout-variant',
+    propKey: 'layoutVariant',
+    type: 'select',
+    label: 'Style de mise en page',
+    tab: 'layout',
+    group: 'Mise en page',
+    options: LAYOUT_VARIANT_OPTIONS,
+    defaultValue: 'split',
   },
   {
     key: 'core-legal-note',
@@ -221,4 +237,11 @@ export function patchCoreFormModeFields(
     fields,
     form: { formConfig, fields },
   };
+}
+
+export function patchCoreLayoutInspectorFields(
+  layoutDirection: CoreLayoutDirection,
+  layoutVariant?: CoreLayoutVariant,
+): Record<string, unknown> {
+  return patchCoreLayoutFields(layoutDirection, layoutVariant ?? 'split');
 }

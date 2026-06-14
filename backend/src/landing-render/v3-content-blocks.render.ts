@@ -83,7 +83,10 @@ export function renderCtaBandHtml(props: Record<string, unknown>): string {
 
 export function renderRichTextHtml(props: Record<string, unknown>): string {
   const design = normalizeSectionDesign('rich_text', props);
-  const sectionClass = buildBlockDesignClasses('lp-rich-text', design);
+  const sectionClass = appendSectionStyleToClass(
+    buildBlockDesignClasses('lp-rich-text', design),
+    props,
+  );
   const titre = propString(props, 'titre', 'title', 'heading');
   const contenu = propString(props, 'contenu', 'content', 'body');
   if (!titre && !contenu) return '';
@@ -111,7 +114,10 @@ export function renderMediaOnlyHtml(
   context?: LandingRenderContext,
 ): string {
   const design = normalizeSectionDesign('media_only', props);
-  const sectionClass = buildBlockDesignClasses('lp-media-only', design);
+  const sectionClass = appendSectionStyleToClass(
+    buildBlockDesignClasses('lp-media-only', design),
+    props,
+  );
   const imageSrc = resolveHeroImageSrc(props, context);
   if (!imageSrc) return '';
 
@@ -170,15 +176,26 @@ export function renderSpacerDividerHtml(props: Record<string, unknown>): string 
     design.density === 'compact' ? 0.75 : design.density === 'immersive' ? 1.25 : 1;
 
   if (type === 'divider') {
-    return `<div class="lp-spacer lp-spacer--divider lp-spacer--density-${design.density}" role="presentation"></div>`;
+    const dividerClass = appendSectionStyleToClass(
+      `lp-spacer lp-spacer--divider lp-spacer--density-${design.density}`,
+      props,
+    );
+    return `<div class="${dividerClass}" role="presentation"></div>`;
   }
 
-  return `<div class="lp-spacer lp-spacer--space lp-spacer--${hauteur.toLowerCase()} lp-spacer--density-${design.density}" style="--lp-spacer-size:${heightMap[hauteur] ?? '4rem'};--lp-spacer-scale:${densityScale}" role="presentation"></div>`;
+  const spaceClass = appendSectionStyleToClass(
+    `lp-spacer lp-spacer--space lp-spacer--${hauteur.toLowerCase()} lp-spacer--density-${design.density}`,
+    props,
+  );
+  return `<div class="${spaceClass}" style="--lp-spacer-size:${heightMap[hauteur] ?? '4rem'};--lp-spacer-scale:${densityScale}" role="presentation"></div>`;
 }
 
 export function renderVideoEmbedHtml(props: Record<string, unknown>): string {
   const design = normalizeSectionDesign('video_embed', props);
-  const sectionClass = buildBlockDesignClasses('lp-video-embed', design);
+  const sectionClass = appendSectionStyleToClass(
+    buildBlockDesignClasses('lp-video-embed', design),
+    props,
+  );
   const videoUrl = propString(props, 'videoUrl', 'url');
   if (!videoUrl) return '';
 

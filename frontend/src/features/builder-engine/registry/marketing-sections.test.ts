@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { getActivePaletteBlocks } from './block-registry';
+import { getInsertablePaletteBlocks } from './block-registry';
 import { MARKETING_SECTIONS } from './marketing-sections';
 
 describe('marketing-sections', () => {
-  const activeTypes = new Set(getActivePaletteBlocks().map((b) => b.type));
+  const insertableTypes = new Set(getInsertablePaletteBlocks().map((b) => b.type));
 
-  it('only uses stable active block types', () => {
+  it('only uses insertable block types', () => {
     for (const section of MARKETING_SECTIONS) {
       for (const type of section.blockTypes) {
-        expect(activeTypes.has(type)).toBe(true);
+        expect(insertableTypes.has(type)).toBe(true);
       }
     }
   });

@@ -8,7 +8,7 @@ export type BlockCategory =
   | 'trust'
   | 'footer';
 
-export type BlockAvailability = 'stable' | 'experimental' | 'disabled';
+export type BlockAvailability = 'stable' | 'legacy' | 'experimental' | 'disabled';
 
 export type BlockRegistryEntry = BuilderPaletteItem & {
   category: BlockCategory;
@@ -24,7 +24,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     description:
       'Pattern métier Auto Hall — visuel campagne ou véhicule avec formulaire multistep intégré.',
     category: 'hero',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '⊞',
   },
   {
@@ -32,7 +32,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Promo Auto Hall',
     description: 'Hero plein écran + formulaire flottant — layout référence.',
     category: 'hero',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '★',
   },
   {
@@ -40,7 +40,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Caractéristiques véhicule',
     description: 'Grille 3 colonnes — specs et points forts du modèle.',
     category: 'content',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '⚙',
   },
   {
@@ -48,7 +48,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Galerie visuelle',
     description: 'Trio d’images véhicule pleine largeur avec hover.',
     category: 'content',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '▦',
   },
   {
@@ -56,7 +56,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Section Texte',
     description: 'Titre + paragraphe — mise en page contrôlée.',
     category: 'content',
-    availability: 'stable',
+    availability: 'legacy',
     icon: 'T',
   },
   {
@@ -64,7 +64,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Section Visuel',
     description: 'Image HD encadrée — ratio et ombre verrouillés.',
     category: 'content',
-    availability: 'stable',
+    availability: 'legacy',
     icon: 'M',
   },
   {
@@ -72,7 +72,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Séparateur / Espacement',
     description: 'Respiration entre sections sans CSS.',
     category: 'content',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '—',
   },
   {
@@ -80,7 +80,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Section Vidéo',
     description: 'Embed YouTube ou Vimeo — cadre 16:9 premium.',
     category: 'content',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '▶',
   },
   {
@@ -88,7 +88,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Bandeau CTA',
     description: 'Bandeau conversion pleine largeur avec bouton contrasté.',
     category: 'conversion',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '→',
   },
   {
@@ -96,7 +96,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Financement / Finitions',
     description: 'Grille 3 finitions — prix, équipements et sélection.',
     category: 'conversion',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '€',
   },
   {
@@ -104,7 +104,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Avis Clients',
     description: 'Témoignages vérifiés en grille 3 colonnes.',
     category: 'trust',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '★',
   },
   {
@@ -112,7 +112,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Hero Campaign',
     description: 'Bannière campagne — promo, SAV, gamme ou capture lead.',
     category: 'hero',
-    availability: 'stable',
+    availability: 'legacy',
     icon: 'H',
   },
   {
@@ -120,7 +120,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Hero + Formulaire',
     description: 'Section complète : message campagne + formulaire lead côte à côte.',
     category: 'hero',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '⊞',
   },
   {
@@ -128,7 +128,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Hero offre véhicule',
     description: 'Hero premium brand-aware : modèle, offre, prix et CTAs.',
     category: 'hero',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '◎',
   },
   {
@@ -136,7 +136,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Hero campagne + lead',
     description: 'Hero campagne SI Digital : visuel, formulaire step-based et layouts flexibles.',
     category: 'hero',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '⊞',
   },
   {
@@ -144,7 +144,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Formulaire Auto Hall',
     description: 'Collecte leads conforme campagnes Auto Hall.',
     category: 'conversion',
-    availability: 'stable',
+    availability: 'legacy',
     icon: 'F',
   },
   {
@@ -152,7 +152,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Offre véhicule',
     description: 'Section complète : visuel, prix, points clés et CTA pour une offre véhicule.',
     category: 'content',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '★',
   },
   {
@@ -160,7 +160,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Gamme véhicules',
     description: 'Grille de modèles thermique / HEV.',
     category: 'content',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '▦',
   },
   {
@@ -168,7 +168,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Avantages',
     description: 'Cartes avantages campagne ou SAV.',
     category: 'trust',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '✓',
   },
   {
@@ -176,7 +176,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Bandeau confiance',
     description: 'Chiffres clés et réassurance.',
     category: 'trust',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '+',
   },
   {
@@ -184,7 +184,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'FAQ',
     description: 'Questions fréquentes en accordéon épuré.',
     category: 'content',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '?',
   },
   {
@@ -192,7 +192,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'CTA final',
     description: 'Dernier appel à l’action.',
     category: 'conversion',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '→',
   },
   {
@@ -200,7 +200,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Footer légal',
     description: 'Mentions légales.',
     category: 'footer',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '§',
   },
   {
@@ -208,7 +208,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Bento avantages premium',
     description: 'Grille bento moderne — bénéfices campagne et points forts véhicule.',
     category: 'content',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '◈',
   },
   {
@@ -216,7 +216,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Bandeau chiffres animés',
     description: 'Indicateurs de confiance avec compteur export-safe.',
     category: 'trust',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '▴',
   },
   {
@@ -224,7 +224,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Témoignages premium',
     description: 'Preuve sociale moderne — cartes ou mur de citations.',
     category: 'trust',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '❝',
   },
   {
@@ -232,7 +232,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Showcase véhicule split',
     description: 'Section automotive premium — visuel, specs et CTAs.',
     category: 'content',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '◎',
   },
   {
@@ -240,7 +240,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'CTA sticky conversion',
     description: 'Bandeau flottant ou sticky pour maximiser la conversion.',
     category: 'conversion',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '⊡',
   },
   {
@@ -248,7 +248,7 @@ export const BUILDER_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     label: 'Parcours campagne',
     description: 'Étapes du parcours client — offre, formulaire, contact.',
     category: 'content',
-    availability: 'stable',
+    availability: 'legacy',
     icon: '↝',
   },
   /** Legacy — hors palette, rendu conservé pour pages existantes. */
@@ -313,15 +313,41 @@ export function getActivePaletteBlocks(): BlockRegistryEntry[] {
   );
 }
 
+/** Blocs archivés — rétrocompatibilité JSON existant, panneau « Blocs archivés ». */
+export function getLegacyPaletteBlocks(): BlockRegistryEntry[] {
+  return BUILDER_BLOCK_REGISTRY.filter(
+    (entry) =>
+      entry.availability === 'legacy' && isBackendSupportedBlockType(entry.type),
+  );
+}
+
+/** Stable + legacy — insertion canvas et persistance API. */
+export function getInsertablePaletteBlocks(): BlockRegistryEntry[] {
+  return BUILDER_BLOCK_REGISTRY.filter(
+    (entry) =>
+      (entry.availability === 'stable' || entry.availability === 'legacy') &&
+      isBackendSupportedBlockType(entry.type),
+  );
+}
+
+export function isInsertableBlockType(type: string): boolean {
+  const entry = getRegistryEntry(type);
+  return Boolean(
+    entry &&
+      (entry.availability === 'stable' || entry.availability === 'legacy') &&
+      isBackendSupportedBlockType(type),
+  );
+}
+
 export function getDisabledPaletteBlocks(): BlockRegistryEntry[] {
   return BUILDER_BLOCK_REGISTRY.filter(
     (entry) =>
       entry.availability === 'disabled' ||
+      entry.availability === 'experimental' ||
       !isBackendSupportedBlockType(entry.type),
   );
 }
 
 export function isDeliverableBlockType(type: string): boolean {
-  const entry = getRegistryEntry(type);
-  return Boolean(entry && entry.availability === 'stable' && isBackendSupportedBlockType(type));
+  return isInsertableBlockType(type);
 }

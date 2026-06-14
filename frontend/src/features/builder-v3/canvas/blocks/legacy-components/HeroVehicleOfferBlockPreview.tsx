@@ -7,9 +7,9 @@ import {
 } from '@/features/builder/blocks/hero-vehicle-offer/parse-hero-vehicle-offer-props';
 import { HeroBlockImage } from '@/features/builder-engine/components/media/HeroBlockImage';
 import { mergeBlockSectionPresentation } from '@/features/builder/section-style';
-import { useBuilderPreviewContext } from '../../context/BuilderPreviewContext';
-import { CanvasEmptyHint } from './CanvasEmptyHint';
-import { CanvasCtaLink } from './CanvasCtaLink';
+import { useBuilderPreviewContext } from '../../../context/BuilderPreviewContext';
+import { CanvasEmptyHint } from '../CanvasEmptyHint';
+import { CanvasCtaLink } from '../CanvasCtaLink';
 
 type HeroVehicleOfferBlockPreviewProps = {
   propsJson: Record<string, unknown>;

@@ -9,11 +9,11 @@ import {
   resolveHeroFormImagePosition,
   resolveHeroFormLayoutVariant,
 } from '@/features/builder-engine/lib/premium-block-design';
-import { useBuilderPreviewContext } from '../../context/BuilderPreviewContext';
-import { submitLeadFormFromDom } from '../../lib/submit-lead-form';
-import { CanvasEmptyHint } from './CanvasEmptyHint';
-import { CanvasLeadFormFields, resolveHeroFormProps } from './CanvasLeadFormFields';
-import { FormSuccessPanel } from './FormSuccessPanel';
+import { useBuilderPreviewContext } from '../../../context/BuilderPreviewContext';
+import { submitLeadFormFromDom } from '../../../lib/submit-lead-form';
+import { CanvasEmptyHint } from '../CanvasEmptyHint';
+import { CanvasLeadFormFields, resolveHeroFormProps } from '../CanvasLeadFormFields';
+import { FormSuccessPanel } from '../FormSuccessPanel';
 
 type HeroFormCampaignBlockPreviewProps = {
   propsJson: Record<string, unknown>;

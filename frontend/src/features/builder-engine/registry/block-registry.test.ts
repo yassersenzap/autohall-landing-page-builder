@@ -1,64 +1,64 @@
 import { describe, expect, it } from 'vitest';
 import { isBackendSupportedBlockType } from './backend-block-types';
 import {
+  ARCHIVED_CATALOG_BLOCK_TYPES,
+  LEGACY_BLOCK_TYPES,
+} from '../foundation/catalog-visibility';
+import {
   getActivePaletteBlocks,
+  getInsertablePaletteBlocks,
+  getLegacyPaletteBlocks,
   getRegistryEntry,
   isDeliverableBlockType,
+  isInsertableBlockType,
 } from './block-registry';
 
-/** Types stables exposés via getActivePaletteBlocks (store.addBlock). */
-const DELIVERABLE_TYPES = [
-  'core_campaign_form_landing',
-  'hero_vehicle_offer',
-  'campaign_lead_hero',
-  'promo_autohall',
-  'vehicle_features',
-  'gallery',
-  'rich_text',
-  'media_only',
-  'spacer_divider',
-  'video_embed',
-  'cta_band',
-  'pricing_trim',
-  'testimonials',
-  'hero_campaign',
-  'hero_form_campaign',
-  'lead_form',
-  'vehicle_offer',
-  'vehicle_range',
-  'benefits',
-  'trust_bar',
-  'faq',
-  'final_cta',
-  'footer_legal',
-  'premium_bento_features',
-  'animated_stats_strip',
-  'premium_testimonials',
-  'vehicle_showcase_split',
-  'sticky_lead_cta',
-  'campaign_timeline_steps',
-];
-
 describe('block-registry deliverable palette', () => {
-  it('active palette exposes only deliverable campaign blocks', () => {
-    const activeTypes = getActivePaletteBlocks().map((b) => b.type).sort();
-    expect(activeTypes).toEqual([...DELIVERABLE_TYPES].sort());
+  it('active palette is empty while catalog is fully archived', () => {
+    expect(getActivePaletteBlocks().map((b) => b.type)).toEqual([]);
   });
 
-  it('deliverable blocks are backend-supported and stable', () => {
-    for (const type of DELIVERABLE_TYPES) {
+  it('legacy palette matches archived catalog taxonomy', () => {
+    const legacyTypes = getLegacyPaletteBlocks().map((b) => b.type).sort();
+    const expected = [...ARCHIVED_CATALOG_BLOCK_TYPES]
+      .filter((type) => isBackendSupportedBlockType(type))
+      .sort();
+    expect(legacyTypes).toEqual(expected);
+  });
+
+  it('insertable palette matches archived catalog', () => {
+    const insertable = getInsertablePaletteBlocks().map((b) => b.type).sort();
+    const expected = [...ARCHIVED_CATALOG_BLOCK_TYPES]
+      .filter((type) => isBackendSupportedBlockType(type))
+      .sort();
+    expect(insertable).toEqual(expected);
+  });
+
+  it('archived blocks are backend-supported with availability legacy', () => {
+    for (const type of ARCHIVED_CATALOG_BLOCK_TYPES) {
+      if (!isBackendSupportedBlockType(type)) continue;
+      expect(isInsertableBlockType(type)).toBe(true);
       expect(isDeliverableBlockType(type)).toBe(true);
       expect(isBackendSupportedBlockType(type)).toBe(true);
-      expect(getRegistryEntry(type)?.availability).toBe('stable');
+      expect(getRegistryEntry(type)?.availability).toBe('legacy');
+      expect(getActivePaletteBlocks().map((b) => b.type)).not.toContain(type);
     }
   });
 
-  it('hides non-campaign blocks from palette', () => {
-    const activeTypes = getActivePaletteBlocks().map((b) => b.type);
-    expect(activeTypes).not.toContain('layout_section');
-    expect(activeTypes).not.toContain('text');
-    expect(activeTypes).not.toContain('image');
-    expect(activeTypes).not.toContain('financing');
-    expect(activeTypes).not.toContain('features');
+  it('legacy hero blocks stay in archived palette', () => {
+    for (const type of LEGACY_BLOCK_TYPES) {
+      expect(getLegacyPaletteBlocks().map((b) => b.type)).toContain(type);
+    }
+  });
+
+  it('hides disabled blocks from all palettes', () => {
+    for (const fn of [getActivePaletteBlocks, getLegacyPaletteBlocks, getInsertablePaletteBlocks]) {
+      const types = fn().map((b) => b.type);
+      expect(types).not.toContain('layout_section');
+      expect(types).not.toContain('text');
+      expect(types).not.toContain('image');
+      expect(types).not.toContain('financing');
+      expect(types).not.toContain('features');
+    }
   });
 });
