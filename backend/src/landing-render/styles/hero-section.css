@@ -1,0 +1,466 @@
+/* Integrated conversion hero — single section architecture */
+
+.lp-core-campaign-landing--integrated {
+  padding-block: 0;
+}
+
+.lp-core-campaign-landing--integrated .lp-hero-section {
+  width: 100%;
+}
+
+.lp-hero-section {
+  position: relative;
+  width: 100%;
+  min-height: clamp(28rem, 72vh, 44rem);
+  color: var(--lp-text, #18181b);
+  isolation: isolate;
+}
+
+.lp-hero-section__shell {
+  position: relative;
+  z-index: 2;
+  width: min(100%, var(--lp-container, 76rem));
+  margin-inline: auto;
+  padding-inline: var(--lp-gutter, 1.25rem);
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  min-height: inherit;
+}
+
+/* ── Background layer ── */
+.lp-hero-section__background {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--lp-surface-muted, #f4f4f5);
+}
+
+.lp-hero-section__background--fullscreen {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  min-height: inherit;
+}
+
+.lp-hero-section__background--column {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--lp-radius-lg, 1rem);
+}
+
+.lp-hero-section__background-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  transform-origin: center center;
+  display: block;
+}
+
+.lp-hero-section__background-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ── Marketing layer ── */
+.lp-hero-section__marketing-zone {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.lp-hero-section__marketing-zone--on-visual {
+  position: relative;
+  z-index: 2;
+}
+
+.lp-hero-section__marketing {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.5rem, 1.5vw, 0.85rem);
+  max-width: 36rem;
+}
+
+.lp-hero-section__marketing--on-visual {
+  color: #fff;
+}
+
+.lp-hero-section__marketing--on-visual .lp-hero-section__headline,
+.lp-hero-section__marketing--on-visual .lp-hero-section__supporting,
+.lp-hero-section__marketing--on-visual .lp-hero-section__model,
+.lp-hero-section__marketing--on-visual .lp-hero-section__brand,
+.lp-hero-section__marketing--on-visual .lp-hero-section__price-value,
+.lp-hero-section__marketing--on-visual .lp-hero-section__price-label {
+  color: #fff;
+}
+
+.lp-hero-section__marketing--overlay {
+  padding: clamp(1rem, 3vw, 1.75rem);
+}
+
+.lp-hero-section__brand {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+.lp-hero-section__badge {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--lp-primary, #b91c1c);
+  color: #fff;
+}
+
+.lp-hero-section__headline {
+  margin: 0;
+  font-size: clamp(1.85rem, 4.5vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.lp-hero-section__model {
+  margin: 0;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-weight: 600;
+  opacity: 0.88;
+}
+
+.lp-hero-section__supporting {
+  margin: 0;
+  font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+  line-height: 1.55;
+  opacity: 0.82;
+  max-width: 34ch;
+}
+
+.lp-hero-section__offer {
+  margin: 0;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  font-weight: 700;
+  color: var(--lp-primary, #b91c1c);
+}
+
+.lp-hero-section__marketing--on-visual .lp-hero-section__offer {
+  color: #fff;
+}
+
+.lp-hero-section__pricing {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-top: 0.35rem;
+}
+
+.lp-hero-section__price-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.lp-hero-section__price-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.lp-hero-section__price-value {
+  font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* ── Form layer ── */
+.lp-hero-section__form-zone {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+}
+
+.lp-hero-section__form-zone--align-start {
+  justify-content: flex-start;
+}
+
+.lp-hero-section__form-zone--align-center {
+  justify-content: center;
+}
+
+.lp-hero-section__form-zone--align-end {
+  justify-content: flex-end;
+}
+
+.lp-hero-section__form-zone--floating {
+  align-self: end;
+}
+
+.lp-hero-section__footer {
+  position: relative;
+  z-index: 2;
+  width: min(100%, var(--lp-container, 76rem));
+  margin-inline: auto;
+  padding: 0.75rem var(--lp-gutter, 1.25rem) 1.25rem;
+  font-size: 0.75rem;
+  opacity: 0.55;
+  text-align: center;
+}
+
+.lp-hero-section__footer p {
+  margin: 0;
+}
+
+/* ── Variant: Split Hero ── */
+.lp-hero-section--split_hero .lp-hero-section__shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+.lp-hero-section--split_hero.lp-hero-section--mirrored .lp-hero-section__shell {
+  direction: rtl;
+}
+
+.lp-hero-section--split_hero.lp-hero-section--mirrored .lp-hero-section__shell > * {
+  direction: ltr;
+}
+
+/* ── Variant: Visual Hero ── */
+.lp-hero-section--visual_hero {
+  display: flex;
+  flex-direction: column;
+  min-height: clamp(32rem, 80vh, 48rem);
+}
+
+.lp-hero-section--visual_hero .lp-hero-section__shell {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+}
+
+.lp-hero-section--visual_hero .lp-hero-section__overlay-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 26rem);
+  align-items: end;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  width: 100%;
+  min-height: inherit;
+}
+
+.lp-hero-section--visual_hero.lp-hero-section--mirrored .lp-hero-section__overlay-grid {
+  grid-template-columns: minmax(18rem, 26rem) minmax(0, 1fr);
+}
+
+.lp-hero-section--visual_hero.lp-hero-section--mirrored .lp-hero-section__marketing-zone {
+  order: 2;
+}
+
+.lp-hero-section--visual_hero.lp-hero-section--mirrored .lp-hero-section__form-zone {
+  order: 1;
+}
+
+/* ── Variant: Campaign Hero ── */
+.lp-hero-section--campaign_hero .lp-hero-section__shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  align-items: stretch;
+  gap: clamp(1.25rem, 3vw, 2rem);
+}
+
+.lp-hero-section--campaign_hero .lp-hero-section__visual-zone {
+  position: relative;
+  min-height: clamp(18rem, 42vw, 28rem);
+  border-radius: var(--lp-radius-lg, 1rem);
+  overflow: hidden;
+}
+
+.lp-hero-section--campaign_hero .lp-hero-section__marketing-zone--on-visual {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.72) 0%,
+    rgba(0, 0, 0, 0.2) 55%,
+    transparent 100%
+  );
+}
+
+.lp-hero-section--campaign_hero.lp-hero-section--mirrored .lp-hero-section__shell {
+  direction: rtl;
+}
+
+.lp-hero-section--campaign_hero.lp-hero-section--mirrored .lp-hero-section__shell > * {
+  direction: ltr;
+}
+
+/* ── Premium form card ── */
+.lp-hero-form-card {
+  width: 100%;
+  max-width: 26rem;
+  margin-inline: auto;
+}
+
+.lp-hero-form-card__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: clamp(1.5rem, 3vw, 2rem);
+  border-radius: var(--lp-radius-lg, 1rem);
+  border: 1px solid color-mix(in srgb, var(--lp-text, #18181b) 8%, transparent);
+  background: color-mix(in srgb, #fff 94%, transparent);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 16px 48px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.lp-hero-section--visual_hero .lp-hero-form-card__inner {
+  background: color-mix(in srgb, #fff 97%, transparent);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    0 24px 64px rgba(0, 0, 0, 0.14);
+}
+
+.lp-hero-form-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.lp-hero-form-card__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lp-hero-form-card__steps-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.2rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+
+.lp-hero-form-card__step-index {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--lp-text, #18181b);
+}
+
+.lp-hero-form-card__step-sep,
+.lp-hero-form-card__step-total {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--lp-text-muted, #71717a);
+}
+
+.lp-hero-form-card__progress-track {
+  width: 100%;
+  height: 3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--lp-text, #18181b) 10%, transparent);
+  overflow: hidden;
+}
+
+.lp-hero-form-card__progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--lp-primary, #b91c1c);
+  transition: width 0.3s ease;
+}
+
+.lp-hero-form-card__title {
+  margin: 0;
+  font-size: clamp(1.2rem, 2.2vw, 1.45rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.lp-hero-form-card__subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--lp-text-muted, #71717a);
+}
+
+.lp-hero-form-card__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lp-hero-form-card__form .lp-lead-form__grid {
+  gap: 0.85rem;
+}
+
+.lp-hero-form-card__form .lp-lead-form__label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.lp-hero-form-card__actions {
+  display: flex;
+  gap: 0.75rem;
+  padding-top: 0.35rem;
+}
+
+.lp-hero-form-card__btn-primary {
+  flex: 1;
+  min-height: 2.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.lp-hero-form-card__btn-secondary {
+  flex: 0 0 auto;
+  min-height: 2.75rem;
+}
+
+.lp-hero-form-card__btn-submit {
+  width: 100%;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .lp-hero-section--split_hero .lp-hero-section__shell,
+  .lp-hero-section--campaign_hero .lp-hero-section__shell,
+  .lp-hero-section--visual_hero .lp-hero-section__overlay-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lp-hero-section--split_hero,
+  .lp-hero-section--campaign_hero {
+    min-height: auto;
+  }
+
+  .lp-hero-section--visual_hero {
+    min-height: clamp(28rem, 90vh, 40rem);
+  }
+
+  .lp-hero-section--visual_hero .lp-hero-section__overlay-grid {
+    align-items: end;
+  }
+
+  .lp-hero-form-card {
+    max-width: none;
+  }
+}

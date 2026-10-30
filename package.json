@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "shadcn": "^4.11.0"
+  },
+  "dependencies": {
+    "framer-motion": "^12.42.2",
+    "lucide-react": "^1.23.0"
+  }
+}

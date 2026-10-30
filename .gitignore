@@ -1,0 +1,135 @@
+# ============================================================
+# AutoHall LP Builder — racine du dépôt
+# ============================================================
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment and secrets (never commit real environment files)
+.env
+.env.local
+*.env
+.env.*.local
+.env.*
+!.env.example
+!**/.env.example
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+backend/.env
+backend/.env.local
+backend/.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Build outputs
+dist/
+**/dist/
+build/
+**/build/
+out/
+**/out/
+.next/
+.nuxt/
+.vite/
+vite.config.ts.timestamp-*
+
+# NestJS / TypeScript
+*.tsbuildinfo
+
+# Testing / coverage
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+blob-report/
+
+# Prisma
+*.db
+*.db-journal
+backend/generated/
+**/generated/prisma/
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.stackdump
+
+# IDE / editors
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+*.swp
+*.swo
+*~
+
+# Cursor / local tooling
+.cursor/
+.ai-local/
+
+# Local storage, exports, uploads, assets temporaires
+storage/
+uploads/
+exports/
+output/
+**/output/
+temp/
+**/temp/
+*.zip
+page-landing-page.zip
+*.tar
+*.tar.gz
+
+# Builder — artefacts locaux (uploads blob, brouillons exportés)
+.autohall-builder/
+.builder-cache/
+**/public/uploads/
+**/tmp/assets/
+
+# Package manager caches
+.npm/
+.yarn/
+.pnp.*
+.turbo/
+.cache/
+.parcel-cache/
+
+# Temporary files
+tmp/
+**/tmp/
+*.tmp
+*.temp
+.playwright-cli/
+.qa-screenshots/
+frontend/.qa-screenshots/
+
+# One-off root scripts and generated JavaScript
+/*.mjs
+/*.js
+# Local / AI-private docs (keep docs/architecture, docs/mvp, etc. versionable)
+docs-private/
+docs/ai-handoff/
+
+# Playwright / browser automation artefacts
+playwright/.cache/
+.playwright/
+
+.claude/
+
+# Gemini & Antigravity IDE
+.gemini/
+.gemini*
+.antigravity/
+.antigravity*
+.aider*

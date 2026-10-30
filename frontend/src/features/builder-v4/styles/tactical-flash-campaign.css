@@ -1,0 +1,157 @@
+/*
+ * TacticalFlashCampaign — premium finish (Stripe/Shadcn style).
+ * Inline styles (`fieldStyle()`/`labelStyle()` in TacticalFlashCampaign.tsx)
+ * can't express `:focus`/`:hover`/media queries, so those live here.
+ */
+
+/* Two-column row — flex (not grid) so both columns take natural width,
+   centered as a unit so neither column looks stretched against the other. */
+.tfc-grid-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem; /* gap-8 */
+  max-width: 1200px;
+  min-height: calc(100vh - 80px);
+  padding: 1.5rem; /* p-6 */
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .tfc-grid-container {
+    flex-direction: row;
+    padding: 2.5rem; /* p-10 */
+  }
+  .tfc-marketing-col {
+    flex: 0 0 60% !important;
+    width: 60% !important;
+  }
+  .tfc-form-wrap {
+    flex: 0 0 40% !important;
+    width: 40% !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .tfc-grid-container {
+    gap: 3rem; /* gap-12 */
+  }
+}
+
+.tfc-marketing-col,
+.tfc-form-wrap {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Form card — padding is shared; background/border/shadow are set inline
+   per-instance (light vs dark) in TacticalFlashCampaign.tsx since they
+   depend on the configured formBgColor. */
+.tfc-form-col {
+  padding: 1.5rem !important; /* p-6 */
+}
+
+@media (min-width: 768px) {
+  .tfc-form-col {
+    padding: 2rem !important; /* p-8 */
+  }
+}
+
+.tfc-form-title {
+  font-size: 18px; /* text-lg */
+}
+
+@media (min-width: 768px) {
+  .tfc-form-title {
+    font-size: 20px; /* md:text-xl */
+  }
+}
+
+/* Empty State Styling */
+.tfc-empty-state-card:hover {
+  border-color: var(--tfc-accent, #3b82f6) !important;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.04) !important;
+  background: #ffffff !important;
+}
+
+.tfc-empty-state-card:hover .tfc-empty-state-icon-wrap {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -6px rgba(148, 163, 184, 0.2) !important;
+  border-color: var(--tfc-accent, #3b82f6) !important;
+}
+
+.tfc-empty-state-card:hover .tfc-empty-state-btn {
+  background: var(--tfc-accent-10, rgba(59, 130, 246, 0.1)) !important;
+  border-color: var(--tfc-accent, #3b82f6) !important;
+}
+
+/* Visual Image Hover Zoom */
+.tfc-visual-img:hover {
+  transform: scale(1.02) !important;
+}
+
+/* Depth-of-Field Image Blurry Backdrop Container (Smart TV Ambilight effect) */
+.tfc-visual-backdrop {
+  position: absolute;
+  inset: -20px;
+  filter: blur(40px) opacity(0.35) saturate(1.3);
+  transform: scale(1.2);
+  pointer-events: none;
+  z-index: 0;
+  transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tfc-visual-container:hover .tfc-visual-backdrop {
+  transform: scale(1.25);
+  opacity: 0.45;
+}
+
+/* Inputs/selects — comfortable padding, soft slate surface, blue focus ring */
+.tfc-field-input {
+  transition: all 200ms ease-out !important;
+}
+
+.tfc-field-input::placeholder {
+  color: #64748b;
+}
+
+.tfc-field-input--dark::placeholder {
+  color: #64748b !important;
+}
+
+.tfc-field-input:focus,
+.tfc-field-input--dark:focus {
+  border-color: var(--tfc-accent, #1b7ac8) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08), 0 0 0 5px var(--tfc-accent, #1b7ac8), 0 0 8px var(--tfc-accent, #1b7ac8) !important;
+  outline: none !important;
+}
+
+.tfc-field-input--dark {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+/* CTA — massive, high-contrast action zone */
+.tfc-submit-btn {
+  width: 100% !important;
+  margin-top: 16px;
+  transition: all 300ms ease-out !important;
+}
+
+.tfc-submit-btn:not(:disabled):hover {
+  background: #156cb4 !important;
+  box-shadow: 0 10px 20px -2px rgba(27, 122, 200, 0.3), 0 4px 8px -3px rgba(27, 122, 200, 0.2) !important;
+}
+
+.tfc-submit-btn:not(:disabled):active {
+  transform: scale(0.98) !important;
+}
+
+.tfc-price-card:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06) !important;
+}

@@ -1,0 +1,194 @@
+/* P6 — Canva-style canvas: clean surface, guides on drag only */
+
+.v4-canvas-layer[data-canva-ui='true'] .v4-node-shell {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Selection colours overridden in builder-ux.css (purple Framer-style) */
+
+.v4-canvas-layer[data-canva-ui='true'] .v4-image-node--empty {
+  border: none !important;
+  background: linear-gradient(165deg, #141418 0%, #1a1a20 100%) !important;
+}
+
+.v4-canvas-layer[data-canva-ui='true'] .v4-document-root--autohall-campaign .v4-image-node--empty {
+  border: none !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.v4-canvas-layer[data-canva-ui='true'] .v4-node-shell[data-v4-name='FormZone'],
+.v4-canvas-layer[data-canva-ui='true'] .v4-node-shell[data-v4-name='FormLayer'],
+.v4-canvas-layer[data-canva-ui='true'] .v4-node-shell[data-v4-name='HeroSafeArea'] {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.v4-workspace:not([data-preview='true']) .v4-canvas-layer[data-canva-ui='true'] .v4-node-shell--section[data-v4-name='FormZone'],
+.v4-workspace:not([data-preview='true']) .v4-canvas-layer[data-canva-ui='true'] .v4-node-shell--form[data-v4-name='FormLayer'] {
+  box-shadow: none !important;
+}
+
+.v4-canvas-layer .moveable-line {
+  background: rgba(168, 85, 247, 0.92) !important;
+}
+
+.v4-canvas-empty__eyebrow {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #71717a;
+}
+
+.v4-canvas-starter--cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  background: rgba(59, 130, 246, 0.14);
+  color: #fafafa;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.v4-canvas-starter--cta:hover {
+  background: rgba(59, 130, 246, 0.22);
+}
+
+.v4-inspector-v2__preset-btn--primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-color: rgba(59, 130, 246, 0.45);
+  background: rgba(59, 130, 246, 0.12);
+}
+
+.v4-inspector-panel--v2 {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  border: none;
+}
+
+.v4-inspector-panel--v2 .v4-panel__head {
+  display: none;
+}
+
+.v4-inspector-shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+
+.v4-inspector-shell__head {
+  flex-shrink: 0;
+  padding: 12px 16px 8px;
+  border-bottom: 1px solid var(--v4-border);
+  background: var(--v4-panel);
+}
+
+.v4-inspector-shell__scroll {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 0 12px 16px;
+}
+
+.v4-business-inspector {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.v4-business-inspector__tabs-root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.v4-business-inspector__tabs-sticky {
+  flex-shrink: 0;
+  padding: 0 12px 8px;
+  background: var(--v4-panel);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.v4-business-inspector__scroll {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.v4-business-inspector__tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  margin: 0;
+  padding: 4px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.v4-business-inspector__tab {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 6px 4px;
+}
+
+.v4-business-inspector__panel {
+  padding: 0 0 12px;
+}
+
+.v4-business-inspector .v4-inspector-v2__section-title {
+  display: none;
+}
+
+.v4-business-inspector .v4-inspector-v2__section {
+  border: none;
+  margin: 0;
+}
+
+.v4-business-inspector .v4-inspector-v2__section-body {
+  padding-top: 0;
+}
+
+.v4-inspector-v2__preset-row--radio {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.v4-blocks-accordion {
+  padding: 0 8px 12px;
+}
+
+.v4-blocks-accordion__item {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.v4-blocks-accordion__trigger {
+  padding: 10px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #e4e4e7;
+  text-transform: none;
+}
+
+.v4-blocks-accordion__content {
+  padding: 0 4px 8px;
+}

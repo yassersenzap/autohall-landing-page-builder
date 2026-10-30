@@ -1,0 +1,934 @@
+/*
+ * HeroFormRenderer — Premium Stripe/Shadcn
+ * Objectif: "carte blanche suspendue" + inputs premium + WYSIWYG export.
+ */
+
+:root {
+  --hfr-accent: #e85d04;
+}
+
+/* ── Card (floating white) ───────────────────────────────────────── */
+
+.hfr-card {
+  width: 100%;
+  box-sizing: border-box;
+
+  background: #ffffff !important;
+  border: 1px solid #f4f4f5 !important;
+  border-radius: 16px !important;
+
+  padding: 1.5rem !important;
+  color: #0f172a !important;
+
+  box-shadow: 0 20px 25px -5px rgba(228, 228, 231, 0.5), 0 8px 10px -6px rgba(228, 228, 231, 0.5) !important;
+
+  overflow: visible !important;
+  position: relative;
+  isolation: isolate;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  transition: background-color 200ms ease;
+}
+
+@media (min-width: 768px) {
+  .hfr-card {
+    padding: 2rem !important;
+  }
+}
+
+.hfr-card::before {
+  display: none;
+}
+
+.hfr-progress,
+.hfr-step-label,
+.hfr-step-title,
+.hfr-step-desc,
+.hfr-fields,
+.hfr-actions,
+.hfr-submit-error,
+.hfr-confirmation {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Progress bar ───────────────────────────────────────────────── */
+
+.hfr-progress {
+  height: 3px;
+  background: #f3f4f6;
+  margin-bottom: 0;
+  overflow: hidden;
+  border-radius: 0;
+}
+
+.hfr-progress__fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--hfr-accent, #e85d04) 0%, #fb923c 100%);
+  border-radius: 0 2px 2px 0;
+  transition: width 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Step header / typography ───────────────────────────────────── */
+
+.hfr-step-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  color: #e85d04 !important;
+  margin: 0;
+}
+
+.hfr-step-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  line-height: 1.35;
+
+  color: #18181b !important;
+  letter-spacing: -0.025em;
+}
+
+@media (min-width: 768px) {
+  .hfr-step-title {
+    font-size: 20px;
+  }
+}
+
+.hfr-step-desc {
+  font-size: 14px;
+  color: #334155 !important;
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* ── Fields ────────────────────────────────────────────────────── */
+
+.hfr-fields {
+  /* row + wrap so half-width field pairs (e.g. Civilité + Prénom) sit
+     side by side, while full-width fields each take their own line */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.hfr-field-wrap {
+  width: 100%;
+}
+
+.hfr-field-wrap--half {
+  width: calc(50% - 8px);
+}
+
+.hfr-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.hfr-field__label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #0f172a !important;
+  user-select: none;
+}
+
+.hfr-required {
+  color: var(--hfr-accent, #e85d04) !important;
+  margin-left: 2px;
+}
+
+/* ── Input theme — comfortable padding, soft fill, blue focus ring ── */
+
+.hfr-field__input {
+  height: auto;
+  padding: 10px 12px;
+
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+
+  font-size: 14px;
+  color: #18181b !important;
+
+  background: rgba(250, 250, 250, 0.5) !important;
+
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+
+  transition: all 150ms ease;
+}
+
+.hfr-field__textarea {
+  height: auto !important;
+  min-height: 80px;
+  padding: 10px 12px !important;
+}
+
+.hfr-field__input::placeholder {
+  color: #a1a1aa;
+  font-weight: 400;
+}
+
+.hfr-field__input:focus {
+  border-color: #3b82f6 !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2) !important;
+  outline: none;
+}
+
+/* Select — same padded card-input treatment, keeps its chevron */
+.hfr-field__select {
+  appearance: none;
+
+  background-color: rgba(250, 250, 250, 0.5) !important;
+  color: #18181b !important;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%236b7280' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+
+  padding-right: 32px;
+  cursor: pointer;
+  border: 1px solid #e4e4e7 !important;
+  border-radius: 8px !important;
+
+  transition: all 150ms ease;
+}
+
+.hfr-field__select:focus {
+  border-color: #3b82f6 !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2) !important;
+  outline: none;
+}
+
+/* ── Dark form card (cardBackground is a dark color, e.g. Auto Hall SAV) ──
+   Applied via the .hfr-card--dark companion class (see HeroFormRenderer.tsx
+   / CampaignMultiStepFormView) — descendant selectors cascade to every
+   nested field without needing to thread a `dark` prop through each one. */
+.hfr-card--dark {
+  color: #ffffff;
+}
+
+.hfr-card--dark .hfr-step-label {
+  color: inherit;
+}
+
+.hfr-card--dark .hfr-step-title,
+.hfr-card--dark .hfr-step-desc {
+  color: #ffffff !important;
+}
+
+.hfr-card--dark .hfr-step-desc {
+  color: #a1a1aa !important;
+}
+
+.hfr-card--dark .hfr-field__label {
+  color: #d4d4d8 !important;
+}
+
+.hfr-card--dark .hfr-field__input,
+.hfr-card--dark .hfr-field__select {
+  padding: 8px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 0 !important;
+  color: #ffffff !important;
+  font-size: 12px !important;
+  transition: all 150ms ease !important;
+}
+
+.hfr-card--dark .hfr-field__input::placeholder {
+  color: #a1a1aa;
+}
+
+.hfr-card--dark .hfr-field__input:focus,
+.hfr-card--dark .hfr-field__select:focus {
+  border-bottom-color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  box-shadow: none !important;
+  outline: none;
+}
+
+.hfr-card--dark .hfr-city-combo__icon {
+  color: #a1a1aa;
+}
+
+.hfr-card--dark .hfr-btn--back {
+  color: #d4d4d8;
+}
+
+/* Submit button is hardcoded navy elsewhere — on a navy card it would be
+   invisible, so swap to the light accent for contrast. */
+.hfr-card--dark .hfr-btn--next {
+  background: var(--hfr-accent, #b1dbd8) !important;
+  color: #00364b !important;
+}
+
+.hfr-card--dark .hfr-btn--next:hover:not(:disabled) {
+  background: #99cfca !important;
+}
+
+/* ── City combobox ────────────────────────────────────────────── */
+
+.hfr-city-combo {
+  position: relative;
+}
+
+.hfr-city-combo__input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.hfr-city-combo__icon {
+  position: absolute;
+  left: 14px;
+  color: #9ca3af;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hfr-city-combo__input {
+  padding-left: 40px;
+}
+
+.hfr-city-combo__list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 100;
+  list-style: none;
+  padding: 6px;
+  margin: 0;
+  scrollbar-width: thin;
+  scrollbar-color: #e5e7eb transparent;
+}
+
+.hfr-city-combo__option {
+  padding: 10px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 8px;
+  color: #374151;
+  transition: background 80ms;
+}
+
+.hfr-city-combo__option:hover {
+  background: #f9fafb;
+}
+
+.hfr-city-combo__option--selected {
+  background: rgba(232, 93, 4, 0.08);
+  color: var(--hfr-accent, #e85d04);
+  font-weight: 600;
+}
+
+/* ── Consent ──────────────────────────────────────────────────── */
+
+.hfr-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.55;
+}
+
+.hfr-consent__check {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  accent-color: var(--hfr-accent, #e85d04);
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.hfr-consent__text {
+  flex: 1;
+}
+
+/* ── Validation errors ────────────────────────────────────────── */
+
+.hfr-error {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #ef4444;
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+.hfr-field__input--error {
+  border-color: #fca5a5;
+  background: #fff7f7;
+}
+
+.hfr-field__input--error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+
+.hfr-submit-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #ef4444;
+  text-align: center;
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  background: #fff7f7;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+/* ── Actions (CTA micro-interactions) ───────────────────────────── */
+
+.hfr-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.hfr-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: auto;
+  padding: 12px 24px;
+  border-radius: 2px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 150ms ease;
+  font-family: inherit;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+/* Primary CTA — Submit / Next */
+.hfr-btn--next {
+  background: #00364b !important;
+  color: #ffffff !important;
+  flex: 0 0 auto;
+  float: right;
+  margin-top: 20px;
+
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.hfr-btn--next:hover:not(:disabled) {
+  background: #002635 !important;
+  transform: none;
+  box-shadow: none !important;
+}
+
+.hfr-btn--next:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.hfr-btn--next:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Loading state */
+.hfr-btn--loading {
+  position: relative;
+  color: transparent;
+}
+
+.hfr-btn--loading::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: hfr-spin 0.7s linear infinite;
+}
+
+@keyframes hfr-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Back button — minimal ghost, no border, sits left of the floated submit */
+.hfr-btn--back {
+  background: transparent;
+  color: #52525b;
+  border: none;
+  flex-shrink: 0;
+  padding: 12px 8px;
+  margin-top: 20px;
+}
+
+.hfr-btn--back:hover {
+  color: #27272a;
+}
+
+.hfr-btn--back:active {
+  color: #18181b;
+}
+
+/* ── Confirmation ─────────────────────────────────────────────── */
+
+.hfr-confirmation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  padding: 8px 0 20px;
+}
+
+.hfr-confirmation__icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #059669;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(5, 150, 105, 0.2);
+}
+
+.hfr-confirmation__title {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0;
+  color: #111827;
+  letter-spacing: -0.02em;
+}
+
+.hfr-confirmation__msg {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.6;
+  max-width: 320px;
+}
+
+.hfr-confirmation__recap {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  width: 100%;
+  background: #f9fafb;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin: 4px 0 0;
+  text-align: left;
+  font-size: 13px;
+}
+
+.hfr-confirmation__recap dt {
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.hfr-confirmation__recap dd {
+  color: #111827;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ── Responsive ───────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .hfr-field-wrap--half {
+    width: 100%;
+  }
+
+  .hfr-step-title {
+    font-size: 18px;
+  }
+
+  .hfr-card {
+    border-radius: 16px;
+  }
+
+  .hfr-btn {
+    height: 48px;
+    font-size: 14px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BUILDER-MODE ADDITIONS
+   Classes used exclusively by CampaignMultiStepFormView (canvas)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Card body (padded content area) ─────────────────────────── */
+
+.hfr-card__body {
+  /* padding set via inline style from cardSpacing prop */
+}
+
+/* ── Premium dot stepper ──────────────────────────────────────── */
+
+.hfr-stepper-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 14px 28px 10px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.hfr-stepper__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #d1d5db;
+  background: #ffffff;
+  cursor: pointer;
+  transition:
+    border-color 200ms ease,
+    background 200ms ease,
+    transform 150ms ease,
+    box-shadow 200ms ease;
+  flex-shrink: 0;
+  padding: 0;
+  outline: none;
+}
+
+.hfr-stepper__dot:hover {
+  border-color: var(--hfr-accent, #e85d04);
+  transform: scale(1.25);
+}
+
+.hfr-stepper__dot:focus-visible {
+  box-shadow: 0 0 0 3px rgba(232, 93, 4, 0.25);
+}
+
+.hfr-stepper__dot--active {
+  width: 12px;
+  height: 12px;
+  background: var(--hfr-accent, #e85d04);
+  border-color: var(--hfr-accent, #e85d04);
+  box-shadow: 0 0 0 3px rgba(232, 93, 4, 0.18);
+  cursor: default;
+  transform: none;
+}
+
+.hfr-stepper__dot--done {
+  background: var(--hfr-accent, #e85d04);
+  border-color: var(--hfr-accent, #e85d04);
+  opacity: 0.55;
+}
+
+.hfr-stepper__line {
+  flex: 1;
+  height: 2px;
+  background: #e5e7eb;
+  min-width: 16px;
+  max-width: 56px;
+  transition: background 350ms ease, opacity 350ms ease;
+  border-radius: 1px;
+}
+
+.hfr-stepper__line--done {
+  background: var(--hfr-accent, #e85d04);
+  opacity: 0.55;
+}
+
+/* ── Field wrap — builder mode ────────────────────────────────── */
+
+.hfr-field-wrap {
+  position: relative;
+}
+
+.hfr-field-wrap--selected > .hfr-field .hfr-field__input,
+.hfr-field-wrap--selected > .hfr-field .hfr-field__select {
+  border-color: var(--hfr-accent, #e85d04);
+  box-shadow: 0 0 0 3px rgba(232, 93, 4, 0.12);
+}
+
+.hfr-field-wrap--selected > .hfr-field .hfr-field__label {
+  color: var(--hfr-accent, #e85d04);
+}
+
+/* ── Static field mockup (canvas builder display) ─────────────── */
+
+.hfr-field__input--mock {
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  user-select: none;
+  font-size: 14px;
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+.hfr-field__input--mock-textarea {
+  align-items: flex-start;
+  padding-top: 12px !important;
+  height: 84px !important;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.hfr-field__input--mock-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%236b7280' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-color: rgba(250, 250, 250, 0.5);
+  padding-right: 32px;
+}
+
+/* ── Consent mockup ───────────────────────────────────────────── */
+
+.hfr-consent__check-mock {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 4px;
+  background: #fafafa;
+  margin-top: 1px;
+}
+
+/* ── Field hover overlay ──────────────────────────────────────── */
+
+.hfr-field-overlay {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(17, 17, 17, 0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 8px;
+  padding: 3px 4px;
+  z-index: 10;
+  pointer-events: all;
+  opacity: 0;
+  transform: scale(0.92) translateY(-2px);
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.hfr-field-wrap:hover .hfr-field-overlay,
+.hfr-field-wrap--selected .hfr-field-overlay {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.hfr-field-overlay__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #e5e7eb;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  padding: 4px 7px;
+  cursor: pointer;
+  transition: background 100ms, color 100ms;
+  white-space: nowrap;
+  font-family: inherit;
+  line-height: 1;
+}
+
+.hfr-field-overlay__btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.hfr-field-overlay__btn--danger {
+  color: #fca5a5;
+}
+
+.hfr-field-overlay__btn--danger:hover {
+  background: rgba(239, 68, 68, 0.22);
+  color: #fca5a5;
+}
+
+.hfr-field-overlay__sep {
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.18);
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+
+/* ── Empty fields placeholder ─────────────────────────────────── */
+
+.hfr-fields-placeholder {
+  width: 100%;
+  padding: 28px 20px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 13px;
+  line-height: 1.5;
+  border: 1.5px dashed #e5e7eb;
+  border-radius: 12px;
+  background: #f9fafb;
+  box-sizing: border-box;
+}
+
+/* ── Empty card state ─────────────────────────────────────────── */
+
+.hfr-card--empty {
+  padding: 40px 32px;
+  text-align: center;
+}
+
+/* ── Inline-editable text hints ───────────────────────────────── */
+
+.v4-inline-text--editable.hfr-step-title,
+.v4-inline-text--editable.hfr-step-desc {
+  cursor: text;
+  border-radius: 6px;
+  transition: background 120ms, outline 120ms;
+  outline: 1.5px solid transparent;
+}
+
+.v4-inline-text--editable.hfr-step-title:hover,
+.v4-inline-text--editable.hfr-step-desc:hover {
+  background: rgba(0, 0, 0, 0.035);
+  outline-color: #d1d5db;
+}
+
+.v4-inline-text--editable.hfr-step-desc[data-v4-editable="true"]:empty::before {
+  content: attr(data-placeholder);
+  color: #d1d5db;
+  font-style: italic;
+}
+
+/* ── Form layer empty state (no steps) ────────────────────────── */
+
+.v4-form-layer--empty .hfr-card--empty {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.v4-form-layer__placeholder-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #374151;
+  margin: 0;
+}
+
+.v4-form-layer__placeholder-hint {
+  font-size: 13px;
+  color: #9ca3af;
+  margin: 0;
+  max-width: 260px;
+  line-height: 1.5;
+}
+
+/* ── Canvas Step Toolbar ── */
+.hfr-canvas-step-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 6px 12px;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+.hfr-canvas-step-toolbar__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.hfr-canvas-step-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hfr-canvas-step-toolbar__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: #374151;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all 100ms;
+}
+
+.hfr-canvas-step-toolbar__btn:hover:not(:disabled) {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.hfr-canvas-step-toolbar__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hfr-canvas-step-toolbar__btn--danger {
+  color: #dc2626;
+  border-color: #fca5a5;
+  background: #fef2f2;
+}
+
+.hfr-canvas-step-toolbar__btn--danger:hover:not(:disabled) {
+  background: #fee2e2;
+  border-color: #f87171;
+}
+
+.hfr-field-overlay__btn--active {
+  background: var(--hfr-accent, #e85d04) !important;
+  color: #ffffff !important;
+}

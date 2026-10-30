@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syncopate:wght@400;700&display=swap');
+@import '@fontsource-variable/inter';
+@import './styles/tailwind.css';
+@import './design-system/tokens/tokens.css';
+@import './design-system/tokens/typography.css';
+@import './design-system/styles/shell.css';
+@import './design-system/styles/surfaces.css';
+@import './styles/autohall-campaign-fonts.css';
+@import './styles/studio-tokens.css';
+@import './styles/studio-typography.css';
+@import './styles/studio-effects.css';
+@import './styles/studio-components.css';
+@import './styles/studio-layout.css';
+@import './styles/studio-pages.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+@layer base {
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--studio-font);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    font-weight: 400;
+    color: var(--studio-text);
+    background-color: var(--studio-bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    color: var(--studio-text);
+  }
+}

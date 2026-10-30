@@ -1,0 +1,35 @@
+export const HERO_UNIVERSAL_DEFAULTS = {
+  title: 'Votre campagne Auto Hall',
+  subtitle: 'Découvrez nos offres et réservez votre essai en quelques clics.',
+  badge: 'Offre exclusive',
+  bodyText: '',
+  campaignVariant: 'default',
+  trustStat1: '30+ marques',
+  trustStat2: '50 concessions',
+  trustStat3: 'Réponse 24h',
+  partnerLogos: 'Ford · BMW · Renault · Chery',
+  layoutMode: 'split',
+  imagePosition: 'right',
+  contentAlignment: 'left',
+  imageAspectRatio: '4/3',
+  gradientEnabled: true,
+  ctaLabel: 'Réserver un essai',
+  ctaHref: '#formulaire',
+  secondaryCtaLabel: 'En savoir plus',
+  secondaryCtaHref: '#',
+  imageAssetId: '',
+  imageUrl: '',
+  imageAlt: '',
+  overlayOpacity: 45,
+  overlayColor: '#0f172a',
+  imageFit: 'cover',
+  imageZoom: 100,
+  focalPointX: 50,
+  focalPointY: 50,
+};
+
+export const HERO_ART_DEFAULTS = {
+  title: 'Bringing Art to everything',
+  imageUrl: 'https://images.unsplash.com/photo-1462917882517-e150004895fa?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+};
+

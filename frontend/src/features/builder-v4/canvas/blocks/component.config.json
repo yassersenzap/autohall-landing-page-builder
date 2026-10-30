@@ -1,0 +1,63 @@
+{
+  "name": "multi-step-test-drive",
+  "displayName": "Demande d'Essai Multi-Étapes",
+  "properties": {
+    "promoImageUrl": {
+      "type": "image",
+      "label": "Image Promotionnelle",
+      "category": "content"
+    },
+    "promoImageAlt": {
+      "type": "text",
+      "label": "Texte Alternatif de l'Image",
+      "category": "content",
+      "default": "Essai sur route"
+    },
+    "imageFit": {
+      "type": "select",
+      "label": "Ajustement de l'Image (Fit)",
+      "category": "design",
+      "options": [
+        { "value": "cover", "label": "Cover (Remplir)" },
+        { "value": "contain", "label": "Contain (Conserver les proportions)" },
+        { "value": "fill", "label": "Fill (Étirer)" }
+      ],
+      "default": "cover"
+    },
+    "imagePosition": {
+      "type": "select",
+      "label": "Alignement de l'Image (Position)",
+      "category": "design",
+      "options": [
+        { "value": "center", "label": "Centre" },
+        { "value": "top", "label": "Haut" },
+        { "value": "bottom", "label": "Bas" }
+      ],
+      "default": "center"
+    },
+    "imageFilter": {
+      "type": "select",
+      "label": "Effet Visuel (Filtre)",
+      "category": "design",
+      "options": [
+        { "value": "none", "label": "Aucun" },
+        { "value": "blur", "label": "Flou (Blur)" },
+        { "value": "grayscale", "label": "Niveaux de gris (Grayscale)" }
+      ],
+      "default": "none"
+    },
+    "imageAspect": {
+      "type": "select",
+      "label": "Format de l'Image (Aspect Ratio)",
+      "category": "design",
+      "options": [
+        { "value": "16/9", "label": "16:9 (Cinéma)" },
+        { "value": "4/3", "label": "4:3 (Classique)" },
+        { "value": "1/1", "label": "1:1 (Carré)" },
+        { "value": "21/9", "label": "21:9 (Large)" },
+        { "value": "auto", "label": "Automatique" }
+      ],
+      "default": "16/9"
+    }
+  }
+}

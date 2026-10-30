@@ -1,0 +1,293 @@
+/**
+ * lp-blocks.css — shared styles for all landing page blocks.
+ * Handles: typography scale, responsive grids, section resets.
+ * Applied in V4Workspace (canvas), BuilderV4PreviewPage (preview),
+ * and embedded via <style> in generate-export-html (export).
+ */
+
+/* ── Section reset ──────────────────────────────────────────────────────────── */
+
+.lp-hero-block,
+.lp-hero-form-block,
+section[class^="pb-"],
+section[class*=" pb-"] {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Hero Form Block — responsive variants ──────────────────────────────────── */
+/*
+ * Two-layer approach:
+ *   1. @media queries — apply on real viewport (preview iframe, live pages, ZIP export)
+ *   2. .v4-workspace__frame--mobile/tablet + descendant — apply in canvas builder mode
+ *      (canvas is a fixed-width div, not an iframe; media queries see full desktop viewport)
+ */
+
+/* ---- Layer 1: media queries (preview / export / live) ---- */
+
+@media (max-width: 860px) {
+  .lp-hero-form-container--split {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+  .lp-hero-form-container--reversed {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .lp-hero-form-container--reversed .lp-hero-form-container__form { order: 2; }
+  .lp-hero-form-container--floating {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+  .lp-hero-form-container--floating .lp-hero-form-container__form {
+    width: 100% !important;
+    max-width: 460px !important;
+    margin: 0 auto;
+  }
+  .lp-hero-form-container--overlay {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 32px !important;
+    min-height: 0 !important;
+    padding: 48px 5% !important;
+  }
+  .lp-hero-form-container__form--overlay {
+    position: static !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 460px !important;
+    margin: 0 auto !important;
+  }
+  .lp-hero-form-block > div[style] {
+    padding-top: 48px !important;
+    padding-bottom: 48px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .lp-hero-form-block .hfr-card {
+    max-width: 100% !important;
+    border-radius: 16px !important;
+    padding: 20px !important;
+  }
+  .lp-hero-form-block > div[style] {
+    padding-top: 32px !important;
+    padding-bottom: 32px !important;
+    padding-left: 4% !important;
+    padding-right: 4% !important;
+  }
+  /* Centered/fullbg: form fills width */
+  .lp-hero-form-container--centered > div:last-child {
+    max-width: 100% !important;
+  }
+  /* Benefits list: tighter on mobile */
+  .lp-hero-form-block ul[style] {
+    gap: 8px !important;
+  }
+}
+
+/* ── Responsive grid breakpoints ────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  /* Features grid → 1 column */
+  [style*="grid-template-columns: repeat(3"],
+  [style*="grid-template-columns: repeat(4"] {
+    grid-template-columns: 1fr !important;
+  }
+  /* 2-col grids → stack */
+  [style*="grid-template-columns: repeat(2"] {
+    grid-template-columns: 1fr !important;
+  }
+  /* Stats grid → 2 columns */
+  [style*="grid-template-columns: repeat(4, 1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  /* Footer grid → stack */
+  [style*="grid-template-columns: 240px"] {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+  /* Section padding reduction */
+  section[style*="padding: 72px"],
+  section[style*="padding: 80px"] {
+    padding-top: 48px !important;
+    padding-bottom: 48px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Gallery 3-col → 2 col */
+  [style*="grid-template-columns: repeat(3, 1fr)"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* ---- Layer 2: canvas builder device simulation (mobile + tablet frames) ---- */
+
+.v4-workspace__frame--mobile .lp-hero-form-container--split,
+.v4-workspace__frame--tablet .lp-hero-form-container--split {
+  grid-template-columns: 1fr !important;
+  gap: 32px !important;
+}
+.v4-workspace__frame--mobile .lp-hero-form-container--reversed,
+.v4-workspace__frame--tablet .lp-hero-form-container--reversed {
+  display: flex !important;
+  flex-direction: column !important;
+}
+.v4-workspace__frame--mobile .lp-hero-form-container--reversed .lp-hero-form-container__form,
+.v4-workspace__frame--tablet .lp-hero-form-container--reversed .lp-hero-form-container__form {
+  order: 2;
+}
+.v4-workspace__frame--mobile .lp-hero-form-container--floating,
+.v4-workspace__frame--tablet .lp-hero-form-container--floating {
+  grid-template-columns: 1fr !important;
+  gap: 32px !important;
+}
+.v4-workspace__frame--mobile .lp-hero-form-container--floating .lp-hero-form-container__form,
+.v4-workspace__frame--tablet .lp-hero-form-container--floating .lp-hero-form-container__form {
+  width: 100% !important;
+  max-width: 460px !important;
+  margin: 0 auto;
+}
+.v4-workspace__frame--mobile .lp-hero-form-container--overlay,
+.v4-workspace__frame--tablet .lp-hero-form-container--overlay {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 32px !important;
+  min-height: 0 !important;
+  padding: 48px 5% !important;
+}
+.v4-workspace__frame--mobile .lp-hero-form-container__form--overlay,
+.v4-workspace__frame--tablet .lp-hero-form-container__form--overlay {
+  position: static !important;
+  transform: none !important;
+  width: 100% !important;
+  max-width: 460px !important;
+  margin: 0 auto !important;
+}
+.v4-workspace__frame--mobile .lp-hero-form-block > div[style],
+.v4-workspace__frame--tablet .lp-hero-form-block > div[style] {
+  padding-top: 48px !important;
+  padding-bottom: 48px !important;
+}
+/* Mobile only — extra tight */
+.v4-workspace__frame--mobile .lp-hero-form-block .hfr-card {
+  border-radius: 16px !important;
+}
+.v4-workspace__frame--mobile .hfr-field-wrap--half {
+  width: 100% !important;
+}
+
+/* ── Text block typography ──────────────────────────────────────────────────── */
+
+.lp-text-content {
+  font-family: 'Outfit', Inter, system-ui, sans-serif;
+}
+
+.lp-text-content h1,
+.lp-text-content h2,
+.lp-text-content h3,
+.lp-text-content h4,
+.lp-text-content h5,
+.lp-text-content h6 {
+  font-family: 'Outfit', Inter, system-ui, sans-serif;
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -0.025em;
+  color: #111827;
+  margin: 0 0 16px;
+}
+
+.lp-text-content h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
+.lp-text-content h2 { font-size: clamp(1.6rem, 3.5vw, 2.5rem); }
+.lp-text-content h3 { font-size: clamp(1.25rem, 2.5vw, 1.75rem); }
+.lp-text-content h4 { font-size: 1.25rem; }
+
+.lp-text-content p {
+  margin: 0 0 14px;
+  font-size: 16px;
+  line-height: 1.72;
+  color: #4b5563;
+}
+
+.lp-text-content p:last-child { margin-bottom: 0; }
+
+.lp-text-content ul,
+.lp-text-content ol {
+  padding-left: 1.5em;
+  margin: 0 0 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lp-text-content li {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.lp-text-content blockquote {
+  margin: 0 0 14px;
+  padding: 16px 20px;
+  border-left: 4px solid #e85d04;
+  background: #fff7f0;
+  border-radius: 0 8px 8px 0;
+  font-size: 16px;
+  font-style: italic;
+  color: #374151;
+}
+
+.lp-text-content strong { font-weight: 700; color: #111827; }
+.lp-text-content em    { font-style: italic; }
+.lp-text-content a     { color: #e85d04; text-decoration: underline; }
+
+/* ── ProBlock section base ──────────────────────────────────────────────────── */
+
+.pb-section {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Feature card hover ─────────────────────────────────────────────────────── */
+
+.lp-feature-card:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.06), 0 12px 32px rgba(0,0,0,0.08) !important;
+  transform: translateY(-2px);
+}
+
+/* ── Gallery lightbox placeholder ───────────────────────────────────────────── */
+
+.lp-gallery-img {
+  cursor: pointer;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.lp-gallery-img:hover {
+  transform: scale(1.015);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+/* ── CTA button hover ───────────────────────────────────────────────────────── */
+
+.lp-cta-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18) !important;
+}
+
+/* ── Footer links ───────────────────────────────────────────────────────────── */
+
+footer a:hover {
+  color: #e85d04 !important;
+  opacity: 1 !important;
+}
+
+/* ── Font application to all blocks ────────────────────────────────────────── */
+
+.lp-hero-block *,
+.lp-hero-form-block *,
+section.pb-section * {
+  font-family: 'Outfit', Inter, system-ui, sans-serif;
+}

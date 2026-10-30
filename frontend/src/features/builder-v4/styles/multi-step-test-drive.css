@@ -1,0 +1,215 @@
+/* Scoped mtd- prefix styles for Vercel/Stripe/Linear SaaS Test Drive component */
+
+.test-drive-builder {
+  --primary-color: #0051a3;
+  --secondary-color: #1b7ac8;
+  --accent-color: #4c6b85;
+  --bg-section: #f8fafc;
+  --bg-card: #ffffff;
+  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif !important;
+}
+
+/* Explicit 2-column layout grid (Vertical center alignment) */
+.test-drive-builder .mtd-layout-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 32px !important;
+  max-width: 1200px !important; /* Strict 1200px container width */
+  margin: 0 auto !important;
+  align-items: center !important; /* Perfect vertical center alignment of H1 and Card */
+}
+
+@media (min-width: 768px) {
+  .test-drive-builder .mtd-layout-grid {
+    grid-template-columns: 1.2fr 0.8fr !important; /* 60% left, 40% right */
+    column-gap: 64px !important; /* gap-x-16 */
+  }
+}
+
+.test-drive-builder .mtd-force-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 420px !important;
+  gap: 80px !important;
+  align-items: center !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 40px !important;
+}
+
+@media (max-width: 768px) {
+  .test-drive-builder .mtd-force-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+    padding: 20px !important;
+  }
+}
+
+/* Floating Card structure (Vercel-style soft drop shadow) */
+.test-drive-builder .mtd-form-card {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(226, 232, 240, 0.5) !important; /* border-slate-200/50 */
+  border-radius: 2rem !important; /* rounded-[2rem] (32px) */
+  padding: 2.5rem !important; /* p-10 padding */
+  box-shadow: 0 20px 60px -15px rgba(0, 0, 0, 0.1) !important; /* strong Stripe-style shadow */
+  min-height: 480px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* Form inputs & interaction (Stripe style) */
+.test-drive-builder .mtd-field-label {
+  display: block !important;
+  font-size: 10px !important;
+  text-transform: uppercase !important;
+  font-weight: 700 !important;
+  color: #94a3b8 !important; /* slate-400 */
+  letter-spacing: 0.2em !important;
+  margin-bottom: 8px !important;
+}
+
+.test-drive-builder .tfc-field-input {
+  background-color: #f8fafc !important; /* bg-slate-50 */
+  border: 1px solid #cbd5e1 !important; /* border: 1px solid #cbd5e1 !important */
+  border-radius: 1rem !important; /* rounded-2xl */
+  padding-top: 1.25rem !important; /* p-5 */
+  padding-bottom: 1.25rem !important;
+  padding-left: 1.25rem !important;
+  padding-right: 1.25rem !important;
+  color: #0f172a !important; /* text-slate-900 */
+  font-weight: 500 !important; /* font-medium */
+  font-size: 14px !important;
+  width: 100% !important;
+  height: 64px !important; /* Large 64px height */
+  outline: none !important;
+  transition: all 200ms ease !important;
+  box-sizing: border-box;
+}
+
+.test-drive-builder .tfc-field-input:hover {
+  border-color: #e2e8f0 !important;
+}
+
+.test-drive-builder .tfc-field-input:focus,
+.test-drive-builder .tfc-field-input-focus-within:focus-within {
+  background-color: #ffffff !important; /* focus:bg-white */
+  border-color: #2563eb !important; /* focus:border-blue-600 */
+  box-shadow: none !important;
+}
+
+.test-drive-builder .mtd-btn-primary {
+  background-color: #000000 !important; /* background-color: #000000 !important */
+  color: #ffffff !important;
+  font-weight: 700 !important; /* font-bold */
+  border-radius: 1rem !important; /* rounded-2xl */
+  width: 100% !important;
+  transition: all 200ms ease !important;
+  border: none !important;
+  cursor: pointer !important;
+  font-size: 15px !important;
+  height: 64px !important; /* h-[64px] */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important; /* shadow-lg */
+}
+
+.test-drive-builder .mtd-btn-primary:hover {
+  background-color: #000000 !important; /* hover:bg-black */
+}
+
+.test-drive-builder .mtd-btn-primary:active {
+  transform: scale(0.98) !important; /* active:scale-[0.98] */
+}
+
+/* Secondary back button */
+.test-drive-builder .mtd-btn-secondary {
+  height: 64px !important; /* h-16 */
+  background-color: #f1f5f9 !important; /* bg-slate-100 */
+  color: #475569 !important; /* text-slate-600 */
+  font-weight: 600 !important;
+  border-radius: 1rem !important; /* rounded-2xl */
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 200ms ease !important;
+}
+
+.test-drive-builder .mtd-btn-secondary:hover {
+  background-color: #e2e8f0 !important; /* hover:bg-slate-200 */
+}
+
+.test-drive-builder .mtd-btn-secondary:active {
+  transform: scale(0.98) !important;
+}
+
+/* Sleek thin progress bar track */
+.test-drive-builder .mtd-progress-track {
+  height: 4px !important; /* h-1 */
+  background-color: #f1f5f9 !important; /* bg-slate-100 */
+  border-radius: 9999px !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  margin-bottom: 40px !important; /* mb-10 */
+}
+
+.test-drive-builder .mtd-progress-fill {
+  height: 100% !important;
+  background-color: #0051a3 !important;
+  border-radius: 9999px !important;
+}
+
+/* Simple fade-in CSS transition step animation */
+.test-drive-builder .mtd-fade-in {
+  animation: mtdFadeIn 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes mtdFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Media Box visual styling */
+.test-drive-builder .mtd-image-wrapper {
+  aspect-ratio: 16 / 9 !important;
+  border-radius: 1.5rem !important; /* rounded-3xl */
+  overflow: hidden !important;
+  position: relative !important;
+  width: 100% !important;
+}
+
+.test-drive-builder .mtd-editorial-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  transition: transform 700ms ease-in-out !important;
+}
+
+.test-drive-builder .mtd-editorial-img:hover {
+  transform: scale(1.05) !important;
+}
+
+/* Custom Dropdown select menu */
+.test-drive-builder .mtd-dropdown-menu {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 1rem !important;
+  padding: 4px 0 !important;
+}
+
+.test-drive-builder .mtd-dropdown-option {
+  padding: 12px 16px !important;
+  font-size: 14px !important;
+  color: #0f172a !important;
+  cursor: pointer !important;
+  transition: background-color 150ms ease !important;
+}
+
+.test-drive-builder .mtd-dropdown-option:hover {
+  background-color: #eff6ff !important;
+}

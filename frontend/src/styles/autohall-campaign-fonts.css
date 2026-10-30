@@ -1,0 +1,26 @@
+/** Auto Hall Studio — campaign typography (MASTER.md) */
+
+:root {
+  --ah-font-heading: 'Syncopate', system-ui, sans-serif;
+  --ah-font-mono: 'Space Mono', ui-monospace, monospace;
+}
+
+.font-syncopate {
+  font-family: var(--ah-font-heading);
+}
+
+.font-space-mono {
+  font-family: var(--ah-font-mono);
+}
+
+/** Studio interactive surfaces — Pre-Delivery Checklist */
+.studio-interactive {
+  cursor: pointer;
+  transition: all 250ms ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .studio-interactive {
+    transition: none;
+  }
+}
