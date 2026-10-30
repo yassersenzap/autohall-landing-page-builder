@@ -2,7 +2,8 @@ import { apiRequest, ApiError, type ApiSuccessResponse } from './api';
 import { getAccessToken } from './auth-storage';
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ?? 'http://localhost:3000';
+  (import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL)?.replace(/\/$/, '') ??
+  'http://localhost:3001';
 
 export type PageAsset = {
   id: string;

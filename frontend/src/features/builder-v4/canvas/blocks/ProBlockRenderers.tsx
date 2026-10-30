@@ -1537,7 +1537,8 @@ export function HeroImmersiveFormBlock({ props, editorMode = false }: { props: H
   const [dbBrands, setDbBrands] = useState<any[]>([]);
 
   React.useEffect(() => {
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+    const apiBaseUrl =
+      import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
     fetch(`${apiBaseUrl}/api/brands`)
       .then((res) => res.json())
       .then((data) => {
@@ -2039,7 +2040,8 @@ export function ModelIdentityShowroom({ props }: { props: SpecsShowroomBlockProp
   const [dbBrands, setDbBrands] = useState<any[]>([]);
 
   React.useEffect(() => {
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+    const apiBaseUrl =
+      import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
     fetch(`${apiBaseUrl}/api/brands`)
       .then((res) => res.json())
       .then((data) => {

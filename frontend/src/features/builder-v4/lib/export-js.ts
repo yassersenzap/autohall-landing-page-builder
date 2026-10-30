@@ -17,7 +17,8 @@ export function generateExportJs(ctx: {
   landingPageId?: string;
   pageVersionId?: string;
 }): string {
-  const apiBase   = JSON.stringify((ctx.apiBaseUrl ?? '').replace(/\/$/, ''));
+  const configuredApiBase = (ctx.apiBaseUrl ?? '').replace(/\/$/, '');
+  const apiBase   = JSON.stringify(configuredApiBase || 'http://localhost:3001');
   const campId    = JSON.stringify(ctx.campaignId    ?? '');
   const lpId      = JSON.stringify(ctx.landingPageId ?? '');
   const pvId      = JSON.stringify(ctx.pageVersionId ?? '');
@@ -592,17 +593,10 @@ export function generateExportJs(ctx: {
       if (errEl) errEl.style.display = 'none';
       
       // Determine targets
-      var apiBaseUrl = form.getAttribute('data-api') || API_BASE || '';
+      var apiBaseUrl = form.getAttribute('data-api') || API_BASE || 'http://localhost:3001';
       var targetUrl = apiBaseUrl;
-      if (targetUrl && !targetUrl.includes('/leads')) {
+      if (targetUrl && !targetUrl.includes('/api/public/leads')) {
         targetUrl = targetUrl.replace(/\\/$/, '') + '/api/public/leads';
-      }
-      if (!targetUrl) {
-        targetUrl = '/api/public/leads';
-      }
-      // If relative URL and origin exists, prepend it
-      if (targetUrl.indexOf('/') === 0 && API_BASE) {
-        targetUrl = API_BASE + targetUrl;
       }
       
       function onSuccess() {

@@ -1,7 +1,8 @@
 import { getAccessToken } from './auth-storage';
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ?? 'http://localhost:3000';
+  (import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL)?.replace(/\/$/, '') ??
+  'http://localhost:3001';
 
 function studioExportUrl(pageVersionId: string): string {
   return `${API_BASE_URL}/api/page-versions/${pageVersionId}/studio-v2-export`;

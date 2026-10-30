@@ -254,7 +254,9 @@ export default function LeadsPage() {
       if (appliedFilters.assignedToUserId) params.set('assignedToUserId', appliedFilters.assignedToUserId);
       if (appliedFilters.overdueOnly) params.set('overdueOnly', 'true');
 
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ?? 'http://localhost:3000';
+      const apiBaseUrl =
+        (import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL)?.replace(/\/$/, '') ??
+        'http://localhost:3001';
       const response = await fetch(`${apiBaseUrl}/api/lead-events/export?${params.toString()}`, {
         headers,
       });

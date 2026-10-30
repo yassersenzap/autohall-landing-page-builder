@@ -53,15 +53,19 @@ async function bootstrap(): Promise<void> {
       if (
         !origin ||
         origin === 'null' ||
-        isDevelopment ||
         corsOrigins.includes(origin)
       ) {
         callback(null, true);
         return;
       }
-      callback(null, true);
+      if (isDevelopment) {
+        callback(null, true);
+        return;
+      }
+      callback(new Error(`CORS origin not allowed: ${origin}`), false);
     },
     credentials: true,
+    methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
 

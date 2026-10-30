@@ -612,7 +612,7 @@ export function contactSectionBlockHtml(props: any, ctx: ExportContext): string 
   const accent = props.accentColor ?? '#002C6C';
   const bg = props.bgColor ?? '#ffffff';
   const blockId = props.id || 'contact';
-  const localApiUrl = ctx.apiBaseUrl ?? 'http://localhost:3000';
+  const localApiUrl = ctx.apiBaseUrl ?? 'http://localhost:3001';
 
   const citiesOptions = villesList.map((v: string) => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
 
@@ -811,8 +811,8 @@ export function contactSectionBlockHtml(props: any, ctx: ExportContext): string 
       errorEl.style.display = 'none';
 
       var localApi = (contactSection.querySelector('.contact-form-card-${blockId}').dataset.localApi || A || '').replace(/\\/$/, '');
-      if (!localApi || localApi.indexOf('http') !== 0) localApi = 'http://localhost:3000';
-      var finalLocalUrl = 'http://localhost:3000/api/public/leads';
+      if (!localApi || localApi.indexOf('http') !== 0) localApi = 'http://localhost:3001';
+      var finalLocalUrl = 'http://localhost:3001/api/public/leads';
       try {
         var parsed = new URL(localApi);
         finalLocalUrl = parsed.origin + '/api/public/leads';
@@ -1131,7 +1131,7 @@ function renderFormCardHtml(props: any, ctx: ExportContext, darkTheme: boolean):
   const colorPrimary = props.colorPrimary ?? '#005bc4';
   const autoHallApiUrl = props.autoHallApiUrl ?? '';
   const syncToAutoHallBase = props.syncToAutoHallBase ?? false;
-  const localApiUrl = ctx.apiBaseUrl ?? 'http://localhost:3000';
+  const localApiUrl = ctx.apiBaseUrl ?? 'http://localhost:3001';
   const exportCampaignId    = esc(ctx.campaignId    ?? '');
   const exportLandingPageId = esc(ctx.landingPageId ?? '');
   const exportPageVersionId = esc(ctx.pageVersionId ?? '');
@@ -1595,7 +1595,7 @@ export function heroImmersiveFormBlockHtml(props: any, ctx: ExportContext, _them
             data-pv="${esc(ctx.pageVersionId ?? '')}"
             data-sync-autohall="${props.syncToAutoHallBase ? 'true' : 'false'}"
             data-autohall-api="${esc(props.autoHallApiUrl ?? '')}"
-            data-local-api="${esc(ctx.apiBaseUrl ?? 'http://localhost:3000')}"
+            data-local-api="${esc(ctx.apiBaseUrl ?? 'http://localhost:3001')}"
             style="background:#ffffff;box-shadow:0 25px 50px -12px rgba(0, 0, 0, 0.25);border-radius:16px;padding:24px;border:1px solid #e4e4e7;box-sizing:border-box;color:#18181b;"
           >
             <!-- Hidden inputs for mapping -->
@@ -2028,7 +2028,7 @@ export function heroFormUnifiedBlockHtml(props: any, ctx: ExportContext, _theme:
   const priceAppel = props.priceAppel ?? '';
   const autoHallApiUrl = props.autoHallApiUrl ?? '';
   const syncToAutoHallBase = props.syncToAutoHallBase ?? false;
-  const localApiUrl = ctx.apiBaseUrl ?? 'http://localhost:3000';
+  const localApiUrl = ctx.apiBaseUrl ?? 'http://localhost:3001';
   const exportCampaignId    = esc(ctx.campaignId    ?? '');
   const exportLandingPageId = esc(ctx.landingPageId ?? '');
   const exportPageVersionId = esc(ctx.pageVersionId ?? '');
@@ -2801,7 +2801,7 @@ export function modelsGridBlockHtml(props: any): string {
 export function conversionFormSplitBlockHtml(props: any, ctx: ExportContext): string {
   const accent = esc(props.accentColor ?? '#288fe3');
   const benefits = (props.benefits ?? []).filter((b: any) => b.enabled);
-  const apiBase = esc(ctx.apiBaseUrl ?? 'http://localhost:3000');
+  const apiBase = esc(ctx.apiBaseUrl ?? 'http://localhost:3001');
   const cId = esc(ctx.campaignId ?? '');
   const lpId = esc(ctx.landingPageId ?? '');
 
@@ -3751,7 +3751,7 @@ export function campaignGammeThermiqueBlockHtml(props: any, ctx: ExportContext):
       var base = (form.getAttribute('data-api') || '').replace(/\\/$/, '');
       // Si vide ou relatif depuis file://, on utilise le port dev standard
       if (!base || base.indexOf('http') !== 0) {
-        base = 'http://localhost:3000';
+        base = 'http://localhost:3001';
       }
       return base + '/api/public/leads';
     }
@@ -4314,7 +4314,7 @@ export function tacticalFlashCampaignBlockHtml(props: any, ctx: ExportContext, t
   `;
 }
 
-export function multiStepTestDriveBlockHtml(props: any, _ctx: ExportContext, _theme: any): string {
+export function multiStepTestDriveBlockHtml(props: any, ctx: ExportContext, _theme: any): string {
   const villesList = props.villesList?.length ? props.villesList : [...AUTOHALL_OFFICIAL_CITIES];
   const modelesList = props.modelesList?.length ? props.modelesList : ['Opel Corsa', 'Opel Mokka', 'Ford Focus', 'Ford Kuga', 'Chery Tiggo 7', 'Chery Tiggo 8 Pro'];
   const formTitle = props.formTitle || 'RÉSERVER UN ESSAI';
@@ -4322,6 +4322,7 @@ export function multiStepTestDriveBlockHtml(props: any, _ctx: ExportContext, _th
   const btnSubmitLabel = props.btnSubmitLabel || 'Confirmer mon essai';
   const blockId = props.id || 'main';
   const imageUrl = props.promoImageUrl || props.imageSrc || 'https://www.autohall.ma/assets/campagne/Gamme-Thermique-1200x628.jpg';
+  const apiEndpoint = `${(ctx.apiBaseUrl || 'http://localhost:3001').replace(/\/$/, '')}/api/public/leads`;
 
   return `
 <section id="test-drive-${blockId}" class="w-full bg-[#f4f6f8] py-6 px-4 md:px-8 flex items-center justify-center min-h-fit" style="width:100%; background-color:#f4f6f8; padding:24px 16px; min-height:fit-content; display:flex; align-items:center; justify-content:center; box-sizing:border-box; font-family:'Outfit', system-ui, -apple-system, sans-serif;">
@@ -4622,14 +4623,20 @@ export function multiStepTestDriveBlockHtml(props: any, _ctx: ExportContext, _th
           preferredDate: date,
           requestType: 'TEST_DRIVE'
         };
-        var apiUrl = typeof API_ENDPOINT !== 'undefined' ? API_ENDPOINT : 'http://localhost:3000/api/public/leads';
-        await fetch(apiUrl, {
+        var apiUrl = ${JSON.stringify(apiEndpoint)};
+        var response = await fetch(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
-        }).catch(function(e){ console.warn('Offline lead cache:', e); });
+        });
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status);
+        }
       } catch(err) {
-        console.warn('Submission error:', err);
+        console.error('[AutoHall] Lead submission error:', err);
+        mtdShowErr(bid, 'Une erreur est survenue lors de l’envoi. Veuillez réessayer.');
+        if (btn) btn.disabled = false;
+        return;
       }
 
       document.getElementById('mtd-form-' + bid).style.display = 'none';
@@ -4747,14 +4754,14 @@ function buildFormScript(): string {
     var localApi = (form.dataset.localApi || form.dataset.api || A || '').replace(/\\/$/, '');
     // Si vide ou relatif (contexte file://), on pointe vers le port dev standard
     if (!localApi || localApi.indexOf('http') !== 0) {
-      localApi = 'http://localhost:3000';
+      localApi = 'http://localhost:3001';
     }
     var finalLocalUrl = localApi + '/api/public/leads';
     try {
       var parsed = new URL(localApi);
       finalLocalUrl = parsed.origin + '/api/public/leads';
     } catch (e) {
-      finalLocalUrl = 'http://localhost:3000/api/public/leads';
+      finalLocalUrl = 'http://localhost:3001/api/public/leads';
     }
 
     var syncToAutoHallBase = form.dataset.syncAutohall === 'true';
@@ -5027,10 +5034,10 @@ export function generateExportHtml(document: BuilderDocument, ctx: ExportContext
   const headScripts = document.meta.headScripts?.trim();
   const headScriptsBlock = headScripts ? `\n  ${headScripts}` : '';
   const apiBaseUrl = (
-    import.meta.env.VITE_BACKEND_URL
+    ctx.apiBaseUrl
+    || import.meta.env.VITE_BACKEND_URL
     || import.meta.env.VITE_API_BASE_URL
-    || ctx.apiBaseUrl
-    || 'http://localhost:3000'
+    || 'http://localhost:3001'
   ).replace(/\/$/, '');
   const apiEndpoint = `${apiBaseUrl}/api/public/leads`;
 

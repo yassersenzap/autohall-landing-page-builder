@@ -49,7 +49,9 @@ export default function BuilderV4PreviewPage() {
         setCampaignTitle(previewData.data.campaign.name || previewData.data.landingPage.title);
 
         const token = getAccessToken();
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ?? 'http://localhost:3000';
+        const API_BASE_URL =
+          (import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL)?.replace(/\/$/, '') ??
+          'http://localhost:3001';
         const res = await fetch(`${API_BASE_URL}/api/landing-pages/${lpId}/versions/${versionId}/preview-html`, {
           headers: { Authorization: token ? `Bearer ${token}` : '' }
         });

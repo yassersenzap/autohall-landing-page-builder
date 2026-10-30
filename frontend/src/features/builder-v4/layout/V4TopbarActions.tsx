@@ -33,7 +33,7 @@ export function V4TopbarActions() {
 
   function handleExport() {
     const ctx: ZipExportContext = {
-      apiBaseUrl:    import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ?? 'http://localhost:3000',
+      apiBaseUrl:    (import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL)?.replace(/\/$/, '') ?? 'http://localhost:3001',
       campaignId:    campaignId ?? undefined,
       landingPageId: landingPageId ?? undefined,
       pageVersionId: pageVersionId ?? undefined,

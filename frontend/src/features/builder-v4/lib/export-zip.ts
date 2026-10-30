@@ -280,6 +280,8 @@ function buildIndexHtml(
   const root = doc.nodes[doc.rootId];
   if (!root) return '<!DOCTYPE html><html><body></body></html>';
 
+  const apiBaseUrl = (ctx.apiBaseUrl || 'http://localhost:3001').replace(/\/$/, '');
+  const apiEndpointScript = `<script>var API_ENDPOINT = ${JSON.stringify(`${apiBaseUrl}/api/public/leads`)}; var __EXPORT_API_URL__ = ${JSON.stringify(apiBaseUrl)};</script>`;
   const body = root.children
     .map(id => doc.nodes[id])
     .filter(Boolean)
@@ -342,6 +344,7 @@ function buildIndexHtml(
     '  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" /></noscript>',
     '  <!-- Main stylesheet -->',
     '  <link rel="stylesheet" href="./css/style.css" />',
+    `  ${apiEndpointScript}`,
     '</head>',
     '<body>',
     body,
